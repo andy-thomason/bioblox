@@ -77,7 +77,7 @@ public class PDB_molecule
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = new Vector3(atoms[j*4+0], atoms[j*4+1], atoms[j*4+2]);
             if (j < 10) Debug.Log(pos);
-            float r = atoms[j*4+3];
+            float r = atoms[j*4+3] * 3;
             for (int i = 0; i != vlen; ++i) {
                 vertices[v] = vsphere[i]*r + pos;
                 normals[v] = vsphere[i];
