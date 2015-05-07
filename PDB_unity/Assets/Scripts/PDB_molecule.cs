@@ -23,7 +23,7 @@ public class PDB_molecule
     int [] isphere;
 
     public enum Mode { Ball, Ribbon };
-    public static Mode mode = Mode.Ribbon;
+    public static Mode mode = Mode.Ball;
 
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
 
@@ -106,6 +106,7 @@ public class PDB_molecule
     public static int atom_C = encode(' ', 'C', ' ', ' ');
 
     void build_ribbon_mesh() {
+		/*
         Debug.Log("building mesh");
         mesh = new Mesh();
         mesh.name = "ribbon view";
@@ -144,6 +145,7 @@ public class PDB_molecule
         mesh.uv = uvs;
         mesh.triangles = indices;
         //mesh.RecalculateNormals();
+        */
     }
 
     public void build_mesh() {
