@@ -68,7 +68,7 @@ public class PDB_parser {
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
-                    float r = 0.3f; //radii[line.Substring(77 - 1, 2)];
+                    float r = 1.0f; //radii[line.Substring(77 - 1, 2)];
                     int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
                     if (name == PDB_molecule.atom_N) {
                         residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
