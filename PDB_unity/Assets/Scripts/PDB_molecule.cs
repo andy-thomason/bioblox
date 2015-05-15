@@ -3,15 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System;
 
 public class PDB_molecule
 {
-    public float[] atoms;
+    public Vector4[] atoms;
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
     public Mesh mesh;
+    public Vector4[] bvh_tree;
+    public int[] bvh_terminals;
 
     //const float c = 1.618033988749895f;
     const float e = 0.52573111f;
@@ -37,6 +40,7 @@ public class PDB_molecule
             vsphere[i].y = vproto[i*3+1];
             vsphere[i].z = vproto[i*3+2];
         }
+        int idx = num_verts;
         for (int i = 0; i != num_tris; ++i) {
             int i0 = iproto[i*3+0];
             int i1 = iproto[i*3+1];
@@ -44,6 +48,16 @@ public class PDB_molecule
             Vector3 p0 = get_v(i0);
             Vector3 p1 = get_v(i1);
             Vector3 p2 = get_v(i2);
+
+            /*for (int ty = 0; ty <= 3; ++ty)
+            {
+                Vector3 q0 = Vector3.Lerp(p0, p1, ty / 3.0f);
+                Vector3 q1 = Vector3.Lerp(p0, p2, ty / 3.0f);
+                for (int tx = 0; tx <= ty; ++tx)
+                {
+                    vsphere[idx++] = Vector3.Lerp(q0, q1, tx == 0 ? 0.0f : tx / (float)ty);
+                }
+            }*/
             int i3 = num_verts + i;
             vsphere[i3] = (p0 + p1 + p2).normalized;
             //    i0
@@ -59,13 +73,14 @@ public class PDB_molecule
             isphere[i*9+7] = i0;
             isphere[i*9+8] = i3;
         }
+        Debug.Log(isphere.Length);
     }
 
     void build_ball_mesh() {
         Debug.Log("building mesh");
         mesh = new Mesh();
         mesh.name = "ball view";
-        int num_atoms = atoms.Length/4;
+        int num_atoms = atoms.Length;
         int vlen = vsphere.Length;
         int ilen = isphere.Length;
         Vector3[] vertices = new Vector3[vlen*num_atoms];
@@ -75,9 +90,9 @@ public class PDB_molecule
         int v = 0;
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
-            Vector3 pos = new Vector3(atoms[j*4+0], atoms[j*4+1], atoms[j*4+2]);
-            if (j < 10) Debug.Log(pos);
-            float r = atoms[j*4+3] * 3;
+            Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z);
+            //if (j < 10) Debug.Log(pos);
+            float r = atoms[j].w;
             for (int i = 0; i != vlen; ++i) {
                 vertices[v] = vsphere[i]*r + pos;
                 normals[v] = vsphere[i];
@@ -148,15 +163,109 @@ public class PDB_molecule
         */
     }
 
+    public class Sorter : IComparer  {
+        Vector4 axis;
+        Vector4[] atoms_;
+
+        public Sorter(Vector3 dim, Vector4[] atoms)
+        {
+            atoms_ = atoms;
+            if (dim.x >= dim.y && dim.x >= dim.z)
+            {
+                axis = new Vector4(1, 0, 0, 0);
+            } else if (dim.y >= dim.x && dim.y >= dim.z)
+            {
+                axis = new Vector4(0, 1, 0, 0);
+            } else
+            {
+                axis = new Vector4(0, 0, 1, 0);
+            }
+        }
+
+        public int Compare(object x, object y) {
+            float a = Vector4.Dot(atoms_[(int)x], axis);
+            float b = Vector4.Dot(atoms_[(int)y], axis);
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
+    }
+
+    private void partition(List<Vector4> tree, List<int> terminals, int[] index, int b, int e) {
+        //Debug.Log("partition " + b + ".." + e);
+        if (e-b <= 2) {
+            if (b == e) return;
+            terminals.Add(index[b]);
+            terminals.Add(e-b == 1 ? -1 : index[b+1]);
+            //tree.Add(atoms[b]);
+            //tree.Add(e-b == 1 ? new Vector4(0, 0, 0, 0) : atoms[b+1]);
+            return;
+        }
+
+        Vector3 min = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
+        Vector3 max = min;
+        for (int j = b; j != e; ++j)
+        {
+            float r = atoms[j].w;
+            min = Vector3.Min(min, new Vector3(atoms[j].x-r, atoms[j].y-r, atoms[j].z-r));
+            max = Vector3.Max(max, new Vector3(atoms[j].x+r, atoms[j].y+r, atoms[j].z+r));
+        }
+
+        Vector3 dim = max - min;
+        Vector3 centre = (max + min) * 0.5f;
+
+        Array.Sort(index, b, e-b, new Sorter(dim, atoms));
+
+        int mid = b + (e-b)/2;
+
+        float radius = 0;
+        for (int j = b; j != e; ++j)
+        {
+            Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z) - centre;
+            float r = atoms[j].w + pos.magnitude;
+            radius = Mathf.Max(radius, r);
+        }
+
+        //if (tree.Count < 30) Debug.Log("" + (e - b) + " r=" + radius);
+
+        tree.Add(new Vector4(centre.x, centre.y, centre.z, radius));
+        partition(tree, terminals, index, b, mid);
+        partition(tree, terminals, index, mid, e);
+    }
+
+    public void build_bvh() {
+        int num_atoms = atoms.Length;
+        int[] index = new int[num_atoms];
+        for (int j = 0; j != num_atoms; ++j) {
+            index[j] = j;
+        }
+        List<Vector4> tree = new List<Vector4>();
+        List<int> terminals = new List<int>();
+        partition(tree, terminals, index, 0, num_atoms);
+
+        Debug.Log("atoms=" + num_atoms);
+        Debug.Log("tree=" + tree.Count);
+        Debug.Log("terminals=" + terminals.Count);
+
+        bvh_tree = tree.ToArray();
+        bvh_terminals = terminals.ToArray();
+    }
+
     public void build_mesh() {
         if (vsphere == null) {
             build_sphere();
         }
+        build_bvh();
         if (mode == Mode.Ball) {
             build_ball_mesh();
         } else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
+    }
+
+    static public void collide(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1)
+    {
+        //Debug.Log("t0=" +t0);
+        //Debug.Log("t1=" +t1);
+        t0.TransformPoint();
     }
 };
 

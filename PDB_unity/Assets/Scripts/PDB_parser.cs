@@ -47,7 +47,7 @@ public class PDB_parser {
     };
 
     static public List<PDB_molecule> parse(string asset_name) {
-        List<float> atoms = new List<float>();
+        List<Vector4> atoms = new List<Vector4>();
         //List<int> pairs = new List<int>();
         List<int> names = new List<int>();
         List<int> residues = new List<int>();
@@ -75,10 +75,7 @@ public class PDB_parser {
                         residues.Add(names.Count);
                     }
                     names.Add(name);
-                    atoms.Add(x);
-                    atoms.Add(y);
-                    atoms.Add(z);
-                    atoms.Add(r);
+                    atoms.Add(new Vector4(x, y, z, r));
                     minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
                     maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
                 } else if (kind == "CONECT") {
@@ -104,12 +101,9 @@ public class PDB_parser {
                     cur.pos.y = (maxy + miny) * 0.5f;
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
-                    cur.atoms = new float[atoms.Count];
+                    cur.atoms = new Vector4[atoms.Count];
                     for (int j = 0; j != names.Count; ++j) {
-                        cur.atoms[j*4+0] = atoms[j*4+0] - cur.pos.x;
-                        cur.atoms[j*4+1] = atoms[j*4+1] - cur.pos.y;
-                        cur.atoms[j*4+2] = atoms[j*4+2] - cur.pos.z;
-                        cur.atoms[j*4+3] = atoms[j*4+3];
+                        cur.atoms[j] = new Vector4(atoms[j].x - cur.pos.x, atoms[j].y - cur.pos.y, atoms[j].z - cur.pos.z, atoms[j].w);
                     }
                     minx = 1e37f; miny = 1e37f; minz = 1e37f;
                     maxx = -1e37f; maxy = -1e37f; maxz = -1e37f;
