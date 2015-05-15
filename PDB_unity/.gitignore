@@ -1,1 +1,5 @@
 *.meta
+Library
+obj
+ProjectSettings
+Temp
