@@ -120,6 +120,7 @@ public class PDB_parser {
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
+            m.name = asset_name + "." + (i+1);
             m.build_mesh();
             m.pos -= cofg;
             Debug.Log(m.pos);

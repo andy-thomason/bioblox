@@ -13,7 +13,8 @@ public class PDB_molecule
     public int[] N_atoms;
     public Vector3 pos;
     public Mesh mesh;
-    public Vector4[] bvh_tree;
+    public Vector3[] bvh_centres;
+    public float[] bvh_radii;
     public int[] bvh_terminals;
 
     //const float c = 1.618033988749895f;
@@ -27,6 +28,10 @@ public class PDB_molecule
 
     public enum Mode { Ball, Ribbon };
     public static Mode mode = Mode.Ball;
+
+    public string name;
+
+    //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.txt");
 
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
 
@@ -73,11 +78,11 @@ public class PDB_molecule
             isphere[i*9+7] = i0;
             isphere[i*9+8] = i3;
         }
-        Debug.Log(isphere.Length);
+        //debug.WriteLine(isphere.Length);
     }
 
     void build_ball_mesh() {
-        Debug.Log("building mesh");
+        //debug.WriteLine("building mesh");
         mesh = new Mesh();
         mesh.name = "ball view";
         int num_atoms = atoms.Length;
@@ -91,7 +96,7 @@ public class PDB_molecule
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z);
-            //if (j < 10) Debug.Log(pos);
+            //if (j < 10) debug.WriteLine(pos);
             float r = atoms[j].w;
             for (int i = 0; i != vlen; ++i) {
                 vertices[v] = vsphere[i]*r + pos;
@@ -122,7 +127,7 @@ public class PDB_molecule
 
     void build_ribbon_mesh() {
 		/*
-        Debug.Log("building mesh");
+        debug.WriteLine("building mesh");
         mesh = new Mesh();
         mesh.name = "ribbon view";
 
@@ -189,46 +194,50 @@ public class PDB_molecule
         }
     }
 
-    private void partition(List<Vector4> tree, List<int> terminals, int[] index, int b, int e) {
-        //Debug.Log("partition " + b + ".." + e);
-        if (e-b <= 2) {
-            if (b == e) return;
-            terminals.Add(index[b]);
-            terminals.Add(e-b == 1 ? -1 : index[b+1]);
-            //tree.Add(atoms[b]);
-            //tree.Add(e-b == 1 ? new Vector4(0, 0, 0, 0) : atoms[b+1]);
-            return;
+    private void partition(int[] index, int b, int e, int addr) {
+        if (e == b + 1) {
+            Vector3 centre = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
+            float radius = atoms[b].w;
+            //debug.WriteLine("[" + addr + "] [T] centre=" + centre + " r=" + radius);
+            bvh_terminals[addr] = index[b];
+            bvh_centres[addr] = centre;
+            bvh_radii[addr] = radius;
         }
-
-        Vector3 min = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
-        Vector3 max = min;
-        for (int j = b; j != e; ++j)
+        else
         {
-            float r = atoms[j].w;
-            min = Vector3.Min(min, new Vector3(atoms[j].x-r, atoms[j].y-r, atoms[j].z-r));
-            max = Vector3.Max(max, new Vector3(atoms[j].x+r, atoms[j].y+r, atoms[j].z+r));
+            Vector3 min = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
+            Vector3 max = min;
+            for (int j = b; j != e; ++j)
+            {
+                float r = atoms[j].w;
+                min = Vector3.Min(min, new Vector3(atoms[j].x-r, atoms[j].y-r, atoms[j].z-r));
+                max = Vector3.Max(max, new Vector3(atoms[j].x+r, atoms[j].y+r, atoms[j].z+r));
+            }
+
+            Vector3 dim = max - min;
+            Vector3 centre = (max + min) * 0.5f;
+
+            Array.Sort(index, b, e-b, new Sorter(dim, atoms));
+
+            int mid = b + (e-b)/2;
+
+            float radius = 0;
+            for (int j = b; j != e; ++j)
+            {
+                Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z) - centre;
+                float r = atoms[j].w + pos.magnitude;
+                radius = Mathf.Max(radius, r);
+            }
+
+            //if (tree.Count < 30) debug.WriteLine("" + (e - b) + " r=" + radius);
+
+            //debug.WriteLine("[" + addr + "] [N] centre=" + centre + " r=" + radius);
+            bvh_centres[addr] = centre;
+            bvh_radii[addr] = radius;
+            bvh_terminals[addr] = -1;
+            partition(index, b, mid, addr * 2 + 1);
+            partition(index, mid, e, addr * 2 + 2);
         }
-
-        Vector3 dim = max - min;
-        Vector3 centre = (max + min) * 0.5f;
-
-        Array.Sort(index, b, e-b, new Sorter(dim, atoms));
-
-        int mid = b + (e-b)/2;
-
-        float radius = 0;
-        for (int j = b; j != e; ++j)
-        {
-            Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z) - centre;
-            float r = atoms[j].w + pos.magnitude;
-            radius = Mathf.Max(radius, r);
-        }
-
-        //if (tree.Count < 30) Debug.Log("" + (e - b) + " r=" + radius);
-
-        tree.Add(new Vector4(centre.x, centre.y, centre.z, radius));
-        partition(tree, terminals, index, b, mid);
-        partition(tree, terminals, index, mid, e);
     }
 
     public void build_bvh() {
@@ -237,16 +246,18 @@ public class PDB_molecule
         for (int j = 0; j != num_atoms; ++j) {
             index[j] = j;
         }
-        List<Vector4> tree = new List<Vector4>();
-        List<int> terminals = new List<int>();
-        partition(tree, terminals, index, 0, num_atoms);
 
-        Debug.Log("atoms=" + num_atoms);
-        Debug.Log("tree=" + tree.Count);
-        Debug.Log("terminals=" + terminals.Count);
+        int num_bvh = 1;
+        while (num_bvh < num_atoms*2) num_bvh *= 2;
 
-        bvh_tree = tree.ToArray();
-        bvh_terminals = terminals.ToArray();
+        //debug.WriteLine("building bvh for " + name + "with " + num_atoms + " atoms and " + num_bvh + " bvhs");
+
+        bvh_centres = new Vector3[num_bvh];
+        bvh_radii = new float[num_bvh];
+        bvh_terminals = new int[num_bvh];
+
+        partition(index, 0, num_atoms, 0);
+        //debug.Flush();
     }
 
     public void build_mesh() {
@@ -261,11 +272,101 @@ public class PDB_molecule
         }
     }
 
+    class BvhCollider
+    {
+        PDB_molecule mol0;
+        Transform t0;
+        PDB_molecule mol1;
+        Transform t1;
+        int work_done = 0;
+
+        //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\BvhCollider.txt");
+
+        public struct Result {
+            public int i0;
+            public int i1;
+            public Result(int i0, int i1) { this.i0 = i0; this.i1 = i1; }
+        };
+
+        public List<Result> results;
+
+        public void collide_recursive(int bvh0, int bvh1)
+        {
+            if (work_done++ == 100000) return;
+
+            //if (bvh0 >= mol0.bvh_terminals.Length) debug.WriteLine("BOOM!");
+            //if (bvh1 >= mol1.bvh_terminals.Length) debug.WriteLine("BOOM!");
+            int bt0 = mol0.bvh_terminals[bvh0];
+            int bt1 = mol1.bvh_terminals[bvh1];
+
+            //debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] / [" + bt0 + ", " + bt1 + "]");
+            //debug.Flush();
+            Vector3 c0 = t0.TransformPoint(mol0.bvh_centres[bvh0]);
+            Vector3 c1 = t1.TransformPoint(mol1.bvh_centres[bvh1]);
+            float r0 = mol0.bvh_radii[bvh0];
+            float r1 = mol1.bvh_radii[bvh1];
+
+            /*GameObject lhs = GameObject.Find("lhs" + bvh0);
+            if (lhs) {
+                lhs.transform.localPosition = c0;
+                lhs.transform.localScale = new Vector3(r0*2, r0*2, r0*2);
+            }
+
+            GameObject rhs = GameObject.Find("rhs" + bvh1);
+            if (rhs) {
+                rhs.transform.localPosition = c1;
+                rhs.transform.localScale = new Vector3(r1*2, r1*2, r1*2);
+            }*/
+
+            //debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] c0=" + c0 + " c1=" + c1 + " d0=" + (c0 - c1).sqrMagnitude + " d1=" + (r0 + r1)*(r0 + r1));
+            //debug.Flush();
+
+            if ((c0 - c1).sqrMagnitude < (r0 + r1)*(r0 + r1) && r0 != 0 && r1 != 0)
+            {
+                if (bt0 == -1) {
+                    if (bt1 == -1) {
+                        collide_recursive(bvh0*2+1, bvh1*2+1);
+                        collide_recursive(bvh0*2+1, bvh1*2+2);
+                        collide_recursive(bvh0*2+2, bvh1*2+1);
+                        collide_recursive(bvh0*2+2, bvh1*2+2);
+                    }
+                    else
+                    {
+                        collide_recursive(bvh0*2+1, bvh1);
+                        collide_recursive(bvh0*2+2, bvh1);
+                    }
+                }
+                else
+                {
+                    if (bt1 == -1) {
+                        collide_recursive(bvh0, bvh1*2+1);
+                        collide_recursive(bvh0, bvh1*2+2);
+                    }
+                    else
+                    {
+                        results.Add(new Result(bt0, bt1));
+                    }
+                }
+            }
+        }
+
+        public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1)
+        {
+            //debug.WriteLine("colliding " + mol0.name + "/" + mol0.bvh_centres.Length + " with " + mol1.name + "/" + mol1.bvh_centres.Length);
+            this.mol0 = mol0;
+            this.t0 = t0;
+            this.mol1 = mol1;
+            this.t1 = t1;
+            results = new List<Result>();
+            collide_recursive(0, 0);
+            Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atoms.Length + 1) * mol1.atoms.Length / 2));
+        }
+    };
+
+
     static public void collide(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1)
     {
-        //Debug.Log("t0=" +t0);
-        //Debug.Log("t1=" +t1);
-        t0.TransformPoint();
+        BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
     }
 };
 
