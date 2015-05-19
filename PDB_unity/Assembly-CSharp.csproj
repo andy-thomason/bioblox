@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\PDB_parser.cs" />
      <None Include="Assets\Shaders\PDB.shader" />
      <None Include="Assets\Resources\pdb2ptc.txt" />
+     <None Include="Assets\Resources\script.txt" />
      <None Include="Assets\Resources\pdb1t6b.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
