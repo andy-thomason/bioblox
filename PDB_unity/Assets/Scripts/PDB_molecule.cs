@@ -7,7 +7,8 @@ using System;
 
 public class PDB_molecule
 {
-    public Vector4[] atoms;
+    public Vector3[] atom_centres;
+    public float[] atom_radii;
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
@@ -85,7 +86,7 @@ public class PDB_molecule
         //debug.WriteLine("building mesh");
         mesh = new Mesh();
         mesh.name = "ball view";
-        int num_atoms = atoms.Length;
+        int num_atoms = atom_centres.Length;
         int vlen = vsphere.Length;
         int ilen = isphere.Length;
         Vector3[] vertices = new Vector3[vlen*num_atoms];
@@ -95,9 +96,9 @@ public class PDB_molecule
         int v = 0;
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
-            Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z);
+            Vector3 pos = atom_centres[j];
             //if (j < 10) debug.WriteLine(pos);
-            float r = atoms[j].w;
+            float r = atom_radii[j];
             for (int i = 0; i != vlen; ++i) {
                 vertices[v] = vsphere[i]*r + pos;
                 normals[v] = vsphere[i];
@@ -169,35 +170,35 @@ public class PDB_molecule
     }
 
     public class Sorter : IComparer  {
-        Vector4 axis;
-        Vector4[] atoms_;
+        Vector3 axis;
+        Vector3[] atom_centres;
 
-        public Sorter(Vector3 dim, Vector4[] atoms)
+        public Sorter(Vector3 dim, Vector3[] atoms)
         {
-            atoms_ = atoms;
+            atom_centres = atoms;
             if (dim.x >= dim.y && dim.x >= dim.z)
             {
-                axis = new Vector4(1, 0, 0, 0);
+                axis = new Vector4(1, 0, 0);
             } else if (dim.y >= dim.x && dim.y >= dim.z)
             {
-                axis = new Vector4(0, 1, 0, 0);
+                axis = new Vector4(0, 1, 0);
             } else
             {
-                axis = new Vector4(0, 0, 1, 0);
+                axis = new Vector4(0, 0, 1);
             }
         }
 
         public int Compare(object x, object y) {
-            float a = Vector4.Dot(atoms_[(int)x], axis);
-            float b = Vector4.Dot(atoms_[(int)y], axis);
+            float a = Vector3.Dot(atom_centres[(int)x], axis);
+            float b = Vector3.Dot(atom_centres[(int)y], axis);
             return a < b ? -1 : a > b ? 1 : 0;
         }
     }
 
     private void partition(int[] index, int b, int e, int addr) {
         if (e == b + 1) {
-            Vector3 centre = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
-            float radius = atoms[b].w;
+            Vector3 centre = atom_centres[b];
+            float radius = atom_radii[b];
             //debug.WriteLine("[" + addr + "] [T] centre=" + centre + " r=" + radius);
             bvh_terminals[addr] = index[b];
             bvh_centres[addr] = centre;
@@ -205,27 +206,27 @@ public class PDB_molecule
         }
         else
         {
-            Vector3 min = new Vector3(atoms[b].x, atoms[b].y, atoms[b].z);
+            Vector3 min = atom_centres[b];
             Vector3 max = min;
             for (int j = b; j != e; ++j)
             {
-                float r = atoms[j].w;
-                min = Vector3.Min(min, new Vector3(atoms[j].x-r, atoms[j].y-r, atoms[j].z-r));
-                max = Vector3.Max(max, new Vector3(atoms[j].x+r, atoms[j].y+r, atoms[j].z+r));
+                Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]);
+                min = Vector3.Min(min, atom_centres[j] - r);
+                max = Vector3.Max(max, atom_centres[j] + r);
             }
 
             Vector3 dim = max - min;
             Vector3 centre = (max + min) * 0.5f;
 
-            Array.Sort(index, b, e-b, new Sorter(dim, atoms));
+            Array.Sort(index, b, e-b, new Sorter(dim, atom_centres));
 
             int mid = b + (e-b)/2;
 
             float radius = 0;
             for (int j = b; j != e; ++j)
             {
-                Vector3 pos = new Vector3(atoms[j].x, atoms[j].y, atoms[j].z) - centre;
-                float r = atoms[j].w + pos.magnitude;
+                Vector3 pos = atom_centres[j] - centre;
+                float r = atom_radii[j] + pos.magnitude;
                 radius = Mathf.Max(radius, r);
             }
 
@@ -241,7 +242,7 @@ public class PDB_molecule
     }
 
     public void build_bvh() {
-        int num_atoms = atoms.Length;
+        int num_atoms = atom_centres.Length;
         int[] index = new int[num_atoms];
         for (int j = 0; j != num_atoms; ++j) {
             index[j] = j;
@@ -359,14 +360,31 @@ public class PDB_molecule
             this.t1 = t1;
             results = new List<Result>();
             collide_recursive(0, 0);
-            Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atoms.Length + 1) * mol1.atoms.Length / 2));
+            //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
         }
     };
 
 
-    static public void collide(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1)
+    static public void collide(
+        GameObject obj0, PDB_molecule mol0, Transform t0,
+        GameObject obj1, PDB_molecule mol1, Transform t1
+    )
     {
         BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
+        Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+        Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+        foreach (BvhCollider.Result r in b.results) {
+            Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+            Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+            float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+            float distance = (c1 - c0).magnitude;
+            Debug.Log("distance=" + distance);
+            if (distance < min_d) {
+                Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+                r0.AddForceAtPosition(normal, c0);
+                //r1.AddForceAtPosition(normal, c1);
+            }
+        }
     }
 };
 

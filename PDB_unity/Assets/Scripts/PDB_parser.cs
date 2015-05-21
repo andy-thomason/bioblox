@@ -47,8 +47,8 @@ public class PDB_parser {
     };
 
     static public List<PDB_molecule> parse(string asset_name) {
-        List<Vector4> atoms = new List<Vector4>();
-        //List<int> pairs = new List<int>();
+        List<Vector3> atom_centres = new List<Vector3>();
+        List<float> atom_radii = new List<float>();
         List<int> names = new List<int>();
         List<int> residues = new List<int>();
 
@@ -68,14 +68,15 @@ public class PDB_parser {
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
-                    float r = 1.0f; //radii[line.Substring(77 - 1, 2)];
+                    float r = radii[line.Substring(77 - 1, 2)];
                     int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
                     if (name == PDB_molecule.atom_N) {
                         residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
                         residues.Add(names.Count);
                     }
                     names.Add(name);
-                    atoms.Add(new Vector4(x, y, z, r));
+                    atom_centres.Add(new Vector3(x, y, z));
+                    atom_radii.Add(r);
                     minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
                     maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
                 } else if (kind == "CONECT") {
@@ -101,15 +102,18 @@ public class PDB_parser {
                     cur.pos.y = (maxy + miny) * 0.5f;
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
-                    cur.atoms = new Vector4[atoms.Count];
+                    cur.atom_centres = new Vector3[atom_centres.Count];
+                    cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
                     for (int j = 0; j != names.Count; ++j) {
-                        cur.atoms[j] = new Vector4(atoms[j].x - cur.pos.x, atoms[j].y - cur.pos.y, atoms[j].z - cur.pos.z, atoms[j].w);
+                        cur.atom_centres[j] = atom_centres[j] - cur.pos;
+                        //cur.atom_radii[j] = atom_radii[j];
                     }
                     minx = 1e37f; miny = 1e37f; minz = 1e37f;
                     maxx = -1e37f; maxy = -1e37f; maxz = -1e37f;
                     result.Add(cur);
                     names.Clear();
-                    atoms.Clear();
+                    atom_centres.Clear();
+                    atom_radii.Clear();
                     residues.Clear();
                 }
             }

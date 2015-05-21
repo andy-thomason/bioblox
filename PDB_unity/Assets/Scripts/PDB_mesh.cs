@@ -15,17 +15,30 @@ public class PDB_mesh : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        Rigidbody rb = GetComponent<Rigidbody>();
         if (other) {
             if (Input.GetKey("w"))
             {
-                transform.Translate(0, 0.1f, 0);
+                rb.AddForce(new Vector3(0, 10, 0));
             }
             if (Input.GetKey("s"))
             {
-                transform.Translate(0, -0.1f, 0);
+                rb.AddForce(new Vector3(0, -10, 0));
+            }
+            if (Input.GetKey("a"))
+            {
+                rb.AddForce(new Vector3(-10, 0, 0));
+            }
+            if (Input.GetKey("d"))
+            {
+                rb.AddForce(new Vector3(10, 0, 0));
             }
             PDB_mesh other_mesh = other.GetComponent<PDB_mesh>();
-    	    PDB_molecule.collide(mol, transform, other_mesh.mol, other.transform);
+
+    	    PDB_molecule.collide(
+                gameObject, mol, transform,
+                other, other_mesh.mol, other.transform
+            );
         }
 	}
 }
