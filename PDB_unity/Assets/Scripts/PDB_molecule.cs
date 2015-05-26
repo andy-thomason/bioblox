@@ -32,7 +32,7 @@ public class PDB_molecule
 
     public string name;
 
-    //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.txt");
+    //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\PDB_molecule.csv");
 
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
 
@@ -45,6 +45,7 @@ public class PDB_molecule
             vsphere[i].x = vproto[i*3+0];
             vsphere[i].y = vproto[i*3+1];
             vsphere[i].z = vproto[i*3+2];
+			vsphere[i] = vsphere[i].normalized;
         }
         int idx = num_verts;
         for (int i = 0; i != num_tris; ++i) {
@@ -197,10 +198,11 @@ public class PDB_molecule
 
     private void partition(int[] index, int b, int e, int addr) {
         if (e == b + 1) {
-            Vector3 centre = atom_centres[b];
-            float radius = atom_radii[b];
+			int bi = index[b];
+			Vector3 centre = atom_centres[bi];
+			float radius = atom_radii[bi];
             //debug.WriteLine("[" + addr + "] [T] centre=" + centre + " r=" + radius);
-            bvh_terminals[addr] = index[b];
+            bvh_terminals[addr] = bi;
             bvh_centres[addr] = centre;
             bvh_radii[addr] = radius;
         }
@@ -210,9 +212,10 @@ public class PDB_molecule
             Vector3 max = min;
             for (int j = b; j != e; ++j)
             {
-                Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]);
-                min = Vector3.Min(min, atom_centres[j] - r);
-                max = Vector3.Max(max, atom_centres[j] + r);
+				int ji = index[j];
+                Vector3 r = new Vector3(atom_radii[ji], atom_radii[ji], atom_radii[ji]);
+                min = Vector3.Min(min, atom_centres[ji] - r);
+                max = Vector3.Max(max, atom_centres[ji] + r);
             }
 
             Vector3 dim = max - min;
@@ -225,8 +228,9 @@ public class PDB_molecule
             float radius = 0;
             for (int j = b; j != e; ++j)
             {
-                Vector3 pos = atom_centres[j] - centre;
-                float r = atom_radii[j] + pos.magnitude;
+				int ji = index[j];
+                Vector3 pos = atom_centres[ji] - centre;
+                float r = atom_radii[ji] + pos.magnitude;
                 radius = Mathf.Max(radius, r);
             }
 
@@ -253,12 +257,22 @@ public class PDB_molecule
 
         //debug.WriteLine("building bvh for " + name + "with " + num_atoms + " atoms and " + num_bvh + " bvhs");
 
+
+
         bvh_centres = new Vector3[num_bvh];
         bvh_radii = new float[num_bvh];
         bvh_terminals = new int[num_bvh];
 
         partition(index, 0, num_atoms, 0);
-        //debug.Flush();
+		/*
+		for (int i=0; i<num_bvh; ++i) {
+			debug.WriteLine("B,"+i+",\""+ bvh_centres[i]+"\","+bvh_terminals[i]+","+bvh_radii[i]);
+		}
+		for(int i=0; i<num_atoms; ++i)
+		{
+			debug.WriteLine("A,"+i+",\""+ atom_centres[i]+"\",,"+atom_radii[i]);
+		}
+        debug.Flush();*/
     }
 
     public void build_mesh() {
@@ -281,7 +295,7 @@ public class PDB_molecule
         Transform t1;
         int work_done = 0;
 
-        //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\BvhCollider.txt");
+        //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\BvhCollider.txt");
 
         public struct Result {
             public int i0;
@@ -294,7 +308,6 @@ public class PDB_molecule
         public void collide_recursive(int bvh0, int bvh1)
         {
             if (work_done++ == 100000) return;
-
             //if (bvh0 >= mol0.bvh_terminals.Length) debug.WriteLine("BOOM!");
             //if (bvh1 >= mol1.bvh_terminals.Length) debug.WriteLine("BOOM!");
             int bt0 = mol0.bvh_terminals[bvh0];
@@ -306,6 +319,7 @@ public class PDB_molecule
             Vector3 c1 = t1.TransformPoint(mol1.bvh_centres[bvh1]);
             float r0 = mol0.bvh_radii[bvh0];
             float r1 = mol1.bvh_radii[bvh1];
+
 
             /*GameObject lhs = GameObject.Find("lhs" + bvh0);
             if (lhs) {
@@ -321,7 +335,6 @@ public class PDB_molecule
 
             //debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] c0=" + c0 + " c1=" + c1 + " d0=" + (c0 - c1).sqrMagnitude + " d1=" + (r0 + r1)*(r0 + r1));
             //debug.Flush();
-
             if ((c0 - c1).sqrMagnitude < (r0 + r1)*(r0 + r1) && r0 != 0 && r1 != 0)
             {
                 if (bt0 == -1) {
@@ -360,17 +373,78 @@ public class PDB_molecule
             this.t1 = t1;
             results = new List<Result>();
             collide_recursive(0, 0);
-            //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
+
+            Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
         }
     };
 
+	class BvhRayCollider
+	{
+		PDB_molecule mol;
+		Transform t;
+		Ray ray;
+		Vector3 cameraPosition;
+		int work_done=0;
 
-    static public void collide(
-        GameObject obj0, PDB_molecule mol0, Transform t0,
-        GameObject obj1, PDB_molecule mol1, Transform t1
-    )
-    {
-        BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
+		public struct Result
+		{
+			public int index;
+			public Result(int argIndex){this.index=argIndex;}
+		}
+
+		public List<Result> results;
+
+		public void collide_recursive(int bvh)
+		{
+
+			//THIS DOES NOT WORK YET
+			if (work_done++ > 100000) {
+				return;
+			}
+			int bt = mol.bvh_terminals[bvh];
+			
+			//debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] / [" + bt0 + ", " + bt1 + "]");
+			//debug.Flush();
+			Vector3 c = t.TransformPoint(mol.bvh_centres[bvh]);
+			float r = mol.bvh_radii[bvh];
+
+			Vector3 q = c - ray.origin;
+			float f = Vector3.Dot (q, ray.direction);
+
+
+			if (false)
+			{
+				if (bt == -1) {
+						collide_recursive(bvh*2+1);
+						collide_recursive(bvh*2+2);
+				}
+				else
+				{
+					results.Add(new Result(bt));
+				}
+			}
+			
+		}
+		
+		BvhRayCollider(PDB_molecule mol,Transform t, Ray ray, Vector3 cameraPos)
+		{
+			this.mol=mol;
+			this.t=t;
+			this.ray=ray;
+			this.cameraPosition=cameraPos;
+			results =new List<Result>();
+			
+		}
+		
+	}
+	
+	
+	static public void collide(
+		GameObject obj0, PDB_molecule mol0, Transform t0,
+		GameObject obj1, PDB_molecule mol1, Transform t1
+		)
+	{
+		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
         Rigidbody r0 = obj0.GetComponent<Rigidbody>();
         Rigidbody r1 = obj1.GetComponent<Rigidbody>();
         foreach (BvhCollider.Result r in b.results) {
@@ -378,10 +452,10 @@ public class PDB_molecule
             Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
             float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
             float distance = (c1 - c0).magnitude;
-            Debug.Log("distance=" + distance);
+            //Debug.Log("distance=" + distance
             if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-                r0.AddForceAtPosition(normal, c0);
+				r0.velocity=new Vector3(0,0,0);
                 //r1.AddForceAtPosition(normal, c1);
             }
         }
