@@ -194,7 +194,7 @@ namespace prashant
 			surface.transform.name = "HeightMap";
 			surface.AddComponent<MeshFilter>();
 			surface.AddComponent<MeshRenderer>();
-			surface.renderer.material.mainTexture = texture;
+			surface.GetComponent<Renderer>().material.mainTexture = texture;
 
 			//Private Variables
 			lastElapsedTime = Time.realtimeSinceStartup;
