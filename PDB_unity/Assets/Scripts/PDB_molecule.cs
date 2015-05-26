@@ -374,7 +374,7 @@ public class PDB_molecule
             results = new List<Result>();
             collide_recursive(0, 0);
 
-            Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
+            //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
         }
     };
 
@@ -383,7 +383,6 @@ public class PDB_molecule
 		PDB_molecule mol;
 		Transform t;
 		Ray ray;
-		Vector3 cameraPosition;
 		int work_done=0;
 
 		public struct Result
@@ -396,23 +395,26 @@ public class PDB_molecule
 
 		public void collide_recursive(int bvh)
 		{
-
-			//THIS DOES NOT WORK YET
 			if (work_done++ > 100000) {
 				return;
 			}
 			int bt = mol.bvh_terminals[bvh];
-			
-			//debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] / [" + bt0 + ", " + bt1 + "]");
-			//debug.Flush();
+
 			Vector3 c = t.TransformPoint(mol.bvh_centres[bvh]);
 			float r = mol.bvh_radii[bvh];
 
 			Vector3 q = c - ray.origin;
 			float f = Vector3.Dot (q, ray.direction);
 
+			float d = 0;
 
-			if (false)
+			if (f < 0) {
+				d = q.sqrMagnitude;
+			} else {
+				d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
+			}
+
+			if (d<r*r)
 			{
 				if (bt == -1) {
 						collide_recursive(bvh*2+1);
@@ -420,22 +422,40 @@ public class PDB_molecule
 				}
 				else
 				{
+					Debug.Log("Hit!");
 					results.Add(new Result(bt));
 				}
 			}
-			
 		}
 		
-		BvhRayCollider(PDB_molecule mol,Transform t, Ray ray, Vector3 cameraPos)
+		public BvhRayCollider(PDB_molecule mol,Transform t, Ray ray)
 		{
 			this.mol=mol;
 			this.t=t;
 			this.ray=ray;
-			this.cameraPosition=cameraPos;
 			results =new List<Result>();
-			
+			collide_recursive(0);
 		}
 		
+	}
+	static public int collide_ray(
+		GameObject obj, PDB_molecule mol, Transform t,
+		Ray ray)
+	{
+		BvhRayCollider b = new BvhRayCollider (mol, t, ray);
+		int closestIndex = -1;
+		float closestDistance = float.MaxValue;
+		for (int i=0; i<b.results.Count; i++) {
+			BvhRayCollider.Result r= b.results[i];
+			Vector3 c= t.TransformPoint(mol.atom_centres[r.index]);
+			float dist=(ray.origin-c).sqrMagnitude;
+			if(closestDistance>dist)
+			{
+				closestDistance=dist;
+				closestIndex=r.index;
+			}
+		}
+		return closestIndex;
 	}
 	
 	

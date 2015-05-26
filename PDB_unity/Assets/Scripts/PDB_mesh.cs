@@ -33,6 +33,23 @@ public class PDB_mesh : MonoBehaviour {
             {
                 rb.AddForce(new Vector3(10, 0, 0));
             }
+			if(Input.GetMouseButtonDown(0))
+			{
+				Debug.Log ("Cast ray");
+				Ray r=GameObject.FindGameObjectWithTag("MainCamera").
+					GetComponent<Camera>().ScreenPointToRay(
+						Input.mousePosition);
+
+				int hit =PDB_molecule.collide_ray(gameObject,mol,
+				                         transform,r);
+				Debug.Log("hit is:"+ hit);
+				if(hit!=-1)
+				{
+					Debug.Log (mol.atom_centres[hit]);
+
+				}
+
+			}
             PDB_mesh other_mesh = other.GetComponent<PDB_mesh>();
 
     	    PDB_molecule.collide(
