@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: molecule2
-  m_Shader: {fileID: 4800000, guid: 4a491ec9993b44a4cbfebab38c879d29, type: 3}
+  m_Shader: {fileID: 4800000, guid: 61ec3fa58beb22443bbd29b879a9efe2, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1

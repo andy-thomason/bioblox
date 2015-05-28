@@ -132,7 +132,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01e9fffd5a3d99b43848b07aa83e8728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  other: {fileID: 2104543009}
 --- !u!23 &35609391
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -565,7 +564,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: a7bff8008f4c8e5458c5a35a07390272, type: 2}
+  - {fileID: 2100000, guid: 3d972e9f1438e0748b7c2e5d82ec0c20, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -621,7 +620,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 670702978}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01e9fffd5a3d99b43848b07aa83e8728, type: 3}
+  m_Script: {fileID: 11500000, guid: 692d9384e74769145a77ad680e6cd8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   other: {fileID: 0}
@@ -978,7 +977,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1348893745}
   m_LocalRotation: {x: .087155737, y: 0, z: 0, w: .99619472}
-  m_LocalPosition: {x: 0, y: 0, z: -20}
+  m_LocalPosition: {x: 0, y: 0, z: -50}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1346,7 +1345,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: b2a4791baa3a69e4bafed2d7f76d8154, type: 2}
+  - {fileID: 2100000, guid: a4f81e1ca23df9248857fc290359714b, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -1402,10 +1401,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1922896237}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01e9fffd5a3d99b43848b07aa83e8728, type: 3}
+  m_Script: {fileID: 11500000, guid: 692d9384e74769145a77ad680e6cd8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  other: {fileID: 670702978}
+  other: {fileID: 0}
 --- !u!1 &2104543009
 GameObject:
   m_ObjectHideFlags: 0
@@ -1451,7 +1450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01e9fffd5a3d99b43848b07aa83e8728, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  other: {fileID: 0}
 --- !u!23 &2104543012
 MeshRenderer:
   m_ObjectHideFlags: 0
