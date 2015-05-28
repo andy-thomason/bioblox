@@ -5,14 +5,39 @@ public class PDB_mesh : MonoBehaviour {
     PDB_molecule mol;
     public GameObject other;
 
+	Quaternion start;
+	Quaternion end;
+	bool startRotation=false;
+	float t=0;
+
 	// Use this for initialization
 	void Start () {
 	    MeshFilter f = GetComponent<MeshFilter>();
         mol = PDB_parser.get_molecule(this.name);;
         f.mesh = mol.mesh;
-        f.transform.Translate(mol.pos);
+        //f.transform.Translate(mol.pos);
 	}
-	
+
+	void BringPointToFocus(Vector3 LocalPoint,Camera c)
+	{
+		Vector3 startDir = LocalPoint;
+		Vector3 targetDir=c.transform.position-this.transform.position;
+		
+		Quaternion targetQ=Quaternion.LookRotation(targetDir);
+		Quaternion startQ=Quaternion.LookRotation(startDir);
+		start=transform.rotation;
+		
+		Quaternion toFront = targetQ * Quaternion.Inverse (startQ);
+		
+		
+		end=toFront;
+		startRotation=true;
+		t=0;
+
+
+	}
+
+
 	// Update is called once per frame
 	void Update () {
         Rigidbody rb = GetComponent<Rigidbody>();
@@ -35,19 +60,30 @@ public class PDB_mesh : MonoBehaviour {
             }
 			if(Input.GetMouseButtonDown(0))
 			{
-				Debug.Log ("Cast ray");
-				Ray r=GameObject.FindGameObjectWithTag("MainCamera").
-					GetComponent<Camera>().ScreenPointToRay(
+				Camera c=GameObject.FindGameObjectWithTag("MainCamera").
+					GetComponent<Camera>();
+				Ray r=c.ScreenPointToRay(
 						Input.mousePosition);
 
 				int hit =PDB_molecule.collide_ray(gameObject,mol,
 				                         transform,r);
-				Debug.Log("hit is:"+ hit);
-				if(hit!=-1)
+				if(hit!=-1&&!startRotation)
 				{
-					Debug.Log (mol.atom_centres[hit]);
-
+					Vector3 molDir=mol.atom_centres[hit];
+					BringPointToFocus(molDir,c);
 				}
+			}
+			if(startRotation)
+			{
+				t+=Time.deltaTime;
+				transform.localRotation=Quaternion.Slerp(start,end,t);
+				if(t>1)
+				{
+					startRotation=false;
+					t=0;
+				}
+
+
 
 			}
             PDB_mesh other_mesh = other.GetComponent<PDB_mesh>();

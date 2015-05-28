@@ -9,6 +9,7 @@ public class PDB_molecule
 {
     public Vector3[] atom_centres;
     public float[] atom_radii;
+	public int[] pairedAtoms;
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
@@ -17,6 +18,7 @@ public class PDB_molecule
     public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
+	public Label[] labels;
 
     //const float c = 1.618033988749895f;
     const float e = 0.52573111f;
@@ -32,6 +34,13 @@ public class PDB_molecule
 
     public string name;
 
+	public class Label
+	{
+		public Label(int a, string label)
+		{atomIndex=a;labelName=label;}
+		int atomIndex;
+		string labelName;
+	}
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\PDB_molecule.csv");
 
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
@@ -422,7 +431,6 @@ public class PDB_molecule
 				}
 				else
 				{
-					Debug.Log("Hit!");
 					results.Add(new Result(bt));
 				}
 			}
@@ -475,7 +483,7 @@ public class PDB_molecule
             //Debug.Log("distance=" + distance
             if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				r0.velocity=new Vector3(0,0,0);
+				r0.AddForceAtPosition(normal,c0);
                 //r1.AddForceAtPosition(normal, c1);
             }
         }
