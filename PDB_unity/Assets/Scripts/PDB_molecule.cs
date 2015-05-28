@@ -92,6 +92,22 @@ public class PDB_molecule
         //debug.WriteLine(isphere.Length);
     }
 
+	float CalcAmbientOcclusion(Vector3 pos, Vector3 norm)
+	{
+		Vector3 posOffset = pos + norm;
+		Ray r = new Ray (posOffset, norm);
+		BvhRayCollider b = new BvhRayCollider (this, r);
+		float minDist = 5;
+		for (int i=0; i< b.results.Count; ++i) {
+			float dist=(pos-atom_centres[b.results[i].index]).sqrMagnitude;
+			if(dist<5&&dist!=0)
+			{
+				minDist=Math.Min(minDist,dist);
+			}
+		}
+		return minDist / 5.0f;
+	}
+
     void build_ball_mesh() {
         //debug.WriteLine("building mesh");
         mesh = new Mesh();
@@ -102,11 +118,14 @@ public class PDB_molecule
         Vector3[] vertices = new Vector3[vlen*num_atoms];
         Vector3[] normals = new Vector3[vlen*num_atoms];
         Vector2[] uvs = new Vector2[vlen*num_atoms];
+		Color[] colors = new Color[vlen * num_atoms];
         int[] indices = new int[ilen*num_atoms];
         int v = 0;
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = atom_centres[j];
+			Color col=new Color(0.0f,0.0f,0.0f,CalcAmbientOcclusion(pos,
+			                                                        pos.normalized));
             //if (j < 10) debug.WriteLine(pos);
             float r = atom_radii[j];
             for (int i = 0; i != vlen; ++i) {
@@ -114,6 +133,7 @@ public class PDB_molecule
                 normals[v] = vsphere[i];
                 uvs[v].x = normals[v].x;
                 uvs[v].y = normals[v].y;
+				colors[v] = col;
                 ++v;
             }
             for (int i = 0; i != ilen; ++i) {
@@ -125,6 +145,7 @@ public class PDB_molecule
         mesh.normals = normals;
         mesh.uv = uvs;
         mesh.triangles = indices;
+		mesh.colors = colors;
         //mesh.RecalculateNormals();
     }
 
@@ -435,6 +456,40 @@ public class PDB_molecule
 				}
 			}
 		}
+
+		public void collide_recursiveNT(int bvh)
+		{
+			if (work_done++ > 100000) {
+				return;
+			}
+			int bt = mol.bvh_terminals[bvh];
+			
+			Vector3 c = mol.bvh_centres[bvh];
+			float r = mol.bvh_radii[bvh];
+			
+			Vector3 q = c - ray.origin;
+			float f = Vector3.Dot (q, ray.direction);
+			
+			float d = 0;
+			
+			if (f < 0) {
+				d = q.sqrMagnitude;
+			} else {
+				d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
+			}
+			
+			if (d<r*r)
+			{
+				if (bt == -1) {
+					collide_recursiveNT(bvh*2+1);
+					collide_recursiveNT(bvh*2+2);
+				}
+				else
+				{
+					results.Add(new Result(bt));
+				}
+			}
+		}
 		
 		public BvhRayCollider(PDB_molecule mol,Transform t, Ray ray)
 		{
@@ -444,7 +499,13 @@ public class PDB_molecule
 			results =new List<Result>();
 			collide_recursive(0);
 		}
-		
+		public BvhRayCollider(PDB_molecule mol, Ray ray)
+		{
+			this.mol=mol;
+			this.ray=ray;
+			results=new List<Result>();
+			collide_recursiveNT(0);
+		}
 	}
 	static public int collide_ray(
 		GameObject obj, PDB_molecule mol, Transform t,

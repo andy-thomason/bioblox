@@ -76,6 +76,7 @@
         float4 projection_pos : POSITION;
         float3 normal : NORMAL;
         float4 world_pos : TEXCOORD;
+        float4 col:COLOR;
       };
       
       uniform float4 _Color;
@@ -86,16 +87,19 @@
       uniform float3 _LightPos;
       uniform float3 _CameraPos;
 
-      varying_t vert(appdata_base v) {
+      varying_t vert(appdata_full v) {
         varying_t o;
         o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
         o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
         o.world_pos = mul (_Object2World, v.vertex);
+        o.col=v.color;
         return o;
       }
 
       fixed4 frag(varying_t i) : COLOR {
         float3 normal = normalize(i.normal);
+        float aoValue=i.col.w;
+        i.col.w=1;
         //float3 light_dir = normalize(_WorldSpaceLightPos0.xyz - i.world_pos.xyz);
         //float3 view_dir = normalize(i.world_pos.xyz - _WorldSpaceCameraPos.xyz);
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
@@ -103,9 +107,9 @@
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
         float diffuse_factor = max(0.5f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
-      
-        return fixed4(_Color.xyz * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
-        //return fixed4(1, 0, 0, _Color.w);
+      	
+        return fixed4(_Color.xyz * aoValue + i.col * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
+        //return fixed4(colr);
         //return fixed4(normalize(_WorldSpaceLightPos0.xyz), 1);
         //return fixed4(normalize(_WorldSpaceCameraPos.xyz), 1);
         //return fixed4(light_dir,1);
