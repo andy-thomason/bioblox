@@ -1,10 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using AssemblyCSharp;
 
 public class PDB_mesh : MonoBehaviour {
     PDB_molecule mol;
     public GameObject other;
 
+	Vector3 joinedPos = new Vector3();
+	Quaternion joinedRotation = Quaternion.identity;
+	Vector3 autoDockStartPos;
+	Quaternion autoDockStartRotation;
+
+	bool allowInteraction=true;
+
+	
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
@@ -15,12 +24,17 @@ public class PDB_mesh : MonoBehaviour {
 	    MeshFilter f = GetComponent<MeshFilter>();
         mol = PDB_parser.get_molecule(this.name);;
         f.mesh = mol.mesh;
-        //f.transform.Translate(mol.pos);
+		autoDockStartPos = this.transform.position;
+		autoDockStartRotation = this.transform.rotation;
+		joinedPos = mol.pos;
+
+			f.transform.position = mol.pos;
+
 	}
 
-	void BringPointToFocus(Vector3 LocalPoint,Camera c)
+	void BringPointToFocus(Vector3 localPoint,Camera c)
 	{
-		Vector3 startDir = LocalPoint;
+		Vector3 startDir = localPoint;
 		Vector3 targetDir=c.transform.position-this.transform.position;
 		
 		Quaternion targetQ=Quaternion.LookRotation(targetDir);
@@ -33,15 +47,27 @@ public class PDB_mesh : MonoBehaviour {
 		end=toFront;
 		startRotation=true;
 		t=0;
+	}
 
 
+	//at the moment very fake
+	void AutoDock()
+	{
+		allowInteraction = false;
+		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
+		this.gameObject.GetComponent<Rigidbody> ().velocity = Vector3.zero;
+		this.gameObject.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
+		t = 0;
+		mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
+		mover.AddTransformPoint(mol.pos,Quaternion.identity);
+		mover.StartTransform();
 	}
 
 
 	// Update is called once per frame
 	void Update () {
         Rigidbody rb = GetComponent<Rigidbody>();
-        if (other) {
+        if (other&&allowInteraction) {
             if (Input.GetKey("w"))
             {
                 rb.AddForce(new Vector3(0, 10, 0));
@@ -58,6 +84,10 @@ public class PDB_mesh : MonoBehaviour {
             {
                 rb.AddForce(new Vector3(10, 0, 0));
             }
+			if(Input.GetKey("p"))
+			{
+				AutoDock();
+			}
 			if(Input.GetMouseButtonDown(0))
 			{
 				Camera c=GameObject.FindGameObjectWithTag("MainCamera").
@@ -82,9 +112,6 @@ public class PDB_mesh : MonoBehaviour {
 					startRotation=false;
 					t=0;
 				}
-
-
-
 			}
             PDB_mesh other_mesh = other.GetComponent<PDB_mesh>();
 

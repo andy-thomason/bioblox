@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\PDB_mesh.cs" />
      <Compile Include="Assets\Scripts\PDB_molecule.cs" />
      <Compile Include="Assets\Scripts\PDB_parser.cs" />
+     <Compile Include="Assets\Scripts\TransformLerper.cs" />
      <None Include="Assets\Resources\pdb2ptc.txt" />
      <None Include="Assets\Shaders\PDB.shader" />
      <None Include="Assets\Resources\DebugPDB.txt" />
