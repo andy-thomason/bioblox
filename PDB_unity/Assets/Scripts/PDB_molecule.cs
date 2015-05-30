@@ -29,6 +29,16 @@ public class PDB_molecule
     Vector3 [] vsphere;
     int [] isphere;
 
+	Vector3[] aoccRays = {
+		new Vector3 (0, 1, 0),
+		new Vector3 (0, -1, 0),
+		new Vector3 (1, 0, 0),
+		new Vector3 (-1, 0, 0),
+		new Vector3 (0, 0, 1),
+		new Vector3 (0, 0, -1),
+	};
+
+
     public enum Mode { Ball, Ribbon };
     public static Mode mode = Mode.Ball;
 
@@ -92,20 +102,27 @@ public class PDB_molecule
         //debug.WriteLine(isphere.Length);
     }
 
-	float CalcAmbientOcclusion(Vector3 pos, Vector3 norm)
+	float CalcAmbientOcclusion(Vector3 pos, Vector3 norm, float radius)
 	{
-		Vector3 posOffset = pos + norm;
-		Ray r = new Ray (posOffset, norm);
-		BvhRayCollider b = new BvhRayCollider (this, r);
-		float minDist = 5;
-		for (int i=0; i< b.results.Count; ++i) {
-			float dist=(pos-atom_centres[b.results[i].index]).sqrMagnitude;
-			if(dist<5&&dist!=0)
-			{
-				minDist=Math.Min(minDist,dist);
+
+		float occlusion = 0;
+		float maxDist = 5;
+		for(int i=0;i<aoccRays.Length;++i)
+		{
+			Vector3 posOffset = pos + aoccRays[i] * radius;
+			Ray r = new Ray (posOffset, aoccRays[i]);
+			BvhRayCollider b = new BvhRayCollider (this, r);
+			float minDist = maxDist;
+			for (int j=0; j< b.results.Count; ++j) {
+				float dist=(pos-atom_centres[b.results[j].index]).sqrMagnitude;
+				if(dist<maxDist&&dist!=0)
+				{
+					minDist=Math.Min(minDist,dist);
+				}
 			}
+		occlusion += (1 - (minDist / maxDist));
 		}
-		return minDist / 5.0f;
+		return (1 - ((occlusion) / aoccRays.Length));
 	}
 
     void build_ball_mesh() {
@@ -124,8 +141,9 @@ public class PDB_molecule
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = atom_centres[j];
-			Color col=new Color(0.0f,0.0f,0.0f,CalcAmbientOcclusion(pos,
-			                                                        pos.normalized));
+			Color col=new 
+				Color(0.1f,0.1f,0.1f,
+			    CalcAmbientOcclusion(pos,pos.normalized,atom_radii[j]));
             //if (j < 10) debug.WriteLine(pos);
             float r = atom_radii[j];
             for (int i = 0; i != vlen; ++i) {
