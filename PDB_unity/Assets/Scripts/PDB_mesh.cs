@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using AssemblyCSharp;
 
 public class PDB_mesh : MonoBehaviour {
@@ -13,7 +14,11 @@ public class PDB_mesh : MonoBehaviour {
 
 	bool allowInteraction=true;
 
-	
+
+	public List<GameObject> prefabLabels{ private get; set;}
+
+	List<GameObject> activeLabels=new List<GameObject>();
+
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
@@ -30,6 +35,22 @@ public class PDB_mesh : MonoBehaviour {
 
 			f.transform.position = mol.pos;
 
+	}
+
+
+	public void LabelClicked(GameObject labelObj)
+	{
+		//Handle label click, make active, focusd on atom //etc
+		BringAtomToFocus (labelObj.GetComponent<LabelScript> ().label.atomIndex);
+	}
+
+	void BringAtomToFocus(int atomIndex)
+	{
+			Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
+				GetComponent<Camera> ();
+
+			Vector3 localPos = mol.atom_centres [atomIndex];
+		BringPointToFocus (localPos, c);
 	}
 	//rotates this object to bring that point closest to the camera
 	void BringPointToFocus(Vector3 localPoint,Camera c)
@@ -49,6 +70,35 @@ public class PDB_mesh : MonoBehaviour {
 		t=0;
 	}
 
+
+
+	void CreateLabel(PDB_molecule.Label label)
+	{
+		int labelTypeIndex = -1;
+		for(int i=0;i<prefabLabels.Count;++i)
+		{
+			if(string.Compare(label.labelName,prefabLabels[i].name)==0)
+			{
+				labelTypeIndex=i;
+				break;
+			}
+		}
+		if (labelTypeIndex == -1) {
+			Debug.LogError("Could not find Label with type"+label.labelName);
+			return;
+		}
+		GameObject newLabel = GameObject.Instantiate<GameObject>(prefabLabels[labelTypeIndex]);
+		if (!newLabel) {
+			Debug.Log("Could not create Label");
+		}
+		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
+		if (!laSc) {
+			Debug.LogError("Label prefab "+ label.labelName +" does not have a LabelScript attached");
+		}
+		laSc.label = label;
+		laSc.ownerMesh = this;
+		activeLabels.Add (newLabel);
+	}
 
 	//at the moment very fake
 	void AutoDock()
@@ -93,11 +143,16 @@ public class PDB_mesh : MonoBehaviour {
 					Ray r = c.ScreenPointToRay (
 						Input.mousePosition);
 
-					int hit = PDB_molecule.collide_ray (gameObject, mol,
+					RaycastHit info= new RaycastHit();
+					Physics.Raycast(r,out info);
+					if(info.collider==null)
+					{
+						int hit = PDB_molecule.collide_ray (gameObject, mol,
 				                         transform, r);
-					if (hit != -1 && !startRotation) {
-						Vector3 molDir = mol.atom_centres [hit];
-						BringPointToFocus (molDir, c);
+						if (hit != -1 && !startRotation) {
+							Vector3 molDir = mol.atom_centres [hit];
+							BringPointToFocus (molDir, c);
+						}
 					}
 				}
 				if (startRotation) {

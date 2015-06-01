@@ -48,8 +48,8 @@ public class PDB_molecule
 	{
 		public Label(int a, string label)
 		{atomIndex=a;labelName=label;}
-		int atomIndex;
-		string labelName;
+		public int atomIndex;
+		public string labelName;
 	}
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\PDB_molecule.csv");
 
@@ -106,7 +106,7 @@ public class PDB_molecule
 	{
 
 		float occlusion = 0;
-		float maxDist = 5;
+		float maxDist = 7;
 		for(int i=0;i<aoccRays.Length;++i)
 		{
 			Vector3 posOffset = pos + aoccRays[i] * radius;
