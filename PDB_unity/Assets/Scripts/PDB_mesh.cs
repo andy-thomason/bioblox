@@ -27,7 +27,7 @@ public class PDB_mesh : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	    MeshFilter f = GetComponent<MeshFilter>();
-        mol = PDB_parser.get_molecule(this.name);;
+        PDB_molecule mol = PDB_parser.get_molecule(this.name);
         f.mesh = mol.mesh;
 		autoDockStartPos = this.transform.position;
 		autoDockStartRotation = this.transform.rotation;

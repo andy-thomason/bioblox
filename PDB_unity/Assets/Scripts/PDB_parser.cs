@@ -171,7 +171,7 @@ public class PDB_parser {
             m.name = asset_name + "." + (i+1);
             m.build_mesh();
             m.pos -= cofg;
-            Debug.Log(m.pos);
+            //Debug.Log(m.pos);
         }
         return result;
     }

@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Classes\Tuple.cs" />
+     <Compile Include="Assets\Scripts\BioBlox.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
      <Compile Include="Assets\Scripts\LabelScript.cs" />
      <Compile Include="Assets\Scripts\PDB_mesh.cs" />
