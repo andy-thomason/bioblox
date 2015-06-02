@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System;
+using AssemblyCSharp;
 
 public class PDB_molecule
 {
     public Vector3[] atom_centres;
     public float[] atom_radii;
-	public int[] pairedAtoms;
+	public Tuple<int,int>[] pairedAtoms=new Tuple<int, int>[0];
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
@@ -18,7 +19,7 @@ public class PDB_molecule
     public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
-	public Label[] labels;
+	public Label[] labels = new Label[0];
 
     //const float c = 1.618033988749895f;
     const float e = 0.52573111f;

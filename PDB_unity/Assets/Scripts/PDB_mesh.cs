@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AssemblyCSharp;
 
 public class PDB_mesh : MonoBehaviour {
-    PDB_molecule mol;
+    public PDB_molecule mol;
     public GameObject other;
 
 	Vector3 joinedPos = new Vector3();
@@ -14,11 +14,6 @@ public class PDB_mesh : MonoBehaviour {
 
 	bool allowInteraction=true;
 
-
-	public List<GameObject> prefabLabels{ private get; set;}
-
-	List<GameObject> activeLabels=new List<GameObject>();
-
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
@@ -27,21 +22,11 @@ public class PDB_mesh : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 	    MeshFilter f = GetComponent<MeshFilter>();
-        PDB_molecule mol = PDB_parser.get_molecule(this.name);
+        mol = PDB_parser.get_molecule(this.name);
         f.mesh = mol.mesh;
 		autoDockStartPos = this.transform.position;
 		autoDockStartRotation = this.transform.rotation;
 		joinedPos = mol.pos;
-
-			f.transform.position = mol.pos;
-
-	}
-
-
-	public void LabelClicked(GameObject labelObj)
-	{
-		//Handle label click, make active, focusd on atom //etc
-		BringAtomToFocus (labelObj.GetComponent<LabelScript> ().label.atomIndex);
 	}
 
 	void BringAtomToFocus(int atomIndex)
@@ -70,46 +55,15 @@ public class PDB_mesh : MonoBehaviour {
 		t=0;
 	}
 
-
-
-	void CreateLabel(PDB_molecule.Label label)
-	{
-		int labelTypeIndex = -1;
-		for(int i=0;i<prefabLabels.Count;++i)
-		{
-			if(string.Compare(label.labelName,prefabLabels[i].name)==0)
-			{
-				labelTypeIndex=i;
-				break;
-			}
-		}
-		if (labelTypeIndex == -1) {
-			Debug.LogError("Could not find Label with type"+label.labelName);
-			return;
-		}
-		GameObject newLabel = GameObject.Instantiate<GameObject>(prefabLabels[labelTypeIndex]);
-		if (!newLabel) {
-			Debug.Log("Could not create Label");
-		}
-		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
-		if (!laSc) {
-			Debug.LogError("Label prefab "+ label.labelName +" does not have a LabelScript attached");
-		}
-		laSc.label = label;
-		laSc.ownerMesh = this;
-		activeLabels.Add (newLabel);
-	}
-
 	//at the moment very fake
-	void AutoDock()
+	public void AutoDock()
 	{
 		allowInteraction = false;
 		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
-		this.gameObject.GetComponent<Rigidbody> ().velocity = Vector3.zero;
-		this.gameObject.GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
+
 		t = 0;
-		mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
-		mover.AddTransformPoint(mol.pos,Quaternion.identity);
+		//mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
+		//mover.AddTransformPoint(mol.pos,Quaternion.identity);
 		mover.StartTransform();
 	}
 
@@ -122,18 +76,18 @@ public class PDB_mesh : MonoBehaviour {
 				allowInteraction = true;
 			}
 			if (allowInteraction) {
-				if (Input.GetKey ("w")) {
-					rb.AddForce (new Vector3 (0, 10, 0));
-				}
-				if (Input.GetKey ("s")) {
-					rb.AddForce (new Vector3 (0, -10, 0));
-				}
-				if (Input.GetKey ("a")) {
-					rb.AddForce (new Vector3 (-10, 0, 0));
-				}
-				if (Input.GetKey ("d")) {
-					rb.AddForce (new Vector3 (10, 0, 0));
-				}
+//				if (Input.GetKey ("w")) {
+//					rb.AddForce (new Vector3 (0, 10, 0));
+//				}
+//				if (Input.GetKey ("s")) {
+//					rb.AddForce (new Vector3 (0, -10, 0));
+//				}
+//				if (Input.GetKey ("a")) {
+//					rb.AddForce (new Vector3 (-10, 0, 0));
+//				}
+//				if (Input.GetKey ("d")) {
+//					rb.AddForce (new Vector3 (10, 0, 0));
+//				}
 				if (Input.GetKey ("p")) {
 					AutoDock ();
 				}
@@ -165,10 +119,10 @@ public class PDB_mesh : MonoBehaviour {
 				}
 				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
 
-				PDB_molecule.collide (
-                gameObject, mol, transform,
-                other, other_mesh.mol, other.transform
-				);
+				//PDB_molecule.collide (
+               // gameObject, mol, transform,
+               // other, other_mesh.mol, other.transform
+				//);
 			}
 		}
 	}

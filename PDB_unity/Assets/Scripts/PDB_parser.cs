@@ -34,12 +34,14 @@ using AssemblyCSharp;
 //------------------------------------------------------
 //1 -6          BioBlox name    "BBPAIR"
 //7 -11			Integer			index		Index of atom in first molecule to pair
-//13-16			Integer			index		Index of atom in second molecule to pair
+//12-16			Integer			index		Index of atom in second molecule to pair
 //------------------------------------------------------
 //1 -6			BioBlox name    "BIOB"
-//7-11			Integer			index		Index of labled atom
-//13-16			Integer			index		Molecule index
+//7-11			Integer			index		Index of labeled atom
+//12-16 		Integer			index		Molecule index
 //17-21			LString(8)      string		Tag for the atom
+
+
 
 public class PDB_parser {
     static private Dictionary<string, int> colour = new Dictionary<string, int> {
@@ -109,8 +111,6 @@ public class PDB_parser {
 					int firstMeshAtom= int.Parse(line.Substring(7,4));
 					int secondMeshAtom = int.Parse(line.Substring(12,4));
 					pairs.Add(new Tuple<int,int>(firstMeshAtom,secondMeshAtom));
-
-
 				}else if(kind=="BIOB  "){
 					int atomIndex = int.Parse(line.Substring(7,4));
 					int molIndex = int.Parse(line.Substring(12,4));
@@ -121,7 +121,6 @@ public class PDB_parser {
 					}
 					Debug.Log(tag+" attached to "+atomIndex+" on molecule "+molIndex);
 					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex,tag));
-
 				}else if (kind == "TER   ") {
                     cur = new PDB_molecule();
                     cur.residues = residues.ToArray();
@@ -152,18 +151,7 @@ public class PDB_parser {
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
-			m.pairedAtoms=new int[pairs.Count];
-			for(int j=0;j<pairs.Count;++j)
-			{
-				if(i==0)
-				{
-					m.pairedAtoms[j]=pairs[j].First;
-				}
-				else if (i==1)
-				{
-					m.pairedAtoms[j]=pairs[j].Second;
-				}
-			}
+			m.pairedAtoms=pairs.ToArray();
 			if(labels.Count>i)
 			{
 				m.labels=labels[i].ToArray();

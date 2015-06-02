@@ -10,27 +10,32 @@ public class TransformLerper : MonoBehaviour {
 			
 		public bool finished=true;
 		
-		Transform target;
+		public Transform target;
+	int numRunning=0;
 		
-		IEnumerator LerpTransforms()
-		{
-			float t = 0;
-			Vector3 start = target.position;
-			Quaternion startRot = target.rotation;
-			if (index == positions.Count) {
-				finished=true;
-				yield break;
-			}
-			while (t<=1){
-				t += Time.deltaTime;
-				target.position = Vector3.Lerp (start,positions[index], t);
-				target.rotation = 
-					Quaternion.Slerp (startRot,quaternions[index], t);
-				yield return null;
-			}
-			index++;
+		IEnumerator LerpTransforms ()
+	{
+		Debug.Log ("Start: Num Alive:" + numRunning);
+		numRunning++;
+		float t = 0;
+		Vector3 start = target.position;
+		Quaternion startRot = target.rotation;
+		if (index == positions.Count) {
+			Debug.Log ("Stopping: Num Alive:" + numRunning);
+			finished = true;
+			yield break;
+		}
+		while (t<=1) {
+			t += Time.deltaTime;
+			target.position = Vector3.Lerp (start, positions [index], t);
+			target.rotation = 
+						Quaternion.Slerp (startRot, quaternions [index], t);
+			yield return null;
+		}
+		index++;
 			StartCoroutine ("LerpTransforms");
-		} 
+		yield break;
+	} 
 		
 		public void AddTransformPoint(Vector3 vec,
 		                              Quaternion rot)
@@ -40,8 +45,10 @@ public class TransformLerper : MonoBehaviour {
 		}
 		public void StartTransform()
 		{
-			finished = false;
+			if (finished) {
+			finished=false;
 			StartCoroutine ("LerpTransforms");
+		}
 			
 		}
 	// Use this for initialization

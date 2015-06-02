@@ -59,6 +59,7 @@
      <None Include="Assets\Resources\DebugPDB.txt" />
      <None Include="Assets\Resources\script.txt" />
      <None Include="Assets\Resources\pdb1t6b.txt" />
+     <None Include="Assets\Resources\pdb2ptcWithTags.txt" />
      <None Include="Assets\Resources\mypdb.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>D:/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
