@@ -71,13 +71,14 @@ public class PDB_parser {
         float minx = 1e37f, miny = 1e37f, minz = 1e37f;
         float maxx = -1e37f, maxy = -1e37f, maxz = -1e37f;
         Vector3 cofg = new Vector3();
+		List<int> serial_to_atom = new List<int>();
         using (StringReader reader = new StringReader(pdbTA.text)) {
             string line;
             while ((line = reader.ReadLine()) != null) {
                 string kind = line.Substring(0, 6);
                 if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
                 {
-                    //int idx = int.Parse(line.Substring(7 - 1, 5));
+                    int serial = int.Parse(line.Substring(7 - 1, 5));
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
@@ -88,6 +89,10 @@ public class PDB_parser {
                         residues.Add(names.Count);
                     }
                     names.Add(name);
+					if (serial >= 0) {
+						while (serial >= serial_to_atom.Count) serial_to_atom.Add (-1);
+						serial_to_atom[serial] = atom_centres.Count;
+					}
                     atom_centres.Add(new Vector3(x, y, z));
                     atom_radii.Add(r);
                     minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
@@ -107,20 +112,20 @@ public class PDB_parser {
                         int c = int.Parse(sc);
                         pairs.Add((idx << 16) | c);
                     }*/
-				} else if(kind=="BBPAIR"){
-					int firstMeshAtom= int.Parse(line.Substring(7,4));
-					int secondMeshAtom = int.Parse(line.Substring(12,4));
-					pairs.Add(new Tuple<int,int>(firstMeshAtom,secondMeshAtom));
-				}else if(kind=="BIOB  "){
-					int atomIndex = int.Parse(line.Substring(7,4));
-					int molIndex = int.Parse(line.Substring(12,4));
-					string tag = line.Substring(17,4);
+				} else if (kind == "BBPAIR") {
+					int firstMeshAtom = int.Parse(line.Substring(7, 4));
+					int secondMeshAtom = int.Parse(line.Substring(12, 4));
+					pairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+				} else if (kind == "BIOB  ") {
+					int atomIndex = int.Parse(line.Substring(7, 4));
+					int molIndex = int.Parse(line.Substring(12, 4));
+					string tag = line.Substring(17, 4);
 					while(labels.Count<=molIndex)
 					{
 						labels.Add(new List<PDB_molecule.Label>());
 					}
-					Debug.Log(tag+" attached to "+atomIndex+" on molecule "+molIndex);
-					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex,tag));
+					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
+					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
 				}else if (kind == "TER   ") {
                     cur = new PDB_molecule();
                     cur.residues = residues.ToArray();
@@ -131,6 +136,7 @@ public class PDB_parser {
                     cofg += cur.pos;
                     cur.atom_centres = new Vector3[atom_centres.Count];
                     cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
+					cur.serial_to_atom = serial_to_atom.ToArray();
                     for (int j = 0; j != names.Count; ++j) {
                         cur.atom_centres[j] = atom_centres[j] - cur.pos;
                         //cur.atom_radii[j] = atom_radii[j];
@@ -142,6 +148,7 @@ public class PDB_parser {
                     atom_centres.Clear();
                     atom_radii.Clear();
                     residues.Clear();
+					serial_to_atom.Clear();
                 } 
             }
         }

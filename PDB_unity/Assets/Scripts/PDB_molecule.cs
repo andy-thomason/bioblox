@@ -20,6 +20,7 @@ public class PDB_molecule
     public float[] bvh_radii;
     public int[] bvh_terminals;
 	public Label[] labels = new Label[0];
+	public int[] serial_to_atom;
 
     //const float c = 1.618033988749895f;
     const float e = 0.52573111f;
