@@ -1,0 +1,161 @@
+fileFormatVersion: 2
+guid: 1c80ca88bc9332f42b907b1f059ba868
+timeCreated: 1433414114
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Gene_04:EyeBrowLeft
+    100002: Gene_04:EyeBrowRight
+    100004: Gene_04:Hair
+    100006: Gene_04:Head
+    100008: Gene_04:HeadRotation
+    100010: Gene_04:joint10
+    100012: Gene_04:joint11
+    100014: Gene_04:joint12
+    100016: Gene_04:joint13
+    100018: Gene_04:joint14
+    100020: Gene_04:joint15
+    100022: Gene_04:joint16
+    100024: Gene_04:joint33
+    100026: Gene_04:joint34
+    100028: Gene_04:joint35
+    100030: Gene_04:joint36
+    100032: Gene_04:joint37
+    100034: Gene_04:joint38
+    100036: Gene_04:joint39
+    100038: Gene_04:joint4
+    100040: Gene_04:joint40
+    100042: Gene_04:joint41
+    100044: Gene_04:joint42
+    100046: Gene_04:joint43
+    100048: Gene_04:joint44
+    100050: Gene_04:joint45
+    100052: Gene_04:joint5
+    100054: Gene_04:joint6
+    100056: Gene_04:joint7
+    100058: Gene_04:joint8
+    100060: Gene_04:joint9
+    100062: Gene_04:LeftHand
+    100064: Gene_04:LEftHandWrist
+    100066: Gene_04:Moustache
+    100068: Gene_04:RightHand
+    100070: Gene_04:RightHandWrist
+    100072: Gene_04:transform1
+    100074: Gene_04:transform2
+    100076: Gene_04:transform3
+    100078: Gene_04:transform4
+    100080: Gene_04:transform5
+    100082: Gene_04:WholeHead
+    100084: //RootNode
+    100086: Mesh
+    100088: Skeleton
+    400000: Gene_04:EyeBrowLeft
+    400002: Gene_04:EyeBrowRight
+    400004: Gene_04:Hair
+    400006: Gene_04:Head
+    400008: Gene_04:HeadRotation
+    400010: Gene_04:joint10
+    400012: Gene_04:joint11
+    400014: Gene_04:joint12
+    400016: Gene_04:joint13
+    400018: Gene_04:joint14
+    400020: Gene_04:joint15
+    400022: Gene_04:joint16
+    400024: Gene_04:joint33
+    400026: Gene_04:joint34
+    400028: Gene_04:joint35
+    400030: Gene_04:joint36
+    400032: Gene_04:joint37
+    400034: Gene_04:joint38
+    400036: Gene_04:joint39
+    400038: Gene_04:joint4
+    400040: Gene_04:joint40
+    400042: Gene_04:joint41
+    400044: Gene_04:joint42
+    400046: Gene_04:joint43
+    400048: Gene_04:joint44
+    400050: Gene_04:joint45
+    400052: Gene_04:joint5
+    400054: Gene_04:joint6
+    400056: Gene_04:joint7
+    400058: Gene_04:joint8
+    400060: Gene_04:joint9
+    400062: Gene_04:LeftHand
+    400064: Gene_04:LEftHandWrist
+    400066: Gene_04:Moustache
+    400068: Gene_04:RightHand
+    400070: Gene_04:RightHandWrist
+    400072: Gene_04:transform1
+    400074: Gene_04:transform2
+    400076: Gene_04:transform3
+    400078: Gene_04:transform4
+    400080: Gene_04:transform5
+    400082: Gene_04:WholeHead
+    400084: //RootNode
+    400086: Mesh
+    400088: Skeleton
+    4300000: Gene_04:RightHand
+    4300002: Gene_04:LeftHand
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: Gene_04:LeftHand
+    13700002: Gene_04:RightHand
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,14 @@
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\UnityEditor.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\UnityEditor.iOS.Extensions.Xcode.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\UnityEngine.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Unity.SerializationLogic.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\mon and paul\Documents\GeneCharacter\Temp\bin\Debug\Unity.CecilTools.dll
+C:\Users\mon and paul\Documents\GeneCharacter\obj\Debug\Assembly-CSharp-firstpass-vs.csprojResolveAssemblyReference.cache
+C:\Users\mon and paul\Documents\GeneCharacter\obj\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\mon and paul\Documents\GeneCharacter\obj\Debug\Assembly-CSharp-firstpass.pdb
