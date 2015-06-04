@@ -26,10 +26,16 @@ public class TransformLerper : MonoBehaviour {
 			yield break;
 		}
 		while (t<=1) {
-			t += Time.deltaTime;
+			t += Time.deltaTime*0.5f;
+			if(positions[index]!=null)
+			{
 			target.position = Vector3.Lerp (start, positions [index], t);
+			}
+			if(quaternions[index]!=null)
+			{
 			target.rotation = 
 						Quaternion.Slerp (startRot, quaternions [index], t);
+			}
 			yield return null;
 		}
 		index++;
@@ -42,6 +48,16 @@ public class TransformLerper : MonoBehaviour {
 		{
 			positions.Add (vec);
 			quaternions.Add (rot);
+		}
+
+		public void AddTransformPoint(Quaternion rot)
+		{
+		if (positions.Count > 0) {
+			positions.Add (positions [positions.Count - 1]);
+		} else {
+			positions.Add(this.transform.position);
+		}
+		quaternions.Add (rot);
 		}
 		public void StartTransform()
 		{

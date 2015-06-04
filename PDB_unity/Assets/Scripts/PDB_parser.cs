@@ -34,7 +34,7 @@ using AssemblyCSharp;
 //------------------------------------------------------
 //1 -6          BioBlox name    "BBPAIR"
 //7 -11			Integer			index		Index of atom in first molecule to pair
-//12-16			Integer			index		Index of atom in second molecule to pair
+//13-16			Integer			index		Index of atom in second molecule to pair
 //------------------------------------------------------
 //1 -6			BioBlox name    "BIOB"
 //7-11			Integer			index		Index of labeled atom
@@ -114,7 +114,7 @@ public class PDB_parser {
                     }*/
 				} else if (kind == "BBPAIR") {
 					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(12, 4));
+					int secondMeshAtom = int.Parse(line.Substring(13, 4));
 					pairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
 				} else if (kind == "BIOB  ") {
 					int atomIndex = int.Parse(line.Substring(7, 4));

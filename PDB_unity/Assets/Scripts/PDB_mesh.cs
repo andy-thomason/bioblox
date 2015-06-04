@@ -29,7 +29,7 @@ public class PDB_mesh : MonoBehaviour {
 		joinedPos = mol.pos;
 	}
 
-	void BringAtomToFocus(int atomIndex)
+	public void BringAtomToFocus(int atomIndex)
 	{
 			Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
 				GetComponent<Camera> ();
@@ -91,24 +91,26 @@ public class PDB_mesh : MonoBehaviour {
 				if (Input.GetKey ("p")) {
 					AutoDock ();
 				}
-				if (Input.GetMouseButtonDown (0)) {
-					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
-					GetComponent<Camera> ();
-					Ray r = c.ScreenPointToRay (
-						Input.mousePosition);
-
-					RaycastHit info= new RaycastHit();
-					Physics.Raycast(r,out info);
-					if(info.collider==null)
-					{
-						int hit = PDB_molecule.collide_ray (gameObject, mol,
-				                         transform, r);
-						if (hit != -1 && !startRotation) {
-							Vector3 molDir = mol.atom_centres [hit];
-							BringPointToFocus (molDir, c);
-						}
-					}
-				}
+//				if (Input.GetMouseButtonDown (0)) {
+//					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
+//					GetComponent<Camera> ();
+//					Ray r = c.ScreenPointToRay (
+//						Input.mousePosition);
+//
+//					RaycastHit info= new RaycastHit();
+//					Physics.Raycast(r,out info);
+//					if(info.collider==null)
+//					{
+//
+//						int hit = PDB_molecule.collide_ray (gameObject, mol,
+//				                         transform, r);
+//						Debug.Log (hit);
+//						if (hit != -1 && !startRotation) {
+//							Vector3 molDir = mol.atom_centres [hit];
+//							BringPointToFocus (molDir, c);
+//						}
+//					}
+//				}
 				if (startRotation) {
 					t += Time.deltaTime;
 					transform.localRotation = Quaternion.Slerp (start, end, t);
