@@ -6,17 +6,21 @@ using UnityEngine.EventSystems;
 
 public class BioBlox : MonoBehaviour
 {
-
 	List<string> filenames = new List<string> ();
 	int filenameIndex = 0;
 	EventSystem eventSystem;
 	public List<GameObject> prefabLabels;
+	public GameObject winSplash;
+	public GameObject looseSplash;
 	List<LabelScript> activeLabels = new List<LabelScript> ();
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 	bool reload = false;
 	bool won = false;
+	bool loose=false;
 	LabelScript[] selectedLabelIndex = new LabelScript[2];
 	GameObject[] molecules;
+
+	GameObject popTarget;
 
 	// Use this for initialization
 	void Start ()
@@ -62,7 +66,7 @@ public class BioBlox : MonoBehaviour
 			transToAt = transToAt.normalized * molMesh.mol.bvh_radii [0];
 			atomPosW = transToAt + molMesh.transform.position;
 		} else {
-			atomPosW += new Vector3 (0, 0, -10);
+			atomPosW += new Vector3 (0, 0, -12);
 		}
 		t.position = atomPosW;
 		if (atomPosW.x < molMesh.transform.position.x) {
@@ -98,6 +102,47 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 
+	void PopIn(GameObject g)
+	{
+		popTarget = g;
+		StartCoroutine ("PopInCo");
+	}
+	void PopOut(GameObject g)
+	{
+		popTarget = g;
+		StartCoroutine ("PopOutCo");
+	}
+
+	IEnumerator PopInCo()
+	{
+		GameObject target = popTarget;
+		target.SetActive (true);
+		popTarget = null;
+		float scaleSpeed = 3.0f;
+		Vector3 targetScale = target.transform.localScale;
+		target.transform.localScale = new Vector3 (0, 0, 0);
+		for (float t=0; t<1; t+=Time.deltaTime*scaleSpeed) {
+			target.transform.localScale= targetScale*t;
+			yield return null;
+		}
+		yield break;
+	}
+
+	IEnumerator PopOutCo()
+	{
+		GameObject target = popTarget;
+		popTarget = null;
+		float scaleSpeed = 3.0f;
+		Vector3 targetScale = target.transform.localScale;
+		for (float t=1; t>0; t-=Time.deltaTime*scaleSpeed) {
+			target.transform.localScale= targetScale*t;
+			yield return null;
+		}
+		target.SetActive (false);
+		target.transform.localScale = targetScale;
+		yield break;
+	}
+
 	//returns other link index or -1 on failure
 //	public void LinkPair(LabelScript a, LabelScript b)
 //	{
@@ -122,9 +167,14 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log (labelObj.name + " was clicked");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
+
 		int molNum = -1;
 		int index = GetAtomIndexFromID (script.label.atomIndex, out molNum);
-		molecules [molNum].GetComponent<PDB_mesh> ().BringAtomToFocus (index);
+		//gives us the opposite molecule, 1-0=1, 1-1 =0
+		int otherMolNum = 1 - molNum;
+		Vector3 alignDir = molecules [otherMolNum].transform.position -
+			molecules [molNum].transform.position;
+		molecules [molNum].GetComponent<PDB_mesh> ().AlignAtomToVector (index,alignDir);
 		if (selectedLabelIndex [0]) {
 			selectedLabelIndex [0].shouldGlow = false;
 		}
@@ -171,7 +221,7 @@ public class BioBlox : MonoBehaviour
 		laSc.is3D = true;
 		//GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
 		//newLabel.transform.position = foundObject.transform.position;
-		GameObject canvas = GameObject.Find ("Canvas");
+		GameObject canvas = GameObject.Find ("Labels");
 		newLabel.transform.SetParent (canvas.transform);
 		newLabel.name = label.labelName + laSc.labelID;
 		activeLabels.Add (laSc);
@@ -191,29 +241,50 @@ public class BioBlox : MonoBehaviour
 		won = false;
 	}
 
-	public void CheckWin ()
+	public void CheckPair()
 	{
+		bool hasWon = true;
 		if (winCondition.Count > 0 && selectedLabelIndex [0] && selectedLabelIndex [1]) {
-
+			
 			for (int i=0; i<winCondition.Count; ++i) {
 				int winCon1 = winCondition [i].First;
 				int winCon2 = winCondition [i].Second;
-
+				
 				int selected1 = selectedLabelIndex [0].label.atomIndex;
 				int selected2 = selectedLabelIndex [1].label.atomIndex;
-
+				
 				if (!(winCon1 == selected1 && winCon2 == selected2) &&
 					!(winCon1 == selected2 && winCon2 == selected1)) {
-					won = false;
-					return;	
+					hasWon=false;
+					break;
 				}
 			}
-			won = true;
-			return;
 		}
-		won = false;
-		return;
+		if (hasWon) {
+			won=true;
+		} else {
+			loose=true;
+		}
 	}
+
+	IEnumerator LooseSplash()
+	{
+		//put animation for loose splash here
+		looseSplash.SetActive (true);
+		yield return new WaitForSeconds (2.0f);
+		looseSplash.SetActive (false);
+		yield break;
+	}
+
+	IEnumerator WinSplash ()
+	{
+		//put animation for win splash here
+		winSplash.SetActive (true);
+		yield return new WaitForSeconds (2.0f);
+		winSplash.SetActive (false);
+		yield break;
+	}
+
 
 	MeshRenderer make_molecule (
 		string name, string proto, float xoffset
@@ -234,9 +305,6 @@ public class BioBlox : MonoBehaviour
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
 		r.material = pdbr.material;
-		r.enabled = false;
-
-
 
 		obj.transform.Rotate (0, 0, 270);
 		Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
@@ -271,9 +339,10 @@ public class BioBlox : MonoBehaviour
 		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
 		p1.other = p2.gameObject;
 		p2.other = p1.gameObject;
+		p1.gameObject.SetActive (false);
+		p2.gameObject.SetActive (false);
 		for (int i=0; i<p1.mol.pairedAtoms.Length; ++i) {
 			winCondition.Add (p1.mol.pairedAtoms [i]);
-		
 		}
 
 		for (int i = 0; i < activeLabels.Count; ++i) {
@@ -293,13 +362,13 @@ public class BioBlox : MonoBehaviour
 		yield return new WaitForSeconds (1.0f);
 		CD1.transform.Translate (1000, 0, 0);
 
-		mol1.enabled = true;
+		PopIn (mol1.gameObject);
 		yield return new WaitForSeconds (0.3f);
-		mol2.enabled = true;
+		PopIn (mol2.gameObject);
 
 		for (int i = 0; i < activeLabels.Count; ++i) {
 			yield return new WaitForSeconds (0.1f);
-			activeLabels [i].gameObject.SetActive (true);
+			PopIn(activeLabels [i].gameObject);
 		}
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true; 
@@ -308,20 +377,72 @@ public class BioBlox : MonoBehaviour
 				Debug.Log ("We won");
 				p1.AutoDock ();
 				p2.AutoDock ();
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					PopOut(activeLabels [i].gameObject);
+				}
 				while (!p1.GetComponent<TransformLerper>().finished&&
 				      !p2.GetComponent<TransformLerper>().finished) {
 					yield return null;
 				}
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					activeLabels [i].gameObject.SetActive (false);
-				}
+
 				eventSystem.enabled = false;
-				yield return new WaitForSeconds(1.0f);
+				StartCoroutine("WinSplash");
+				yield return new WaitForSeconds(2.0f);
+				PopOut(mol1.gameObject);
+				PopOut(mol2.gameObject);
+				yield return new WaitForSeconds(3.0f);
 				GameObject.Destroy (mol1.gameObject);
 				GameObject.Destroy (mol2.gameObject);
 				reload = true;
 				Debug.Log ("Reloading");
 				yield break;
+			}
+			if(loose)
+			{
+				Debug.Log("Wrong");
+				eventSystem.enabled=false;
+				Vector3 startPos1=p1.gameObject.transform.position;
+				Vector3 startPos2=p2.gameObject.transform.position;
+
+				Vector3 moveVec1=p1.mol.pos-startPos1;
+				Vector3 moveVec2=p2.mol.pos-startPos2;
+				moveVec1.y=0;
+				moveVec2.y=0;
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					PopOut(activeLabels [i].gameObject);
+				}
+				for(float t=0;t<1;t+=Time.deltaTime)
+				{
+					p1.transform.position=startPos1+moveVec1*t;
+					p2.transform.position=startPos2+moveVec2*t;
+
+					if(PDB_molecule.collide(p1.gameObject,p1.mol,p1.transform,
+					                        p2.gameObject,p2.mol,p2.transform))
+					{
+						break;
+					}
+
+					yield return null;
+				}
+				StartCoroutine("LooseSplash");
+				yield return new WaitForSeconds(2.0f);
+
+				moveVec1=startPos1-p1.transform.position;
+				moveVec2=startPos2-p2.transform.position;
+
+				startPos1=p1.transform.position;
+				startPos2=p2.transform.position;
+				for(float t=0;t<1;t+=Time.deltaTime)
+				{
+					p1.transform.position=startPos1+moveVec1*t;
+					p2.transform.position=startPos2+moveVec2*t;
+					yield return null;
+				}
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					PopIn(activeLabels [i].gameObject);
+				}
+				eventSystem.enabled=true;
+				loose=false;
 			}
 			yield return null;
 		}

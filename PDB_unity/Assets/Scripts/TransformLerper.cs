@@ -26,7 +26,7 @@ public class TransformLerper : MonoBehaviour {
 			yield break;
 		}
 		while (t<=1) {
-			t += Time.deltaTime*0.5f;
+			t += Time.deltaTime;
 			if(positions[index]!=null)
 			{
 			target.position = Vector3.Lerp (start, positions [index], t);

@@ -1,0 +1,129 @@
+fileFormatVersion: 2
+guid: 9aea073a67a8faf4d8d7dbee3b6e2ccf
+timeCreated: 1432041061
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Gene_04:EyeBrowLeft
+    100002: Gene_04:EyeBrowLeft 1
+    100004: Gene_04:EyeBrowRight
+    100006: Gene_04:EyeBrowRight 1
+    100008: Gene_04:EyeLeft
+    100010: Gene_04:EyeRight
+    100012: Gene_04:Hair
+    100014: Gene_04:Head
+    100016: Gene_04:Head 1
+    100018: Gene_04:HeadControl
+    100020: Gene_04:HeadRotation
+    100022: Gene_04:LEftBrow
+    100024: Gene_04:LEftMoustache
+    100026: Gene_04:MainMoustache
+    100028: Gene_04:Moustache
+    100030: Gene_04:RightBrow
+    100032: Gene_04:RightMoustche
+    100034: Gene_04:TipHaed
+    100036: Gene_04:transform1
+    100038: Gene_04:transform2
+    100040: Gene_04:transform3
+    100042: Gene_04:transform4
+    100044: Gene_04:transform5
+    100046: Gene_04:WholeHead
+    100048: Gene_04:WholeHead_EyeBrowLeft
+    100050: //RootNode
+    100052: Mesh
+    100054: Skeleton
+    400000: Gene_04:EyeBrowLeft
+    400002: Gene_04:EyeBrowLeft 1
+    400004: Gene_04:EyeBrowRight
+    400006: Gene_04:EyeBrowRight 1
+    400008: Gene_04:EyeLeft
+    400010: Gene_04:EyeRight
+    400012: Gene_04:Hair
+    400014: Gene_04:Head
+    400016: Gene_04:Head 1
+    400018: Gene_04:HeadControl
+    400020: Gene_04:HeadRotation
+    400022: Gene_04:LEftBrow
+    400024: Gene_04:LEftMoustache
+    400026: Gene_04:MainMoustache
+    400028: Gene_04:Moustache
+    400030: Gene_04:RightBrow
+    400032: Gene_04:RightMoustche
+    400034: Gene_04:TipHaed
+    400036: Gene_04:transform1
+    400038: Gene_04:transform2
+    400040: Gene_04:transform3
+    400042: Gene_04:transform4
+    400044: Gene_04:transform5
+    400046: Gene_04:WholeHead
+    400048: Gene_04:WholeHead_EyeBrowLeft
+    400050: //RootNode
+    400052: Mesh
+    400054: Skeleton
+    4300000: Gene_04:WholeHead_EyeBrowLeft
+    4300002: Gene_04:EyeRight
+    4300004: Gene_04:EyeLeft
+    7400000: Moustache
+    9500000: //RootNode
+    13700000: Gene_04:EyeLeft
+    13700002: Gene_04:EyeRight
+    13700004: Gene_04:WholeHead_EyeBrowLeft
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

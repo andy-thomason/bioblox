@@ -28,6 +28,21 @@ public class PDB_mesh : MonoBehaviour {
 		autoDockStartRotation = this.transform.rotation;
 		joinedPos = mol.pos;
 	}
+	public void AlignAtomToVector(int atomIndex, Vector3 targetDir)
+	{
+		Vector3 localPos = mol.atom_centres [atomIndex];
+		Vector3 startDir = localPos;
+		
+		Quaternion targetQ=Quaternion.LookRotation(targetDir);
+		Quaternion startQ=Quaternion.LookRotation(startDir);
+		start=transform.rotation;
+		
+		Quaternion toFront = targetQ * Quaternion.Inverse (startQ);
+
+		end=toFront;
+		startRotation=true;
+		t=0;
+	}
 
 	public void BringAtomToFocus(int atomIndex)
 	{
