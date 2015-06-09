@@ -20,6 +20,7 @@ public class BioBlox : MonoBehaviour
 	bool loose = false;
 	LabelScript[] selectedLabelIndex = new LabelScript[2];
 	GameObject[] molecules;
+	bool[] playerIsMoving = new bool[2]{false,false};
 	GameObject popTarget;
 
 	// Use this for initialization
@@ -109,6 +110,46 @@ public class BioBlox : MonoBehaviour
 		return new Vector3 (0, 0, 0);
 	}
     
+	IEnumerator PlayerMoveMolecule(int molIndex)
+	{
+		GameObject mol = molecules [molIndex];
+		Rigidbody r = mol.GetComponent<Rigidbody> ();
+		r.maxAngularVelocity = 4;
+		float timeout = 4.0f;
+		playerIsMoving [molIndex] = true;
+		Vector3 lastMousePos = Input.mousePosition;
+		for (float t=0.0f; t<timeout; t+=Time.deltaTime) {
+			if(playerIsMoving[molIndex]==false||
+			   eventSystem.IsActive()==false)
+			{
+				break;
+			}
+
+			if(Input.GetMouseButton(0))
+			{
+				if(t>0.3f)
+				{
+					lastMousePos=Input.mousePosition;
+				}
+				Debug.Log("Refreshed");
+				t=0.0f;
+				Vector3 mousePos=Input.mousePosition;
+				Vector3 mouseDelta=mousePos-lastMousePos;
+
+				r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
+				lastMousePos=mousePos;
+			}
+			yield return null;
+		}
+		Debug.Log ("Exiting");
+		if (selectedLabelIndex [molIndex]&&eventSystem.IsActive()) {
+			LabelClicked (selectedLabelIndex [molIndex].gameObject);
+		}
+		playerIsMoving[molIndex]=false;
+		r.angularVelocity=new Vector3(0,0,0);
+		yield break;
+	}
+
 	// Update is called once per frame
 	void Update ()
 	{
@@ -121,6 +162,36 @@ public class BioBlox : MonoBehaviour
 			else{
 			StartCoroutine (game_loop ());
 			}
+		}
+		if (eventSystem.IsActive()) {
+			if(Input.GetMouseButton(0))
+			{
+				Camera c=GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+				Ray r=c.ScreenPointToRay(Input.mousePosition);
+				if(!playerIsMoving[0] && PDB_molecule.collide_ray(
+					molecules[0],
+					molecules[0].GetComponent<PDB_mesh>().mol,
+					molecules[0].transform,
+					r)!=-1)
+				{
+					Debug.Log("Started moving 1");
+					playerIsMoving[1]=false;
+					playerIsMoving[0]=true;
+					StartCoroutine("PlayerMoveMolecule",0);
+				}
+				else if(!playerIsMoving[1] && PDB_molecule.collide_ray(
+					molecules[1],
+					molecules[1].GetComponent<PDB_mesh>().mol,
+					molecules[1].transform,
+					r)!=-1)
+				{
+					Debug.Log("Started moving 2");
+					playerIsMoving[0]=false;
+					playerIsMoving[1]=true;
+					StartCoroutine("PlayerMoveMolecule",1);
+				}
+			}
+		
 		}
 	}
 
@@ -196,9 +267,10 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log (labelObj.name + " was clicked");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
-
+		
 		int molNum = -1;
 		int index = GetAtomIndexFromID (script.label.atomIndex, out molNum);
+		playerIsMoving [molNum] = false;
 		//gives us the opposite molecule, 1-0=1, 1-1 =0
 		int otherMolNum = 1 - molNum;
 		Vector3 alignDir = molecules [otherMolNum].transform.position -
@@ -384,6 +456,7 @@ public class BioBlox : MonoBehaviour
 		MeshFilter f = obj.AddComponent<MeshFilter> ();
 		MeshRenderer r = obj.AddComponent<MeshRenderer> ();
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
+		Rigidbody ri = obj.AddComponent<Rigidbody> ();
 
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
@@ -392,6 +465,11 @@ public class BioBlox : MonoBehaviour
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
 		r.material = pdbr.material;
+
+		ri.angularDrag = 1;
+		ri.useGravity = false;
+		ri.constraints = RigidbodyConstraints.FreezePosition;
+
 
 		obj.transform.Rotate (0, 0, 270);
 		Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
