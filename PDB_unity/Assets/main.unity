@@ -96,7 +96,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 42267348}
   - 33: {fileID: 42267347}
-  - 65: {fileID: 42267346}
   - 23: {fileID: 42267345}
   m_Layer: 0
   m_Name: Proto1
@@ -129,18 +128,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &42267346
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 42267344}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &42267347
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -618,7 +605,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 1086054553}
   - 33: {fileID: 1086054552}
-  - 65: {fileID: 1086054551}
   - 23: {fileID: 1086054550}
   m_Layer: 0
   m_Name: Proto2
@@ -651,18 +637,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &1086054551
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1086054549}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &1086054552
 MeshFilter:
   m_ObjectHideFlags: 0
