@@ -7,6 +7,8 @@ public class TransformLerper : MonoBehaviour {
 		List<Quaternion> quaternions = new List<Quaternion> ();
 		
 		int index;
+		public float speed=1;
+
 			
 		public bool finished=true;
 		
@@ -15,18 +17,16 @@ public class TransformLerper : MonoBehaviour {
 		
 		IEnumerator LerpTransforms ()
 	{
-		Debug.Log ("Start: Num Alive:" + numRunning);
 		numRunning++;
 		float t = 0;
 		Vector3 start = target.position;
 		Quaternion startRot = target.rotation;
 		if (index == positions.Count) {
-			Debug.Log ("Stopping: Num Alive:" + numRunning);
 			finished = true;
 			yield break;
 		}
 		while (t<=1) {
-			t += Time.deltaTime;
+			t += Time.deltaTime*speed;
 			if(positions[index]!=null)
 			{
 			target.position = Vector3.Lerp (start, positions [index], t);
@@ -39,7 +39,7 @@ public class TransformLerper : MonoBehaviour {
 			yield return null;
 		}
 		index++;
-			StartCoroutine ("LerpTransforms");
+		StartCoroutine ("LerpTransforms");
 		yield break;
 	} 
 		
@@ -49,7 +49,6 @@ public class TransformLerper : MonoBehaviour {
 			positions.Add (vec);
 			quaternions.Add (rot);
 		}
-
 		public void AddTransformPoint(Quaternion rot)
 		{
 		if (positions.Count > 0) {

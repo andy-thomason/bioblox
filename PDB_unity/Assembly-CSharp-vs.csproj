@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Classes\Tuple.cs" />
      <Compile Include="Assets\MrGene\ScriptsAndAnimations\LookAtObjects.cs" />
+     <Compile Include="Assets\Scripts\AudioManager.cs" />
      <Compile Include="Assets\Scripts\BioBlox.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
      <Compile Include="Assets\Scripts\LabelScript.cs" />

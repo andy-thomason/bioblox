@@ -75,7 +75,7 @@ public class PDB_mesh : MonoBehaviour {
 	{
 		allowInteraction = false;
 		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
-
+		startRotation = false;
 		t = 0;
 		//mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
 		//mover.AddTransformPoint(mol.pos,Quaternion.identity);

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -11,17 +12,59 @@ IDragHandler,IEndDragHandler{
 	public BioBlox owner;
 	public int labelID;
 
+	public GameObject cloudPrefab;
+	public int numClouds;
+
+	public Sprite clicked;
+	public Sprite nonClicked;
 //	private int linkIndex=-1;
 
 	public bool is3D =false;
 	public bool isInteractable=true;
 	public bool shouldGlow=false;
 	
+	List<GameObject> clouds = new List<GameObject> ();
+	GameObject cloudStorer;
+	
 	// Use this for initialization
 	void Start () {
 		gameObject.GetComponent<Light> ().enabled = false;
+		GameObject cloudSorter = new GameObject ();
+		cloudSorter.name = "Clouds" + this.name;
+		cloudSorter.transform.SetParent(GameObject.Find ("Clouds").transform);
+		cloudSorter.transform.localScale = new Vector3 (1, 1, 1);
+		cloudStorer = cloudSorter;
+		for(int i=0;i<numClouds;++i)
+		{
+			MakeCloud(i);
+		}
 	}
 
+	void MakeCloud(int i)
+	{
+		GameObject c = GameObject.Instantiate (cloudPrefab);
+		c.transform.SetParent(GameObject.Find ("Clouds"+this.name).transform);
+		clouds.Add (c);
+	}
+
+	public void OnDisable()
+	{
+		if (cloudStorer) {
+			cloudStorer.SetActive (false);
+		}
+	}
+	public void OnEnable()
+	{
+		if (cloudStorer) {
+			cloudStorer.SetActive (true);
+		}
+	}
+
+	public void OnDestroy()
+	{
+		GameObject.Destroy (cloudStorer);
+
+	}
 //	public void BreakLink()
 //	{
 //		linkIndex = -1;
@@ -67,18 +110,40 @@ IDragHandler,IEndDragHandler{
 //			}
 //		}
 	}
-	
+
+	void GenerateTail()
+	{
+		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex);
+		Vector3 toAtom = atomPos - this.transform.position;
+		float tIncrement = 1.0f / clouds.Count;
+		Sprite s = this.GetComponent<Image> ().sprite;
+		Vector3 scale = this.transform.localScale * 0.7f;
+		Vector3 targetScale = new Vector3 (1.0f, 1.0f, 1.0f);
+		Vector3 scaleDiff = targetScale - scale;
+		for (int i=0; i<clouds.Count; ++i) {
+		clouds[i].transform.position=this.transform.position+
+				toAtom*tIncrement*(i+1);
+			clouds[i].transform.localScale=scale+
+				scaleDiff*tIncrement*(i+1);
+			clouds[i].GetComponent<Image>().sprite=s;
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		if (is3D) {
 			//Vector3 toCamera =c.transform.position-atomPos;
 			//toCamera=toCamera.normalized*3;
 			owner.GetLabelPos(label.atomIndex,this.transform);
+
 		}
 		if (shouldGlow) {
-			gameObject.GetComponent<Light> ().enabled = true;
+			this.GetComponent<Image>().sprite=clicked;
+			//gameObject.GetComponent<Light> ().enabled = true;
 		} else {
-			gameObject.GetComponent<Light> ().enabled = false;
+			this.GetComponent<Image>().sprite=nonClicked;
+			//gameObject.GetComponent<Light> ().enabled = false;
 		}
+		GenerateTail();
 	}
 }
