@@ -29,6 +29,7 @@ public class BioBlox : MonoBehaviour
 		Debug.Log ("Start");
 		filenames.Add ("pdb2ptcWithTags");
 		filenames.Add ("pdb2ptcWithTags");
+		filenames.Add ("4PH2");
 		StartCoroutine (game_loop ());
 		eventSystem = EventSystem.current;
 
@@ -59,28 +60,24 @@ public class BioBlox : MonoBehaviour
 		int molNum = -1;
 		Vector3 atomPos = GetAtomPos (atomID);
 		int index = GetAtomIndexFromID (atomID, out molNum);
-
+		//if the molecule does not exist, or the atom id is bad
 		if (molNum == -1) {
 			return;
 		}
 		PDB_mesh molMesh = molecules [molNum].GetComponent<PDB_mesh> ();
 		Vector3 atomPosW = molMesh.transform.TransformPoint (atomPos);
+
+		Vector3 transToAt = atomPosW - molMesh.transform.position;
 		//atom is behind molecule
 		if (atomPosW.z > molMesh.transform.position.z) {
-			Vector3 transToAt = atomPosW - molMesh.transform.position;
+			//we project onto a circle on the xy plan
 			transToAt.z = 0;
-			transToAt = transToAt.normalized * molMesh.mol.bvh_radii [0];
-			atomPosW = transToAt + molMesh.transform.position;
-		} else {
-			RectTransform r = t.GetComponent<RectTransform> ();
-			atomPosW += new Vector3 (r.rect.width / 2, r.rect.height / 2, -10);
 		}
+
+		transToAt = transToAt.normalized * molMesh.mol.bvh_radii [0];
+		atomPosW = transToAt + molMesh.transform.position;
 		t.position = atomPosW;
-		if (atomPosW.x < molMesh.transform.position.x) {
-			t.localScale = new Vector3 (- Mathf.Abs (t.localScale.x), t.localScale.y, t.localScale.z);
-		} else {
-			t.localScale = new Vector3 (Mathf.Abs (t.localScale.x), t.localScale.y, t.localScale.z);
-		}
+
 	}
 
 	public Vector3 GetAtomPos (int atomID)
@@ -131,7 +128,6 @@ public class BioBlox : MonoBehaviour
 				{
 					lastMousePos=Input.mousePosition;
 				}
-				Debug.Log("Refreshed");
 				t=0.0f;
 				Vector3 mousePos=Input.mousePosition;
 				Vector3 mouseDelta=mousePos-lastMousePos;
@@ -141,7 +137,6 @@ public class BioBlox : MonoBehaviour
 			}
 			yield return null;
 		}
-		Debug.Log ("Exiting");
 		if (selectedLabelIndex [molIndex]&&eventSystem.IsActive()) {
 			LabelClicked (selectedLabelIndex [molIndex].gameObject);
 		}
@@ -483,6 +478,10 @@ public class BioBlox : MonoBehaviour
 		obj.GetComponent<TransformLerper> ().AddTransformPoint (originMolPos,
 		                                                       originalMolRot);
 		obj.GetComponent<TransformLerper> ().speed =1.0f;
+
+
+
+		obj.transform.rotation = Random.rotation;
 		for (int i=0; i<mol.labels.Length; ++i) {
 			CreateLabel (mol.labels [i], (int)char.GetNumericValue (name [name.Length - 1]));
 		}
@@ -544,13 +543,28 @@ public class BioBlox : MonoBehaviour
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true; 
 		while (true) {
+			if(Input.GetKeyDown(KeyCode.L))
+			{
+				PopOut (molecules[0].gameObject);
+				PopOut (molecules[1].gameObject);
+				yield return new WaitForSeconds (1.0f);
+				GameObject.Destroy (molecules[0].gameObject);
+				GameObject.Destroy (molecules[1].gameObject);
+				reload=true;
+				yield break;
+			}
 			if (won) {
 				Debug.Log ("We won");
-				p1.AutoDock ();
-				p2.AutoDock ();
+
 				for (int i = 0; i < activeLabels.Count; ++i) {
 					PopOut (activeLabels [i].gameObject);
 				}
+
+				p1.AutoDockCheap();
+				p2.AutoDockCheap();
+				//p1.AutoDock (p2.gameObject,winCondition.ToArray());
+				//yield return new WaitForSeconds(500.0f);
+
 				while (!p1.GetComponent<TransformLerper>().finished&&
 				      !p2.GetComponent<TransformLerper>().finished) {
 					yield return null;
@@ -565,11 +579,17 @@ public class BioBlox : MonoBehaviour
 				eventSystem.enabled = false;
 				Vector3 startPos1 = p1.gameObject.transform.position;
 				Vector3 startPos2 = p2.gameObject.transform.position;
-
+			
 				Vector3 moveVec1 =  - startPos1;
 				Vector3 moveVec2 =  - startPos2;
 				moveVec1.y = 0;
 				moveVec2.y = 0;
+
+				LabelClicked(selectedLabelIndex[0].gameObject);
+				LabelClicked(selectedLabelIndex[1].gameObject);
+				yield return new WaitForSeconds(0.9f);
+
+
 				for (int i = 0; i < activeLabels.Count; ++i) {
 					PopOut (activeLabels [i].gameObject);
 				}

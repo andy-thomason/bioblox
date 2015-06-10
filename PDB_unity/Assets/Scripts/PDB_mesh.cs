@@ -69,9 +69,43 @@ public class PDB_mesh : MonoBehaviour {
 		startRotation=true;
 		t=0;
 	}
+	public void AutoDock(GameObject other,Tuple<int,int>[] links)
+	{
+		allowInteraction = false;
+		startRotation = false;
+		PDB_molecule otherMol = other.GetComponent<PDB_mesh> ().mol;
+		Rigidbody r1 = gameObject.GetComponent<Rigidbody> ();
+		Rigidbody r2 = other.GetComponent<Rigidbody> ();
 
+		r1.constraints = RigidbodyConstraints.None;
+		r2.constraints = RigidbodyConstraints.None;
+		r1.drag = 2.0f;
+		r2.drag = 2.0f;
+
+
+		for (int i=0; i<links.Length; ++i) {
+			int index1=mol.serial_to_atom[links[i].First];
+			int index2=otherMol.serial_to_atom[links[i].Second];
+
+			Vector3 atomPos1 = mol.atom_centres[index1];
+			Vector3 atomPos2 =otherMol.atom_centres[index2];
+
+			float atomRad1= mol.atom_radii[index1];
+			float atomRad2=otherMol.atom_radii[index2];
+
+			SpringJoint j=gameObject.AddComponent<SpringJoint>();
+
+			j.anchor=atomPos1;
+			j.connectedBody=r2;
+			j.autoConfigureConnectedAnchor=false;
+			j.connectedAnchor=atomPos2;
+			j.damper=3.0f;
+			j.spring=1.0f;
+			j.minDistance=atomRad1+atomRad2+0.2f;
+		}
+	}
 	//at the moment very fake
-	public void AutoDock()
+	public void AutoDockCheap()
 	{
 		allowInteraction = false;
 		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
@@ -87,6 +121,32 @@ public class PDB_mesh : MonoBehaviour {
 	void Update () {
         Rigidbody rb = GetComponent<Rigidbody>();
         if (other) {
+
+			if (Input.GetMouseButtonDown(1)) {
+				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
+					GetComponent<Camera> ();
+				Ray r = c.ScreenPointToRay (
+					Input.mousePosition);
+				
+				RaycastHit info= new RaycastHit();
+				Physics.Raycast(r,out info);
+				if(info.collider==null)
+				{
+					
+					int hit = PDB_molecule.collide_ray (gameObject, mol,
+					                                    transform, r);
+					for(int i=0;i< mol.serial_to_atom.Length;++i)
+					{
+						if(mol.serial_to_atom[i]==hit)
+						{
+							Debug.Log(i);
+							break;
+						}
+
+					}
+				}
+			}
+
 			if (gameObject.GetComponent<TransformLerper> ().finished == true) {
 				allowInteraction = true;
 			}
@@ -103,29 +163,13 @@ public class PDB_mesh : MonoBehaviour {
 //				if (Input.GetKey ("d")) {
 //					rb.AddForce (new Vector3 (10, 0, 0));
 //				}
-				if (Input.GetKey ("p")) {
-					AutoDock ();
+				if(Input.GetKey("p"))
+				{
+					this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+					other.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+					AutoDockCheap();
 				}
-//				if (Input.GetMouseButtonDown (0)) {
-//					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
-//					GetComponent<Camera> ();
-//					Ray r = c.ScreenPointToRay (
-//						Input.mousePosition);
-//
-//					RaycastHit info= new RaycastHit();
-//					Physics.Raycast(r,out info);
-//					if(info.collider==null)
-//					{
-//
-//						int hit = PDB_molecule.collide_ray (gameObject, mol,
-//				                         transform, r);
-//						Debug.Log (hit);
-//						if (hit != -1 && !startRotation) {
-//							Vector3 molDir = mol.atom_centres [hit];
-//							BringPointToFocus (molDir, c);
-//						}
-//					}
-//				}
+
 				if (startRotation) {
 					t += Time.deltaTime;
 					transform.localRotation = Quaternion.Slerp (start, end, t);
@@ -134,11 +178,11 @@ public class PDB_mesh : MonoBehaviour {
 						t = 0;
 					}
 				}
-				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
+				//PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
 
 				//PDB_molecule.collide (
-               // gameObject, mol, transform,
-               // other, other_mesh.mol, other.transform
+                //gameObject, mol, transform,
+                //other, other_mesh.mol, other.transform
 				//);
 			}
 		}

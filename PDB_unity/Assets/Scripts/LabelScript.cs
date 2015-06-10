@@ -117,8 +117,8 @@ IDragHandler,IEndDragHandler{
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
 		Sprite s = this.GetComponent<Image> ().sprite;
-		Vector3 scale = this.transform.localScale * 0.7f;
-		Vector3 targetScale = new Vector3 (1.0f, 1.0f, 1.0f);
+		Vector3 scale = new Vector3 (2.0f, 2.0f, 2.0f);
+		Vector3 targetScale = new Vector3 (0.1f, 0.1f, 0.1f);
 		Vector3 scaleDiff = targetScale - scale;
 		for (int i=0; i<clouds.Count; ++i) {
 		clouds[i].transform.position=this.transform.position+

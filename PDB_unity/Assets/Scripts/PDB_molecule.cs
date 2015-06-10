@@ -345,6 +345,7 @@ public class PDB_molecule
         Transform t1;
         int work_done = 0;
 
+		float radiusInflate=0.0f;
         //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\BvhCollider.txt");
 
         public struct Result {
@@ -370,6 +371,8 @@ public class PDB_molecule
             float r0 = mol0.bvh_radii[bvh0];
             float r1 = mol1.bvh_radii[bvh1];
 
+			r0 += radiusInflate;
+			r1 += radiusInflate;
 
             /*GameObject lhs = GameObject.Find("lhs" + bvh0);
             if (lhs) {
@@ -385,7 +388,7 @@ public class PDB_molecule
 
             //debug.WriteLine("[" + bvh0 + ", " + bvh1 + "] c0=" + c0 + " c1=" + c1 + " d0=" + (c0 - c1).sqrMagnitude + " d1=" + (r0 + r1)*(r0 + r1));
             //debug.Flush();
-            if ((c0 - c1).sqrMagnitude < (r0 + r1)*(r0 + r1) && r0 != 0 && r1 != 0)
+            if ((c0 - c1).sqrMagnitude < (r0 + r1)*(r0 + r1) && r0 > 0 && r1 > 0)
             {
                 if (bt0 == -1) {
                     if (bt1 == -1) {
@@ -423,10 +426,71 @@ public class PDB_molecule
             this.t1 = t1;
             results = new List<Result>();
             collide_recursive(0, 0);
-
             //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
         }
+		public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1,float inflation)
+		{
+			this.mol0 = mol0;
+			this.t0 = t0;
+			this.mol1 = mol1;
+			this.t1 = t1;
+			results = new List<Result>();
+			radiusInflate=inflation;
+			collide_recursive(0, 0);
+		}
+
     };
+
+	class BvhSphereCollider
+	{
+		PDB_molecule mol;
+		Transform t;
+		Vector3 center;
+		float radius;
+		int work_done=0;
+
+		public struct Result
+		{
+			public int index;
+			public Result(int argIndex){this.index=argIndex;}
+		}
+		public List<Result> results;
+
+		public void collide_recursive(int bvh)
+		{
+			if (work_done++ >= 100000) {
+				return;
+			}
+			int bt = mol.bvh_terminals[bvh];
+			
+			Vector3 c = t.TransformPoint(mol.bvh_centres[bvh]);
+			float r = mol.bvh_radii[bvh];
+
+			Vector3 between = c - center;
+			float dist = between.sqrMagnitude;
+
+			if (dist<(r+radius)*(r*radius))
+			{
+				if (bt == -1) {
+					collide_recursive(bvh*2+1);
+					collide_recursive(bvh*2+2);
+				}
+				else
+				{
+					results.Add(new Result(bt));
+				}
+			}
+		}
+		BvhSphereCollider(PDB_molecule amol, Transform at, Vector3 spherePos, float sphereRad)
+		{
+			mol=amol;
+			t=at;
+			center=spherePos;
+			radius=sphereRad;
+			results=new List<Result>();
+			collide_recursive(0);
+		}
+	}
 
 	class BvhRayCollider
 	{
@@ -476,7 +540,7 @@ public class PDB_molecule
 				}
 			}
 		}
-
+		//no transform
 		public void collide_recursiveNT(int bvh)
 		{
 			if (work_done++ > 100000) {
@@ -546,7 +610,32 @@ public class PDB_molecule
 		}
 		return closestIndex;
 	}
-	
+
+	static public bool collide_ray_quick(
+		GameObject obj, PDB_molecule mol, Transform t,
+		Ray ray)
+	{
+		int bt = mol.bvh_terminals[0];
+		
+		Vector3 c = mol.bvh_centres[0];
+		float r = mol.bvh_radii[0];
+		
+		Vector3 q = c - ray.origin;
+		float f = Vector3.Dot (q, ray.direction);
+		
+		float d = 0;
+		
+		if (f < 0) {
+			d = q.sqrMagnitude;
+		} else {
+			d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
+		}
+		
+		if (d < r * r) {
+			return true;
+		}
+		return false;
+	}
 	
 	static public bool collide(
 		GameObject obj0, PDB_molecule mol0, Transform t0,
@@ -563,10 +652,9 @@ public class PDB_molecule
             float distance = (c1 - c0).magnitude;
             //Debug.Log("distance=" + distance
             if (distance < min_d) {
-				return true;
-                //Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				//normal*=0.1f;
-				//r0.AddForceAtPosition(normal,c0);
+                Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+				normal*=0.8f;
+				r0.AddForceAtPosition(normal,c0);
                 //r1.AddForceAtPosition(normal, c1);
             }
         }
