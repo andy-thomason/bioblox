@@ -20,6 +20,7 @@ public class PDB_molecule
     public float[] bvh_radii;
     public int[] bvh_terminals;
 	public Label[] labels = new Label[0];
+	public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
 	public int[] serial_to_atom;
 
     //const float c = 1.618033988749895f;
@@ -636,8 +637,29 @@ public class PDB_molecule
 		}
 		return false;
 	}
-	
+
 	static public bool collide(
+		GameObject obj0, PDB_molecule mol0, Transform t0,
+		GameObject obj1, PDB_molecule mol1, Transform t1
+		)
+	{
+		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
+		Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+		Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+		foreach (BvhCollider.Result r in b.results) {
+			Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+			Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+			float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+			float distance = (c1 - c0).magnitude;
+			//Debug.Log("distance=" + distance
+			if (distance < min_d) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	static public bool pysics_collide(
 		GameObject obj0, PDB_molecule mol0, Transform t0,
 		GameObject obj1, PDB_molecule mol1, Transform t1
 		)
@@ -655,7 +677,7 @@ public class PDB_molecule
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
 				normal*=0.8f;
 				r0.AddForceAtPosition(normal,c0);
-                //r1.AddForceAtPosition(normal, c1);
+                r1.AddForceAtPosition(-normal, c1);
             }
         }
 		return false;

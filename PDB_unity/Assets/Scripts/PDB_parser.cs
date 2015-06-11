@@ -36,6 +36,10 @@ using AssemblyCSharp;
 //7 -11			Integer			index		Index of atom in first molecule to pair
 //13-16			Integer			index		Index of atom in second molecule to pair
 //------------------------------------------------------
+//1 -6			BioBlox name	"BBSPNG"
+//7 -11			Integer			index		Index of first atom in spring
+//13-16			Integer			index		Index of second atom in spring
+//------------------------------------------------------
 //1 -6			BioBlox name    "BIOB"
 //7-11			Integer			index		Index of labeled atom
 //12-16 		Integer			index		Molecule index
@@ -63,6 +67,7 @@ public class PDB_parser {
         List<int> names = new List<int>();
         List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
+		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
 		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
@@ -112,6 +117,10 @@ public class PDB_parser {
                         int c = int.Parse(sc);
                         pairs.Add((idx << 16) | c);
                     }*/
+				} else if(kind == "BBSPNG"){
+					int firstMeshAtom = int.Parse(line.Substring(7, 4));
+					int secondMeshAtom = int.Parse(line.Substring(13, 4));
+					springPairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
 				} else if (kind == "BBPAIR") {
 					int firstMeshAtom = int.Parse(line.Substring(7, 4));
 					int secondMeshAtom = int.Parse(line.Substring(13, 4));
@@ -126,7 +135,7 @@ public class PDB_parser {
 					}
 					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
 					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
-				}else if (kind == "TER   ") {
+				} else if (kind == "TER   ") {
                     cur = new PDB_molecule();
                     cur.residues = residues.ToArray();
                     cur.names = names.ToArray();
@@ -159,6 +168,7 @@ public class PDB_parser {
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
 			m.pairedAtoms=pairs.ToArray();
+			m.spring_pairs=springPairs.ToArray();
 			if(labels.Count>i)
 			{
 				m.labels=labels[i].ToArray();

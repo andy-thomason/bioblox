@@ -87,7 +87,7 @@ MonoBehaviour:
   owner: {fileID: 0}
   labelID: 0
   cloudPrefab: {fileID: 176384, guid: 34a5e5283807ae6418a3fab7fb478a28, type: 2}
-  numClouds: 5
+  numClouds: 4
   clicked: {fileID: 21300000, guid: 1a844ff3054ba4f4091232b47c1b7755, type: 3}
   nonClicked: {fileID: 21300000, guid: fd17e7504b70b6549bbd8b11a6c24632, type: 3}
   is3D: 0

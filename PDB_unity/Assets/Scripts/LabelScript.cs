@@ -78,7 +78,9 @@ IDragHandler,IEndDragHandler{
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		owner.LabelClicked (this.gameObject);
+		if (eventData.button == PointerEventData.InputButton.Left) {
+			owner.LabelClicked (this.gameObject);
+		}
 	}
 
 	public void OnBeginDrag (PointerEventData eventData)

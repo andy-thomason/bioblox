@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class BioBlox : MonoBehaviour
 {
-	List<string> filenames = new List<string> ();
+	public List<string> filenames = new List<string> ();
 	int filenameIndex = 0;
 	EventSystem eventSystem;
 	public List<GameObject> prefabLabels;
@@ -27,6 +27,7 @@ public class BioBlox : MonoBehaviour
 	void Start ()
 	{
 		Debug.Log ("Start");
+		//filenames.Add ("jigsawBlue");
 		filenames.Add ("pdb2ptcWithTags");
 		filenames.Add ("pdb2ptcWithTags");
 		filenames.Add ("4PH2");
@@ -285,9 +286,7 @@ public class BioBlox : MonoBehaviour
 			selectedLabelIndex [1].shouldGlow = true;
 		}
 
-
 		//Handle label click, make active, focusd on atom //etc
-
 	}
 
 	void CreateLabel (PDB_molecule.Label label, int molNum)
@@ -559,18 +558,23 @@ public class BioBlox : MonoBehaviour
 				for (int i = 0; i < activeLabels.Count; ++i) {
 					PopOut (activeLabels [i].gameObject);
 				}
+				eventSystem.enabled = false;
+				//p1.AutoDockCheap();
+				//p2.AutoDockCheap();
+				p1.AutoDock ();
+				while(!p1.HasDocked())
+				{
 
-				p1.AutoDockCheap();
-				p2.AutoDockCheap();
-				//p1.AutoDock (p2.gameObject,winCondition.ToArray());
-				//yield return new WaitForSeconds(500.0f);
-
+					yield return null;
+				}
+				Debug.Log("Docked");
+				/*
 				while (!p1.GetComponent<TransformLerper>().finished&&
 				      !p2.GetComponent<TransformLerper>().finished) {
 					yield return null;
-				}
+				}*/
 				this.GetComponent<AudioManager>().Play("Win");
-				eventSystem.enabled = false;
+
 				StartCoroutine ("WinSplash",new Vector3(0,0,0));
 				yield break;
 			}
@@ -600,7 +604,6 @@ public class BioBlox : MonoBehaviour
 					                        p2.gameObject, p2.mol, p2.transform)) {
 						break;
 					}
-
 					yield return null;
 				}
 				this.GetComponent<AudioManager>().Play("Loose");

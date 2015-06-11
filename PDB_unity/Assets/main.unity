@@ -97,6 +97,8 @@ GameObject:
   - 4: {fileID: 42267348}
   - 33: {fileID: 42267347}
   - 23: {fileID: 42267345}
+  - 54: {fileID: 42267349}
+  - 145: {fileID: 42267346}
   m_Layer: 0
   m_Name: Proto1
   m_TagString: Untagged
@@ -128,6 +130,24 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
+--- !u!145 &42267346
+SpringJoint:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 42267344}
+  m_ConnectedBody: {fileID: 0}
+  m_Anchor: {x: 0, y: .5, z: 0}
+  m_AutoConfigureConnectedAnchor: 1
+  m_ConnectedAnchor: {x: 0, y: .5, z: 0}
+  m_Spring: 10
+  m_Damper: .200000003
+  m_MinDistance: 0
+  m_MaxDistance: 0
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 0
+  m_EnablePreprocessing: 1
 --- !u!33 &42267347
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -147,6 +167,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 4
+--- !u!54 &42267349
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 42267344}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: .0500000007
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &158787332
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,6 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a5210f38c12224c97066f4b1a9c125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  filenames: []
   prefabLabels:
   - {fileID: 159324, guid: 44b693c99012fb34f8d32df9b1901344, type: 2}
   - {fileID: 199540, guid: f2fad8605e44b384c97bf40ec17b0da6, type: 2}
@@ -1110,7 +1146,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: .553372204, g: .490808815, b: .75, a: .0196078438}
+  m_BackGroundColor: {r: .0635813251, g: .411764681, b: .354134291, a: .0196078438}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
