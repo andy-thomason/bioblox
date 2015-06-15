@@ -3,94 +3,90 @@ using System.Collections;
 
 public class LookAtObjects : MonoBehaviour
 {
-    public Animator[] animations;
-    public Animator[] BothHands;
-    public Animator normalMotion;
+    public Animator[] animations = null;
+    public Animator questionAnim = null;
 
-    private bool firstA = false;
-    //Mouse components
-    public Collider coll;
-    //   private bool zoomIn = false;
-
+    public Renderer questionMark = null;
+  
+    public Collider gene;
+    public Collider question;
     private bool loop = false;
-    public int zoom = 10;
-    public int defaultOf = 57;
-    public float smoothness = 20f;
 
-    //Rotation Variables
-    public float rotationDamping = 0.0f;
+    int clickHash = Animator.StringToHash("Explaining");
+
 
     //Look at functions for each object
-#region
+    #region
     // Use this for initialization
     void Start()
     {
         AnimationGoing();
-        normalMotion.speed = 0.5f;
+    
     }
 
     void AnimationGoing()
     {
+        //introduction.speed = 0;
         for (int i = 0; i < animations.Length; i++)
         {
             animations[i].speed = 0;
         }
     }
+    
+    //Question mark render mask
+    #region
+    void QuestionRenderOff()
+    {
+        //questionAnim.Play(0);
+        //questionMark.enabled = true;
+        //yield return new WaitForSeconds(1);
+        questionMark.enabled = false;
+     
+    }
 
- 
+    IEnumerator QuestionRenderOn()
+    {
+        questionMark.enabled = false;
+        yield return new WaitForSeconds(1);
+        questionMark.enabled = true;
+       
+    }
+    #endregion
 
     #endregion
-    //Mouse select functions
+    //Mouse select
     #region
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
         //AnimationGoing();
-
-        if (Input.GetMouseButtonDown(0)) {
+   
+        if (Input.GetMouseButtonDown(0))
+        {
+            Debug.Log("Works");
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (!loop && Physics.Raycast(ray, out hit))
             {
-
                 for (int i = 0; i < animations.Length; i++)
                 {
 
-                    if (coll.Raycast(ray, out hit, 1000.0f))
+                    if (gene.Raycast(ray, out hit, 1000.0f)) //|| question.Raycast(ray, out hit, 1000.0f))
                     {
                         animations[i].Play(0);
                         animations[i].speed = 1.0f;
-                        firstA = true;
-                    }
-                    else
-                    {
-                        animations[i].StopPlayback();
-                        animations[i].Play(0);
-                        animations[i].speed = -15.0f;
-                    }
-                }
+                        QuestionRenderOff();
 
-            }
-            else
-            {
-                for (int i = 0; i < animations.Length; i++)
-                {
-                    if(firstA)
-                    {
-                            //Debug.Log(animations[i].GetCurrentAnimatorStateInfo(0).nameHash);
-                            animations[i].StopPlayback();
-                            animations[i].Play(0);
-                            animations[i].speed = -15.0f;
                     }
+                    //else {
+                    //    animations[i].speed = -15.0f;
+
+                    //}
                 }
-            }  
             }
-        
         }
-   
+    }
 }
 
-
-
 #endregion
-

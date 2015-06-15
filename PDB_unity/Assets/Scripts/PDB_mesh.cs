@@ -19,7 +19,6 @@ public class PDB_mesh : MonoBehaviour {
 	void Start () {
 	    MeshFilter f = GetComponent<MeshFilter>();
         mol = PDB_parser.get_molecule(this.name);
-        f.mesh = mol.mesh;
 	}
 	public void AlignAtomToVector(int atomIndex, Vector3 targetDir)
 	{

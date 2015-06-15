@@ -15,7 +15,7 @@ public class PDB_molecule
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
-	public Mesh mesh;
+	public Mesh[] mesh;
     public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
@@ -161,49 +161,73 @@ public class PDB_molecule
             }
         }
 
-		mesh = new Mesh();
-		mesh.name = "ball view";
-		mesh.Clear();
-		mesh.vertices = vertices;
-		mesh.normals = normals;
-		mesh.uv = uvs;
-		mesh.colors = colors;
-		mesh.triangles = indices;
+
         //mesh.RecalculateNormals();
     }
 
-//	void construct_unity_meshes(Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
-//	{
-//
-//		int numMesh = 1;
-//		while ((vertices.Length / numMesh) > 65000) {
-//			numMesh += 1;
-//		}
-//		
-//		float vertsPerMesh = vertices.Length / numMesh;
-//
-//		   
-//		   
-//		   mesh = new Mesh[numMesh];
-//		   for (int i = 0; i < mesh.Length; ++i)
-//		   {
-//			mesh[i].Clear();
-//			mesh[i].name = "ball view"+i;
-//
-//			
-//			
-//		}
-//		
-//		mesh = new Mesh();
-//		mesh.name = "ball view";
-//		mesh.Clear();
-//		mesh.vertices = vertices;
-//		mesh.normals = normals;
-//		mesh.uv = uvs;
-//		mesh.colors = colors;
-//		mesh.triangles = indices;
-//	}
-//
+	void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
+	{
+
+		int numMesh = 1;
+
+
+		while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
+			numMesh += 1;
+		}
+
+		int atomsPerMesh = atom_centres.Length / numMesh;
+
+		int vertsPerMesh = atomsPerMesh * vsphere.Length;
+		int indiciesPerMesh = atomsPerMesh * isphere.Length;
+		   
+
+		   
+		mesh = new Mesh[numMesh];
+		for (int i = 0; i < mesh.Length; ++i) {
+			int vOff=vertsPerMesh*i;
+			int iOff=indiciesPerMesh*i;
+
+			int delta = vertices.Length-(vOff +vertsPerMesh);
+			if(delta <0)
+			{
+				Debug.LogError("BAD VERTS PER MESH ASSIGN");
+			}
+
+
+			mesh [i]= new Mesh();
+			mesh [i].Clear ();
+			mesh [i].name = "ball view" + i;
+
+			Vector3[] v = new Vector3[vertsPerMesh];
+			Array.Copy(vertices, vOff, v, 0, vertsPerMesh);
+			mesh [i].vertices = v;
+
+			//reusing V as it is the appropriate size
+			Array.Copy(normals, vOff, v, 0, vertsPerMesh);
+			mesh [i].normals = v;
+
+			Vector2[] u = new Vector2[vertsPerMesh];
+			Array.Copy (uvs, vOff, u, 0, vertsPerMesh);
+			mesh [i].uv = u;
+
+			Color[] c = new Color[vertsPerMesh];
+			Array.Copy(colors, vOff, c, 0, vertsPerMesh);
+			mesh [i].colors = c;
+
+			int[] index = new int[indiciesPerMesh];
+			Array.Copy(indices, iOff, index, 0, indiciesPerMesh);
+			if(i!=0)
+			{
+				for(int j = 0; j < index.Length; ++j)
+				{
+					index[j] -= vOff;
+
+				}
+			}
+			mesh [i].triangles = index;
+		}
+	}
+
     static public int encode(char a, char b, char c, char d) {
         return a*0x1000000+b*0x10000+c*0x100+d;
     }
@@ -366,17 +390,17 @@ public class PDB_molecule
         }
         build_bvh();
 
-		Vector3[] verts;
-		Vector3[] normals;
-		Vector2[] uvs;
-		Color[] color;
-		int[] index;
+		Vector3[] verts = new Vector3[0];
+		Vector3[] normals = new Vector3[0];
+		Vector2[] uvs = new Vector2[0];
+		Color[] color = new Color[0];
+		int[] index = new int[0];
         if (mode == Mode.Ball) {
             build_ball_mesh(out verts,out normals,out uvs,out color,out index);
         } else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
-		//construct_unity_meshes (verts,normals,uvs,color,index);
+		construct_unity_meshes (verts,normals,uvs,color,index);
 
     }
 
