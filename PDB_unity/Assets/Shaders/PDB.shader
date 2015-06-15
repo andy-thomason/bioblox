@@ -7,6 +7,7 @@
     _CameraPos ("_CameraPos", Vector) = (0, 0, -50, 0)
     _CullPos ("CullPos", Vector) = (0,0,0,0)
     _K ("K transparrency", Float)=0
+    _AmbientOcclusion ("TexRanger", 3D)="white"{}
   }
   SubShader {
     Pass {
@@ -60,63 +61,6 @@
 //
 //      ENDCG
 //    }
-//     Pass {
-//      Tags {"Queue" = "Transparent" }
-//      Tags {"LightMode" = "ForwardBase" }
-//      Cull Front
-//      Blend SrcAlpha OneMinusSrcAlpha
-//      Fog { Mode Off }
-//
-//      CGPROGRAM
-//      #pragma vertex vert
-//      #pragma fragment frag
-//      #pragma target 3.0
-//
-//      #include "UnityCG.cginc"
-//      #include "Lighting.cginc"
-//      
-//      struct varying_t {
-//        float4 projection_pos : POSITION;
-//        float3 normal : NORMAL;
-//        float4 world_pos : TEXCOORD;
-//        float4 col:COLOR;
-//      };
-//      
-//      uniform float4 _Color;
-//      uniform float4 _Specular;
-//      uniform float _Shininess;
-//      uniform float4 _CullPos;
-//      uniform float _Cull;
-//
-//      // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
-//      uniform float3 _LightPos;
-//      uniform float3 _CameraPos;
-//
-//      varying_t vert(appdata_full v) {
-//        varying_t o;
-//        o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
-//        o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
-//        o.world_pos = mul (_Object2World, v.vertex);
-//        o.col=v.color;
-//        return o;
-//      }
-//
-//      fixed4 frag(varying_t i) : COLOR {
-//      
-//     
-//        if(_Cull!=0&&dot(i.world_pos.xyz-_CullPos,i.world_pos.xyz-_CullPos)>_Cull)
-//      	{
-//      		clip(-1.0f);
-//      	}
-//        return fixed4(_Color.xyz*0.6f,1.0f);
-//        //return fixed4(colr);
-//        //return fixed4(normalize(_WorldSpaceLightPos0.xyz), 1);
-//        //return fixed4(normalize(_WorldSpaceCameraPos.xyz), 1);
-//        //return fixed4(light_dir,1);
-//      }
-//
-//      ENDCG
-//    }
     Pass {
       Tags {"Queue" = "Transparent" }
       Tags {"LightMode" = "ForwardBase" }
@@ -138,6 +82,7 @@
         float4 world_pos : TEXCOORD;
         float4 col:COLOR;
         float4 sp :TEXCOORD1;
+        float4 model_pos :TEXCOORD2;
       };
       
       uniform float4 _Color;
@@ -145,6 +90,8 @@
       uniform float _Shininess;
       uniform float4 _CullPos;
       uniform float _K;
+      
+      uniform sampler3D _AmbientOcclusion;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
@@ -154,6 +101,7 @@
         varying_t o;
         o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
         o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
+        o.model_pos = v.vertex;
         o.world_pos = mul (_Object2World, v.vertex);
         o.col=v.color;
         o.sp= ComputeScreenPos(o.projection_pos);
@@ -161,6 +109,7 @@
       }
 
       fixed4 frag(varying_t i) : COLOR {
+      //return tex3D(_AmbientOcclusion, i.world_pos*(1.0/32.0));
         float3 normal = normalize(i.normal);
         float aoValue=i.col.w;
         i.col.w=1;

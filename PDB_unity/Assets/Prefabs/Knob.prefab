@@ -65,13 +65,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   owner: {fileID: 0}
   labelID: 0
-  cloudPrefab: {fileID: 176384, guid: 34a5e5283807ae6418a3fab7fb478a28, type: 2}
+  cloudPrefab: {fileID: 100000, guid: c32157371ff6bce4f86496cd41201edf, type: 3}
   numClouds: 4
-  clicked: {fileID: 21300000, guid: 1a844ff3054ba4f4091232b47c1b7755, type: 3}
-  nonClicked: {fileID: 21300000, guid: fd17e7504b70b6549bbd8b11a6c24632, type: 3}
+  clicked: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  nonClicked: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
   is3D: 0
   isInteractable: 1
   shouldGlow: 0
+  cloudIs3D: 1
 --- !u!114 &11469922
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -84,7 +85,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: .976470649, g: .976470649, b: .976470649, a: 1}
   m_Sprite: {fileID: 21300000, guid: fb3462de0de9c564b8a65e7db28fc3e3, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
@@ -114,7 +115,7 @@ RectTransform:
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 17.5, y: 10.5}
+  m_SizeDelta: {x: 4, y: 4}
   m_Pivot: {x: .5, y: .5}
 --- !u!225 &22547410
 CanvasGroup:

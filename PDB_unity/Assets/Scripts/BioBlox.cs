@@ -28,9 +28,10 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
+
 		filenames.Add ("pdb2ptcWithTags");
 		filenames.Add ("pdb2ptcWithTags");
-		filenames.Add ("4PH2");
+		filenames.Add ("2Q5R");
 		StartCoroutine (game_loop ());
 		eventSystem = EventSystem.current;
 
@@ -78,6 +79,7 @@ public class BioBlox : MonoBehaviour
 		transToAt = transToAt.normalized * molMesh.mol.bvh_radii [0];
 		atomPosW = transToAt + molMesh.transform.position;
 		t.position = atomPosW;
+		t.position += new Vector3 (0, 0, -10);
 
 	}
 
@@ -385,6 +387,8 @@ public class BioBlox : MonoBehaviour
 			mol2.material.SetFloat("_K",k);
 			yield return null;
 		}
+		mol1.material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
+		mol2.material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
 		mol1.material.SetFloat("_K",targetKVal);
 		mol2.material.SetFloat("_K",targetKVal);
 	}
@@ -439,6 +443,11 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
+
+
+
+
+
 	MeshRenderer make_molecule (
 		string name, string proto, float xoffset
 	)
@@ -451,7 +460,7 @@ public class BioBlox : MonoBehaviour
 		MeshRenderer r = obj.AddComponent<MeshRenderer> ();
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
 		Rigidbody ri = obj.AddComponent<Rigidbody> ();
-
+		//obj.AddComponent<Tex3DMap> ();
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
 		f.mesh = mol.mesh;
@@ -495,11 +504,15 @@ public class BioBlox : MonoBehaviour
 		string file = filenames [filenameIndex];
 		MeshRenderer mol1 = make_molecule (file + ".1", "Proto1", -20);
 		MeshRenderer mol2 = make_molecule (file + ".2", "Proto2", 20);
+
+	
 		molecules = new GameObject[2];
 		molecules [0] = mol1.gameObject;
 		molecules [1] = mol2.gameObject;
 		PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
 		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
+		//debug 3D texture
+		//GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
 		p1.other = p2.gameObject;
 		p2.other = p1.gameObject;
 		p1.gameObject.SetActive (false);

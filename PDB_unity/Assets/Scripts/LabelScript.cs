@@ -22,6 +22,8 @@ IDragHandler,IEndDragHandler{
 	public bool is3D =false;
 	public bool isInteractable=true;
 	public bool shouldGlow=false;
+
+	public bool cloudIs3D;
 	
 	List<GameObject> clouds = new List<GameObject> ();
 	GameObject cloudStorer;
@@ -43,8 +45,10 @@ IDragHandler,IEndDragHandler{
 	void MakeCloud(int i)
 	{
 		GameObject c = GameObject.Instantiate (cloudPrefab);
-		c.transform.SetParent(GameObject.Find ("Clouds"+this.name).transform);
-		clouds.Add (c);
+		if (cloudIs3D) {
+			c.transform.SetParent (GameObject.Find ("Clouds" + this.name).transform);
+		} 
+			clouds.Add (c);
 	}
 
 	public void OnDisable()
@@ -119,7 +123,7 @@ IDragHandler,IEndDragHandler{
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
 		Sprite s = this.GetComponent<Image> ().sprite;
-		Vector3 scale = new Vector3 (2.0f, 2.0f, 2.0f);
+		Vector3 scale = new Vector3 (6.0f, 6.0f, 6.0f);
 		Vector3 targetScale = new Vector3 (0.1f, 0.1f, 0.1f);
 		Vector3 scaleDiff = targetScale - scale;
 		for (int i=0; i<clouds.Count; ++i) {
@@ -127,7 +131,20 @@ IDragHandler,IEndDragHandler{
 				toAtom*tIncrement*(i+1);
 			clouds[i].transform.localScale=scale+
 				scaleDiff*tIncrement*(i+1);
-			clouds[i].GetComponent<Image>().sprite=s;
+
+			if(!cloudIs3D)
+			{
+			Vector3 back=new Vector3 (0,0,1);
+			Vector3 up=Vector3.Cross(toAtom,back);
+			clouds[i].transform.rotation=Quaternion.LookRotation(
+				back,up);
+
+			//clouds[i].GetComponent<Image>().sprite=s;
+			}
+			else{
+				clouds[i].transform.rotation=Quaternion.LookRotation(
+					toAtom,new Vector3(0,1,0));
+			}
 		}
 	}
 
