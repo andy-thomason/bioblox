@@ -6,19 +6,28 @@ using System.IO;
 using System;
 using AssemblyCSharp;
 
+/// Class containing the description of a single molecule.
 public class PDB_molecule
 {
+	// the molecule data itself.
     public Vector3[] atom_centres;
     public float[] atom_radii;
+
+
 	public Tuple<int,int>[] pairedAtoms=new Tuple<int, int>[0];
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
+
+	// bounding volume heirachy to accelerate collisions
 	public Mesh[] mesh;
-    public Vector3[] bvh_centres;
+
+	public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
+
+
 	public Label[] labels = new Label[0];
 	public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
 	public int[] serial_to_atom;
@@ -508,6 +517,7 @@ public class PDB_molecule
 
     };
 
+	/// class to allow accelerated collisions of a sphere with the molecule
 	class BvhSphereCollider
 	{
 		PDB_molecule mol;
@@ -559,6 +569,7 @@ public class PDB_molecule
 		}
 	}
 
+	/// class to allow accelerated ray atom colisions
 	class BvhRayCollider
 	{
 		PDB_molecule mol;
@@ -579,34 +590,36 @@ public class PDB_molecule
 			if (work_done++ > 100000) {
 				return;
 			}
-			int bt = mol.bvh_terminals[bvh];
 
-			Vector3 c = t.TransformPoint(mol.bvh_centres[bvh]);
-			float r = mol.bvh_radii[bvh];
+			Vector3 bvh_world_pos = t.TransformPoint(mol.bvh_centres[bvh]);
+			float bvh_radius = mol.bvh_radii[bvh];
 
-			Vector3 q = c - ray.origin;
-			float f = Vector3.Dot (q, ray.direction);
+			Vector3 bvh_ray_pos = bvh_world_pos - ray.origin;
+			float projection = Vector3.Dot (bvh_ray_pos, ray.direction);
+
+			Vector3 point_on_ray = ray.origin + (ray.direction * projection);
 
 			float d = 0;
-
-			if (f < 0) {
-				d = q.sqrMagnitude;
+			if (projection < 0) {
+				d = bvh_ray_pos.sqrMagnitude;
 			} else {
-				d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
+				d = ( bvh_world_pos - point_on_ray ).sqrMagnitude;
 			}
 
-			if (d<r*r)
+			if (d < bvh_radius * bvh_radius)
 			{
-				if (bt == -1) {
+				int terminal = mol.bvh_terminals[bvh];
+				if (terminal == -1) {
 						collide_recursive(bvh*2+1);
 						collide_recursive(bvh*2+2);
 				}
 				else
 				{
-					results.Add(new Result(bt));
+					results.Add(new Result(terminal));
 				}
 			}
 		}
+
 		//no transform
 		public void collide_recursiveNT(int bvh)
 		{
@@ -658,6 +671,7 @@ public class PDB_molecule
 			collide_recursiveNT(0);
 		}
 	}
+
 	static public int collide_ray(
 		GameObject obj, PDB_molecule mol, Transform t,
 		Ray ray)
@@ -666,13 +680,14 @@ public class PDB_molecule
 		int closestIndex = -1;
 		float closestDistance = float.MaxValue;
 		for (int i=0; i<b.results.Count; i++) {
-			BvhRayCollider.Result r= b.results[i];
-			Vector3 c= t.TransformPoint(mol.atom_centres[r.index]);
-			float dist=(ray.origin-c).sqrMagnitude;
-			if(closestDistance>dist)
+			BvhRayCollider.Result result = b.results[i];
+			Vector3 c = t.TransformPoint(mol.atom_centres[result.index]);
+			//float dist = (ray.origin-c).sqrMagnitude;
+			float dist = Vector3.Dot(ray.origin - c, ray.direction);
+			if (closestDistance > dist)
 			{
-				closestDistance=dist;
-				closestIndex=r.index;
+				closestDistance = dist;
+				closestIndex = result.index;
 			}
 		}
 		return closestIndex;

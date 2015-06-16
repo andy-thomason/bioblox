@@ -130,25 +130,23 @@ public class PDB_mesh : MonoBehaviour {
 	void Update () {
         Rigidbody rb = GetComponent<Rigidbody>();
         if (other) {
-
 			if (Input.GetMouseButtonDown(1)) {
 				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
 					GetComponent<Camera> ();
-				Ray r = c.ScreenPointToRay (
-					Input.mousePosition);
+				Ray r = c.ScreenPointToRay (Input.mousePosition);
 				
-				RaycastHit info= new RaycastHit();
-				Physics.Raycast(r,out info);
-				if(info.collider==null)
+				RaycastHit info = new RaycastHit();
+				Physics.Raycast(r, out info);
+				if (info.collider == null)
 				{
 					
 					int hit = PDB_molecule.collide_ray (gameObject, mol,
 					                                    transform, r);
-					for(int i=0;i< mol.serial_to_atom.Length;++i)
+					for(int i = 0; i < mol.serial_to_atom.Length; ++i)
 					{
-						if(mol.serial_to_atom[i]==hit)
+						if (mol.serial_to_atom[i] == hit)
 						{
-							Debug.Log(i);
+							Debug.Log("atom " + i + "clicked");
 							break;
 						}
 
