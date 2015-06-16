@@ -28,8 +28,9 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
-		filenames.Add ("pdb2ptcWithTags");
+
 		filenames.Add ("1GCQ_bWithTags");
+		filenames.Add ("pdb2ptcWithTags");
 
 		filenames.Add ("pdb2ptcWithTags");
 
