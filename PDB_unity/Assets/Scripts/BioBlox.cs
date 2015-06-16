@@ -28,10 +28,11 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
-	
 		filenames.Add ("pdb2ptcWithTags");
+		filenames.Add ("1GCQ_bWithTags");
+
 		filenames.Add ("pdb2ptcWithTags");
-		filenames.Add ("2Q5R");
+
 
 		StartCoroutine (game_loop ());
 		eventSystem = EventSystem.current;
@@ -378,20 +379,34 @@ public class BioBlox : MonoBehaviour
 
 	IEnumerator FadeMolecules()
 	{
-		MeshRenderer mol1 = molecules [0].GetComponent<MeshRenderer> ();
-		MeshRenderer mol2 = molecules [1].GetComponent<MeshRenderer> ();
+		GameObject mol1 = molecules [0];
+		GameObject mol2 = molecules [1];
+		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
+		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
 		float targetKVal = shaderKVal;
 		float currentKVal = 0;
 		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
 			float k=currentKVal+targetKVal*t;
-			mol1.material.SetFloat("_K",k);
-			mol2.material.SetFloat("_K",k);
+
+			for(int i=0;i<meshes1.Length;++i)
+			{
+			meshes1[i].material.SetFloat("_K",k);
+			}
+			for(int i=0;i<meshes2.Length;++i)
+			{
+			meshes2[i].material.SetFloat("_K",k);
+			}
 			yield return null;
 		}
-		mol1.material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
-		mol2.material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
-		mol1.material.SetFloat("_K",targetKVal);
-		mol2.material.SetFloat("_K",targetKVal);
+		for (int i=0; i<meshes1.Length; ++i) {
+			meshes1[i].material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
+			meshes1[i].material.SetFloat("_K",targetKVal);
+		}
+		for(int i=0;i<meshes2.Length;++i)
+		{
+			meshes2[i].material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
+			meshes2[i].material.SetFloat("_K",targetKVal);
+		}
 	}
 
 	IEnumerator WinSplash (Vector3 focusPoint)

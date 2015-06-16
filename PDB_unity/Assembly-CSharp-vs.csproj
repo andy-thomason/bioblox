@@ -62,6 +62,7 @@
      <None Include="Assets\Shaders\PDB.shader" />
      <None Include="Assets\Resources\DebugPDB.txt" />
      <None Include="Assets\Resources\script.txt" />
+     <None Include="Assets\Resources\1GCQ_bWithTags.txt" />
      <None Include="Assets\Shaders\3DTextureVisualizer.shader" />
      <None Include="Assets\Resources\pdb1t6b.txt" />
      <None Include="Assets\Resources\2Q5R.txt" />
