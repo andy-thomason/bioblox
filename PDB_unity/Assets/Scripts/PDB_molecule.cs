@@ -19,10 +19,11 @@ public class PDB_molecule
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
-    public Mesh mesh;
 
 	// bounding volume heirachy to accelerate collisions
-    public Vector3[] bvh_centres;
+	public Mesh[] mesh;
+
+	public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
 
@@ -136,18 +137,17 @@ public class PDB_molecule
 		return (1 - ((occlusion) / aoccRays.Length));
 	}
 
-    void build_ball_mesh() {
+    void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
         //debug.WriteLine("building mesh");
-        mesh = new Mesh();
-        mesh.name = "ball view";
+ 
         int num_atoms = atom_centres.Length;
         int vlen = vsphere.Length;
         int ilen = isphere.Length;
-        Vector3[] vertices = new Vector3[vlen*num_atoms];
-        Vector3[] normals = new Vector3[vlen*num_atoms];
-        Vector2[] uvs = new Vector2[vlen*num_atoms];
-		Color[] colors = new Color[vlen * num_atoms];
-        int[] indices = new int[ilen*num_atoms];
+        vertices = new Vector3[vlen*num_atoms];
+       	normals = new Vector3[vlen*num_atoms];
+        uvs = new Vector2[vlen*num_atoms];
+		colors = new Color[vlen * num_atoms];
+        indices = new int[ilen*num_atoms];
         int v = 0;
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
@@ -169,14 +169,73 @@ public class PDB_molecule
                 indices[idx++] = isphere[i] + vlen*j;
             }
         }
-        mesh.Clear();
-        mesh.vertices = vertices;
-        mesh.normals = normals;
-        mesh.uv = uvs;
-        mesh.triangles = indices;
-		mesh.colors = colors;
+
+
         //mesh.RecalculateNormals();
     }
+
+	void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
+	{
+
+		int numMesh = 1;
+
+
+		while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
+			numMesh += 1;
+		}
+
+		int atomsPerMesh = atom_centres.Length / numMesh;
+
+		int vertsPerMesh = atomsPerMesh * vsphere.Length;
+		int indiciesPerMesh = atomsPerMesh * isphere.Length;
+		   
+
+		   
+		mesh = new Mesh[numMesh];
+		for (int i = 0; i < mesh.Length; ++i) {
+			int vOff=vertsPerMesh*i;
+			int iOff=indiciesPerMesh*i;
+
+			int delta = vertices.Length-(vOff +vertsPerMesh);
+			if(delta <0)
+			{
+				Debug.LogError("BAD VERTS PER MESH ASSIGN");
+			}
+
+
+			mesh [i]= new Mesh();
+			mesh [i].Clear ();
+			mesh [i].name = "ball view" + i;
+
+			Vector3[] v = new Vector3[vertsPerMesh];
+			Array.Copy(vertices, vOff, v, 0, vertsPerMesh);
+			mesh [i].vertices = v;
+
+			//reusing V as it is the appropriate size
+			Array.Copy(normals, vOff, v, 0, vertsPerMesh);
+			mesh [i].normals = v;
+
+			Vector2[] u = new Vector2[vertsPerMesh];
+			Array.Copy (uvs, vOff, u, 0, vertsPerMesh);
+			mesh [i].uv = u;
+
+			Color[] c = new Color[vertsPerMesh];
+			Array.Copy(colors, vOff, c, 0, vertsPerMesh);
+			mesh [i].colors = c;
+
+			int[] index = new int[indiciesPerMesh];
+			Array.Copy(indices, iOff, index, 0, indiciesPerMesh);
+			if(i!=0)
+			{
+				for(int j = 0; j < index.Length; ++j)
+				{
+					index[j] -= vOff;
+
+				}
+			}
+			mesh [i].triangles = index;
+		}
+	}
 
     static public int encode(char a, char b, char c, char d) {
         return a*0x1000000+b*0x10000+c*0x100+d;
@@ -339,11 +398,19 @@ public class PDB_molecule
             build_sphere();
         }
         build_bvh();
+
+		Vector3[] verts = new Vector3[0];
+		Vector3[] normals = new Vector3[0];
+		Vector2[] uvs = new Vector2[0];
+		Color[] color = new Color[0];
+		int[] index = new int[0];
         if (mode == Mode.Ball) {
-            build_ball_mesh();
+            build_ball_mesh(out verts,out normals,out uvs,out color,out index);
         } else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
+		construct_unity_meshes (verts,normals,uvs,color,index);
+
     }
 
     class BvhCollider

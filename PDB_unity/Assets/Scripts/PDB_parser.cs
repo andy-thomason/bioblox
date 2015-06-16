@@ -79,8 +79,11 @@ public class PDB_parser {
 		List<int> serial_to_atom = new List<int>();
         using (StringReader reader = new StringReader(pdbTA.text)) {
             string line;
-            while ((line = reader.ReadLine()) != null) {
-                string kind = line.Substring(0, 6);
+			while ((line = reader.ReadLine()) != null) {
+
+                string kind = line.Substring(0, Mathf.Min(6, line.Length));
+				if(line.Length < 5)
+				{Debug.Log("(" + kind + ")");}
                 if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
                 {
                     int serial = int.Parse(line.Substring(7 - 1, 5));
@@ -135,7 +138,8 @@ public class PDB_parser {
 					}
 					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
 					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
-				} else if (kind == "TER   ") {
+				} else if (kind == "TER   " || kind == "TER") {
+
                     cur = new PDB_molecule();
                     cur.residues = residues.ToArray();
                     cur.names = names.ToArray();

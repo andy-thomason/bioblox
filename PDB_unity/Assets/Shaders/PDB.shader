@@ -7,6 +7,7 @@
     _CameraPos ("_CameraPos", Vector) = (0, 0, -50, 0)
     _CullPos ("CullPos", Vector) = (0,0,0,0)
     _K ("K transparrency", Float)=0
+    _AmbientOcclusion ("TexRanger", 3D)="white"{}
   }
   SubShader {
     Pass {
@@ -135,6 +136,7 @@
         float4 world_pos : TEXCOORD;
         float4 col:COLOR;
         float4 sp :TEXCOORD1;
+        float4 model_pos :TEXCOORD2;
       };
       
       uniform float4 _Color;
@@ -142,6 +144,8 @@
       uniform float _Shininess;
       uniform float4 _CullPos;
       uniform float _K;
+      
+      uniform sampler3D _AmbientOcclusion;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
@@ -151,6 +155,7 @@
         varying_t o;
         o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
         o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
+        o.model_pos = v.vertex;
         o.world_pos = mul (_Object2World, v.vertex);
         o.col=v.color;
         o.sp= ComputeScreenPos(o.projection_pos);
@@ -158,6 +163,7 @@
       }
 
       fixed4 frag(varying_t i) : COLOR {
+      //return tex3D(_AmbientOcclusion, i.world_pos*(1.0/32.0));
         float3 normal = normalize(i.normal);
         float aoValue=i.col.w;
         i.col.w=1;
