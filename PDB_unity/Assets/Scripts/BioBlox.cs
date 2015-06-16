@@ -156,14 +156,14 @@ public class BioBlox : MonoBehaviour
 				Debug.Log ("End of levels");
 			}
 			else{
-			StartCoroutine (game_loop ());
+				StartCoroutine (game_loop ());
 			}
 		}
 		if (eventSystem.IsActive()) {
 			if(Input.GetMouseButton(0))
 			{
-				Camera c=GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-				Ray r=c.ScreenPointToRay(Input.mousePosition);
+				Camera c = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+				Ray r = c.ScreenPointToRay(Input.mousePosition);
 				if(!playerIsMoving[0] && PDB_molecule.collide_ray(
 					molecules[0],
 					molecules[0].GetComponent<PDB_mesh>().mol,
@@ -187,7 +187,6 @@ public class BioBlox : MonoBehaviour
 					StartCoroutine("PlayerMoveMolecule",1);
 				}
 			}
-		
 		}
 	}
 
@@ -405,7 +404,7 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 		while(true){
-			Vector3 dir= new Vector3(
+			Vector3 dir = new Vector3(
 				Mathf.Cos(radRot),
 				0,
 				Mathf.Sin(radRot));
