@@ -28,9 +28,9 @@ public class BioBlox : MonoBehaviour
 	{
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
-
-		filenames.Add ("1GCQ_bWithTags");
 		filenames.Add ("pdb2ptcWithTags");
+		filenames.Add ("1GCQ_bWithTags");
+
 
 		filenames.Add ("pdb2ptcWithTags");
 
@@ -201,13 +201,13 @@ public class BioBlox : MonoBehaviour
 		PopIn (g);
 	}
 
-	void PopIn (GameObject g)
+	public void PopIn (GameObject g)
 	{
 		popTarget = g;
 		StartCoroutine ("PopInCo");
 	}
 
-	void PopOut (GameObject g)
+	public void PopOut (GameObject g)
 	{
 		popTarget = g;
 		StartCoroutine ("PopOutCo");
@@ -442,6 +442,7 @@ public class BioBlox : MonoBehaviour
 		}
 		PopOut (molecules[0].gameObject);
 		PopOut (molecules[1].gameObject);
+		PopOut (winSplash);
 		yield return new WaitForSeconds (1.0f);
 		GameObject.Destroy (molecules[0].gameObject);
 		GameObject.Destroy (molecules[1].gameObject);
@@ -455,7 +456,7 @@ public class BioBlox : MonoBehaviour
 		}
 		reload = true;
 		Debug.Log ("Reloading");
-		PopOut (winSplash);
+
 		yield break;
 	}
 

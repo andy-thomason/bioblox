@@ -45,7 +45,7 @@ IDragHandler,IEndDragHandler{
 	void MakeCloud(int i)
 	{
 		GameObject c = GameObject.Instantiate (cloudPrefab);
-		if (cloudIs3D) {
+		if (!cloudIs3D) {
 			c.transform.SetParent (GameObject.Find ("Clouds" + this.name).transform);
 		} 
 			clouds.Add (c);
@@ -123,7 +123,11 @@ IDragHandler,IEndDragHandler{
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
 		Sprite s = this.GetComponent<Image> ().sprite;
-		Vector3 scale = new Vector3 (6.0f, 6.0f, 6.0f);
+		Vector3 scale = new Vector3 (1.0f, 1.0f, 1.0f);
+		if(cloudIs3D)
+		{
+		  scale = new Vector3 (6.0f, 6.0f, 6.0f);
+		}
 		Vector3 targetScale = new Vector3 (0.1f, 0.1f, 0.1f);
 		Vector3 scaleDiff = targetScale - scale;
 		for (int i=0; i<clouds.Count; ++i) {
@@ -134,10 +138,11 @@ IDragHandler,IEndDragHandler{
 
 			if(!cloudIs3D)
 			{
-			Vector3 back=new Vector3 (0,0,1);
-			Vector3 up=Vector3.Cross(toAtom,back);
-			clouds[i].transform.rotation=Quaternion.LookRotation(
-				back,up);
+			Vector3 back = new Vector3 (0,0,1);
+			Vector3 up = Vector3.Cross(toAtom,back);
+			Vector3 down = Vector3.Cross(up,toAtom);
+			clouds[i].transform.rotation = Quaternion.LookRotation(
+				down,up);
 
 			//clouds[i].GetComponent<Image>().sprite=s;
 			}

@@ -12,7 +12,7 @@ GameObject:
   - 114: {fileID: 11448646}
   - 225: {fileID: 22514350}
   m_Layer: 5
-  m_Name: MiniClouds
+  m_Name: BlueArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Sprite: {fileID: 21300000, guid: 5a5cd404a829c3a44abcdbf78be7ced6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 92f3f4ea35c45c8459ff114a58ba00e6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
