@@ -163,10 +163,10 @@ IDragHandler,IEndDragHandler{
 		}
 		if (shouldGlow) {
 			this.GetComponent<Image>().sprite=clicked;
-			//gameObject.GetComponent<Light> ().enabled = true;
+			gameObject.GetComponent<Light> ().enabled = true;
 		} else {
 			this.GetComponent<Image>().sprite=nonClicked;
-			//gameObject.GetComponent<Light> ().enabled = false;
+			gameObject.GetComponent<Light> ().enabled = false;
 		}
 		GenerateTail();
 	}

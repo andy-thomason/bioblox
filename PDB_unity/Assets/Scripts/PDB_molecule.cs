@@ -725,8 +725,6 @@ public class PDB_molecule
 		)
 	{
 		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
-		Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-		Rigidbody r1 = obj1.GetComponent<Rigidbody>();
 		foreach (BvhCollider.Result r in b.results) {
 			Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
 			Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
@@ -748,6 +746,9 @@ public class PDB_molecule
 		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
         Rigidbody r0 = obj0.GetComponent<Rigidbody>();
         Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+		if (!r0 || !r1) {
+			return false;
+		}
         foreach (BvhCollider.Result r in b.results) {
             Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
             Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);

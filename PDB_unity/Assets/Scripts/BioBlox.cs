@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using AssemblyCSharp;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class BioBlox : MonoBehaviour
 {
@@ -23,16 +24,30 @@ public class BioBlox : MonoBehaviour
 	bool[] playerIsMoving = new bool[2]{false,false};
 	GameObject popTarget;
 
+	List<Color> colorPool=new List<Color>();
+	int randomColorPoolOffset;
+
 	// Use this for initialization
 	void Start ()
 	{
+		colorPool.Add (Color.red);
+		colorPool.Add (Color.blue);
+		colorPool.Add (Color.cyan);
+		colorPool.Add (Color.green);
+		colorPool.Add (Color.magenta);
+		colorPool.Add (Color.yellow);
+		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
+		randomColorPoolOffset = Random.Range (0, colorPool.Count-1);
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
+
+		//filenames.Add ("2Q5R");
 		filenames.Add ("pdb2ptcWithTags");
 		filenames.Add ("1GCQ_bWithTags");
 
 
 		filenames.Add ("pdb2ptcWithTags");
+
 
 
 		StartCoroutine (game_loop ());
@@ -314,6 +329,8 @@ public class BioBlox : MonoBehaviour
 		if (!laSc) {
 			Debug.LogError ("Label prefab " + label.labelName + " does not have a LabelScript attached");
 		}
+		newLabel.GetComponent<Image> ().color = colorPool[(activeLabels.Count+randomColorPoolOffset) % colorPool.Count];
+		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
 		laSc.label = label;
 		laSc.owner = this;
 		laSc.labelID = activeLabels.Count;
@@ -331,6 +348,7 @@ public class BioBlox : MonoBehaviour
 		for (int i=0; i<activeLabels.Count; ++i) {
 			GameObject.Destroy (activeLabels [i].gameObject);
 		}
+		randomColorPoolOffset = Random.Range (0, colorPool.Count-1);
 		molecules = new GameObject[0];
 		activeLabels.Clear ();
 		selectedLabelIndex [0] = null;
@@ -414,6 +432,16 @@ public class BioBlox : MonoBehaviour
 		//put animation for win splash here
 		PopIn (winSplash);
 		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
+		GameObject parent = new GameObject ();
+		Rigidbody r=parent.AddComponent<Rigidbody> ();
+		molecules [0].transform.SetParent (parent.transform, true);
+		molecules [1].transform.SetParent (parent.transform, true);
+	
+		r.angularDrag = 1.0f;
+		r.constraints = RigidbodyConstraints.FreezePosition;
+		r.useGravity = false;
+		parent.name = "MoveableParent";
+
 		StartCoroutine ("FadeMolecules");
 		float zoomValue = 30.0f;
 		float radRot = (3.0f * Mathf.PI) / 2;
@@ -424,17 +452,54 @@ public class BioBlox : MonoBehaviour
 			c.transform.position = start + moveDir * t;
 			yield return null;
 		}
+		SpringJoint [] joints = molecules [0].GetComponents<SpringJoint> ();
+		for(int i=0;i<joints.Length;++i)
+		{
+			Component.Destroy(joints[i]);
+		}
+		Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
+		Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
+ 
+
+		const float nonInteractionTimeOut = 4.0f;
+		float nonInteractionTimer = 0.0f;
+		bool autoRotate = true;
+
+		Vector3 oldMousePos = Input.mousePosition;
+
 		while(true){
-			Vector3 dir = new Vector3(
-				Mathf.Cos(radRot),
-				0,
-				Mathf.Sin(radRot));
-			dir=dir.normalized*zoomValue;
-			c.transform.position=dir;
-			c.transform.rotation =Quaternion.LookRotation(focusPoint-c.transform.position);
-			radRot+=Time.deltaTime;
-			camRot+=Time.deltaTime;
-			if(Input.anyKeyDown)
+
+			nonInteractionTimer+=Time.deltaTime;
+			if(nonInteractionTimer>nonInteractionTimeOut)
+			{
+				autoRotate=true;
+			}
+			if(Input.GetMouseButton(0))
+			{
+				if(nonInteractionTimer>0.3f)
+				{
+					oldMousePos=Input.mousePosition;
+				}
+				nonInteractionTimer=0;
+				autoRotate=false;
+				Vector3 mousePos=Input.mousePosition;
+				Vector3 mouseDelta=mousePos-oldMousePos;
+				oldMousePos=mousePos;
+				r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
+			}
+			if(autoRotate)
+			{
+				Vector3 dir = new Vector3(
+					Mathf.Cos(radRot),
+					0,
+					Mathf.Sin(radRot));
+				dir=dir.normalized*zoomValue;
+				c.transform.position=dir;
+				c.transform.rotation =Quaternion.LookRotation(focusPoint-c.transform.position);
+				radRot+=Time.deltaTime;
+				camRot+=Time.deltaTime;
+			}
+			if(Input.anyKeyDown&&!Input.GetMouseButtonDown(0))
 			{
 				break;
 			}

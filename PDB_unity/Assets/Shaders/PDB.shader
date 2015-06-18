@@ -170,7 +170,7 @@
         float2 screen_pos = i.sp.xy/i.sp.w*_ScreenParams.xy;
         
         float half_tone = sin(screen_pos.x*screen_pos.y *1000) * 0.5 + 0.5;
-        //float half_tone = 0.5f;
+       //float half_tone = 0.5f;
         
         //float3 light_dir = normalize(_WorldSpaceLightPos0.xyz - i.world_pos.xyz);
         //float3 view_dir = normalize(i.world_pos.xyz - _WorldSpaceCameraPos.xyz);
