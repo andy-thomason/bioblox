@@ -401,6 +401,9 @@ public class BioBlox : MonoBehaviour
 		GameObject mol2 = molecules [1];
 		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
 		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
+		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
+		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
+
 		float targetKVal = shaderKVal;
 		float currentKVal = 0;
 		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
@@ -417,18 +420,22 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1[i].material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
+			meshes1[i].material.SetVector ("_CullPos",mol1.transform.TransformPoint( 
+			    molInfo1.atom_centres[molInfo1.serial_to_atom[winCondition[0].First]]));
 			meshes1[i].material.SetFloat("_K",targetKVal);
 		}
 		for(int i=0;i<meshes2.Length;++i)
 		{
-			meshes2[i].material.SetVector ("_CullPos", (mol1.transform.position + mol2.transform.position) / 2);
+			meshes2[i].material.SetVector ("_CullPos",mol2.transform.TransformPoint(
+				molInfo2.atom_centres[molInfo2.serial_to_atom[winCondition[0].Second]]));
 			meshes2[i].material.SetFloat("_K",targetKVal);
 		}
 	}
 
 	IEnumerator WinSplash (Vector3 focusPoint)
 	{
+		gameObject.GetComponent<ClockTimer> ().LogPlayerTime ();
+		gameObject.GetComponent<ClockTimer> ().StopPlayerTimer ();
 		//put animation for win splash here
 		PopIn (winSplash);
 		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
@@ -556,7 +563,6 @@ public class BioBlox : MonoBehaviour
 		GameObject obj = new GameObject ();
 		obj.name = name;
 		obj.AddComponent<TransformLerper> ();
-	
 
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
 		Rigidbody ri = obj.AddComponent<Rigidbody> ();
@@ -602,7 +608,8 @@ public class BioBlox : MonoBehaviour
 		string file = filenames [filenameIndex];
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -20);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 20);
-
+		ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
+		playerClock.ResetTimer ();
 	
 		molecules = new GameObject[2];
 		molecules [0] = mol1.gameObject;
@@ -651,7 +658,8 @@ public class BioBlox : MonoBehaviour
 			PopInSound (activeLabels [i].gameObject);
 		}
 		yield return new WaitForSeconds (0.1f);
-		eventSystem.enabled = true; 
+		eventSystem.enabled = true;
+		playerClock.StartPlayerTimer ();
 		while (true) {
 			if(Input.GetKeyDown(KeyCode.L))
 			{

@@ -32,6 +32,7 @@ public class AudioManager : MonoBehaviour {
 		g.name = "AudioClip" + name + sources.Count;
 		g.AddComponent<AudioSource> ();
 		AudioSource source = g.GetComponent<AudioSource> ();
+		source.volume = 0.5f;
 		source.clip = clip;
 		source.Play ();
 		sources.Add (g);

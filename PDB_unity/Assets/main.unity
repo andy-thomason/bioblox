@@ -1013,6 +1013,7 @@ RectTransform:
   - {fileID: 1186451403}
   - {fileID: 1530988230}
   - {fileID: 1157848641}
+  - {fileID: 1356369609}
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_AnchorMin: {x: 0, y: 0}
@@ -1243,6 +1244,7 @@ GameObject:
   - 4: {fileID: 913013346}
   - 114: {fileID: 913013347}
   - 114: {fileID: 913013349}
+  - 114: {fileID: 913013348}
   m_Layer: 0
   m_Name: BioBlox
   m_TagString: Untagged
@@ -1280,6 +1282,19 @@ MonoBehaviour:
   winSplash: {fileID: 1186451402}
   looseSplash: {fileID: 1530988229}
   shaderKVal: -.0299999993
+--- !u!114 &913013348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 913013345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a6bd806a166d864bb7bda6388efb430, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeText: {fileID: 1356369610}
+  playerLevelTimes: []
 --- !u!114 &913013349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2055,7 +2070,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1186451403
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2063,14 +2078,14 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1186451402}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -60}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 573904673}
   m_RootOrder: 7
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -242.399994, y: 135.399994}
+  m_AnchoredPosition: {x: -285, y: 135}
   m_SizeDelta: {x: 166.5, y: 176.699997}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1186451404
@@ -2712,6 +2727,74 @@ Skybox:
   m_GameObject: {fileID: 1348893745}
   m_Enabled: 1
   m_CustomSkybox: {fileID: 2100000, guid: 23f2d5a25d50a0e42b78951acd8f0e9e, type: 2}
+--- !u!1 &1356369608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1356369609}
+  - 222: {fileID: 1356369611}
+  - 114: {fileID: 1356369610}
+  m_Layer: 5
+  m_Name: Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1356369609
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1356369608}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 573904673}
+  m_RootOrder: 10
+  m_AnchorMin: {x: .5, y: .5}
+  m_AnchorMax: {x: .5, y: .5}
+  m_AnchoredPosition: {x: -235, y: 30}
+  m_SizeDelta: {x: 240, y: 90}
+  m_Pivot: {x: .5, y: .5}
+--- !u!114 &1356369610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1356369608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 30
+    m_FontStyle: 1
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'TimeText
+
+'
+--- !u!222 &1356369611
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1356369608}
 --- !u!1 &1383371472
 GameObject:
   m_ObjectHideFlags: 0
@@ -3139,7 +3222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1530988230
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3148,14 +3231,14 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1530988229}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -60}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 573904673}
   m_RootOrder: 8
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: -241.699997, y: 132.100006}
+  m_AnchoredPosition: {x: -284, y: 132}
   m_SizeDelta: {x: 352.109985, y: 138.899994}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1530988231

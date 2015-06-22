@@ -57,6 +57,7 @@
      <Compile Include="Assets\Scripts\ClockTimer.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
      <Compile Include="Assets\Scripts\LabelScript.cs" />
+     <Compile Include="Assets\Scripts\NetworkMan.cs" />
      <Compile Include="Assets\Scripts\PDB_mesh.cs" />
      <Compile Include="Assets\Scripts\PDB_molecule.cs" />
      <Compile Include="Assets\Scripts\PDB_parser.cs" />
