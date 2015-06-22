@@ -122,7 +122,7 @@ IDragHandler,IEndDragHandler{
 		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex);
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
-		Sprite s = this.GetComponent<Image> ().sprite;
+		//Sprite s = this.GetComponent<Image> ().sprite;
 		Vector3 scale = new Vector3 (1.0f, 1.0f, 1.0f);
 		if(cloudIs3D)
 		{

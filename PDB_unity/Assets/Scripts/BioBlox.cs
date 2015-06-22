@@ -19,6 +19,7 @@ public class BioBlox : MonoBehaviour
 	bool reload = false;
 	bool won = false;
 	bool loose = false;
+	public bool exitWinSplash=false;
 	LabelScript[] selectedLabelIndex = new LabelScript[2];
 	GameObject[] molecules;
 	bool[] playerIsMoving = new bool[2]{false,false};
@@ -26,6 +27,7 @@ public class BioBlox : MonoBehaviour
 
 	List<Color> colorPool=new List<Color>();
 	int randomColorPoolOffset;
+	
 
 	// Use this for initialization
 	void Start ()
@@ -79,7 +81,7 @@ public class BioBlox : MonoBehaviour
 	{
 		int molNum = -1;
 		Vector3 atomPos = GetAtomPos (atomID);
-		int index = GetAtomIndexFromID (atomID, out molNum);
+		GetAtomIndexFromID (atomID, out molNum);
 		//if the molecule does not exist, or the atom id is bad
 		if (molNum == -1) {
 			return;
@@ -438,6 +440,10 @@ public class BioBlox : MonoBehaviour
 		gameObject.GetComponent<ClockTimer> ().StopPlayerTimer ();
 		//put animation for win splash here
 		PopIn (winSplash);
+		GameObject gene = GameObject.Find ("Gene");
+		if (gene) {
+			gene.SetActive (false);
+		}
 		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 		GameObject parent = new GameObject ();
 		Rigidbody r=parent.AddComponent<Rigidbody> ();
@@ -467,8 +473,8 @@ public class BioBlox : MonoBehaviour
 		Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
 		Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
  
-
-		const float nonInteractionTimeOut = 4.0f;
+		float timeoutTimer = 10.0f;
+		const float nonInteractionTimeOut = 2.0f;
 		float nonInteractionTimer = 0.0f;
 		bool autoRotate = true;
 
@@ -476,7 +482,8 @@ public class BioBlox : MonoBehaviour
 
 		while(true){
 
-			nonInteractionTimer+=Time.deltaTime;
+			nonInteractionTimer += Time.deltaTime;
+			timeoutTimer -= Time.deltaTime;
 			if(nonInteractionTimer>nonInteractionTimeOut)
 			{
 				autoRotate=true;
@@ -506,8 +513,9 @@ public class BioBlox : MonoBehaviour
 				radRot+=Time.deltaTime;
 				camRot+=Time.deltaTime;
 			}
-			if(Input.anyKeyDown&&!Input.GetMouseButtonDown(0))
+			if((Input.anyKeyDown&&!Input.GetMouseButtonDown(0))||exitWinSplash||timeoutTimer<0)
 			{
+				exitWinSplash=false;
 				break;
 			}
 			yield return null;
@@ -518,6 +526,10 @@ public class BioBlox : MonoBehaviour
 		yield return new WaitForSeconds (1.0f);
 		GameObject.Destroy (molecules[0].gameObject);
 		GameObject.Destroy (molecules[1].gameObject);
+		GameObject.Destroy (parent);
+		if (gene) {
+			gene.SetActive (true);
+		}
 		Vector3 target = start;
 		start = c.transform.position;
 		Quaternion startQ = c.transform.rotation;
@@ -610,6 +622,7 @@ public class BioBlox : MonoBehaviour
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 20);
 		ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
 		playerClock.ResetTimer ();
+		playerClock.timeText.enabled = false;
 	
 		molecules = new GameObject[2];
 		molecules [0] = mol1.gameObject;
@@ -641,10 +654,12 @@ public class BioBlox : MonoBehaviour
 		yield return new WaitForSeconds (1.0f);
 		CD3.transform.Translate (1000, 0, 0);
 		CD2.transform.Translate (-1000, 0, 0);
+		playerClock.timeText.enabled = true;
 		this.GetComponent<AudioManager> ().Play ("Count");
 		yield return new WaitForSeconds (1.0f);
 		CD2.transform.Translate (1000, 0, 0);
 		CD1.transform.Translate (-1000, 0, 0);
+
 		this.GetComponent<AudioManager> ().Play ("Count");
 		yield return new WaitForSeconds (1.0f);
 		CD1.transform.Translate (1000, 0, 0);
@@ -663,13 +678,7 @@ public class BioBlox : MonoBehaviour
 		while (true) {
 			if(Input.GetKeyDown(KeyCode.L))
 			{
-				PopOut (molecules[0].gameObject);
-				PopOut (molecules[1].gameObject);
-				yield return new WaitForSeconds (1.0f);
-				GameObject.Destroy (molecules[0].gameObject);
-				GameObject.Destroy (molecules[1].gameObject);
-				reload=true;
-				yield break;
+				won=true;
 			}
 			if (won) {
 				Debug.Log ("We won");

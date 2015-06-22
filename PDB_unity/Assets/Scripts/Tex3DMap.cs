@@ -81,10 +81,7 @@ public class Tex3DMap : MonoBehaviour {
 					}
 				}
 			}
-
-
-
-			int dexy=x_index+y_index*yStride+z_index*zStride;
+			//int dexy=x_index+y_index*yStride+z_index*zStride;
 		}
 
 

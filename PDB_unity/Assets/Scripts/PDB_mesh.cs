@@ -17,7 +17,7 @@ public class PDB_mesh : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	    MeshFilter f = GetComponent<MeshFilter>();
+	  
         mol = PDB_parser.get_molecule(this.name);
 	}
 	public void AlignAtomToVector(int atomIndex, Vector3 targetDir)
@@ -128,7 +128,6 @@ public class PDB_mesh : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        Rigidbody rb = GetComponent<Rigidbody>();
         if (other) {
 			if (Input.GetMouseButtonDown(1)) {
 				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").

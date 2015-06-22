@@ -24,6 +24,12 @@ public class LookAtObjects : MonoBehaviour
        // Gene = GameObject.FindGameObjectWithTag("Gene");
     }
 
+	void OnDisable()
+	{
+		this.GetComponent<AudioSource> ().enabled = false;
+
+	}
+
     void AnimationGoing()
     {
         

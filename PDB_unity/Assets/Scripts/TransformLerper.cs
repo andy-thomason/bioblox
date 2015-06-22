@@ -27,11 +27,11 @@ public class TransformLerper : MonoBehaviour {
 		}
 		while (t<=1) {
 			t += Time.deltaTime*speed;
-			if(positions[index]!=null)
+			if(index < positions.Count)
 			{
 			target.position = Vector3.Lerp (start, positions [index], t);
 			}
-			if(quaternions[index]!=null)
+			if(index < quaternions.Count)
 			{
 			target.rotation = 
 						Quaternion.Slerp (startRot, quaternions [index], t);

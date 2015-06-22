@@ -6,7 +6,7 @@ public class ShirnkGuy : StateMachineBehaviour {
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
 	override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		GameObject.Find ("BioBlox").GetComponent<BioBlox> ().PopOut (animator.gameObject);	
-	GameObject questionMark = GameObject.Find ("QuestionMark");
+		GameObject questionMark = animator.GetComponent<LookAtObjects> ().questionMark.gameObject;
 	questionMark.transform.localScale = new Vector3(14,14,14);
 	GameObject.Find("BioBlox").GetComponent<BioBlox>().PopIn(questionMark.gameObject);
 	}

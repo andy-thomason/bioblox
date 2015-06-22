@@ -78,7 +78,6 @@ public class PDB_molecule
             vsphere[i].z = vproto[i*3+2];
 			vsphere[i] = vsphere[i].normalized;
         }
-        int idx = num_verts;
         for (int i = 0; i != num_tris; ++i) {
             int i0 = iproto[i*3+0];
             int i1 = iproto[i*3+1];
@@ -697,7 +696,6 @@ public class PDB_molecule
 		GameObject obj, PDB_molecule mol, Transform t,
 		Ray ray)
 	{
-		int bt = mol.bvh_terminals[0];
 		
 		Vector3 c = mol.bvh_centres[0];
 		float r = mol.bvh_radii[0];
