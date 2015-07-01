@@ -465,6 +465,10 @@ public class BioBlox : MonoBehaviour
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
 
+		if (mesh.mol.mesh == null) {
+			return;
+		}
+
 
 		for(int i=0;i<mesh.mol.mesh.Length;++i)
 		{
@@ -497,7 +501,7 @@ public class BioBlox : MonoBehaviour
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
 		make_molecule_mesh (p,proto);
-		Debug.Log (mol.mesh[0].vertices.Length);
+		//Debug.Log (mol.mesh[0].vertices.Length);
 
 
 		ri.angularDrag = 1;

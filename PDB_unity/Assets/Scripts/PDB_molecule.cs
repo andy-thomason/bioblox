@@ -51,8 +51,8 @@ public class PDB_molecule
 	};
 
 
-    public enum Mode { Ball, Ribbon };
-    public static Mode mode = Mode.Ball;
+    public enum Mode { Ball, Ribbon, Voxel, Metasphere };
+	public static Mode mode = Mode.Metasphere;
 
     public string name;
 
@@ -132,7 +132,7 @@ public class PDB_molecule
 					minDist=Math.Min(minDist,dist);
 				}
 			}
-		occlusion += (1 - (minDist / maxDist));
+			occlusion += (1 - (minDist / maxDist));
 		}
 		return (1 - ((occlusion) / aoccRays.Length));
 	}
@@ -245,7 +245,283 @@ public class PDB_molecule
     public static int atom_O = encode(' ', 'O', ' ', ' ');
     public static int atom_C = encode(' ', 'C', ' ', ' ');
 
-    void build_ribbon_mesh() {
+	void make_face(
+		ref int ind, ref int id,
+		Vector3[] vertices, Color[] colours, Vector3[] normals, int[] indices, Vector3 normal,
+		int i, int j, int k,
+		int ui, int uj, int uk,
+		int vi, int vj, int vk,
+		int value, int tex
+		) {
+		if (vertices == null) {
+			id += 6;
+			ind += 4;
+			return;
+		}
+		
+		// 0 1
+		// 2 3
+		indices[id++] = ind + 0;
+		indices[id++] = ind + 1;
+		indices[id++] = ind + 2;
+		indices[id++] = ind + 1;
+		indices[id++] = ind + 3;
+		indices[id++] = ind + 2;
+		
+		
+		//int sx = 16, sy = 16;
+		//int tx = textures [value * texture_stride + tex * 2 + 0] * 16;
+		//int ty = textures [value * texture_stride + tex * 2 + 1] * 16;
+		vertices[ind].x = i; vertices[ind].y = j; vertices[ind].z = k; 
+		colours[ind].r = 1; colours[ind].g = 1; colours[ind].b = 1; colours[ind].a = 1;
+		normals [ind] = normal;
+		//texcoord [ind].x = (tx + 0.25f) * (1.0f / 512); texcoord [ind].y = (512.0f/512) - (ty + 0.25f) * (1.0f / 512);
+		ind++;
+		vertices[ind].x = i+ui; vertices[ind].y = j+uj; vertices[ind].z = k+uk; 
+		colours[ind].r = 1; colours[ind].g = 1; colours[ind].b = 1; colours[ind].a = 1;
+		normals [ind] = normal;
+		//texcoord [ind].x = (tx+sx-0.25f) * (1.0f / 512); texcoord [ind].y = (512.0f/512) - (ty + 0.25f) * (1.0f / 512);
+		ind++;
+		vertices[ind].x = i+vi; vertices[ind].y = j+vj; vertices[ind].z = k+vk; 
+		colours[ind].r = 1; colours[ind].g = 1; colours[ind].b = 1; colours[ind].a = 1;
+		normals [ind] = normal;
+		//texcoord [ind].x = (tx + 0.25f) * (1.0f / 512); texcoord [ind].y = (512.0f/512) - (ty+sy - 0.25f) * (1.0f / 512);
+		ind++;
+		vertices[ind].x = i+ui+vi; vertices[ind].y = j+uj+vj; vertices[ind].z = k+uk+vk; 
+		colours[ind].r = 1; colours[ind].g = 1; colours[ind].b = 1; colours[ind].a = 1;
+		normals [ind] = normal;
+		//texcoord [ind].x = (tx+sx-0.25f) * (1.0f / 512); texcoord [ind].y = (512.0f/512) - (ty+sy - 0.25f) * (1.0f / 512);
+		ind++;
+	}
+
+	int xdim;
+	int ydim;
+	int zdim;
+	byte[] values;
+
+	void make_faces(int x0, int y0, int z0, ref int ind, ref int id, Vector3[] vertices, Color[] colours, Vector3[] normals, int[] indices) {
+		for (int i = 0; i != xdim; ++i) {
+			for (int j = 0; j != ydim; ++j) {
+				for (int k = 0; k != zdim; ++k) {
+					int idx = (k * ydim + j) * xdim + i;
+					int value = values[idx];
+					if (value != 0) {
+						if (i == 0 || values[idx-1] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(-1, 0, 0),
+								i+x0, j+y0+1, k+z0+1, 0, 0, -1, 0, -1, 0, value, 0);
+						}
+						if (i == xdim-1 || values[idx+1] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(1, 0, 0),
+								i+x0+1, j+y0+1, k+z0, 0, 0, 1, 0, -1, 0, value, 2);
+						}
+						if (j == 0 || values[idx-xdim] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(0, -1, 0),
+								i+x0, j+y0, k+z0, 1, 0, 0, 0, 0, 1, value, 5);
+						}
+						if (j == ydim-1 || values[idx+xdim] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(0, 1, 0),
+								i+x0, j+y0+1, k+z0+1, 1, 0, 0, 0, 0, -1, value, 4);
+						}
+						if (k == 0 || values[idx-ydim*xdim] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(0, 0, -1),
+								i+x0, j+y0+1, k+z0, 1, 0, 0, 0, -1, 0, value, 1);
+						}
+						if (k == zdim-1 || values[idx+ydim*xdim] == 0) {
+							make_face(
+								ref ind, ref id, vertices, colours, normals, indices,
+								new Vector3(0, 0, 1),
+								i+x0+1, j+y0+1, k+z0+1, -1, 0, 0, 0, -1, 0, value, 3);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/*
+	//https://en.wikipedia.org/wiki/Marching_cubes
+	void make_mc_faces(int x0, int y0, int z0, ref int ind, ref int id, Vector3[] vertices, Color[] colours, Vector3[] normals, int[] indices) {
+		for (int i = 0; i != xdim-1; ++i) {
+			for (int j = 0; j != ydim-1; ++j) {
+				for (int k = 0; k != zdim-1; ++k) {
+					int idx = (k * ydim + j) * xdim + i;
+					//     3 7   y   z
+					// 2 6 1 5   | /
+					// 0 4       0 - x
+					float v0 = values [idx] - 0.5f;
+					float v4 = values [idx + 1] - 0.5f;
+					float v2 = values [idx + xdim] - 0.5f;
+					float v6 = values [idx + 1 + xdim] - 0.5f;
+					float v1 = values [idx + xdim*ydim] - 0.5f;
+					float v5 = values [idx + 1 + xdim*ydim] - 0.5f;
+					float v3 = values [idx + xdim + xdim*ydim] - 0.5f;
+					float v7 = values [idx + 1 + xdim + xdim*ydim] - 0.5f;
+
+					// mask of vertices inside the isosurface
+					int mask =
+						(v0 < 0 ? 1<<0 : 0) |
+						(v4 < 0 ? 1<<4 : 0) |
+						(v2 < 0 ? 1<<2 : 0) |
+						(v6 < 0 ? 1<<6 : 0) |
+						(v1 < 0 ? 1<<1 : 0) |
+						(v5 < 0 ? 1<<5 : 0) |
+						(v3 < 0 ? 1<<3 : 0) |
+						(v7 < 0 ? 1<<7 : 0) |
+					0;
+
+					switch (mask) {
+					case 0x00: break;
+					//case 0x01: make_mc_corner(i+x0, j+y0, k+z0, v0, e01, v1, e02, v2, e04, v4); break;
+					//case 0x02: make_mc_corner(i+x0, j+y0, k+z0, v1, e10, v0, e13, v2, e04, v4); break;
+					case 0xff: break;
+					}
+				}
+			}
+		}
+	}*/
+
+	void build_voxel_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
+		Vector3 min = atom_centres[0];
+		Vector3 max = min;
+		for (int i = 0; i != atom_centres.Length; ++i) {
+			Vector3 r = new Vector3(atom_radii[i], atom_radii[i], atom_radii[i]);
+			min = Vector3.Min(min, atom_centres[i] - r);
+			max = Vector3.Max(max, atom_centres[i] + r);
+		}
+		int x0 = Mathf.FloorToInt (min.x);
+		int y0 = Mathf.FloorToInt (min.y);
+		int z0 = Mathf.FloorToInt (min.z);
+		int x1 = Mathf.CeilToInt (max.x);
+		int y1 = Mathf.CeilToInt (max.y);
+		int z1 = Mathf.CeilToInt (max.z);
+		
+		xdim = x1 - x0;
+		ydim = y1 - y0;
+		zdim = z1 - z0;
+		values = new byte[xdim * ydim * zdim];
+		
+		int[] stack = new int[1000];
+		
+		for (int z = z0; z < z1; ++z) {
+			for (int y = y0; y < y1; ++y) {
+				for (int x = x0; x < x1; ++x) {
+					Vector3 pos = new Vector3(x, y, z);
+					int sp = 0;
+					stack [sp++] = 0;
+					while (sp != 0) {
+						int idx = stack[--sp];
+						int ter = bvh_terminals[idx];
+						Vector3 c = bvh_centres[idx];
+						float r = bvh_radii[idx] + 0.5f;
+						if ((c - pos).sqrMagnitude <= r*r) {
+							if (ter != -1) {
+								values[((z - z0) * ydim + (y - y0)) * xdim + (x - x0)] = 1;
+								break;
+							} else {
+								stack [sp++] = idx*2+1;
+								stack [sp++] = idx*2+2;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		int num_ind = 0;
+		int num_id = 0;
+		make_faces (x0, y0, z0, ref num_ind, ref num_id, null, null, null, null);
+		
+		int ind = 0;
+		int id = 0;
+		vertices = new Vector3[num_ind];
+		normals = new Vector3[num_ind];
+		colors = new Color[num_ind];
+		uvs = new Vector2[num_ind];
+		indices = new int[num_id];
+		make_faces (x0, y0, z0, ref ind, ref id, vertices, colors, normals, indices);
+		
+		if (num_ind != ind || num_id != id) {
+			throw new System.Exception("ouch!");
+		}
+	}
+
+	/*void build_metasphere_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
+		Vector3 min = atom_centres[0];
+		Vector3 max = min;
+		for (int i = 0; i != atom_centres.Length; ++i) {
+			Vector3 r = new Vector3(atom_radii[i], atom_radii[i], atom_radii[i]);
+			min = Vector3.Min(min, atom_centres[i] - r);
+			max = Vector3.Max(max, atom_centres[i] + r);
+		}
+		int x0 = Mathf.FloorToInt (min.x);
+		int y0 = Mathf.FloorToInt (min.y);
+		int z0 = Mathf.FloorToInt (min.z);
+		int x1 = Mathf.CeilToInt (max.x);
+		int y1 = Mathf.CeilToInt (max.y);
+		int z1 = Mathf.CeilToInt (max.z);
+		
+		xdim = x1 - x0 + 1;
+		ydim = y1 - y0 + 1;
+		zdim = z1 - z0 + 1;
+		values = new float[xdim * ydim * zdim];
+		
+		int[] stack = new int[1000];
+		
+		for (int z = z0; z <= z1; ++z) {
+			for (int y = y0; y <= y1; ++y) {
+				for (int x = x0; x <= x1; ++x) {
+					Vector3 pos = new Vector3(x, y, z);
+					int sp = 0;
+					stack [sp++] = 0;
+					while (sp != 0) {
+						int idx = stack[--sp];
+						int ter = bvh_terminals[idx];
+						Vector3 c = bvh_centres[idx];
+						float r = bvh_radii[idx] + 0.5f;
+						float d2 = (c - pos).sqrMagnitude;
+						if (d2 <= r*r) {
+							if (ter != -1) {
+								int idx = ((z - z0) * ydim + (y - y0)) * xdim + (x - x0);
+								values[idx] += exp(-0.5f * d2);
+							} else {
+								stack [sp++] = idx*2+1;
+								stack [sp++] = idx*2+2;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		int num_ind = 0;
+		int num_id = 0;
+		make_mc_faces (x0, y0, z0, ref num_ind, ref num_id, null, null, null, null);
+		
+		int ind = 0;
+		int id = 0;
+		vertices = new Vector3[num_ind];
+		normals = new Vector3[num_ind];
+		colors = new Color[num_ind];
+		uvs = new Vector2[num_ind];
+		indices = new int[num_id];
+		make_mc_faces (x0, y0, z0, ref ind, ref id, vertices, colors, normals, indices);
+		
+		if (num_ind != ind || num_id != id) {
+			throw new System.Exception("ouch!");
+		}
+	}*/
+	
+	void build_ribbon_mesh() {
 		/*
         debug.WriteLine("building mesh");
         mesh = new Mesh();
@@ -404,13 +680,30 @@ public class PDB_molecule
 		Vector2[] uvs = new Vector2[0];
 		Color[] color = new Color[0];
 		int[] index = new int[0];
-        if (mode == Mode.Ball) {
-            build_ball_mesh(out verts,out normals,out uvs,out color,out index);
-        } else if (mode == Mode.Ribbon) {
+		if (mode == Mode.Ball) {
+			build_ball_mesh (out verts, out normals, out uvs, out color, out index);
+			construct_unity_meshes (verts,normals,uvs,color,index);
+		} else if (mode == Mode.Voxel) {
+			build_voxel_mesh(out verts,out normals,out uvs,out color,out index);
+			mesh = new Mesh[1];
+			mesh[0] = new Mesh();
+			mesh[0].vertices = verts;
+			mesh[0].normals = normals;
+			mesh[0].uv = uvs;
+			mesh[0].colors = color;
+			mesh[0].triangles = index;
+		/*} else if (mode == Mode.Metasphere) {
+			build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
+			mesh = new Mesh[1];
+			mesh[0] = new Mesh();
+			mesh[0].vertices = verts;
+			mesh[0].normals = normals;
+			mesh[0].uv = uvs;
+			mesh[0].colors = color;
+			mesh[0].triangles = index;*/
+		} else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
-		construct_unity_meshes (verts,normals,uvs,color,index);
-
     }
 
     class BvhCollider
@@ -504,6 +797,7 @@ public class PDB_molecule
             collide_recursive(0, 0);
             //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
         }
+
 		public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1,float inflation)
 		{
 			this.mol0 = mol0;

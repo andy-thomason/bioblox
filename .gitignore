@@ -1,2 +1,5 @@
 *.userprefs
 *.TMP
+*.cs
+*.sln
+
