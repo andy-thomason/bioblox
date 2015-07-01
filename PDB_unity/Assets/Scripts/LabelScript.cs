@@ -85,6 +85,9 @@ IDragHandler,IEndDragHandler{
 		if (eventData.button == PointerEventData.InputButton.Left) {
 			owner.LabelClicked (this.gameObject);
 		}
+		if (eventData.button == PointerEventData.InputButton.Right) {
+			owner.SiteClicked (this.gameObject);
+		}
 	}
 
 	public void OnBeginDrag (PointerEventData eventData)

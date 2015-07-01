@@ -12,6 +12,7 @@ public class ClockTimer : MonoBehaviour {
 	bool clockStopped=true;
 
 	public GameObject levelTimePrefab;
+	public GameObject clockArmPrefab;
 
 	public List<float> playerLevelTimes = new List<float>();
 
@@ -46,17 +47,12 @@ public class ClockTimer : MonoBehaviour {
 
 		g.GetComponentInChildren<Text>().text = playTime.ToString ("F2");
 		Vector3 prevScale = g.transform.localScale;
-		g.transform.position = new Vector3 (0, 0, 0);
 
 		target = GameObject.Instantiate (g);
-		target.transform.position = new Vector3 (0, 0, 0);
 		target.name = "TimePipLevel" + playerLevelTimes.Count;
-		target.transform.SetParent(playerTimeZone.transform);
+		target.transform.SetParent(playerTimeZone.transform,false);
 		target.transform.localScale = prevScale;
-		target.transform.position = new Vector3 (
-			target.transform.position.x,
-			target.transform.position.y,
-			0);
+
 
 
 		g.transform.SetParent (GameObject.Find ("Canvas").transform);
@@ -89,7 +85,9 @@ public class ClockTimer : MonoBehaviour {
 			                                         t);
 			yield return null;
 		}
+
 		GameObject.Destroy (from);
+
 		to.GetComponent<CanvasGroup> ().alpha = 1.0f;
 		yield break;
 	}
@@ -121,9 +119,10 @@ public class ClockTimer : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		timeText.text = string.Format ("Time\n {0}", playTime.ToString("F2"));
+		timeText.text = string.Format ("{0}", playTime.ToString("F2"));
 		if (!clockStopped) {
 			playTime+=Time.deltaTime;
 		}
+		clockArmPrefab.transform.localRotation = Quaternion.Euler (-playTime*6, 0, 0);
 	}
 }

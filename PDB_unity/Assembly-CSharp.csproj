@@ -55,7 +55,9 @@
      <Compile Include="Assets\Scripts\AudioManager.cs" />
      <Compile Include="Assets\Scripts\BioBlox.cs" />
      <Compile Include="Assets\Scripts\ClockTimer.cs" />
+     <Compile Include="Assets\Scripts\DepthTexture.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
+     <Compile Include="Assets\Scripts\InteractiveViewer.cs" />
      <Compile Include="Assets\Scripts\LabelScript.cs" />
      <Compile Include="Assets\Scripts\NetworkMan.cs" />
      <Compile Include="Assets\Scripts\PDB_mesh.cs" />
@@ -67,8 +69,11 @@
      <None Include="Assets\Resources\4PH2.txt" />
      <None Include="Assets\Shaders\PDB.shader" />
      <None Include="Assets\Resources\DebugPDB.txt" />
+     <None Include="Assets\Shaders\DepthShader.shader" />
+     <None Include="Assets\Resources\betabarrel_b.txt" />
      <None Include="Assets\Resources\script.txt" />
      <None Include="Assets\Resources\1GCQ_bWithTags.txt" />
+     <None Include="Assets\Resources\letterc.txt" />
      <None Include="Assets\Shaders\3DTextureVisualizer.shader" />
      <None Include="Assets\Resources\pdb1t6b.txt" />
      <None Include="Assets\Resources\2Q5R.txt" />

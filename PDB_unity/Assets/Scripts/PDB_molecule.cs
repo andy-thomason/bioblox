@@ -173,6 +173,57 @@ public class PDB_molecule
         //mesh.RecalculateNormals();
     }
 
+	public Mesh build_section_mesh(int[] atom_indicies)
+	{
+		Mesh meshy = new Mesh ();
+		meshy.Clear ();
+
+		int vlen = vsphere.Length;
+		int ilen = isphere.Length;
+
+		Vector3[] verts = new Vector3[atom_indicies.Length * vlen];
+		Vector3[] normals = new Vector3[atom_indicies.Length * vlen];
+		Vector2[] uvs = new Vector2[atom_indicies.Length * vlen];
+		Color[] colors = new Color[atom_indicies.Length * vlen];
+		int[] indices = new int[atom_indicies.Length * ilen];
+
+		Vector3 offset = new Vector3 ();
+		for(int i=0;i<atom_indicies.Length;++i)
+		{
+			offset+=atom_centres[atom_indicies[i]];
+		}
+		offset /= atom_indicies.Length;
+
+		int idx = 0;
+		for (int i=0; i<atom_indicies.Length; ++i) {
+			int index = atom_indicies[i];
+			Vector3 pos = atom_centres[index];
+			Color col= Color.green;
+			float rad = atom_radii[index];
+
+			for(int j=0; j!= vlen; ++j)
+			{
+				int v=j+i*vlen;
+				verts[v] = vsphere[j]*rad + pos - offset;
+				normals[v] = vsphere[j];
+				uvs[v].x = normals[v].x;
+				uvs[v].y = normals[v].y;
+				colors[v] = col;
+			}
+			for (int j = 0; j != ilen; ++j) {
+				indices[idx++] = isphere[j]+ i*vlen;
+			}
+		}
+
+		meshy.vertices = verts;
+		meshy.normals = normals;
+		meshy.uv = uvs;
+		meshy.colors = colors;
+		meshy.triangles = indices;
+
+		return meshy;
+	}
+	
 	void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
 	{
 
@@ -412,7 +463,7 @@ public class PDB_molecule
 
     }
 
-    class BvhCollider
+    public class BvhCollider
     {
         PDB_molecule mol0;
         Transform t0;
@@ -517,7 +568,7 @@ public class PDB_molecule
     };
 
 	/// class to allow accelerated collisions of a sphere with the molecule
-	class BvhSphereCollider
+	public class BvhSphereCollider
 	{
 		PDB_molecule mol;
 		Transform t;
@@ -557,7 +608,33 @@ public class PDB_molecule
 				}
 			}
 		}
-		BvhSphereCollider(PDB_molecule amol, Transform at, Vector3 spherePos, float sphereRad)
+
+		public void collide_recursiveNT(int bvh)
+		{
+			if (work_done++ >= 100000) {
+				return;
+			}
+			int bt = mol.bvh_terminals[bvh];
+			
+			Vector3 c =mol.bvh_centres[bvh];
+			float r = mol.bvh_radii[bvh];
+			
+			Vector3 between = c - center;
+			float dist = between.sqrMagnitude;
+			
+			if (dist<(r+radius)*(r*radius))
+			{
+				if (bt == -1) {
+					collide_recursiveNT(bvh*2+1);
+					collide_recursiveNT(bvh*2+2);
+				}
+				else
+				{
+					results.Add(new Result(bt));
+				}
+			}
+		}
+		public BvhSphereCollider(PDB_molecule amol, Transform at, Vector3 spherePos, float sphereRad)
 		{
 			mol=amol;
 			t=at;
@@ -566,10 +643,18 @@ public class PDB_molecule
 			results=new List<Result>();
 			collide_recursive(0);
 		}
+		public BvhSphereCollider(PDB_molecule amol, Vector3 spherePos, float sphereRad)
+		{
+			mol=amol;
+			center=spherePos;
+			radius=sphereRad;
+			results=new List<Result>();
+			collide_recursiveNT(0);
+		}
 	}
 
 	/// class to allow accelerated ray atom colisions
-	class BvhRayCollider
+	public class BvhRayCollider
 	{
 		PDB_molecule mol;
 		Transform t;
@@ -699,6 +784,8 @@ public class PDB_molecule
 		
 		Vector3 c = mol.bvh_centres[0];
 		float r = mol.bvh_radii[0];
+
+		c = t.TransformPoint (c);
 		
 		Vector3 q = c - ray.origin;
 		float f = Vector3.Dot (q, ray.direction);
@@ -760,6 +847,9 @@ public class PDB_molecule
                 r1.AddForceAtPosition(-normal, c1);
             }
         }
+		if (b.results.Count > 0) {
+			return true;
+		}
 		return false;
     }
 };

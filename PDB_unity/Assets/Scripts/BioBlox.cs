@@ -21,7 +21,8 @@ public class BioBlox : MonoBehaviour
 	bool loose = false;
 	public bool exitWinSplash=false;
 	LabelScript[] selectedLabelIndex = new LabelScript[2];
-	GameObject[] molecules;
+	public GameObject[] molecules;
+	GameObject[] sites = new GameObject[2];
 	bool[] playerIsMoving = new bool[2]{false,false};
 	GameObject popTarget;
 
@@ -43,8 +44,9 @@ public class BioBlox : MonoBehaviour
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
 
-		//filenames.Add ("2Q5R");
+		//filenames.Add ("betabarrel_b");
 		filenames.Add ("pdb2ptcWithTags");
+
 		filenames.Add ("1GCQ_bWithTags");
 
 
@@ -135,7 +137,7 @@ public class BioBlox : MonoBehaviour
 		GameObject mol = molecules [molIndex];
 		Rigidbody r = mol.GetComponent<Rigidbody> ();
 		r.maxAngularVelocity = 4;
-		float timeout = 4.0f;
+		float timeout = 100.0f;
 		playerIsMoving [molIndex] = true;
 		Vector3 lastMousePos = Input.mousePosition;
 		for (float t=0.0f; t<timeout; t+=Time.deltaTime) {
@@ -144,19 +146,25 @@ public class BioBlox : MonoBehaviour
 			{
 				break;
 			}
-
 			if(Input.GetMouseButton(0))
 			{
-				if(t>0.3f)
+				Camera c = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+				Ray ray = c.ScreenPointToRay(Input.mousePosition);
+				if(PDB_molecule.collide_ray_quick(mol,mol.GetComponent<PDB_mesh>().mol,
+				                                  mol.transform,
+				                                  ray))
 				{
-					lastMousePos=Input.mousePosition;
-				}
-				t=0.0f;
-				Vector3 mousePos=Input.mousePosition;
-				Vector3 mouseDelta=mousePos-lastMousePos;
+					if(t>0.3f)
+					{
+						lastMousePos=Input.mousePosition;
+					}
+					t=0.0f;
+					Vector3 mousePos=Input.mousePosition;
+					Vector3 mouseDelta=mousePos-lastMousePos;
 
-				r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
-				lastMousePos=mousePos;
+					r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
+					lastMousePos=mousePos;
+				}
 			}
 			yield return null;
 		}
@@ -208,6 +216,16 @@ public class BioBlox : MonoBehaviour
 					playerIsMoving[1]=true;
 					StartCoroutine("PlayerMoveMolecule",1);
 				}
+			}
+			if(sites[0])
+			{
+				sites[0].transform.rotation=molecules[0].transform.rotation;
+				//sites[0].transform.Rotate(new Vector3(0,90,0),Space.World);
+			}
+			if(sites[1])
+			{
+				sites[1].transform.rotation=molecules[1].transform.rotation;
+				//sites[1].transform.Rotate(new Vector3(0,-90,0),Space.World);
 			}
 		}
 	}
@@ -279,6 +297,52 @@ public class BioBlox : MonoBehaviour
 //			activeLabels [link.Second].BreakLink ();
 //		labelToLabelPairs.Remove (linkIndex);
 //	}
+	public void SiteClicked (GameObject labelObj)
+	{
+		Debug.Log (labelObj.name + "'s site was selected");
+		LabelScript script = labelObj.GetComponent<LabelScript> ();
+		int molNum = -1;
+		int index = GetAtomIndexFromID (script.label.atomIndex,out molNum);
+
+		GameObject g;
+		Transform t = GameObject.Find ("SitePosition" + molNum).transform;
+		if (!sites [molNum]) {
+			Debug.Log("Created site");
+			GameObject primitive = GameObject.CreatePrimitive (PrimitiveType.Quad);
+			Material diffuse = primitive.GetComponent<MeshRenderer> ().sharedMaterial;
+			DestroyImmediate (primitive);
+
+			g = new GameObject ();
+			g.AddComponent<MeshFilter> ();
+			MeshRenderer r = g.AddComponent<MeshRenderer> ();
+			g.transform.position = t.position;
+			r.material = diffuse;
+			sites [molNum] = g;
+			g.transform.rotation = Quaternion.identity;
+		}
+
+		MeshFilter f = sites [molNum].GetComponent<MeshFilter> ();
+		sites [molNum].GetComponent<MeshRenderer> ();
+		PDB_mesh meshy = molecules [molNum].GetComponent<PDB_mesh> ();
+		PDB_molecule mol = meshy.mol;
+		Vector3 spherePos = meshy.mol.atom_centres [index];
+		float rad = 3.5f;
+
+		PDB_molecule.BvhSphereCollider sphere = 
+			new PDB_molecule.BvhSphereCollider (meshy.mol,
+			                                    spherePos,
+			                                    rad);
+
+		List<int> mol_index_vec = new List<int> ();
+		for(int i=0;i<sphere.results.Count;++i)
+		{
+			mol_index_vec.Add(sphere.results[i].index);
+		}
+		Mesh m = mol.build_section_mesh (mol_index_vec.ToArray());
+		f.mesh = m;
+	
+	}
+
 
 	public void LabelClicked (GameObject labelObj)
 	{
@@ -306,7 +370,6 @@ public class BioBlox : MonoBehaviour
 		if (selectedLabelIndex [1]) {
 			selectedLabelIndex [1].shouldGlow = true;
 		}
-
 		//Handle label click, make active, focusd on atom //etc
 	}
 
@@ -405,7 +468,15 @@ public class BioBlox : MonoBehaviour
 		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
 		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
 		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
-
+		for (int i=0; i<meshes1.Length; ++i) {
+			meshes1[i].material.SetVector ("_CullPos", 
+			                               molInfo1.atom_centres[molInfo1.serial_to_atom[winCondition[0].First]]);
+		}
+		for(int i=0;i<meshes2.Length;++i)
+		{
+			meshes2[i].material.SetVector ("_CullPos",
+			                               molInfo2.atom_centres[molInfo2.serial_to_atom[winCondition[0].Second]]);
+		}
 		float targetKVal = shaderKVal;
 		float currentKVal = 0;
 		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
@@ -422,14 +493,10 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1[i].material.SetVector ("_CullPos",mol1.transform.TransformPoint( 
-			    molInfo1.atom_centres[molInfo1.serial_to_atom[winCondition[0].First]]));
 			meshes1[i].material.SetFloat("_K",targetKVal);
 		}
 		for(int i=0;i<meshes2.Length;++i)
 		{
-			meshes2[i].material.SetVector ("_CullPos",mol2.transform.TransformPoint(
-				molInfo2.atom_centres[molInfo2.serial_to_atom[winCondition[0].Second]]));
 			meshes2[i].material.SetFloat("_K",targetKVal);
 		}
 	}
@@ -473,7 +540,7 @@ public class BioBlox : MonoBehaviour
 		Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
 		Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
  
-		float timeoutTimer = 10.0f;
+		float timeoutTimer = 40.0f;
 		const float nonInteractionTimeOut = 2.0f;
 		float nonInteractionTimer = 0.0f;
 		bool autoRotate = true;
@@ -481,7 +548,6 @@ public class BioBlox : MonoBehaviour
 		Vector3 oldMousePos = Input.mousePosition;
 
 		while(true){
-
 			nonInteractionTimer += Time.deltaTime;
 			timeoutTimer -= Time.deltaTime;
 			if(nonInteractionTimer>nonInteractionTimeOut)
@@ -544,9 +610,51 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
+	IEnumerator DockingOneAxis()
+	{
+		PDB_mesh mol1 = molecules [0].GetComponent<PDB_mesh> ();
+		PDB_mesh mol2 = molecules [1].GetComponent<PDB_mesh> ();
+		mol1.OneAxisDock ();
+
+		Quaternion q1 = mol1.transform.rotation;
+		Quaternion q2 = mol2.transform.rotation;
+
+		Vector3 p1 = mol1.transform.position;
+		Vector3 p2 = mol2.transform.position;
+
+		Vector2 oldMousePos = Input.mousePosition;
+
+		float hasCollidedCountdown = 6.0f;
+		float hasCollidedTimer = 0.0f;
+
+		mol1.transform.rotation = Quaternion.LookRotation (new Vector3 (0, 0, 1),
+		                                                  new Vector3 (1, 0, 0));
+		mol2.transform.rotation = Quaternion.LookRotation (new Vector3 (0, 0, 1),
+		                                                   new Vector3 (1, 0, 0));
 
 
-	void make_molecule_mesh(PDB_mesh mesh, string proto)
+		while (!mol1.OneAxisHasDocked()) {
+			if (mol1.hasCollided) {
+				hasCollidedTimer += Time.deltaTime;
+				if (hasCollidedTimer > hasCollidedCountdown) {
+					Debug.Log("Timeout");
+					yield break;
+				}
+			}
+			Vector2 mPos = Input.mousePosition;
+			Vector2 diff = mPos - oldMousePos;
+			oldMousePos = mPos;
+
+			mol2.GetComponent<Rigidbody> ().AddTorque (new Vector3 (diff.y, 0, 0));
+			yield return null;
+		}
+		this.GetComponent<AudioManager>().Play("Win");
+		
+		StartCoroutine ("WinSplash",new Vector3(0,0,0));
+		yield break;
+	}
+
+	void make_molecule_mesh(PDB_mesh mesh, string proto,int layerNum)
 	{
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
@@ -557,6 +665,7 @@ public class BioBlox : MonoBehaviour
 			Mesh cur=mesh.mol.mesh[i];
 			GameObject obj = new GameObject();
 			obj.name=cur.name;
+			obj.layer=layerNum;
 			MeshFilter f = obj.AddComponent<MeshFilter> ();
 			MeshRenderer r = obj.AddComponent<MeshRenderer> ();
 			r.material = pdbr.material;
@@ -569,11 +678,12 @@ public class BioBlox : MonoBehaviour
 
 
 	GameObject make_molecule (
-		string name, string proto, float xoffset
+		string name, string proto, float xoffset, int layerNum
 	)
 	{
 		GameObject obj = new GameObject ();
 		obj.name = name;
+		obj.layer = layerNum;
 		obj.AddComponent<TransformLerper> ();
 
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
@@ -581,8 +691,9 @@ public class BioBlox : MonoBehaviour
 		//obj.AddComponent<Tex3DMap> ();
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
-		make_molecule_mesh (p,proto);
+		make_molecule_mesh (p,proto,layerNum);
 		Debug.Log (mol.mesh[0].vertices.Length);
+
 
 
 		ri.angularDrag = 1;
@@ -594,7 +705,7 @@ public class BioBlox : MonoBehaviour
 		Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
 		Quaternion originalMolRot = obj.transform.rotation;
 		obj.transform.Rotate (0, 0, -270); 
-		obj.transform.Translate (xoffset, 0, 0);
+		obj.transform.Translate (mol.bvh_radii[0]*xoffset, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 		obj.GetComponent<TransformLerper> ().AddTransformPoint (obj.transform.rotation);
@@ -618,15 +729,17 @@ public class BioBlox : MonoBehaviour
 			Debug.LogError ("No next level");
 		}
 		string file = filenames [filenameIndex];
-		GameObject mol1 = make_molecule (file + ".1", "Proto1", -20);
-		GameObject mol2 = make_molecule (file + ".2", "Proto2", 20);
+		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1,8);
+		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1,9);
 		ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
 		playerClock.ResetTimer ();
 		playerClock.timeText.enabled = false;
 	
 		molecules = new GameObject[2];
 		molecules [0] = mol1.gameObject;
+		mol1.layer = 7;
 		molecules [1] = mol2.gameObject;
+		mol1.layer = 8;
 		PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
 		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
 		//debug 3D texture
@@ -674,11 +787,13 @@ public class BioBlox : MonoBehaviour
 		}
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
-		playerClock.StartPlayerTimer ();
 		while (true) {
-			if(Input.GetKeyDown(KeyCode.L))
-			{
-				won=true;
+			if (Input.GetKeyDown (KeyCode.L)) {
+				won = true;
+			}
+			if (Input.anyKey){
+			playerClock.StartPlayerTimer();
+		
 			}
 			if (won) {
 				Debug.Log ("We won");
@@ -687,12 +802,21 @@ public class BioBlox : MonoBehaviour
 					PopOut (activeLabels [i].gameObject);
 				}
 				eventSystem.enabled = false;
+				//StartCoroutine("DockingOneAxis");
+				if(sites[0])
+				{
+				PopOut (sites[0]);
+				}
+				if(sites[1])
+				{
+				PopOut (sites[1]);
+				}
+
 				//p1.AutoDockCheap();
 				//p2.AutoDockCheap();
-				p1.AutoDock ();
+				p1.AutoDock();
 				while(!p1.HasDocked())
 				{
-
 					yield return null;
 				}
 				Debug.Log("Docked");
@@ -700,10 +824,13 @@ public class BioBlox : MonoBehaviour
 				while (!p1.GetComponent<TransformLerper>().finished&&
 				      !p2.GetComponent<TransformLerper>().finished) {
 					yield return null;
-				}*/
+				}/=*/
+
 				this.GetComponent<AudioManager>().Play("Win");
 
 				StartCoroutine ("WinSplash",new Vector3(0,0,0));
+				GameObject.Destroy(sites[0]);
+				GameObject.Destroy(sites[1]);
 				yield break;
 			}
 			if (loose) {
@@ -720,6 +847,8 @@ public class BioBlox : MonoBehaviour
 				LabelClicked(selectedLabelIndex[0].gameObject);
 				LabelClicked(selectedLabelIndex[1].gameObject);
 				yield return new WaitForSeconds(0.9f);
+				PopOut (sites[0]);
+				PopOut (sites[1]);
 
 
 				for (int i = 0; i < activeLabels.Count; ++i) {
@@ -751,6 +880,8 @@ public class BioBlox : MonoBehaviour
 				for (int i = 0; i < activeLabels.Count; ++i) {
 					PopIn(activeLabels [i].gameObject);
 				}
+				PopIn (sites[0]);
+				PopIn (sites[1]);
 				eventSystem.enabled = true;
 				loose = false;
 			}

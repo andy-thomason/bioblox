@@ -15,6 +15,8 @@ public class PDB_mesh : MonoBehaviour {
 	bool shouldCollide =false;
 	float t=0;
 
+	public bool hasCollided=false;
+
 	// Use this for initialization
 	void Start () {
 	  
@@ -61,6 +63,39 @@ public class PDB_mesh : MonoBehaviour {
 		startRotation=true;
 		t=0;
 	}
+
+	public void OneAxisDock()
+	{
+		shouldCollide = true;
+		allowInteraction = false;
+		startRotation = false;
+
+		Rigidbody rigidBody1 = gameObject.GetComponent<Rigidbody> ();
+		Rigidbody rigidBody2 = other.GetComponent<Rigidbody> ();
+
+		rigidBody1.constraints = RigidbodyConstraints.FreezeRotation;
+		rigidBody2.constraints = RigidbodyConstraints.None;
+
+		rigidBody1.drag = 2.0f;
+		rigidBody2.drag = 2.0f;
+
+		Vector3 usToOth = other.transform.position - gameObject.transform.position;
+		Vector3 othToUs = gameObject.transform.position - other.transform.position;
+
+
+		Vector3 anchor = transform.InverseTransformPoint (transform.position + usToOth.normalized);
+		Vector3 otherAnchor = other.transform.InverseTransformPoint (other.transform.position + othToUs.normalized);
+
+		SpringJoint j = gameObject.AddComponent<SpringJoint> ();
+
+		j.anchor = anchor;
+		j.connectedBody = rigidBody2;
+		j.autoConfigureConnectedAnchor = false;
+		j.connectedAnchor = otherAnchor;
+		j.damper = 6.0f;
+		j.spring = 0.5f;
+	}
+
 	public void AutoDock()
 	{
 		shouldCollide = true;
@@ -74,7 +109,6 @@ public class PDB_mesh : MonoBehaviour {
 		r2.constraints = RigidbodyConstraints.None;
 		r1.drag = 2.0f;
 		r2.drag = 2.0f;
-
 
 		for (int i=0; i<mol.spring_pairs.Length; ++i) {
 			int index1=mol.serial_to_atom[mol.spring_pairs[i].First];
@@ -98,10 +132,33 @@ public class PDB_mesh : MonoBehaviour {
 		}
 	}
 
+	public bool OneAxisHasDocked()
+	{
+		Tuple<int,int>[] pairs = mol.spring_pairs;
+		PDB_molecule otherMol = other.GetComponent<PDB_mesh> ().mol;
+		for(int i = 0; i < pairs.Length; i++)
+		{
+			Vector3 pos1 = transform.TransformPoint(mol.atom_centres[mol.serial_to_atom[pairs[i].First]]);
+			Vector3 pos2 = other.transform.TransformPoint(otherMol.atom_centres[otherMol.serial_to_atom[pairs[i].Second]]);
+
+			float rad=mol.atom_radii[mol.serial_to_atom[pairs[i].First]];
+
+			float sqrdDist= (pos1-pos2).sqrMagnitude;
+			float sqrdRad = (rad+rad)*(rad*rad);
+			float offset = 0.4f;
+
+			if(sqrdDist > sqrdRad + offset)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public bool HasDocked ()
 	{
 		for (int i=0; i<gameObject.GetComponents<SpringJoint>().Length; ++i) {
-			SpringJoint s=gameObject.GetComponent<SpringJoint>();
+			SpringJoint s=gameObject.GetComponents<SpringJoint>()[i];
 
 			Vector3 wpos1=transform.TransformPoint(s.anchor);
 			Vector3 wpos2=other.transform.TransformPoint(s.connectedAnchor);
@@ -188,10 +245,13 @@ public class PDB_mesh : MonoBehaviour {
 				{
 					PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
 					
-					PDB_molecule.pysics_collide (
+					if(PDB_molecule.pysics_collide (
 						gameObject, mol, transform,
 						other, other_mesh.mol, other.transform
-						);
+						))
+					{
+						hasCollided=true;
+					}
 				}
 			}
 		}
