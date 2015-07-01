@@ -9,6 +9,7 @@
     _K ("K transparrency", Float)=0
     //_AmbientOcclusion ("TexRanger", 3D)="white"{}
     _BVH ("BVH_texture", RECT) = "black"{}
+    _BVH_SCALE ("BVH_scale", Float)=0
   }
   SubShader {
     Pass {
@@ -68,6 +69,7 @@
       
       //uniform sampler3D _AmbientOcclusion;
       uniform sampler2D _BVH;
+      uniform float _BVH_SCALE;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
@@ -85,41 +87,67 @@
 	}
 	
 	float rgtof(fixed r, fixed g) {
-		return (r * 256.0 + g) - 128.0;
+		return (r * 255.0 + g * (255.0/256)) - 128.0;
 	}
 
-	// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 	fixed4 frag(varying_t i) : COLOR {
-		//return fixed4(1, 0, 0, 1);
-		return fixed4(tex2Dlod(_BVH, float4(0, 0, 0, 0)));
-
-		//return fixed4(1, 0, 0, 1);
-		/*float4 cr0 = tex2D(_BVH, float2(0.25, 0.5));
-		float4 cr1 = tex2D(_BVH, float2(0.75, 0.5));
+		float min_d = 1000;
+		float3 min_pos = float3(0, 0, 0);
+		float3 min_norm = float3(0, 0, 0);
 		float3 ray_start = i.world_pos.xyz;
 		float3 ray_dir = normalize(ray_start - _CameraPos);
-		float3 centre = float3(rgtof(cr0.r, cr0.g), rgtof(cr0.b, cr0.a), rgtof(cr1.r, cr1.g));
-		float radius = 10;
-		float3 oc = ray_start - centre;
-		float l_dot_oc = dot(ray_dir, oc);
-		float oc2 = dot(oc, oc);
-		
-		float sq = l_dot_oc * l_dot_oc - oc2 + radius * radius;
-		if (sq < 0) {
-			clip(-1.0f);
-		}
-		float3 pos = ray_start + (-l_dot_oc - sqrt(sq)) * ray_dir;
-		float3 normal = normalize(pos - centre);
-		//return fixed4(normal, 1);
+		//return fixed4(1, 0, 0, 1);
 
+		int sp = 0;
+		int stack[32];
+		stack[sp++] = 0;
+		//for (int i = 0; i != 64; ++i) {
+		while (sp != 0) {
+			//if (sp == 0) continue;
+			int i = stack[--sp];
+			float4 cr0 = tex2Dlod(_BVH, float4(0.25, ( i + 0.5 ) * _BVH_SCALE, 0, 0));
+			float4 cr1 = tex2Dlod(_BVH, float4(0.75, ( i + 0.5 ) * _BVH_SCALE, 0, 0));
+			float3 centre = float3(rgtof(cr0.r, cr0.g), rgtof(cr0.b, cr0.a), rgtof(cr1.r, cr1.g));
+			centre -= ray_start;
+			float radius = rgtof(cr1.b, cr1.a);
+			float dir_dot_centre = dot(ray_dir, centre);
+			float3 closest = ray_dir * dir_dot_centre;
+
+			//   min_pos   closest
+			//        \  s /
+			// 0-------+--+----> ray_dir
+			//          \ |
+			//    radius \|
+			//            + centre
+			// 
+			// s^2 + (closest - centre)^2 = radius^2
+			float s2 = radius * radius - dot(closest - centre, closest - centre);
+			if (s2 > 0) {
+				float d = dir_dot_centre - sqrt(s2);
+				if (radius < 2) {
+					if (d < min_d) {
+						min_d = d;
+						min_pos = ray_start + d * ray_dir;
+						min_norm = normalize(d * ray_dir - centre);
+					}
+				} else {
+					stack[sp++] = i*2 + 1;
+					stack[sp++] = i*2 + 2;
+				}
+			}
+		}
+		if (min_d == 1000) {
+			clip(-1.0);
+		}
+
+		float3 pos = min_pos;
+		float3 normal = min_norm;
         float3 light_dir = normalize(_LightPos.xyz - pos);
         float3 view_dir = ray_dir;
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
         float diffuse_factor = max(0.5f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
-        float aoValue = 0;
-		//return fixed4(diffuse_fact/or, diffuse_factor, diffuse_factor, 1);
-        return fixed4(_Color.xyz * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);*/
+        return fixed4(_Color.xyz * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
 	}
 
       ENDCG

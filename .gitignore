@@ -1,5 +1,5 @@
 *.userprefs
 *.TMP
-*.cs
-*.sln
+PDB_Unity/*.csproj
+PDB_Unity/*.sln
 
