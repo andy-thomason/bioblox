@@ -323,7 +323,7 @@ public class PDB_molecule
         public string labelName;
     }
     
-    static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
+    //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
 
@@ -397,7 +397,7 @@ public class PDB_molecule
 		return (1 - ((occlusion) / aoccRays.Length));
 	}
 
-	float fk = Mathf.Log(0.5f) / (2.0f*2.0f);
+	float fk = Mathf.Log(0.5f) / (1.25f*1.25f);
 	int[] mf_stack = new int [128];
 	float mf(float x, float y, float z) {
 		int sp = 0;
@@ -427,8 +427,22 @@ public class PDB_molecule
 
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
-		int x0 = -32, y0 = -32, z0 = -32;
-		int xdim = 65, ydim = 65, zdim = 65;
+		Vector3 min = atom_centres[0];
+		Vector3 max = min;
+		for (int j = 0; j != atom_centres.Length; ++j)
+		{
+			Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]);
+			min = Vector3.Min(min, atom_centres[j] - r);
+			max = Vector3.Max(max, atom_centres[j] + r);
+		}
+		int x0 = Mathf.FloorToInt (min.x);
+		int y0 = Mathf.FloorToInt (min.y);
+		int z0 = Mathf.FloorToInt (min.z);
+		int x1 = Mathf.CeilToInt (max.x);
+		int y1 = Mathf.CeilToInt (max.y);
+		int z1 = Mathf.CeilToInt (max.z);
+
+		int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
 		float[] mc_values = new float[xdim * ydim * zdim];
 		Vector3[] mc_normals = new Vector3[xdim * ydim * zdim];
@@ -507,7 +521,7 @@ public class PDB_molecule
 									vertices[num_edges] = new Vector3(x0 + i + lambda, y0 + j, z0 + k);
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+1], lambda);
-									debug.WriteLine("x " + normals[num_edges]);
+									//debug.WriteLine("x " + normals[num_edges]);
 								}
 								num_edges++;
 							}
@@ -521,7 +535,7 @@ public class PDB_molecule
 									vertices[num_edges] = new Vector3(x0 + i, y0 + j + lambda, z0 + k);
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+xdim], lambda);
-									debug.WriteLine("y " + normals[num_edges]);
+									//debug.WriteLine("y " + normals[num_edges]);
 								}
                                 num_edges++;
                             }
@@ -535,18 +549,18 @@ public class PDB_molecule
 									vertices[num_edges] = new Vector3(x0 + i, y0 + j, z0 + k + lambda);
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+xdim*ydim], lambda);
-									debug.WriteLine("z " + normals[num_edges]);
+									//debug.WriteLine("z " + normals[num_edges]);
 								}
                                 num_edges++;
                             }
                         }
 						if (pass == 1) {
-							debug.WriteLine(i + ", " + j + ", " + k + ", " + idx + ", " + mc_values[idx] + ", " + edge_indices[idx*3+0] + ", " + edge_indices[idx*3+1] + ", " + edge_indices[idx*3+2]);
+							//debug.WriteLine(i + ", " + j + ", " + k + ", " + idx + ", " + mc_values[idx] + ", " + edge_indices[idx*3+0] + ", " + edge_indices[idx*3+1] + ", " + edge_indices[idx*3+2]);
 						}
 					}
-					debug.WriteLine("");
+					//debug.WriteLine("");
                 }
-				debug.WriteLine("");
+				//debug.WriteLine("");
             }
             if (pass == 0) {
 				vertices = new Vector3[num_edges];
@@ -578,7 +592,7 @@ public class PDB_molecule
 							(mc_values [idx + 1 + xdim + xdim * ydim] < 0 ? 1 << 6 : 0) |
 							(mc_values [idx + xdim + xdim * ydim] < 0 ? 1 << 7 : 0
 						);
-						if (pass == 1) debug.WriteLine("mask={0:X2}", mask);
+						//if (pass == 1) debug.WriteLine("mask={0:X2}", mask);
 
 						int off = mask * 16;
 						while (mc_triangles[off] != -1) {
@@ -586,7 +600,7 @@ public class PDB_molecule
 								indices [num_idx + 0] = edge_indices [idx*3 + edge_offsets [mc_triangles [off + 0]]];
 								indices [num_idx + 1] = edge_indices [idx*3 + edge_offsets [mc_triangles [off + 1]]];
 								indices [num_idx + 2] = edge_indices [idx*3 + edge_offsets [mc_triangles [off + 2]]];
-								debug.WriteLine("tri, " + i + ", " + j + ", " + k + ", " + idx + ", " + indices [num_idx + 0] + ", " + indices [num_idx + 1] + ", " + indices [num_idx + 2]);
+								//debug.WriteLine("tri, " + i + ", " + j + ", " + k + ", " + idx + ", " + indices [num_idx + 0] + ", " + indices [num_idx + 1] + ", " + indices [num_idx + 2]);
                             }
 							num_idx += 3;
 							off += 3;
@@ -598,7 +612,7 @@ public class PDB_molecule
 				indices = new int[num_idx];
             }
 		}
-		debug.Flush();
+		//debug.Flush();
     }
 	
 	void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
