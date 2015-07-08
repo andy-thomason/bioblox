@@ -165,7 +165,7 @@
       fixed4 frag(varying_t i) : COLOR {
       //return tex3D(_AmbientOcclusion, i.world_pos*(1.0/32.0));
         float3 normal = normalize(i.normal);
-        float aoValue=i.col.w;
+        //float aoValue=0;//i.col.w;
         i.col.w=1;
         float2 screen_pos = i.sp.xy/i.sp.w*_ScreenParams.xy;
         
@@ -177,7 +177,7 @@
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
         float3 view_dir = normalize(i.world_pos.xyz - _CameraPos.xyz);
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
-        float diffuse_factor = max(0.5f, dot(normal, light_dir));
+        float diffuse_factor = max(0.3f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
 
       	float alpha = exp(_K * dot(i.model_pos.xyz-_CullPos,i.model_pos.xyz-_CullPos)) * 4;
@@ -186,8 +186,7 @@
       		clip(-1.0f);
       	}
       	
-      	
-        return fixed4(_Color.xyz * aoValue + i.col * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
+        return fixed4(_Color.xyz * i.col.xyz * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
       }
 
       ENDCG
