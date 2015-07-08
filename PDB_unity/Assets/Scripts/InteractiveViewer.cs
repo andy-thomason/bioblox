@@ -11,7 +11,7 @@ IDragHandler,IEndDragHandler{
 
 	public int molNum;
 	public float maxRadius=22.0f;
-	public float scrollSpeed=1.3f;
+	public float scrollSpeed=0.1f;
 
 	Vector2 oldMousePos;
 	// Use this for initialization

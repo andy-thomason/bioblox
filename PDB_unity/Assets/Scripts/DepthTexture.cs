@@ -61,12 +61,12 @@ IDragHandler,IEndDragHandler {
 		float radOffset = mol.atom_radii [0];
 		if (molNumber==0) {
 			Vector3 camPos=leftCamera.transform.position;
-			camPos.x = bestWorldPos.x + leftCamera.nearClipPlane+radOffset;
+			camPos.x = bestWorldPos.x + leftCamera.nearClipPlane + radOffset +1;
 			leftCamera.transform.position=camPos;
 		}
 		if (molNumber==1) {
 			Vector3 camPos=rightCamera.transform.position;
-			camPos.x = (bestWorldPos.x - rightCamera.nearClipPlane) - radOffset;
+			camPos.x = ((bestWorldPos.x - rightCamera.nearClipPlane) - radOffset) -1;
 			rightCamera.transform.position=camPos;
 		}
 
@@ -109,6 +109,7 @@ IDragHandler,IEndDragHandler {
 
 			}
 		}
+
 		rightT.SetPixels (rCol);
 		rightT.Apply ();
 		leftT.SetPixels (lCol);
@@ -121,6 +122,8 @@ IDragHandler,IEndDragHandler {
 		int textureWidth = rightT.width;
 		int textureHeight = rightT.height;
 
+
+
 		for (int i=0; i<textureHeight; ++i) {
 
 			for(int j=0;j<textureWidth;++j)
@@ -129,6 +132,7 @@ IDragHandler,IEndDragHandler {
 				int reverseHorizontalIndex = (i*textureHeight) + textureWidth-1-j;
 				//Color invert=Color.white-rCol[reverseHorizontalIndex];
 				centerCol[index]=rCol[reverseHorizontalIndex]*0.5f + lCol[index]*0.5f;
+				centerCol[index].a=1.0f;
 			}
 
 		}

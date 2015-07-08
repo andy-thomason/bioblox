@@ -26,6 +26,8 @@ public class BioBlox : MonoBehaviour
 	bool[] playerIsMoving = new bool[2]{false,false};
 	GameObject popTarget;
 
+	public Text debugText;
+
 	List<Color> colorPool=new List<Color>();
 	int randomColorPoolOffset;
 	
@@ -102,7 +104,6 @@ public class BioBlox : MonoBehaviour
 		atomPosW = transToAt + molMesh.transform.position;
 		t.position = atomPosW;
 		t.position += new Vector3 (0, 0, -10);
-
 	}
 
 	public Vector3 GetAtomPos (int atomID)
@@ -179,6 +180,10 @@ public class BioBlox : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
+		if(debugText)
+		{
+			debugText.text = string.Format("Score :{0}", ScoreRMSD().ToString("F3"));
+		}
 		if (reload) {
 			filenameIndex++;
 			Reset ();
@@ -276,6 +281,27 @@ public class BioBlox : MonoBehaviour
 		target.SetActive (false);
 		target.transform.localScale = targetScale;
 		yield break;
+	}
+
+	public float ScoreRMSD()
+	{
+		if (molecules.Length == 0 || !molecules [0] || !molecules [0]) {
+			return 0.0f;
+		}
+		float rmsd = 0.0f;
+		int count = 0;
+		PDB_mesh receptor = molecules [0].GetComponent<PDB_mesh> ();
+		PDB_mesh ligand = molecules [1].GetComponent<PDB_mesh> ();
+		Vector3 offset = ligand.mol.pos - receptor.mol.pos;
+		Matrix4x4 transMat = ligand.transform.worldToLocalMatrix * receptor.transform.localToWorldMatrix;
+		for (int i = 0; i < ligand.mol.atom_centres.Length; i++) {
+			if(ligand.mol.names[i] == PDB_molecule.atom_C)
+			{
+				rmsd += (transMat.MultiplyPoint3x4(ligand.mol.atom_centres[i] + offset) - ligand.mol.atom_centres[i]).sqrMagnitude;
+				count++;
+			}
+		}
+		return Mathf.Sqrt (rmsd / count);
 	}
 
 	//returns other link index or -1 on failure
@@ -469,35 +495,31 @@ public class BioBlox : MonoBehaviour
 		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
 		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
 		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1[i].material.SetVector ("_CullPos", 
-			                               molInfo1.atom_centres[molInfo1.serial_to_atom[winCondition[0].First]]);
+			meshes1 [i].material.SetVector ("_CullPos", 
+			                               molInfo1.atom_centres [molInfo1.serial_to_atom [winCondition [0].First]]);
 		}
-		for(int i=0;i<meshes2.Length;++i)
-		{
-			meshes2[i].material.SetVector ("_CullPos",
-			                               molInfo2.atom_centres[molInfo2.serial_to_atom[winCondition[0].Second]]);
+		for (int i=0; i<meshes2.Length; ++i) {
+			meshes2 [i].material.SetVector ("_CullPos",
+			                               molInfo2.atom_centres [molInfo2.serial_to_atom [winCondition [0].Second]]);
 		}
 		float targetKVal = shaderKVal;
 		float currentKVal = 0;
 		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
-			float k=currentKVal+targetKVal*t;
+			float k = currentKVal + targetKVal * t;
 
-			for(int i=0;i<meshes1.Length;++i)
-			{
-			meshes1[i].material.SetFloat("_K",k);
+			for (int i=0; i<meshes1.Length; ++i) {
+				meshes1 [i].material.SetFloat ("_K", k);
 			}
-			for(int i=0;i<meshes2.Length;++i)
-			{
-			meshes2[i].material.SetFloat("_K",k);
+			for (int i=0; i<meshes2.Length; ++i) {
+				meshes2 [i].material.SetFloat ("_K", k);
 			}
 			yield return null;
 		}
 		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1[i].material.SetFloat("_K",targetKVal);
+			meshes1 [i].material.SetFloat ("_K", targetKVal);
 		}
-		for(int i=0;i<meshes2.Length;++i)
-		{
-			meshes2[i].material.SetFloat("_K",targetKVal);
+		for (int i=0; i<meshes2.Length; ++i) {
+			meshes2 [i].material.SetFloat ("_K", targetKVal);
 		}
 	}
 
@@ -723,6 +745,7 @@ public class BioBlox : MonoBehaviour
 		return obj;
 	}
 
+
 	IEnumerator game_loop ()
 	{
 		if (filenameIndex >= filenames.Count) {
@@ -885,6 +908,7 @@ public class BioBlox : MonoBehaviour
 				eventSystem.enabled = true;
 				loose = false;
 			}
+
 			yield return null;
 		}
 	}
