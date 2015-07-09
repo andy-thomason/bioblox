@@ -14,8 +14,6 @@ public class BioBlox : MonoBehaviour
 	public GameObject winSplash;
 	public GameObject looseSplash;
 	public float shaderKVal=-0.03f;
-	List<LabelScript> activeLabels = new List<LabelScript> ();
-	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 	bool reload = false;
 	bool won = false;
 	bool loose = false;
@@ -35,6 +33,7 @@ public class BioBlox : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		gameObject.AddComponent<ConnectionManager> ();
 		colorPool.Add (Color.red);
 		colorPool.Add (Color.blue);
 		colorPool.Add (Color.cyan);
@@ -398,282 +397,18 @@ public class BioBlox : MonoBehaviour
 		}
 		//Handle label click, make active, focusd on atom //etc
 	}
-
-	void CreateLabel (PDB_molecule.Label label, int molNum)
-	{
-		int labelTypeIndex = -1;
-		for (int i=0; i<prefabLabels.Count; ++i) {
-			if (string.Compare (label.labelName, prefabLabels [i].name) == 0) {
-				labelTypeIndex = i;
-				break;
-			}
-		}
-		if (labelTypeIndex == -1) {
-			Debug.LogError ("Could not find Label with type" + label.labelName);
-			return;
-		}
-		GameObject newLabel = GameObject.Instantiate<GameObject> (prefabLabels [labelTypeIndex]);
-		if (!newLabel) {
-			Debug.Log ("Could not create Label");
-		}
-		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
-		if (!laSc) {
-			Debug.LogError ("Label prefab " + label.labelName + " does not have a LabelScript attached");
-		}
-		newLabel.GetComponent<Image> ().color = colorPool[(activeLabels.Count+randomColorPoolOffset) % colorPool.Count];
-		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
-		laSc.label = label;
-		laSc.owner = this;
-		laSc.labelID = activeLabels.Count;
-		laSc.is3D = true;
-		//GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
-		//newLabel.transform.position = foundObject.transform.position;
-		GameObject canvas = GameObject.Find ("Labels");
-		newLabel.transform.SetParent (canvas.transform);
-		newLabel.name = label.labelName + laSc.labelID;
-		activeLabels.Add (laSc);
-	}
+	
 
 	void Reset ()
 	{
-		for (int i=0; i<activeLabels.Count; ++i) {
-			GameObject.Destroy (activeLabels [i].gameObject);
-		}
+
 		randomColorPoolOffset = Random.Range (0, colorPool.Count-1);
 		molecules = new GameObject[0];
-		activeLabels.Clear ();
+
 		selectedLabelIndex [0] = null;
 		selectedLabelIndex [1] = null;
-		winCondition.Clear ();
 		reload = false;
 		won = false;
-	}
-
-	public void CheckPair ()
-	{
-		if (winCondition.Count > 0 && selectedLabelIndex [0] && selectedLabelIndex [1]) {
-			bool hasWon = true;
-
-			
-			for (int i=0; i<winCondition.Count; ++i) {
-				int winCon1 = winCondition [i].First;
-				int winCon2 = winCondition [i].Second;
-				
-				int selected1 = selectedLabelIndex [0].label.atomIndex;
-				int selected2 = selectedLabelIndex [1].label.atomIndex;
-				
-				if (!(winCon1 == selected1 && winCon2 == selected2) &&
-					!(winCon1 == selected2 && winCon2 == selected1)) {
-					hasWon = false;
-					break;
-				}
-			}
-			if (hasWon) {
-				won = true;
-			} else {
-				loose = true;
-			}
-			this.GetComponent<AudioManager>().Play("Drum");
-		}
-	}
-
-	IEnumerator LooseSplash ()
-	{
-		//put animation for loose splash here
-		PopIn (looseSplash);
-		yield return new WaitForSeconds (2.0f);
-		PopOut (looseSplash);
-		yield break;
-	}
-
-	IEnumerator FadeMolecules()
-	{
-		GameObject mol1 = molecules [0];
-		GameObject mol2 = molecules [1];
-		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
-		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
-		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
-		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
-		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1 [i].material.SetVector ("_CullPos", 
-			                               molInfo1.atom_centres [molInfo1.serial_to_atom [winCondition [0].First]]);
-		}
-		for (int i=0; i<meshes2.Length; ++i) {
-			meshes2 [i].material.SetVector ("_CullPos",
-			                               molInfo2.atom_centres [molInfo2.serial_to_atom [winCondition [0].Second]]);
-		}
-		float targetKVal = shaderKVal;
-		float currentKVal = 0;
-		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
-			float k = currentKVal + targetKVal * t;
-
-			for (int i=0; i<meshes1.Length; ++i) {
-				meshes1 [i].material.SetFloat ("_K", k);
-			}
-			for (int i=0; i<meshes2.Length; ++i) {
-				meshes2 [i].material.SetFloat ("_K", k);
-			}
-			yield return null;
-		}
-		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1 [i].material.SetFloat ("_K", targetKVal);
-		}
-		for (int i=0; i<meshes2.Length; ++i) {
-			meshes2 [i].material.SetFloat ("_K", targetKVal);
-		}
-	}
-
-	IEnumerator WinSplash (Vector3 focusPoint)
-	{
-		gameObject.GetComponent<ClockTimer> ().LogPlayerTime ();
-		gameObject.GetComponent<ClockTimer> ().StopPlayerTimer ();
-		//put animation for win splash here
-		PopIn (winSplash);
-		GameObject gene = GameObject.Find ("Gene");
-		if (gene) {
-			gene.SetActive (false);
-		}
-		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-		GameObject parent = new GameObject ();
-		Rigidbody r=parent.AddComponent<Rigidbody> ();
-		molecules [0].transform.SetParent (parent.transform, true);
-		molecules [1].transform.SetParent (parent.transform, true);
-	
-		r.angularDrag = 1.0f;
-		r.constraints = RigidbodyConstraints.FreezePosition;
-		r.useGravity = false;
-		parent.name = "MoveableParent";
-
-		StartCoroutine ("FadeMolecules");
-		float zoomValue = 30.0f;
-		float radRot = (3.0f * Mathf.PI) / 2;
-		float camRot = 0;
-		Vector3 start = c.transform.position;
-		Vector3 moveDir = focusPoint+ new Vector3 (0,0, -30) - c.transform.position;
-		for (float t=0; t<1.0f; t+=Time.deltaTime) {
-			c.transform.position = start + moveDir * t;
-			yield return null;
-		}
-		SpringJoint [] joints = molecules [0].GetComponents<SpringJoint> ();
-		for(int i=0;i<joints.Length;++i)
-		{
-			Component.Destroy(joints[i]);
-		}
-		Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
-		Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
- 
-		float timeoutTimer = 40.0f;
-		const float nonInteractionTimeOut = 2.0f;
-		float nonInteractionTimer = 0.0f;
-		bool autoRotate = true;
-
-		Vector3 oldMousePos = Input.mousePosition;
-
-		while(true){
-			nonInteractionTimer += Time.deltaTime;
-			timeoutTimer -= Time.deltaTime;
-			if(nonInteractionTimer>nonInteractionTimeOut)
-			{
-				autoRotate=true;
-			}
-			if(Input.GetMouseButton(0))
-			{
-				if(nonInteractionTimer>0.3f)
-				{
-					oldMousePos=Input.mousePosition;
-				}
-				nonInteractionTimer=0;
-				autoRotate=false;
-				Vector3 mousePos=Input.mousePosition;
-				Vector3 mouseDelta=mousePos-oldMousePos;
-				oldMousePos=mousePos;
-				r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
-			}
-			if(autoRotate)
-			{
-				Vector3 dir = new Vector3(
-					Mathf.Cos(radRot),
-					0,
-					Mathf.Sin(radRot));
-				dir=dir.normalized*zoomValue;
-				c.transform.position=dir;
-				c.transform.rotation =Quaternion.LookRotation(focusPoint-c.transform.position);
-				radRot+=Time.deltaTime;
-				camRot+=Time.deltaTime;
-			}
-			if((Input.anyKeyDown&&!Input.GetMouseButtonDown(0))||exitWinSplash||timeoutTimer<0)
-			{
-				exitWinSplash=false;
-				break;
-			}
-			yield return null;
-		}
-		PopOut (molecules[0].gameObject);
-		PopOut (molecules[1].gameObject);
-		PopOut (winSplash);
-		yield return new WaitForSeconds (1.0f);
-		GameObject.Destroy (molecules[0].gameObject);
-		GameObject.Destroy (molecules[1].gameObject);
-		GameObject.Destroy (parent);
-		if (gene) {
-			gene.SetActive (true);
-		}
-		Vector3 target = start;
-		start = c.transform.position;
-		Quaternion startQ = c.transform.rotation;
-		for (float t=0; t<1.0f; t+=Time.deltaTime) {
-			c.transform.position=Vector3.Lerp(start,target,t);
-			c.transform.rotation=Quaternion.Slerp(startQ,Quaternion.identity,t);
-			yield return null;
-		}
-		reload = true;
-		Debug.Log ("Reloading");
-
-		yield break;
-	}
-
-	IEnumerator DockingOneAxis()
-	{
-		PDB_mesh mol1 = molecules [0].GetComponent<PDB_mesh> ();
-		PDB_mesh mol2 = molecules [1].GetComponent<PDB_mesh> ();
-		mol1.OneAxisDock ();
-
-		Quaternion q1 = mol1.transform.rotation;
-		Quaternion q2 = mol2.transform.rotation;
-
-		Vector3 p1 = mol1.transform.position;
-		Vector3 p2 = mol2.transform.position;
-
-		Vector2 oldMousePos = Input.mousePosition;
-
-		float hasCollidedCountdown = 6.0f;
-		float hasCollidedTimer = 0.0f;
-
-		mol1.transform.rotation = Quaternion.LookRotation (new Vector3 (0, 0, 1),
-		                                                  new Vector3 (1, 0, 0));
-		mol2.transform.rotation = Quaternion.LookRotation (new Vector3 (0, 0, 1),
-		                                                   new Vector3 (1, 0, 0));
-
-
-		while (!mol1.OneAxisHasDocked()) {
-			if (mol1.hasCollided) {
-				hasCollidedTimer += Time.deltaTime;
-				if (hasCollidedTimer > hasCollidedCountdown) {
-					Debug.Log("Timeout");
-					yield break;
-				}
-			}
-			Vector2 mPos = Input.mousePosition;
-			Vector2 diff = mPos - oldMousePos;
-			oldMousePos = mPos;
-
-			mol2.GetComponent<Rigidbody> ().AddTorque (new Vector3 (diff.y, 0, 0));
-			yield return null;
-		}
-		this.GetComponent<AudioManager>().Play("Win");
-		
-		StartCoroutine ("WinSplash",new Vector3(0,0,0));
-		yield break;
 	}
 
 	void make_molecule_mesh(PDB_mesh mesh, string proto,int layerNum)
@@ -695,7 +430,6 @@ public class BioBlox : MonoBehaviour
 			obj.transform.SetParent(mesh.transform);
 			obj.transform.position=Vector3.zero;
 		}
-	
 	}
 
 
@@ -706,7 +440,7 @@ public class BioBlox : MonoBehaviour
 		GameObject obj = new GameObject ();
 		obj.name = name;
 		obj.layer = layerNum;
-		obj.AddComponent<TransformLerper> ();
+		//obj.AddComponent<TransformLerper> ();
 
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
 		Rigidbody ri = obj.AddComponent<Rigidbody> ();
@@ -716,11 +450,9 @@ public class BioBlox : MonoBehaviour
 		make_molecule_mesh (p,proto,layerNum);
 		Debug.Log (mol.mesh[0].vertices.Length);
 
-
-
+		ri.drag = 1;
 		ri.angularDrag = 1;
 		ri.useGravity = false;
-		ri.constraints = RigidbodyConstraints.FreezePosition;
 
 
 		obj.transform.Rotate (0, 0, 270);
@@ -730,18 +462,15 @@ public class BioBlox : MonoBehaviour
 		obj.transform.Translate (mol.bvh_radii[0]*xoffset, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
-		obj.GetComponent<TransformLerper> ().AddTransformPoint (obj.transform.rotation);
+		//obj.GetComponent<TransformLerper> ().AddTransformPoint (obj.transform.rotation);
 
-		obj.GetComponent<TransformLerper> ().AddTransformPoint (originMolPos,
-		                                                       originalMolRot);
-		obj.GetComponent<TransformLerper> ().speed =1.0f;
+		//obj.GetComponent<TransformLerper> ().AddTransformPoint (originMolPos,
+		//                                                       originalMolRot);
+		//obj.GetComponent<TransformLerper> ().speed =1.0f;
 
 
 
 		obj.transform.rotation = Random.rotation;
-		for (int i=0; i<mol.labels.Length; ++i) {
-			CreateLabel (mol.labels [i], (int)char.GetNumericValue (name [name.Length - 1]));
-		}
 		return obj;
 	}
 
@@ -771,144 +500,60 @@ public class BioBlox : MonoBehaviour
 		p2.other = p1.gameObject;
 		p1.gameObject.SetActive (false);
 		p2.gameObject.SetActive (false);
-		for (int i=0; i<p1.mol.pairedAtoms.Length; ++i) {
-			winCondition.Add (p1.mol.pairedAtoms [i]);
-		}
 
-		for (int i = 0; i < activeLabels.Count; ++i) {
-			activeLabels [i].gameObject.SetActive (false);
-		}
 		GameObject CD1 = GameObject.Find ("CD1");
 		GameObject CD2 = GameObject.Find ("CD2");
 		GameObject CD3 = GameObject.Find ("CD3");
-		CD1.transform.position = new Vector3 (0, 0, 0);
-		CD2.transform.position = new Vector3 (0, 0, 0);
-		CD3.transform.position = new Vector3 (0, 0, 0);
-		CD1.transform.Translate (1000, 0, 0);
-		CD2.transform.Translate (1000, 0, 0);
-		this.GetComponent<AudioManager> ().Play ("Count");
-		yield return new WaitForSeconds (1.0f);
-		CD3.transform.Translate (1000, 0, 0);
-		CD2.transform.Translate (-1000, 0, 0);
-		playerClock.timeText.enabled = true;
-		this.GetComponent<AudioManager> ().Play ("Count");
-		yield return new WaitForSeconds (1.0f);
-		CD2.transform.Translate (1000, 0, 0);
-		CD1.transform.Translate (-1000, 0, 0);
-
-		this.GetComponent<AudioManager> ().Play ("Count");
-		yield return new WaitForSeconds (1.0f);
-		CD1.transform.Translate (1000, 0, 0);
+		CD1.transform.position = new Vector3 (1000, 0, 0);
+		CD2.transform.position = new Vector3 (1000, 0, 0);
+		CD3.transform.position = new Vector3 (1000, 0, 0);
 
 		PopInSound (mol1.gameObject);
 		yield return new WaitForSeconds (0.3f);
 		PopInSound (mol2.gameObject);
 
-		for (int i = 0; i < activeLabels.Count; ++i) {
-			yield return new WaitForSeconds (0.1f);
-			PopInSound (activeLabels [i].gameObject);
-		}
+		p1.shouldCollide = true;
+
+
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
 		while (true) {
-			if (Input.GetKeyDown (KeyCode.L)) {
-				won = true;
-			}
 			if (Input.anyKey){
 			playerClock.StartPlayerTimer();
-		
-			}
-			if (won) {
-				Debug.Log ("We won");
-
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					PopOut (activeLabels [i].gameObject);
-				}
-				eventSystem.enabled = false;
-				//StartCoroutine("DockingOneAxis");
-				if(sites[0])
-				{
-				PopOut (sites[0]);
-				}
-				if(sites[1])
-				{
-				PopOut (sites[1]);
-				}
-
-				//p1.AutoDockCheap();
-				//p2.AutoDockCheap();
-				p1.AutoDock();
-				while(!p1.HasDocked())
-				{
-					yield return null;
-				}
-				Debug.Log("Docked");
-				/*
-				while (!p1.GetComponent<TransformLerper>().finished&&
-				      !p2.GetComponent<TransformLerper>().finished) {
-					yield return null;
-				}/=*/
-
-				this.GetComponent<AudioManager>().Play("Win");
-
-				StartCoroutine ("WinSplash",new Vector3(0,0,0));
-				GameObject.Destroy(sites[0]);
-				GameObject.Destroy(sites[1]);
-				yield break;
-			}
-			if (loose) {
-				Debug.Log ("Wrong");
-				eventSystem.enabled = false;
-				Vector3 startPos1 = p1.gameObject.transform.position;
-				Vector3 startPos2 = p2.gameObject.transform.position;
-			
-				Vector3 moveVec1 =  - startPos1;
-				Vector3 moveVec2 =  - startPos2;
-				moveVec1.y = 0;
-				moveVec2.y = 0;
-
-				LabelClicked(selectedLabelIndex[0].gameObject);
-				LabelClicked(selectedLabelIndex[1].gameObject);
-				yield return new WaitForSeconds(0.9f);
-				PopOut (sites[0]);
-				PopOut (sites[1]);
-
-
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					PopOut (activeLabels [i].gameObject);
-				}
-				for (float t=0; t<1;t+=Time.deltaTime*0.35f) {
-					p1.transform.position = startPos1 + moveVec1 * t;
-					p2.transform.position = startPos2 + moveVec2 * t;
-					if (PDB_molecule.collide (p1.gameObject, p1.mol, p1.transform,
-					                        p2.gameObject, p2.mol, p2.transform)) {
-						break;
-					}
-					yield return null;
-				}
-				this.GetComponent<AudioManager>().Play("Loose");
-				StartCoroutine ("LooseSplash");
-				yield return new WaitForSeconds (2.0f);
-
-				moveVec1 = startPos1 - p1.transform.position;
-				moveVec2 = startPos2 - p2.transform.position;
-
-				startPos1 = p1.transform.position;
-				startPos2 = p2.transform.position;
-				for (float t=0; t<1;t+=Time.deltaTime) {
-					p1.transform.position = startPos1 + moveVec1 * t;
-					p2.transform.position = startPos2 + moveVec2 * t;
-					yield return null;
-				}
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					PopIn(activeLabels [i].gameObject);
-				}
-				PopIn (sites[0]);
-				PopIn (sites[1]);
-				eventSystem.enabled = true;
-				loose = false;
 			}
 
+			if(Input.GetMouseButtonDown(1))
+			{
+				Debug.Log("Clicked");
+				ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+				Camera main =  GameObject.Find ("Main Camera").GetComponent<Camera>();
+				Ray r = main.ScreenPointToRay(Input.mousePosition);
+				if(PDB_molecule.collide_ray_quick( mol1, p1.mol,
+				                                  mol1.transform,
+				                                  r))
+				{
+					int atomID = PDB_molecule.collide_ray(mol1, p1.mol,
+					                                      mol1.transform,
+					                                      r);
+					conMan.RegisterClick(p1,atomID);
+
+				}
+				else if(PDB_molecule.collide_ray_quick( mol2, p2.mol,
+				                                       mol2.transform,
+				                                       r))
+				{
+					int atomID = PDB_molecule.collide_ray(mol2, p2.mol,
+					                                      mol2.transform,
+					                                      r);
+					conMan.RegisterClick(p2,atomID);
+				}
+			}
+
+			if(Input.GetKeyDown(KeyCode.Space))
+			{
+				gameObject.GetComponent<ConnectionManager>().Contract();
+
+			}
 			yield return null;
 		}
 	}

@@ -52,9 +52,11 @@
      <Compile Include="Assets\MrGene\ScriptsAndAnimations\QuestionMarkScript.cs" />
      <Compile Include="Assets\MrGene\ScriptsAndAnimations\ShirnkGuy.cs" />
      <Compile Include="Assets\MrGene\ScriptsAndAnimations\StartAudio.cs" />
+     <Compile Include="Assets\Scripts\AtomConnection.cs" />
      <Compile Include="Assets\Scripts\AudioManager.cs" />
      <Compile Include="Assets\Scripts\BioBlox.cs" />
      <Compile Include="Assets\Scripts\ClockTimer.cs" />
+     <Compile Include="Assets\Scripts\ConnectionManager.cs" />
      <Compile Include="Assets\Scripts\DepthTexture.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
      <Compile Include="Assets\Scripts\InteractiveViewer.cs" />

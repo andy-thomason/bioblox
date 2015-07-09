@@ -12,7 +12,7 @@ public class PDB_mesh : MonoBehaviour {
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
-	bool shouldCollide =false;
+	public bool shouldCollide =false;
 	float t=0;
 
 	public bool hasCollided=false;
@@ -208,10 +208,6 @@ public class PDB_mesh : MonoBehaviour {
 
 					}
 				}
-			}
-
-			if (gameObject.GetComponent<TransformLerper> ().finished == true) {
-				allowInteraction = true;
 			}
 			if (allowInteraction) {
 //				if (Input.GetKey ("w")) {

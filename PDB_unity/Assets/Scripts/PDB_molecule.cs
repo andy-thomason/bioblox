@@ -1252,7 +1252,7 @@ public class PDB_molecule
 			BvhRayCollider.Result result = b.results[i];
 			Vector3 c = t.TransformPoint(mol.atom_centres[result.index]);
 			//float dist = (ray.origin-c).sqrMagnitude;
-			float dist = Vector3.Dot(ray.origin - c, ray.direction);
+			float dist = Vector3.Dot(c, ray.direction);
 			if (closestDistance > dist)
 			{
 				closestDistance = dist;
@@ -1327,7 +1327,7 @@ public class PDB_molecule
             //Debug.Log("distance=" + distance
             if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				normal*=0.8f;
+				normal*=0.2f;
 				r0.AddForceAtPosition(normal,c0);
                 r1.AddForceAtPosition(-normal, c1);
             }
