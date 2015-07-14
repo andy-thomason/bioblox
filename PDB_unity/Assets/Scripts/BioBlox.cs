@@ -22,6 +22,7 @@ public class BioBlox : MonoBehaviour
 	public GameObject[] molecules;
 	GameObject[] sites = new GameObject[2];
 	bool[] playerIsMoving = new bool[2]{false,false};
+	Vector3[] originPosition = new Vector3[2];
 	GameObject popTarget;
 
 	public Text debugText;
@@ -474,6 +475,20 @@ public class BioBlox : MonoBehaviour
 		return obj;
 	}
 
+	void ApplyReturnToOriginForce()
+	{
+		for(int i = 0; i < molecules.Length; ++i)
+		{
+			Vector3 molToOrigin = originPosition[i] -molecules[i].transform.position;
+			if(molToOrigin.sqrMagnitude>1.0f)
+			{
+				Rigidbody rb = molecules[i].GetComponent<Rigidbody>();
+				rb.AddForce(molToOrigin.normalized*2.0f);
+			}
+		}
+
+	}
+
 
 	IEnumerator game_loop ()
 	{
@@ -483,6 +498,12 @@ public class BioBlox : MonoBehaviour
 		string file = filenames [filenameIndex];
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1,8);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1,9);
+
+		originPosition [0] = mol1.transform.position;
+		originPosition [1] = mol2.transform.position;
+
+
+
 		ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
 		playerClock.ResetTimer ();
 		playerClock.timeText.enabled = false;
@@ -514,6 +535,7 @@ public class BioBlox : MonoBehaviour
 
 		p1.shouldCollide = true;
 
+		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
 
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
@@ -525,7 +547,7 @@ public class BioBlox : MonoBehaviour
 			if(Input.GetMouseButtonDown(1))
 			{
 				Debug.Log("Clicked");
-				ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+
 				Camera main =  GameObject.Find ("Main Camera").GetComponent<Camera>();
 				Ray r = main.ScreenPointToRay(Input.mousePosition);
 				if(PDB_molecule.collide_ray_quick( mol1, p1.mol,
@@ -548,11 +570,13 @@ public class BioBlox : MonoBehaviour
 					conMan.RegisterClick(p2,atomID);
 				}
 			}
-
+			if(!conMan.shouldContract)
+			{
+				ApplyReturnToOriginForce();
+			}
 			if(Input.GetKeyDown(KeyCode.Space))
 			{
 				gameObject.GetComponent<ConnectionManager>().Contract();
-
 			}
 			yield return null;
 		}

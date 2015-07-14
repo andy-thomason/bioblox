@@ -38,6 +38,11 @@ public class PDB_mesh : MonoBehaviour {
 		t=0;
 	}
 
+	public Vector3 GetAtomWorldPositon(int atomIndex)
+	{
+		return transform.TransformPoint (mol.atom_centres [atomIndex]);
+	}
+
 	public void BringAtomToFocus(int atomIndex)
 	{
 			Camera c = GameObject.FindGameObjectWithTag ("MainCamera").

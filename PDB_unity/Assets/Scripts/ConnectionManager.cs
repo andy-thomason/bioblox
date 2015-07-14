@@ -8,7 +8,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	int contractionKVal;
 
-	bool shouldContract = false;
+	public bool shouldContract = false;
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
@@ -43,13 +43,13 @@ public class ConnectionManager : MonoBehaviour {
 
 	public void Contract()
 	{
-		shouldContract = true;
-
+		shouldContract = !shouldContract;
 	}
 
 	// Use this for initialization
 	void Start () {
 	}
+
 
 	void FixedUpdate()
 	{
@@ -75,8 +75,45 @@ public class ConnectionManager : MonoBehaviour {
 			Debug.DrawLine(con.molecules[0].transform.TransformPoint(atomCenter),
 			               to);
 		}
+
 		for (int i = 0; i < connections.Count; ++i) {
 			connections[i].Draw();
 		}
+
+		if (Input.GetMouseButtonDown (0)) {
+			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
+			Ray cursorRay = c.ScreenPointToRay(Input.mousePosition);
+			for(int i = 0; i < connections.Count; ++i)
+			{
+				AtomConnection con=connections[i];
+				if(con.isActive)
+				{
+					Vector3 aPos = con.molecules[0].GetAtomWorldPositon(con.atomIds[0]);
+					Vector3 bPos = con.molecules[1].GetAtomWorldPositon(con.atomIds[1]);
+
+					Vector3 aToB = bPos - aPos;;
+					Plane p = new Plane(aPos,bPos,aPos+ new Vector3(0,1,0));
+					float distOut;
+					p.Raycast(cursorRay,out distOut);
+					Vector3 cursorWorldPos = cursorRay.GetPoint(distOut);
+
+					Vector3 aToCursor = cursorWorldPos - aPos;
+
+					float f = Vector3.Dot(aToCursor,aToB.normalized);
+					Debug.Log("Dot product value is F" + f);
+					if(f < aToB.magnitude && f > 0)
+					{
+						Vector3 closestPoint = aPos + (aToB.normalized * f);
+						float dist = (cursorWorldPos - closestPoint).sqrMagnitude;
+						Debug.Log("SqrdDist is " + dist);
+						if(dist <1.0f)
+						{
+							connections.RemoveAt(i);
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
