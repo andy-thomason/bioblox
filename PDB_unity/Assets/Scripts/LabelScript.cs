@@ -11,6 +11,7 @@ IDragHandler,IEndDragHandler{
 	public PDB_molecule.Label label;
 	public BioBlox owner;
 	public int labelID;
+	public int moleculeNumber;
 
 	public GameObject cloudPrefab;
 	public int numClouds;
@@ -82,10 +83,12 @@ IDragHandler,IEndDragHandler{
 
 	public void OnPointerClick (PointerEventData eventData)
 	{
-		if (eventData.button == PointerEventData.InputButton.Left) {
+		if (eventData.button == PointerEventData.InputButton.Left &&
+		    !Input.GetKey(KeyCode.LeftShift)) {
 			owner.LabelClicked (this.gameObject);
 		}
-		if (eventData.button == PointerEventData.InputButton.Right) {
+		if (eventData.button == PointerEventData.InputButton.Left &&
+		    Input.GetKey(KeyCode.LeftShift)) {
 			owner.SiteClicked (this.gameObject);
 		}
 	}
@@ -122,7 +125,7 @@ IDragHandler,IEndDragHandler{
 
 	void GenerateTail()
 	{
-		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex);
+		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex,moleculeNumber);
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
 		//Sprite s = this.GetComponent<Image> ().sprite;
@@ -161,7 +164,7 @@ IDragHandler,IEndDragHandler{
 		if (is3D) {
 			//Vector3 toCamera =c.transform.position-atomPos;
 			//toCamera=toCamera.normalized*3;
-			owner.GetLabelPos(label.atomIndex,this.transform);
+			owner.GetLabelPos(label.atomIndex,moleculeNumber,this.transform);
 
 		}
 		if (shouldGlow) {

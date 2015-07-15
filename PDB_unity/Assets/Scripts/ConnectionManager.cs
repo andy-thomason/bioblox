@@ -12,7 +12,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
-	public void RegisterClick (PDB_mesh mol, int atomIndex)
+	public bool RegisterClick (PDB_mesh mol, int atomIndex)
 	{
 		if (atomIndex != -1) {
 			if (numChainClicks == 0) {
@@ -20,7 +20,7 @@ public class ConnectionManager : MonoBehaviour {
 				connections [connections.Count - 1].molecules [0] = mol;
 				connections [connections.Count - 1].atomIds [0] = atomIndex;
 				numChainClicks++;
-				Debug.Log ("StartConnection: " + atomIndex);
+				return true;
 			} else if (numChainClicks > 0) {
 				AtomConnection grap = (Grappel)connections [connections.Count - 1];
 
@@ -28,6 +28,7 @@ public class ConnectionManager : MonoBehaviour {
 				{
 					connections.Remove(grap);
 					numChainClicks=0;
+					return false;
 				}
 				else if(atomIndex!=-1)
 				{
@@ -35,10 +36,11 @@ public class ConnectionManager : MonoBehaviour {
 					grap.molecules [1] = mol;
 					grap.atomIds [1] = atomIndex;
 					grap.isActive = true;
-					Debug.Log ("EndConnection: " + atomIndex);
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
 	public void Contract()
@@ -80,7 +82,8 @@ public class ConnectionManager : MonoBehaviour {
 			connections[i].Draw();
 		}
 
-		if (Input.GetMouseButtonDown (0)) {
+		if (Input.GetMouseButtonDown (0) &&
+		    !Input.GetKey(KeyCode.LeftShift)) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			Ray cursorRay = c.ScreenPointToRay(Input.mousePosition);
 			for(int i = 0; i < connections.Count; ++i)

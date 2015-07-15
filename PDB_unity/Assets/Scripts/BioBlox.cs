@@ -10,14 +10,16 @@ public class BioBlox : MonoBehaviour
 	public List<string> filenames = new List<string> ();
 	int filenameIndex = 0;
 	EventSystem eventSystem;
-	public List<GameObject> prefabLabels;
+	public GameObject prefabLabel;
 	public GameObject winSplash;
 	public GameObject looseSplash;
 	public float shaderKVal=-0.03f;
 	bool reload = false;
-	bool won = false;
-	bool loose = false;
+
+
+
 	public bool exitWinSplash=false;
+	List<LabelScript> activeLabels = new List<LabelScript> ();
 	LabelScript[] selectedLabelIndex = new LabelScript[2];
 	public GameObject[] molecules;
 	GameObject[] sites = new GameObject[2];
@@ -25,21 +27,26 @@ public class BioBlox : MonoBehaviour
 	Vector3[] originPosition = new Vector3[2];
 	GameObject popTarget;
 
+	public float score=10.0f;
+	public float winScore=10.0f;
+
 
 	List<Color> colorPool=new List<Color>();
 	int randomColorPoolOffset;
 	
-
+	int numLinks;
 	// Use this for initialization
 	void Start ()
 	{
-		gameObject.AddComponent<ConnectionManager> ();
+		numLinks = 0;
 		colorPool.Add (Color.red);
 		colorPool.Add (Color.blue);
 		colorPool.Add (Color.cyan);
 		colorPool.Add (Color.green);
 		colorPool.Add (Color.magenta);
 		colorPool.Add (Color.yellow);
+		colorPool.Add (Color.white);
+		colorPool.Add (Color.gray);
 		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
 		randomColorPoolOffset = Random.Range (0, colorPool.Count-1);
 		Debug.Log ("Start");
@@ -80,11 +87,11 @@ public class BioBlox : MonoBehaviour
 		return -1;
 	}
 
-	public void GetLabelPos (int atomID, Transform t)
+	public void GetLabelPos (int atomID,int molNum, Transform t)
 	{
-		int molNum = -1;
-		Vector3 atomPos = GetAtomPos (atomID);
-		GetAtomIndexFromID (atomID, out molNum);
+
+		Vector3 atomPos = GetAtomPos (atomID,molNum);
+
 		//if the molecule does not exist, or the atom id is bad
 		if (molNum == -1) {
 			return;
@@ -105,29 +112,26 @@ public class BioBlox : MonoBehaviour
 		t.position += new Vector3 (0, 0, -10);
 	}
 
-	public Vector3 GetAtomPos (int atomID)
+	public Vector3 GetAtomPos (int atomID,int molNum)
 	{
 		if (molecules.Length == 2) {
-			int molNum;
-			int index = GetAtomIndexFromID (atomID, out molNum);
-			if (index == -1) {
+
+			if (atomID == -1) {
 				Debug.LogError ("Bad index");
 			}
-			return  molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [index];
+			return  molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID];
 		}
 		return new Vector3 (0, 0, 0);
 	}
 
-	public Vector3 GetAtomWorldPos( int atomID)
+	public Vector3 GetAtomWorldPos(int atomID, int molNum)
 	{
 		if (molecules.Length == 2) {
-			int molNum;
-			int index = GetAtomIndexFromID (atomID, out molNum);
-			if (index == -1) {
+			if (atomID == -1) {
 				Debug.LogError ("Bad index");
 			}
 			return  molecules[molNum].transform.TransformPoint(
-				molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [index]);
+				molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID]);
 		}
 		return new Vector3 (0, 0, 0);
 	}
@@ -201,7 +205,7 @@ public class BioBlox : MonoBehaviour
 					molecules[0].transform,
 					r)!=-1)
 				{
-					Debug.Log("Started moving 1");
+
 					playerIsMoving[1]=false;
 					playerIsMoving[0]=true;
 					StartCoroutine("PlayerMoveMolecule",0);
@@ -212,7 +216,7 @@ public class BioBlox : MonoBehaviour
 					molecules[1].transform,
 					r)!=-1)
 				{
-					Debug.Log("Started moving 2");
+
 					playerIsMoving[0]=false;
 					playerIsMoving[1]=true;
 					StartCoroutine("PlayerMoveMolecule",1);
@@ -321,6 +325,9 @@ public class BioBlox : MonoBehaviour
 //	}
 	public void SiteClicked (GameObject labelObj)
 	{
+		activeLabels.Remove (labelObj.GetComponent<LabelScript> ());
+		GameObject.Destroy (labelObj);
+		/*
 		Debug.Log (labelObj.name + "'s site was selected");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
 		int molNum = -1;
@@ -361,36 +368,58 @@ public class BioBlox : MonoBehaviour
 			mol_index_vec.Add(sphere.results[i].index);
 		}
 		Mesh m = mol.build_section_mesh (mol_index_vec.ToArray());
-		f.mesh = m;
+		f.mesh = m;*/
 	
 	}
 
+	void CreateLabel (PDB_molecule.Label label, int molNum)
+	{
+		GameObject newLabel = GameObject.Instantiate<GameObject> (prefabLabel);
+		if (!newLabel) {
+			Debug.Log ("Could not create Label");
+		}
+		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
+		if (!laSc) {
+			Debug.LogError ("Label prefab " + label.labelName + " does not have a LabelScript attached");
+		}
+		newLabel.GetComponent<Image> ().color = colorPool[(activeLabels.Count+randomColorPoolOffset) % colorPool.Count];
+		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
+		laSc.label = label;
+		laSc.moleculeNumber = molNum;
+		laSc.owner = this;
+		laSc.labelID = activeLabels.Count;
+		laSc.is3D = true;
+		//GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
+		//newLabel.transform.position = foundObject.transform.position;
+		GameObject canvas = GameObject.Find ("Labels");
+		newLabel.transform.SetParent (canvas.transform);
+		newLabel.name = label.labelName + laSc.labelID;
+		activeLabels.Add (laSc);
+	}
 
 	public void LabelClicked (GameObject labelObj)
 	{
 		Debug.Log (labelObj.name + " was clicked");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
 		
-		int molNum = -1;
-		int index = GetAtomIndexFromID (script.label.atomIndex, out molNum);
-		playerIsMoving [molNum] = false;
-		//gives us the opposite molecule, 1-0=1, 1-1 =0
-		int otherMolNum = 1 - molNum;
-		Vector3 alignDir = molecules [otherMolNum].transform.position -
-			molecules [molNum].transform.position;
-		molecules [molNum].GetComponent<PDB_mesh> ().AlignAtomToVector (index, alignDir);
-		if (selectedLabelIndex [0]) {
-			selectedLabelIndex [0].shouldGlow = false;
-		}
-		if (selectedLabelIndex [1]) {
-			selectedLabelIndex [1].shouldGlow = false;
-		}
-		selectedLabelIndex [molNum] = script;
-		if (selectedLabelIndex [0]) {
-			selectedLabelIndex [0].shouldGlow = true;
-		}
-		if (selectedLabelIndex [1]) {
-			selectedLabelIndex [1].shouldGlow = true;
+		int molNum = script.moleculeNumber;
+		int index = script.label.atomIndex;
+	
+
+
+		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+		if (conMan.RegisterClick (molecules [molNum].GetComponent<PDB_mesh> (), index)) {
+			if(numLinks==0)
+			{
+				selectedLabelIndex[numLinks]=script;
+				script.shouldGlow = true;
+				numLinks++;
+			}
+			else{
+				selectedLabelIndex[0].shouldGlow=false;
+				numLinks=0;
+			}
+		
 		}
 		//Handle label click, make active, focusd on atom //etc
 	}
@@ -404,8 +433,7 @@ public class BioBlox : MonoBehaviour
 
 		selectedLabelIndex [0] = null;
 		selectedLabelIndex [1] = null;
-		reload = false;
-		won = false;
+
 	}
 
 	void make_molecule_mesh(PDB_mesh mesh, string proto,int layerNum)
@@ -544,8 +572,6 @@ public class BioBlox : MonoBehaviour
 
 			if(Input.GetMouseButtonDown(1))
 			{
-				Debug.Log("Clicked");
-
 				Camera main =  GameObject.Find ("Main Camera").GetComponent<Camera>();
 				Ray r = main.ScreenPointToRay(Input.mousePosition);
 				if(PDB_molecule.collide_ray_quick( mol1, p1.mol,
@@ -555,7 +581,10 @@ public class BioBlox : MonoBehaviour
 					int atomID = PDB_molecule.collide_ray(mol1, p1.mol,
 					                                      mol1.transform,
 					                                      r);
-					conMan.RegisterClick(p1,atomID);
+					if(conMan.RegisterClick(p1,atomID))
+					{
+						CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),0);
+					}
 
 				}
 				else if(PDB_molecule.collide_ray_quick( mol2, p2.mol,
@@ -565,7 +594,12 @@ public class BioBlox : MonoBehaviour
 					int atomID = PDB_molecule.collide_ray(mol2, p2.mol,
 					                                      mol2.transform,
 					                                      r);
-					conMan.RegisterClick(p2,atomID);
+
+					if(conMan.RegisterClick(p2,atomID))
+					{
+						CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),1);
+
+					}
 				}
 			}
 			if(!conMan.shouldContract)

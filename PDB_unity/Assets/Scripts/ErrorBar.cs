@@ -7,10 +7,14 @@ public class ErrorBar : MonoBehaviour {
 	public float score;
 	float minScore;
 	float maxScore;
+	float winScore;
 	public Text debugText;
 
 	public RectTransform scoreBarObj;
 	Vector3 origin;
+
+	public RectTransform winScoreBar;
+
 
 	BioBlox bloxScript;
 
@@ -21,11 +25,21 @@ public class ErrorBar : MonoBehaviour {
 		score = 0.5f;
 		origin = scoreBarObj.localPosition;
 		bloxScript = GameObject.Find ("BioBlox").GetComponent<BioBlox> ();
-	}
+		winScore = bloxScript.winScore;
 
-	public void UpdateScore(float s)
-	{
-		score = s;
+		float lockScore = Mathf.Min(winScore,maxScore);
+		lockScore = Mathf.Max(winScore,minScore);
+		
+		float scaleFactor = (lockScore - minScore)/(maxScore - minScore);
+		
+		
+		float height = scoreBarObj.rect.height;
+		float positionOffset = height * scaleFactor;
+		
+		
+		Vector3 newPos = winScoreBar.localPosition + new Vector3(0,positionOffset,0);
+
+		winScoreBar.localPosition = newPos;
 	}
 
 	// Update is called once per frame

@@ -207,7 +207,7 @@ public class PDB_mesh : MonoBehaviour {
 					{
 						if (mol.serial_to_atom[i] == hit)
 						{
-							Debug.Log("atom " + i + "clicked");
+
 							break;
 						}
 
