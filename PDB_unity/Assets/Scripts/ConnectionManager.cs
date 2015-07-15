@@ -100,12 +100,12 @@ public class ConnectionManager : MonoBehaviour {
 					Vector3 aToCursor = cursorWorldPos - aPos;
 
 					float f = Vector3.Dot(aToCursor,aToB.normalized);
-					Debug.Log("Dot product value is F" + f);
+
 					if(f < aToB.magnitude && f > 0)
 					{
 						Vector3 closestPoint = aPos + (aToB.normalized * f);
 						float dist = (cursorWorldPos - closestPoint).sqrMagnitude;
-						Debug.Log("SqrdDist is " + dist);
+
 						if(dist <1.0f)
 						{
 							connections.RemoveAt(i);

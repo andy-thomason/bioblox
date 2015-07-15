@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\ClockTimer.cs" />
      <Compile Include="Assets\Scripts\ConnectionManager.cs" />
      <Compile Include="Assets\Scripts\DepthTexture.cs" />
+     <Compile Include="Assets\Scripts\ErrorBar.cs" />
      <Compile Include="Assets\Scripts\HeightMap\MedialSurface.cs" />
      <Compile Include="Assets\Scripts\InteractiveViewer.cs" />
      <Compile Include="Assets\Scripts\LabelScript.cs" />

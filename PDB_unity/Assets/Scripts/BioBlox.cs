@@ -25,7 +25,6 @@ public class BioBlox : MonoBehaviour
 	Vector3[] originPosition = new Vector3[2];
 	GameObject popTarget;
 
-	public Text debugText;
 
 	List<Color> colorPool=new List<Color>();
 	int randomColorPoolOffset;
@@ -180,10 +179,7 @@ public class BioBlox : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if(debugText)
-		{
-			debugText.text = string.Format("Score :{0}", ScoreRMSD().ToString("F3"));
-		}
+
 		if (reload) {
 			filenameIndex++;
 			Reset ();
@@ -537,6 +533,8 @@ public class BioBlox : MonoBehaviour
 
 		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
 
+		mol1.transform.localScale = new Vector3 (1, 1, 1);
+		mol2.transform.localScale = new Vector3 (1, 1, 1);
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
 		while (true) {

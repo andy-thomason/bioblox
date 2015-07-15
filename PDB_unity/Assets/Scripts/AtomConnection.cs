@@ -49,7 +49,7 @@ namespace AssemblyCSharp
 		public Grappel()
 		{
 			force = 1;
-			minDistance = 10;
+			minDistance = 3.4f;
 		}
 
 		public override void Update()
