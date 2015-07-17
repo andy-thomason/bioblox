@@ -30,7 +30,7 @@ namespace AssemblyCSharp
 			isActive = false;
 		}
 
-		virtual public void Update()
+		virtual public void Update(float dampingFactor, float force, float minDist)
 		{}
 		virtual public void Draw()
 		{}
@@ -38,21 +38,14 @@ namespace AssemblyCSharp
 
 	public class Grappel:AtomConnection
 	{
-		float force;
-		float minDistance;
 		public Grappel(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
-			force = 1;
-			minDistance = 2;
-
 		}
 		public Grappel()
 		{
-			force = 1;
-			minDistance = 3.4f;
 		}
 
-		public override void Update()
+		public override void Update(float dampingFactor, float springFactor, float minDistance)
 		{
 			if (isActive) {
 				int atomIndex1 = atomIds [0];
@@ -60,17 +53,29 @@ namespace AssemblyCSharp
 				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
 				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
-				Vector3 dir1to2 = worldAtomPos2 - worldAtomPos1;
-				if (dir1to2.sqrMagnitude < minDistance * minDistance) {
-					return;
-				}
-				Vector3 dir2to1 = worldAtomPos1 - worldAtomPos2;
+				Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
+				float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
 
 				Rigidbody mol1_rb = molecules [0].GetComponent<Rigidbody> ();
 				Rigidbody mol2_rb = molecules [1].GetComponent<Rigidbody> ();
 
-				mol1_rb.AddForceAtPosition (dir1to2.normalized * force, worldAtomPos1);
-				mol2_rb.AddForceAtPosition (dir2to1.normalized * force, worldAtomPos2);
+				// .    .                   .
+				// vp = vb + cross(posW, rotV)
+				Vector3 atom1Velocity = mol1_rb.GetPointVelocity (worldAtomPos1);
+				Vector3 atom2Velocity = mol2_rb.GetPointVelocity (worldAtomPos2);
+			
+				//Vector3 relativeVelocity1To2 = atom1Velocity - atom2Velocity;
+
+				Vector3 damping1 = -dampingFactor * atom1Velocity;
+				Vector3 damping2 = -dampingFactor * atom2Velocity;
+
+				Vector3 force = new Vector3 (0, 0, 0);
+				if (distance > minDistance) {
+					force = dir * (distance - minDistance) * springFactor;
+				}
+
+				mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
+				mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 			}
 		}
 		public override void Draw()

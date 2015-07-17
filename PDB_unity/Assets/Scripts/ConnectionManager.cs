@@ -8,9 +8,19 @@ public class ConnectionManager : MonoBehaviour {
 
 	int contractionKVal;
 
-	public bool shouldContract = false;
+	public float dampingFactor = 1.0f;
+	public float force = 10.0f;
+	public float minDistance = 40.0f;
+
+	public bool shouldContract = true;
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
+
+	public void Reset()
+	{
+		connections.Clear ();
+
+	}
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)
 	{
@@ -58,13 +68,14 @@ public class ConnectionManager : MonoBehaviour {
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
-				connections[i].Update();
+				connections[i].Update(dampingFactor, force, minDistance);
 			}
 		}
 	}
 
 	// Update is called once per frame
 	void Update () {
+		shouldContract = true;
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			AtomConnection con = connections[connections.Count-1];

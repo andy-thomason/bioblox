@@ -41,9 +41,18 @@ IDragHandler,IEndDragHandler {
 	void CalculateOptimumPlane(int molNumber)
 	{
 		BioBlox bioScript = GameObject.Find ("BioBlox").GetComponent<BioBlox> ();
+		if(bioScript.molecules.Length<2)
+		{
+			return;
+		}
 		GameObject molObj = bioScript.molecules [molNumber];
-
+		if (molObj == null) {
+			return;
+		}
 		PDB_molecule mol = molObj.GetComponent<PDB_mesh> ().mol;
+		if (mol == null) {
+			return;
+		}
 		Vector3 axis = molObj.transform.position.normalized;
 
 

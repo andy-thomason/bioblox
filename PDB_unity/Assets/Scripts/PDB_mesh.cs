@@ -13,6 +13,7 @@ public class PDB_mesh : MonoBehaviour {
 	Quaternion end;
 	bool startRotation=false;
 	public bool shouldCollide =false;
+	public float seperationForce =100.0f;
 	float t=0;
 
 	public bool hasCollided=false;
@@ -249,10 +250,15 @@ public class PDB_mesh : MonoBehaviour {
 					if(PDB_molecule.pysics_collide (
 						gameObject, mol, transform,
 						other, other_mesh.mol, other.transform
+						,seperationForce
 						))
 					{
 						hasCollided=true;
 					}
+
+
+
+
 				}
 			}
 		}

@@ -1310,7 +1310,8 @@ public class PDB_molecule
 	
 	static public bool pysics_collide(
 		GameObject obj0, PDB_molecule mol0, Transform t0,
-		GameObject obj1, PDB_molecule mol1, Transform t1
+		GameObject obj1, PDB_molecule mol1, Transform t1,
+		float seperationForce
 		)
 	{
 		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
@@ -1327,7 +1328,7 @@ public class PDB_molecule
             //Debug.Log("distance=" + distance
             if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				normal*=0.2f;
+				normal*=seperationForce;
 				r0.AddForceAtPosition(normal,c0);
                 r1.AddForceAtPosition(-normal, c1);
             }

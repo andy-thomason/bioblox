@@ -29,6 +29,8 @@ public class BioBlox : MonoBehaviour
 
 	public float score=10.0f;
 	public float winScore=10.0f;
+	public float uiScrollSpeed = 10.0f;
+	public float repulsiveForce = 30.0f;
 
 
 	List<Color> colorPool=new List<Color>();
@@ -119,6 +121,10 @@ public class BioBlox : MonoBehaviour
 			if (atomID == -1) {
 				Debug.LogError ("Bad index");
 			}
+			if(molecules [molNum] == null)
+			{
+				return Vector3.zero;
+			}
 			return  molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID];
 		}
 		return new Vector3 (0, 0, 0);
@@ -166,7 +172,7 @@ public class BioBlox : MonoBehaviour
 					Vector3 mousePos=Input.mousePosition;
 					Vector3 mouseDelta=mousePos-lastMousePos;
 
-					r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
+					r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0)*uiScrollSpeed);
 					lastMousePos=mousePos;
 				}
 			}
@@ -265,6 +271,7 @@ public class BioBlox : MonoBehaviour
 			target.transform.localScale = targetScale * t;
 			yield return null;
 		}
+		target.transform.localScale = targetScale;
 		yield break;
 	}
 
@@ -304,25 +311,163 @@ public class BioBlox : MonoBehaviour
 		return Mathf.Sqrt (rmsd / count);
 	}
 
-	//returns other link index or -1 on failure
-//	public void LinkPair(LabelScript a, LabelScript b)
-//	{
-//		Debug.Log ("Link "+a.labelID+" and "+b.labelID+" was made");
-//		Debug.Log (labelToLabelPairs.Count);
-//		labelToLabelPairs.Add (labelToLabelPairs.Count,new Tuple<int,int> (a.labelID, b.labelID));
-//		b.MakeLink(labelToLabelPairs.Count-1);
-//		a.MakeLink (labelToLabelPairs.Count-1);
-//	}
-//
-//	public void BreakLink (int linkIndex)
-//	{
-//			Tuple<int,int> link = labelToLabelPairs [linkIndex];
-//			Debug.Log ("Link "+link.First+" and "+link.Second+" was broken");
-//			
-//			activeLabels [link.First].BreakLink ();
-//			activeLabels [link.Second].BreakLink ();
-//		labelToLabelPairs.Remove (linkIndex);
-//	}
+	IEnumerator FadeMolecules()
+	{
+		GameObject mol1 = molecules [0];
+		GameObject mol2 = molecules [1];
+		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
+		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
+		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
+		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
+		for (int i=0; i<meshes1.Length; ++i) {
+			meshes1 [i].material.SetVector ("_CullPos", 
+			                               new Vector3(0,0,0));
+		}
+		for (int i=0; i<meshes2.Length; ++i) {
+			meshes2 [i].material.SetVector ("_CullPos",
+			                               new Vector3(0,0,0));
+		}
+		float targetKVal = shaderKVal;
+		float currentKVal = 0;
+		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
+			float k = currentKVal + targetKVal * t;
+			
+			for (int i=0; i<meshes1.Length; ++i) {
+				meshes1 [i].material.SetFloat ("_K", k);
+			}
+			for (int i=0; i<meshes2.Length; ++i) {
+				meshes2 [i].material.SetFloat ("_K", k);
+			}
+			yield return null;
+		}
+		for (int i=0; i<meshes1.Length; ++i) {
+			meshes1 [i].material.SetFloat ("_K", targetKVal);
+		}
+		for (int i=0; i<meshes2.Length; ++i) {
+			meshes2 [i].material.SetFloat ("_K", targetKVal);
+		}
+	}
+
+
+	IEnumerator WinSplash (Vector3 focusPoint)
+	{
+		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+		conMan.Reset ();
+		eventSystem.enabled = false;
+		gameObject.GetComponent<ClockTimer> ().LogPlayerTime ();
+		gameObject.GetComponent<ClockTimer> ().StopPlayerTimer ();
+		//put animation for win splash here
+		for(int i=0;i<activeLabels.Count;++i)
+		{
+			GameObject.Destroy(activeLabels[i].gameObject);
+		}
+		activeLabels.Clear();
+
+		PopIn (winSplash);
+		GameObject gene = GameObject.Find ("Gene");
+		if (gene) {
+			gene.SetActive (false);
+		}
+		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
+		GameObject parent = new GameObject ();
+		Rigidbody r=parent.AddComponent<Rigidbody> ();
+		molecules [0].transform.SetParent (parent.transform, true);
+		molecules [1].transform.SetParent (parent.transform, true);
+		
+		r.angularDrag = 1.0f;
+		r.constraints = RigidbodyConstraints.FreezePosition;
+		r.useGravity = false;
+		parent.name = "MoveableParent";
+		
+		//StartCoroutine ("FadeMolecules");
+		float zoomValue = 30.0f;
+		float radRot = (3.0f * Mathf.PI) / 2;
+		float camRot = 0;
+		Vector3 start = c.transform.position;
+		Vector3 moveDir = focusPoint+ new Vector3 (0,0, -30) - c.transform.position;
+		for (float t=0; t<1.0f; t+=Time.deltaTime) {
+			c.transform.position = start + moveDir * t;
+			yield return null;
+		}
+		SpringJoint [] joints = molecules [0].GetComponents<SpringJoint> ();
+		for(int i=0;i<joints.Length;++i)
+		{
+			Component.Destroy(joints[i]);
+		}
+		Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
+		Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
+		
+		float timeoutTimer = 40.0f;
+		const float nonInteractionTimeOut = 2.0f;
+		float nonInteractionTimer = 0.0f;
+		bool autoRotate = true;
+		
+		Vector3 oldMousePos = Input.mousePosition;
+		
+		while(true){
+			nonInteractionTimer += Time.deltaTime;
+			timeoutTimer -= Time.deltaTime;
+			if(nonInteractionTimer>nonInteractionTimeOut)
+			{
+				autoRotate=true;
+			}
+			if(Input.GetMouseButton(0))
+			{
+				if(nonInteractionTimer>0.3f)
+				{
+					oldMousePos=Input.mousePosition;
+				}
+				nonInteractionTimer=0;
+				autoRotate=false;
+				Vector3 mousePos=Input.mousePosition;
+				Vector3 mouseDelta=mousePos-oldMousePos;
+				oldMousePos=mousePos;
+				r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0));
+			}
+			if(autoRotate)
+			{
+				Vector3 dir = new Vector3(
+					Mathf.Cos(radRot),
+					0,
+					Mathf.Sin(radRot));
+				dir=dir.normalized*zoomValue;
+				c.transform.position=dir;
+				c.transform.rotation =Quaternion.LookRotation(focusPoint-c.transform.position);
+				radRot+=Time.deltaTime;
+				camRot+=Time.deltaTime;
+			}
+			if((Input.anyKeyDown&&!Input.GetMouseButtonDown(0))||exitWinSplash||timeoutTimer<0)
+			{
+				exitWinSplash=false;
+				break;
+			}
+			yield return null;
+		}
+		PopOut (molecules[0].gameObject);
+		PopOut (molecules[1].gameObject);
+		PopOut (winSplash);
+		yield return new WaitForSeconds (1.0f);
+		GameObject.Destroy (molecules[0].gameObject);
+		GameObject.Destroy (molecules[1].gameObject);
+		GameObject.Destroy (parent);
+		if (gene) {
+			gene.SetActive (true);
+		}
+		Vector3 target = start;
+		start = c.transform.position;
+		Quaternion startQ = c.transform.rotation;
+		for (float t=0; t<1.0f; t+=Time.deltaTime) {
+			c.transform.position=Vector3.Lerp(start,target,t);
+			c.transform.rotation=Quaternion.Slerp(startQ,Quaternion.identity,t);
+			yield return null;
+		}
+		reload = true;
+		Debug.Log ("Reloading");
+		
+		yield break;
+	}
+
+
 	public void SiteClicked (GameObject labelObj)
 	{
 		activeLabels.Remove (labelObj.GetComponent<LabelScript> ());
@@ -428,12 +573,16 @@ public class BioBlox : MonoBehaviour
 	void Reset ()
 	{
 
-		randomColorPoolOffset = Random.Range (0, colorPool.Count-1);
-		molecules = new GameObject[0];
+		randomColorPoolOffset = Random.Range (0, colorPool.Count - 1);
+		GameObject.Destroy (molecules [0].gameObject);
+		GameObject.Destroy (molecules [1].gameObject);
+
+
+
 
 		selectedLabelIndex [0] = null;
 		selectedLabelIndex [1] = null;
-
+		reload = false;
 	}
 
 	void make_molecule_mesh(PDB_mesh mesh, string proto,int layerNum)
@@ -463,6 +612,7 @@ public class BioBlox : MonoBehaviour
 	)
 	{
 		GameObject obj = new GameObject ();
+		obj.SetActive (true);
 		obj.name = name;
 		obj.layer = layerNum;
 		//obj.AddComponent<TransformLerper> ();
@@ -475,8 +625,9 @@ public class BioBlox : MonoBehaviour
 		make_molecule_mesh (p,proto,layerNum);
 		Debug.Log (mol.mesh[0].vertices.Length);
 
-		ri.drag = 1;
-		ri.angularDrag = 1;
+		p.seperationForce = 200.0f;
+		ri.drag = 0f;
+		ri.angularDrag = 5f;
 		ri.useGravity = false;
 
 
@@ -484,7 +635,7 @@ public class BioBlox : MonoBehaviour
 		Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
 		Quaternion originalMolRot = obj.transform.rotation;
 		obj.transform.Rotate (0, 0, -270); 
-		obj.transform.Translate (mol.bvh_radii[0]*xoffset, 0, 0);
+		obj.transform.Translate ((mol.bvh_radii[0]*xoffset)*0.5f, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 		//obj.GetComponent<TransformLerper> ().AddTransformPoint (obj.transform.rotation);
@@ -507,7 +658,7 @@ public class BioBlox : MonoBehaviour
 			if(molToOrigin.sqrMagnitude>1.0f)
 			{
 				Rigidbody rb = molecules[i].GetComponent<Rigidbody>();
-				rb.AddForce(molToOrigin.normalized*2.0f);
+				rb.AddForce(molToOrigin.normalized* repulsiveForce);
 			}
 		}
 
@@ -545,16 +696,9 @@ public class BioBlox : MonoBehaviour
 		p2.other = p1.gameObject;
 		p1.gameObject.SetActive (false);
 		p2.gameObject.SetActive (false);
-
-		GameObject CD1 = GameObject.Find ("CD1");
-		GameObject CD2 = GameObject.Find ("CD2");
-		GameObject CD3 = GameObject.Find ("CD3");
-		CD1.transform.position = new Vector3 (1000, 0, 0);
-		CD2.transform.position = new Vector3 (1000, 0, 0);
-		CD3.transform.position = new Vector3 (1000, 0, 0);
-
+	
 		PopInSound (mol1.gameObject);
-		yield return new WaitForSeconds (0.3f);
+		yield return new WaitForSeconds (0.2f);
 		PopInSound (mol2.gameObject);
 
 		p1.shouldCollide = true;
@@ -570,6 +714,13 @@ public class BioBlox : MonoBehaviour
 			playerClock.StartPlayerTimer();
 			}
 
+			if(ScoreRMSD() < winScore || Input.GetKeyDown(KeyCode.L))
+			{
+				StartCoroutine("WinSplash",new Vector3(0,0,0));
+				yield break;
+
+			}
+
 			if(Input.GetMouseButtonDown(1))
 			{
 				Camera main =  GameObject.Find ("Main Camera").GetComponent<Camera>();
@@ -583,7 +734,7 @@ public class BioBlox : MonoBehaviour
 					                                      r);
 					if(conMan.RegisterClick(p1,atomID))
 					{
-						CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),0);
+						//CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),0);
 					}
 
 				}
@@ -597,18 +748,15 @@ public class BioBlox : MonoBehaviour
 
 					if(conMan.RegisterClick(p2,atomID))
 					{
-						CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),1);
+						//CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),1);
 
 					}
 				}
 			}
-			if(!conMan.shouldContract)
-			{
 				ApplyReturnToOriginForce();
-			}
 			if(Input.GetKeyDown(KeyCode.Space))
 			{
-				gameObject.GetComponent<ConnectionManager>().Contract();
+				//gameObject.GetComponent<ConnectionManager>().Contract();
 			}
 			yield return null;
 		}
