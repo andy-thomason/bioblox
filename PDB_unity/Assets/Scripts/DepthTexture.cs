@@ -86,10 +86,10 @@ IDragHandler,IEndDragHandler {
 		CalculateOptimumPlane (0);
 		CalculateOptimumPlane (1);
 		rightCamera.targetTexture = rightTex;
-		rightCamera.RenderWithShader (shader, "");
+		rightCamera.Render ();
 
 		leftCamera.targetTexture = leftTex;
-		leftCamera.RenderWithShader (shader, "");
+		leftCamera.Render ();
 
 
 		RenderTexture.active=rightTex;
@@ -104,13 +104,13 @@ IDragHandler,IEndDragHandler {
 		rCol = rightT.GetPixels ();
 		lCol = leftT.GetPixels ();
 		for (int i=0; i<rCol.Length; ++i) {
-			if(rCol[i]!=Color.black)
+			if(rCol[i]!=Color.black && false)
 			{
 			rCol[i]= new Color(1.0f - rCol[i].r, 
 			               		 1.0f - rCol[i].g,
 			                 	 1.0f - rCol[i].b);
 			}
-			if(lCol[i]!=Color.black)
+			if(lCol[i]!=Color.black && false)
 			{
 				lCol[i] = new Color(1.0f - lCol[i].r, 
 				                    1.0f - lCol[i].g,

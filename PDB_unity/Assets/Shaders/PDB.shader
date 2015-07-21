@@ -8,6 +8,8 @@
     _CullPos ("CullPos", Vector) = (0,0,0,0)
     _K ("K transparrency", Float)=0
     _AmbientOcclusion ("TexRanger", 3D)="white"{}
+    _GlowPoint ("GlowPointLocal" , Vector) = (0,0,0,0)
+    _GlowRadius("GlowRadius" , Float) = 0
   }
   SubShader {
     Pass {
@@ -144,6 +146,8 @@
       uniform float _Shininess;
       uniform float4 _CullPos;
       uniform float _K;
+      uniform float4 _GlowPoint;
+      uniform float _GlowRadius;
       
       uniform sampler3D _AmbientOcclusion;
 
@@ -177,7 +181,7 @@
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
         float3 view_dir = normalize(i.world_pos.xyz - _CameraPos.xyz);
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
-        float diffuse_factor = max(0.3f, dot(normal, light_dir));
+        float diffuse_factor = max(0.6f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
 
       	float alpha = exp(_K * dot(i.model_pos.xyz-_CullPos,i.model_pos.xyz-_CullPos)) * 4;
@@ -185,8 +189,15 @@
       	{
       		clip(-1.0f);
       	}
-      	
-        return fixed4(_Color.xyz * i.col.xyz * diffuse_factor + _Specular.xyz * specular_factor, _Color.w);
+      	float4 glowColor = float4(1,1,0,1);
+      	float glowVal = 0;
+      	float dist = distance(i.model_pos,_GlowPoint);
+      	if(dist < _GlowRadius)
+      	{
+     		glowVal = _GlowRadius - dist;
+     		glowVal *= abs(_SinTime.w);
+      	}
+        return fixed4(_Color.xyz * i.col.xyz * diffuse_factor + glowColor * glowVal + _Specular.xyz * specular_factor, _Color.w);
       }
 
       ENDCG

@@ -243,23 +243,23 @@ public class PDB_mesh : MonoBehaviour {
 						t = 0;
 					}
 				}
-				if(shouldCollide)
+			}
+			if(shouldCollide)
+			{
+				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
+				
+				if(PDB_molecule.pysics_collide (
+					gameObject, mol, transform,
+					other, other_mesh.mol, other.transform
+					,seperationForce
+					))
 				{
-					PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
-					
-					if(PDB_molecule.pysics_collide (
-						gameObject, mol, transform,
-						other, other_mesh.mol, other.transform
-						,seperationForce
-						))
-					{
-						hasCollided=true;
-					}
-
-
-
-
+					hasCollided=true;
 				}
+				
+				
+				
+				
 			}
 		}
 	}
