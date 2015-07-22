@@ -26,6 +26,7 @@ public class BioBlox : MonoBehaviour
 	//the win and loose spash images
 	public GameObject winSplash;
 	public GameObject looseSplash;
+	public GameObject goSplash;
 	//a variable controlling the size of the area faded out during the win state
 	public float shaderKVal=-0.03f;
 	//whether the game should load the next level
@@ -105,6 +106,7 @@ public class BioBlox : MonoBehaviour
 
 		winSplash.SetActive (false);
 		looseSplash.SetActive (false);
+		goSplash.SetActive (false);
 	}
 
 
@@ -207,9 +209,10 @@ public class BioBlox : MonoBehaviour
 				Camera c = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 				Ray ray = c.ScreenPointToRay(Input.mousePosition);
 				//create a ray to the cursor and cast it, if it hits at all
-				if(PDB_molecule.collide_ray_quick(mol,mol.GetComponent<PDB_mesh>().mol,
-				                                  mol.transform,
-				                                  ray))
+				int atomID = PDB_molecule.collide_ray(mol,mol.GetComponent<PDB_mesh>().mol,
+				                                      mol.transform,
+				                                      ray);
+				if(atomID != -1)
 				{
 					if(t>0.3f)
 					{
@@ -219,9 +222,14 @@ public class BioBlox : MonoBehaviour
 					t=0.0f;
 					Vector3 mousePos=Input.mousePosition;
 					Vector3 mouseDelta=mousePos-lastMousePos;
+					//find the world position of the atom
+					Vector3 atomPos =GetAtomWorldPos(atomID,molIndex);
+
+
 					//add torque based on mouse delta.
 					//UPGRADE this to adding forces to the atom hit by a ray
-					r.AddTorque(new Vector3(mouseDelta.y,-mouseDelta.x,0)*uiScrollSpeed);
+					r.AddForceAtPosition(new Vector3(mouseDelta.x,mouseDelta.y,0)*uiScrollSpeed,
+					                     atomPos);
 					lastMousePos=mousePos;
 				}
 			}
@@ -264,7 +272,8 @@ public class BioBlox : MonoBehaviour
 					molecules[0].transform,
 					r)!=-1)
 				{
-					playerIsMoving[1]=false;
+					//uncomment this line to stop players moving two molecules at once
+					//playerIsMoving[1]=false;
 					playerIsMoving[0]=true;
 					StartCoroutine("PlayerMoveMolecule",0);
 				}
@@ -274,8 +283,8 @@ public class BioBlox : MonoBehaviour
 					molecules[1].transform,
 					r)!=-1)
 				{
-
-					playerIsMoving[0]=false;
+					//uncomment this line to stop players moving two molecules at once
+					//playerIsMoving[0]=false;
 					playerIsMoving[1]=true;
 					StartCoroutine("PlayerMoveMolecule",1);
 				}
@@ -311,6 +320,12 @@ public class BioBlox : MonoBehaviour
 		StartCoroutine ("PopInCo");
 	}
 
+	public void PopInWaitDisappear(GameObject g, float waitTime)
+	{
+		popTarget = g;
+		StartCoroutine ("PopInWaitDisappearCo", waitTime);
+	}
+
 	public void PopOut (GameObject g)
 	{
 		popTarget = g;
@@ -330,6 +345,24 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 		target.transform.localScale = targetScale;
+		yield break;
+	}
+
+	IEnumerator PopInWaitDisappearCo(float waitTime)
+	{
+		GameObject target = popTarget;
+		target.SetActive (true);
+		popTarget = null;
+		float scaleSpeed = 3.0f;
+		Vector3 targetScale = target.transform.localScale;
+		target.transform.localScale = new Vector3 (0, 0, 0);
+		for (float t=0; t<1; t+=Time.deltaTime*scaleSpeed) {
+			target.transform.localScale = targetScale * t;
+			yield return null;
+		}
+		target.transform.localScale = targetScale;
+		yield return new WaitForSeconds (waitTime);
+		target.SetActive (false);
 		yield break;
 	}
 
@@ -657,6 +690,12 @@ public class BioBlox : MonoBehaviour
 		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
 		laSc.label = label;
 		laSc.moleculeNumber = molNum;
+		if (molNum==1) {
+			Vector3 scale = laSc.transform.localScale;
+			scale.x *= -1;
+			laSc.transform.localScale = scale;
+			
+		}
 		laSc.owner = this;
 		laSc.labelID = activeLabels.Count;
 		//3D and 2D arrows see LabelScript
@@ -738,6 +777,9 @@ public class BioBlox : MonoBehaviour
 		randomColorPoolOffset = Random.Range (0, colorPool.Count - 1);
 		GameObject.Destroy (molecules [0].gameObject);
 		GameObject.Destroy (molecules [1].gameObject);
+
+		//clear the old win condition
+		winCondition.Clear ();
 
 		//deactivates any states
 		win = false;
@@ -844,10 +886,9 @@ public class BioBlox : MonoBehaviour
 				rb.AddForce(molToOrigin.normalized* repulsiveForce);
 			}
 		}
-
 	}
-
 	
+
 	//main meat of the initilisation logic and level completion logic
 	IEnumerator game_loop ()
 	{
@@ -912,8 +953,12 @@ public class BioBlox : MonoBehaviour
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
 		while (true) {
-			if (Input.anyKey){
+			if (Input.anyKey && playerClock.clockStopped){
 				//any input should start the timer
+				if(goSplash)
+				{
+					PopInWaitDisappear(goSplash,1.0f);
+				}
 				playerClock.StartPlayerTimer();
 			}
 

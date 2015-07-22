@@ -16,8 +16,11 @@ IDragHandler,IEndDragHandler{
 	public GameObject cloudPrefab;
 	public int numClouds;
 
-	public Sprite clicked;
-	public Sprite nonClicked;
+	public List<Sprite> sprites;
+	public List<string> spriteNames;
+
+	Sprite clicked;
+	Sprite nonClicked;
 //	private int linkIndex=-1;
 
 	public bool is3D =false;
@@ -37,6 +40,14 @@ IDragHandler,IEndDragHandler{
 		cloudSorter.transform.SetParent(GameObject.Find ("Clouds").transform);
 		cloudSorter.transform.localScale = new Vector3 (1, 1, 1);
 		cloudStorer = cloudSorter;
+
+		for (int i=0; i<sprites.Count; ++i) {
+			if(spriteNames[i] == label.labelName)
+			{
+				clicked = nonClicked = sprites[i];
+			}
+		}
+
 		for(int i=0;i<numClouds;++i)
 		{
 			MakeCloud(i);

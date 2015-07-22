@@ -1387,7 +1387,7 @@ Canvas:
   serializedVersion: 2
   m_RenderMode: 1
   m_Camera: {fileID: 1348893749}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 80
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1423,6 +1423,7 @@ RectTransform:
   - {fileID: 559043326}
   - {fileID: 1356369609}
   - {fileID: 358599018}
+  - {fileID: 659644018}
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_AnchorMin: {x: 0, y: 0}
@@ -1553,6 +1554,72 @@ Transform:
   - {fileID: 2028557176}
   m_Father: {fileID: 307492394}
   m_RootOrder: 0
+--- !u!1 &659644017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 659644018}
+  - 222: {fileID: 659644020}
+  - 114: {fileID: 659644019}
+  m_Layer: 5
+  m_Name: GO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &659644018
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 659644017}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -140}
+  m_LocalScale: {x: .800000012, y: .800000012, z: 1}
+  m_Children: []
+  m_Father: {fileID: 573904673}
+  m_RootOrder: 19
+  m_AnchorMin: {x: .5, y: .5}
+  m_AnchorMax: {x: .5, y: .5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: .5, y: .5}
+--- !u!114 &659644019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 659644017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: .0344829559, g: 1, b: 0, a: 1}
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 300
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_RichText: 1
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: GO
+--- !u!222 &659644020
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 659644017}
 --- !u!1 &700393102
 GameObject:
   m_ObjectHideFlags: 0
@@ -1977,12 +2044,13 @@ MonoBehaviour:
   prefabLabel: {fileID: 199540, guid: f2fad8605e44b384c97bf40ec17b0da6, type: 2}
   winSplash: {fileID: 1186451402}
   looseSplash: {fileID: 1530988229}
+  goSplash: {fileID: 659644017}
   shaderKVal: -.0299999993
   exitWinSplash: 0
   molecules: []
   score: 10
   winScore: 0
-  uiScrollSpeed: 30
+  uiScrollSpeed: 3
   repulsiveForce: 400
 --- !u!114 &913013348
 MonoBehaviour:
@@ -3440,8 +3508,8 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
-  m_AnchoredPosition: {x: 37.5, y: 78}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 29, y: 78}
+  m_SizeDelta: {x: 167, y: 30}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1291934176
 MonoBehaviour:
@@ -3468,7 +3536,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Error
+  m_Text: Error Bar
 --- !u!222 &1291934177
 CanvasRenderer:
   m_ObjectHideFlags: 0

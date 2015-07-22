@@ -65,7 +65,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Sprite: {fileID: 21300000, guid: fb3462de0de9c564b8a65e7db28fc3e3, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e62a2cf422e16f04d96f7a32e6ec806a, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -89,8 +89,14 @@ MonoBehaviour:
   moleculeNumber: 0
   cloudPrefab: {fileID: 176384, guid: 34a5e5283807ae6418a3fab7fb478a28, type: 2}
   numClouds: 6
-  clicked: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  nonClicked: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  sprites:
+  - {fileID: 21300000, guid: e62a2cf422e16f04d96f7a32e6ec806a, type: 3}
+  - {fileID: 21300000, guid: 311c928064be1e64a88f0fc2a51968c8, type: 3}
+  - {fileID: 21300000, guid: 4a851949ec330b2468661c7f4f684261, type: 3}
+  spriteNames:
+  - Knob
+  - Flat
+  - Hole
   is3D: 0
   isInteractable: 0
   shouldGlow: 0
@@ -109,7 +115,7 @@ RectTransform:
   m_GameObject: {fileID: 199540}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .5, y: .5, z: 1}
+  m_LocalScale: {x: .75, y: .75, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -137,12 +143,20 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
+      propertyPath: sprites.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: spriteNames.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
       propertyPath: m_LocalScale.x
-      value: .5
+      value: .75
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_LocalScale.y
-      value: .5
+      value: .75
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: isInteractable
@@ -151,6 +165,33 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_Range
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: e62a2cf422e16f04d96f7a32e6ec806a,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: clicked
+      value: 
+      objectReference: {fileID: 21300000, guid: e62a2cf422e16f04d96f7a32e6ec806a,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: nonClicked
+      value: 
+      objectReference: {fileID: 21300000, guid: e62a2cf422e16f04d96f7a32e6ec806a,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: spriteNames.Array.data[0]
+      value: Knob
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: spriteNames.Array.data[1]
+      value: Flat
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: spriteNames.Array.data[2]
+      value: Hole
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

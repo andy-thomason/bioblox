@@ -2238,7 +2238,7 @@ BBSPNG 1291  1744
 BBSPNG 	589	 1943  
 BIOB   1744  2   Knob 
 BIOB   1641  2   Knob
-BIOB   1173  1   Hole
+BIOB   1173  1   Flat
 BIOB   1291  1   Hole
 TER    1630      ASN E 245                                                      
 ATOM   1631  N   ARG I   1      11.556 100.523   6.363  0.00  0.00           N  

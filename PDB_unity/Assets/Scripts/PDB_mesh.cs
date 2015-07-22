@@ -134,7 +134,7 @@ public class PDB_mesh : MonoBehaviour {
 			j.connectedAnchor=atomPos2;
 			j.damper=3.0f;
 			j.spring=3.0f;
-			j.minDistance=atomRad1+atomRad2-0.2f;
+			j.minDistance=atomRad1 + atomRad2 -0.5f;
 		}
 	}
 
