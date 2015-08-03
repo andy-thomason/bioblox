@@ -222,7 +222,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400010, guid: 8000c1997e4bbda448c888cf123b1ceb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 200
+      value: 165
       objectReference: {fileID: 0}
     - target: {fileID: 400010, guid: 8000c1997e4bbda448c888cf123b1ceb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -828,7 +828,7 @@ RectTransform:
   m_RootOrder: 10
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 403, y: 449}
+  m_AnchoredPosition: {x: 403, y: 476}
   m_SizeDelta: {x: 292.049988, y: 57.7000008}
   m_Pivot: {x: .5, y: .5}
 --- !u!1 &406513214

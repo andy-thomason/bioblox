@@ -411,7 +411,7 @@ public class PDB_molecule
 			float dx = centre.x - x;
 			float dy = centre.y - y;
 			float dz = centre.z - z;
-			float dr = radius + 1.0f;
+			float dr = radius + 2.5f;
 			if (dx*dx + dy*dy + dz*dz < dr*dr) {
 				if (bvh_terminals[idx] != -1) {
 					result += Mathf.Exp(fk * (dx*dx + dy*dy + dz*dz));
