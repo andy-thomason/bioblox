@@ -17,7 +17,7 @@ public class ClockTimer : MonoBehaviour {
 	public List<float> playerLevelTimes = new List<float>();
 
 	GameObject playerTimeZone;
-	bool shouldAddLevelTimes=true;
+	bool shouldAddLevelTimes=false;
 
 
 	GameObject g;
@@ -106,6 +106,12 @@ public class ClockTimer : MonoBehaviour {
 	public void EnableText()
 	{
 		timeText.enabled = true;
+	}
+
+	public float GetLastPlayerTime()
+	{
+		return playerLevelTimes [playerLevelTimes.Count - 1];
+
 	}
 
 	// Use this for initialization

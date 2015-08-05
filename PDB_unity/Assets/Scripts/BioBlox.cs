@@ -14,6 +14,8 @@ public class BioBlox : MonoBehaviour
 	//controls whether the win state should attempt to fade out the molecules
 	public bool winShouldFadeMol = false;
 
+	//score card for saving scores. 
+	ScoreSheet scoreCard;
 
 	//filenames for the levels, without the .txt
 	public List<string> filenames = new List<string> ();
@@ -29,10 +31,7 @@ public class BioBlox : MonoBehaviour
 	public GameObject goSplash;
 	//a variable controlling the size of the area faded out during the win state
 	public float shaderKVal=-0.03f;
-	//whether the game should load the next level
-	bool reload = false;
-
-
+	
 	//a bool that will exit the win splash if set to true
 	public bool exitWinSplash=false;
 
@@ -55,7 +54,6 @@ public class BioBlox : MonoBehaviour
 	//game object target of the "popping" co-routines to shrink and grow the object out of and into the scene
 	GameObject popTarget;
 
-
 	//current score
 	public float score=10.0f;
 	//score to achive to win
@@ -74,6 +72,9 @@ public class BioBlox : MonoBehaviour
 	int randomColorPoolOffset;
 	
 	int numLinks;
+
+
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -99,6 +100,8 @@ public class BioBlox : MonoBehaviour
 
 		filenames.Add ("pdb2ptcWithTags");
 
+		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
+		scoreCard.gameObject.SetActive (false);
 
 		//game_loop loads the file at filenames[filenameIndex]
 		StartCoroutine (game_loop ());
@@ -109,6 +112,10 @@ public class BioBlox : MonoBehaviour
 		goSplash.SetActive (false);
 	}
 
+	public string GetCurrentLevelName()
+	{
+		return filenames [filenameIndex];
+	}
 
 	//converts an atom serial number (unique file identifier) into a index
 	//also outputs the molecule index that that atom serial exists in
@@ -244,68 +251,22 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
+	public void Reload()
+	{
+		filenameIndex++;
+		Reset ();
+		if (filenameIndex == filenames.Count) {
+			Debug.Log ("End of levels");
+		}
+		else{
+			StartCoroutine (game_loop ());
+		}
+	}
+
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
-		if (reload) {
-			//we are loading the next scene. 
-			filenameIndex++;
-			Reset ();
-			if (filenameIndex == filenames.Count) {
-				Debug.Log ("End of levels");
-			}
-			else{
-				StartCoroutine (game_loop ());
-			}
-		}
-		//test if we should move the molecules with quick ray casts
-		if (eventSystem.IsActive()) {
-			if(Input.GetMouseButton(0))
-			{
 
-				//Using this system we dont allow the player to move the two molecules at the same time
-				Camera c = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-				Ray r = c.ScreenPointToRay(Input.mousePosition);
-				if(!playerIsMoving[0] && PDB_molecule.collide_ray(
-					molecules[0],
-					molecules[0].GetComponent<PDB_mesh>().mol,
-					molecules[0].transform,
-					r)!=-1)
-				{
-					//uncomment this line to stop players moving two molecules at once
-					//playerIsMoving[1]=false;
-					playerIsMoving[0]=true;
-					StartCoroutine("PlayerMoveMolecule",0);
-				}
-				else if(!playerIsMoving[1] && PDB_molecule.collide_ray(
-					molecules[1],
-					molecules[1].GetComponent<PDB_mesh>().mol,
-					molecules[1].transform,
-					r)!=-1)
-				{
-					//uncomment this line to stop players moving two molecules at once
-					//playerIsMoving[0]=false;
-					playerIsMoving[1]=true;
-					StartCoroutine("PlayerMoveMolecule",1);
-				}
-			}
-			if(sites[0])
-			{
-				sites[0].transform.rotation=molecules[0].transform.rotation;
-				if(simpleGame)
-				{
-				sites[0].transform.Rotate(new Vector3(0,90,0),Space.World);
-				}
-			}
-			if(sites[1])
-			{
-				sites[1].transform.rotation=molecules[1].transform.rotation;
-				if(simpleGame)
-				{
-				sites[1].transform.Rotate(new Vector3(0,-90,0),Space.World);
-				}
-			}
-		}
 	}
 
 	void PopInSound(GameObject g)
@@ -607,6 +568,10 @@ public class BioBlox : MonoBehaviour
 		}*/
 
 		//transform the camera to its original position
+		eventSystem.enabled = true;
+		scoreCard.ScorePlayer ();
+
+		
 		Vector3 target = start;
 		start = c.transform.position;
 		Quaternion startQ = c.transform.rotation;
@@ -615,12 +580,11 @@ public class BioBlox : MonoBehaviour
 			c.transform.rotation=Quaternion.Slerp(startQ,Quaternion.identity,t);
 			yield return null;
 		}
-		reload = true;
+
+
 		Debug.Log ("Reloading");
-		
 		yield break;
 	}
-
 
 	public void SiteClicked (GameObject labelObj)
 	{
@@ -788,7 +752,6 @@ public class BioBlox : MonoBehaviour
 		//clears the selected index
 		selectedLabelIndex [0] = null;
 		selectedLabelIndex [1] = null;
-		reload = false;
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -961,7 +924,58 @@ public class BioBlox : MonoBehaviour
 				}
 				playerClock.StartPlayerTimer();
 			}
-
+			if(Input.GetKeyDown(KeyCode.L))
+			{
+				win=true;
+			}
+			//test if we should move the molecules with quick ray casts
+			if (eventSystem.IsActive()) {
+				if(Input.GetMouseButton(0))
+				{
+					
+					//Using this system we dont allow the player to move the two molecules at the same time
+					Camera c = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+					Ray r = c.ScreenPointToRay(Input.mousePosition);
+					if(!playerIsMoving[0] && PDB_molecule.collide_ray(
+						molecules[0],
+						molecules[0].GetComponent<PDB_mesh>().mol,
+						molecules[0].transform,
+						r)!=-1)
+					{
+						//uncomment this line to stop players moving two molecules at once
+						//playerIsMoving[1]=false;
+						playerIsMoving[0]=true;
+						StartCoroutine("PlayerMoveMolecule",0);
+					}
+					else if(!playerIsMoving[1] && PDB_molecule.collide_ray(
+						molecules[1],
+						molecules[1].GetComponent<PDB_mesh>().mol,
+						molecules[1].transform,
+						r)!=-1)
+					{
+						//uncomment this line to stop players moving two molecules at once
+						//playerIsMoving[0]=false;
+						playerIsMoving[1]=true;
+						StartCoroutine("PlayerMoveMolecule",1);
+					}
+				}
+				if(sites[0])
+				{
+					sites[0].transform.rotation=molecules[0].transform.rotation;
+					if(simpleGame)
+					{
+						sites[0].transform.Rotate(new Vector3(0,90,0),Space.World);
+					}
+				}
+				if(sites[1])
+				{
+					sites[1].transform.rotation=molecules[1].transform.rotation;
+					if(simpleGame)
+					{
+						sites[1].transform.Rotate(new Vector3(0,-90,0),Space.World);
+					}
+				}
+			}
 			if(!simpleGame)// the complex game uses score minimisation
 			{
 				if(ScoreRMSD() < winScore || Input.GetKeyDown(KeyCode.L))

@@ -1,0 +1,20 @@
+There is a database to store player scores.
+
+The login details for it are
+
+Host = igor.gold.ac.uk
+Username = acurt001
+Password = MrGene
+
+Database = acurt001
+Table = BioBlox
+
+
+
+It stores
+
+LevelName / Initials / Postcode / Score / Unique ID (auto incremented) / date (supplied by the addScore.php script)
+
+Copies of the PHP scripts are stored in PDB_unity/Assets/PHP, and the actual versions are stored on a public folder
+
+doc.gold.ac.uk/~acurt001/
