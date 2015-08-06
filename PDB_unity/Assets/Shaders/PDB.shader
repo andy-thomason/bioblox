@@ -12,7 +12,7 @@
     _GlowPoint ("GlowPointLocal" , Vector) = (0,0,0,0)
     _GlowRadius("GlowRadius" , Float) = 0
     _DarkPoint ("DarkPointLocal" , Vector) = (0,0,0,0)
-    _DarkK("DarkK" , Float) = -0.0001
+    _DarkK("DarkK" , Float) = -0.01
   }
   SubShader {
     Pass {
@@ -155,7 +155,7 @@
       uniform float _GlowRadius;
 
       uniform float4 _DarkPoint;
-      uniform float _DarkRadius;
+      uniform float _DarkK;
       
       uniform sampler3D _AmbientOcclusion;
 
@@ -207,11 +207,9 @@
 
       	float3 rpos = i.model_pos - _DarkPoint.xyz;
       	float d2 = dot(rpos, rpos);
-      	float dark = 1.0 - exp(-0.0001 * d2 * d2);
-      	diffuse_factor *= dark;
-      	specular_factor *= dark;
+      	float dark = 1.0 - exp(_DarkK * d2);
       	
-      	return fixed4(_Ambient.xyz + _Color.xyz * i.color.xyz * diffuse_factor + glowColor * glowVal * 0.25 + _Specular.xyz * specular_factor, _Color.w);
+      	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal * 0.25 + _Specular.xyz * specular_factor * dark, _Color.w);
       }
 
       ENDCG
