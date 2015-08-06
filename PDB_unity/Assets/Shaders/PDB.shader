@@ -2,6 +2,7 @@
   Properties {
     _Color ("Diffuse Material Color", Color) = (1,1,1,1) 
     _Specular ("Specular Material Color", Color) = (1,1,1,1) 
+    _Ambient ("Ambient Material Color", Color) = (0.3,0.3,0.3,1) 
     _Shininess ("Shininess", Float) = 10
     _LightPos ("LightPos", Vector) = (50, 0, 0, 0)
     _CameraPos ("_CameraPos", Vector) = (0, 0, -50, 0)
@@ -10,6 +11,8 @@
     _AmbientOcclusion ("TexRanger", 3D)="white"{}
     _GlowPoint ("GlowPointLocal" , Vector) = (0,0,0,0)
     _GlowRadius("GlowRadius" , Float) = 0
+    _DarkPoint ("DarkPointLocal" , Vector) = (0,0,0,0)
+    _DarkK("DarkK" , Float) = -0.0001
   }
   SubShader {
     Pass {
@@ -142,12 +145,17 @@
       };
       
       uniform float4 _Color;
+      uniform float4 _Ambient;
       uniform float4 _Specular;
       uniform float _Shininess;
       uniform float4 _CullPos;
       uniform float _K;
+      
       uniform float4 _GlowPoint;
       uniform float _GlowRadius;
+
+      uniform float4 _DarkPoint;
+      uniform float _DarkRadius;
       
       uniform sampler3D _AmbientOcclusion;
 
@@ -170,24 +178,26 @@
         float3 normal = normalize(i.normal);
         float2 screen_pos = i.sp.xy/i.sp.w*_ScreenParams.xy;
 
-        // NOTE: should use noise()        
-        float half_tone = sin(screen_pos.x*screen_pos.y *1000) * 0.5 + 0.5;
+		float2 dxy = frac(screen_pos * 0.25) - 0.5;
+		float2 dxy2 = dxy * dxy;
+        float half_tone = (dxy2.x + dxy2.y) * 4;
         
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
         float3 view_dir = normalize(i.world_pos.xyz - _CameraPos.xyz);
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
-        float diffuse_factor = max(0.2f, dot(normal, light_dir));
+        float diffuse_factor = min(1.0f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
 
       	float alpha = exp(_K * dot(i.model_pos.xyz-_CullPos,i.model_pos.xyz-_CullPos)) * 4;
+      	//alpha = 0.5;
       	if (half_tone > alpha)
       	{
       		clip(-1.0f);
       	}
 
-      	float4 glowColor = float4(1,1,0,1);
+      	float4 glowColor = float4(1, 1, 0, 1);
       	float glowVal = 0;
-      	float dist = distance(i.model_pos,_GlowPoint);
+      	float dist = distance(i.model_pos, _GlowPoint);
 
       	if(dist < _GlowRadius)
       	{
@@ -195,7 +205,13 @@
      		glowVal *= abs(_SinTime.w);
       	}
 
-      	return fixed4(_Color.xyz * i.color.xyz * diffuse_factor + glowColor * glowVal + _Specular.xyz * specular_factor, _Color.w);
+      	float3 rpos = i.model_pos - _DarkPoint.xyz;
+      	float d2 = dot(rpos, rpos);
+      	float dark = 1.0 - exp(-0.0001 * d2 * d2);
+      	diffuse_factor *= dark;
+      	specular_factor *= dark;
+      	
+      	return fixed4(_Ambient.xyz + _Color.xyz * i.color.xyz * diffuse_factor + glowColor * glowVal * 0.25 + _Specular.xyz * specular_factor, _Color.w);
       }
 
       ENDCG
