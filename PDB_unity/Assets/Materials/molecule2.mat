@@ -38,6 +38,14 @@ Material:
         first:
           name: _K
         second: 0
+      data:
+        first:
+          name: _GlowRadius
+        second: 0
+      data:
+        first:
+          name: _DarkK
+        second: -9.99999975e-05
     m_Colors:
       data:
         first:
@@ -46,7 +54,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .157892838, g: .0499567352, b: .970588207, a: 1}
+        second: {r: .985294104, g: .340506017, b: .340506017, a: 1}
       data:
         first:
           name: _SpecColor
@@ -54,7 +62,7 @@ Material:
       data:
         first:
           name: _Specular
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: .286764681, g: .286764681, b: .286764681, a: 1}
       data:
         first:
           name: _CameraPos
@@ -62,4 +70,16 @@ Material:
       data:
         first:
           name: _CullPos
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _GlowPoint
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Ambient
+        second: {r: .300000012, g: .300000012, b: .300000012, a: 1}
+      data:
+        first:
+          name: _DarkPoint
         second: {r: 0, g: 0, b: 0, a: 0}
