@@ -23,7 +23,8 @@ public class ScoreSheet : MonoBehaviour {
 
 	//the address for the php script that adds a score ot the database
 	const string addScoreScriptAddress = "doc.gold.ac.uk/~acurt001/AddScore.php?";
-	const string bestScoresTodayAddress = "doc.gold.ac.uk/~acurt001/BestOfLevel.php?";
+	const string bestScoresOnLevelAddress = "doc.gold.ac.uk/~acurt001/BestOfLevel.php?";
+	const string bestScoresOnLevelTodayAddress = "doc.gold.ac.uk/~acurt001/BestTodayOfLevel.php?";
 
 	string currentUserInitial;
 	string currentUserAreacode;
@@ -42,11 +43,13 @@ public class ScoreSheet : MonoBehaviour {
 	public InputField areacodeField;
 	public Text scoreFlavourtext;
 	public Text scoreText;
+	public Text initialsText;
 
 	public GameObject submitUI;
 	public GameObject continueUI;
 	
 	List<float> bestLevelTimes;
+	List<float> bestLevelTimesToday;
 
 	int numComplete=0;
 	
@@ -69,16 +72,31 @@ public class ScoreSheet : MonoBehaviour {
 		yield break;
 	}
 
-	IEnumerator GetBestLevelTimes(string levelName)
+
+
+	IEnumerator GetBestLevelTimes(bool onlyTodaysScores)
 	{
+		string levelName = bioblox.GetCurrentLevelName ();
 		string hash = HashUtility.Md5Sum (levelName + "plznohackkthx");
 
-		WWW php_print = new WWW (bestScoresTodayAddress +
+		string address = bestScoresOnLevelAddress;
+		if (onlyTodaysScores) {
+			address = bestScoresOnLevelTodayAddress;
+		}
+
+		WWW php_print = new WWW (address +
 			"level=" + WWW.EscapeURL (levelName) + "&hash=" + hash);
 		yield return php_print;
 		if (php_print.error == null) {
 			Debug.Log (php_print.text);
-			bestLevelTimes = ParseCSV_f(php_print.text);
+			if(!onlyTodaysScores)
+			{
+				bestLevelTimes = ParseCSV_f(php_print.text);
+			}
+			else
+			{
+				bestLevelTimesToday = ParseCSV_f(php_print.text);
+			}
 			numComplete++;
 		} else {
 			Debug.Log ("Error!");
@@ -125,20 +143,22 @@ public class ScoreSheet : MonoBehaviour {
 
 	public void DEBUGGetBestToday()
 	{
-		StartCoroutine ("GetBestLevelTimes", "pdb2ptcWithTags");
+		StartCoroutine ("GetBestLevelTimes", false);
 	}
 
 	IEnumerator GetScoreFlavourText()
 	{
-		StartCoroutine ("GetBestLevelTimes", bioblox.GetCurrentLevelName ());
+		StartCoroutine ("GetBestLevelTimes", false);
+		StartCoroutine ("GetBestLevelTimes", true);
 
-
-		while (numComplete != 1)
+		while (numComplete != 2)
 		{
 
 			yield return null;
 		}
 		float playerScore = scoreTimer.GetLastPlayerTime ();
+
+		//best level score ever
 		if ( (bestLevelTimes.Count != 0 && playerScore < bestLevelTimes [0]) || bestLevelTimes.Count == 0) {
 			scoreFlavourtext.text = "That is the new level reccord! Well done.";
 			yield break;
@@ -164,13 +184,37 @@ public class ScoreSheet : MonoBehaviour {
 			{
 				positionAppend = "rd";
 			}
-			scoreFlavourtext.text = "Bravo. Your score is in " + position.ToString() + positionAppend + " place on this level";
+			scoreFlavourtext.text = "Bravo. Your score is in " + position.ToString() + positionAppend + " place of all Time!";
+			yield break;
+		}
+		//best level score today
+		if ((bestLevelTimesToday.Count != 0 && playerScore < bestLevelTimesToday [0]) || bestLevelTimesToday.Count == 0) {
+			scoreFlavourtext.text = "Thats the best score today! Awesome!";
+			yield break;
+		} else if (playerScore < bestLevelTimesToday [bestLevelTimesToday.Count - 1]) {
+			int position = bestLevelTimesToday.Count + 1;
+			string positionAppend = "th";
+			for(int i = bestLevelTimesToday.Count - 1; i > 0; --i)
+			{
+				if(playerScore < bestLevelTimesToday[i])
+				{
+					continue;
+				}
+				position = i + 1;
+			}
+			if(position == 1)
+			{
+				positionAppend = "cnd";
+			}
+			else if(position == 2)
+			{
+				positionAppend = "rd";
+			}
+			scoreFlavourtext.text = "Bravo. Your score is in " + position.ToString() + positionAppend + " place today. Keep it up!";
 			yield break;
 		}
 		//get some scores for the server and find something interesting to say
 		//best in area
-		//best of the level
-		//best today
 		//beat your last score
 		//etc
 		scoreFlavourtext.text = "Keep trying!";
@@ -202,7 +246,7 @@ public class ScoreSheet : MonoBehaviour {
 		if (area != null) {
 			currentUserAreacode = area;
 		}
-
+		initialsText.text = currentUserInitial;
 		return true;
 	}
 
@@ -242,6 +286,7 @@ public class ScoreSheet : MonoBehaviour {
 		state = SCORE_STATE.USER_ANON;
 		submitUI.SetActive (true);
 		continueUI.SetActive (false);
+		initialsText.text = "ANO";
 	}
 	// Update is called once per frame
 	void Update () {

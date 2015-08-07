@@ -5350,6 +5350,7 @@ MonoBehaviour:
   areacodeField: {fileID: 2002247276}
   scoreFlavourtext: {fileID: 831503672}
   scoreText: {fileID: 1240623770}
+  initialsText: {fileID: 754571591}
   submitUI: {fileID: 981223640}
   continueUI: {fileID: 235547114}
 --- !u!1 &1464279235

@@ -49,7 +49,7 @@ Material:
       data:
         first:
           name: _DarkK
-        second: -9.99999975e-05
+        second: -.00999999978
     m_Colors:
       data:
         first:
@@ -58,7 +58,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .504259706, g: .308823526, b: 1, a: 1}
+        second: {r: .282758713, g: 0, b: 1, a: 1}
       data:
         first:
           name: _SpecColor
@@ -82,7 +82,7 @@ Material:
       data:
         first:
           name: _Ambient
-        second: {r: .300000012, g: .300000012, b: .300000012, a: 1}
+        second: {r: .333333343, g: .333333343, b: .333333343, a: 1}
       data:
         first:
           name: _DarkPoint
