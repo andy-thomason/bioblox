@@ -7,8 +7,8 @@ using UnityEngine.EventSystems;
 public class LabelScript : MonoBehaviour, IPointerClickHandler, IBeginDragHandler,
 IDragHandler,IEndDragHandler{
 
-
-	public PDB_molecule.Label label;
+	// the 0th element of the atomId's list is assumed to be our location atom
+	public List<int> atomIds;
 	public BioBlox owner;
 	public int labelID;
 	public int moleculeNumber;
@@ -42,7 +42,7 @@ IDragHandler,IEndDragHandler{
 		cloudStorer = cloudSorter;
 
 		for (int i=0; i<sprites.Count; ++i) {
-			if(spriteNames[i] == label.labelName)
+			if(spriteNames[i] == this.name)
 			{
 				clicked = nonClicked = sprites[i];
 			}
@@ -136,7 +136,7 @@ IDragHandler,IEndDragHandler{
 
 	void GenerateTail()
 	{
-		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex,moleculeNumber);
+		Vector3 atomPos = owner.GetAtomWorldPos (atomIds[0],moleculeNumber);
 		Vector3 toAtom = atomPos - this.transform.position;
 		float tIncrement = 1.0f / clouds.Count;
 		//Sprite s = this.GetComponent<Image> ().sprite;
@@ -175,7 +175,7 @@ IDragHandler,IEndDragHandler{
 		if (is3D) {
 			//Vector3 toCamera =c.transform.position-atomPos;
 			//toCamera=toCamera.normalized*3;
-			owner.GetLabelPos(label.atomIndex,moleculeNumber,this.transform);
+			owner.GetLabelPos(atomIds[0],moleculeNumber,this.transform);
 
 		}
 		if (shouldGlow) {

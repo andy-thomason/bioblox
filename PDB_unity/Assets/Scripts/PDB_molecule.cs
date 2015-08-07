@@ -28,7 +28,7 @@ public class PDB_molecule
     public int[] bvh_terminals;
 
 
-	public Label[] labels = new Label[0];
+	public List<int>[] labels = new List<int>[0];
 	public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
 	public int[] serial_to_atom;
 
@@ -314,14 +314,6 @@ public class PDB_molecule
     public static Mode mode = Mode.Metasphere;
     
     public string name;
-    
-    public class Label
-    {
-        public Label(int a, string label)
-        {atomIndex=a;labelName=label;}
-        public int atomIndex;
-        public string labelName;
-    }
     
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     

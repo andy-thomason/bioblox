@@ -423,8 +423,8 @@ public class BioBlox : MonoBehaviour
 				int winCon1 = winCondition [i].First;
 				int winCon2 = winCondition [i].Second;
 				
-				int selected1 = selectedLabelIndex [0].label.atomIndex;
-				int selected2 = selectedLabelIndex [1].label.atomIndex;
+				int selected1 = selectedLabelIndex [0].labelID;
+				int selected2 = selectedLabelIndex [1].labelID;
 				
 				if (!(winCon1 == selected1 && winCon2 == selected2) &&
 				    !(winCon1 == selected2 && winCon2 == selected1)) {
@@ -639,20 +639,17 @@ public class BioBlox : MonoBehaviour
 	}
 
 	//creates a err label. The label object contains a atom id and name used to name the instance
-	void CreateLabel (PDB_molecule.Label label, int molNum)
+	void CreateLabel (List<int> atomIds, int molNum, string labelName)
 	{
 		GameObject newLabel = GameObject.Instantiate<GameObject> (prefabLabel);
 		if (!newLabel) {
 			Debug.Log ("Could not create Label");
 		}
 		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
-		if (!laSc) {
-			Debug.LogError ("Label prefab " + label.labelName + " does not have a LabelScript attached");
-		}
 		//assigned the label a new color from a random range
 		newLabel.GetComponent<Image> ().color = colorPool[(activeLabels.Count+randomColorPoolOffset) % colorPool.Count];
 		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
-		laSc.label = label;
+		laSc.atomIds = atomIds;
 		laSc.moleculeNumber = molNum;
 		if (molNum==1) {
 			Vector3 scale = laSc.transform.localScale;
@@ -670,7 +667,7 @@ public class BioBlox : MonoBehaviour
 		//we group all the labels under a single empty transform for convienence in the unity hierarchy
 		GameObject canvas = GameObject.Find ("Labels");
 		newLabel.transform.SetParent (canvas.transform);
-		newLabel.name = label.labelName + laSc.labelID;
+		newLabel.name = labelName + laSc.labelID;
 		activeLabels.Add (laSc);
 	}
 
@@ -682,7 +679,7 @@ public class BioBlox : MonoBehaviour
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
 		
 		int molNum = script.moleculeNumber;
-		int index = script.label.atomIndex;
+		int index = script.labelID;
 
 		PDB_mesh pdbMesh = molecules [molNum].GetComponent<PDB_mesh> ();
 
@@ -829,8 +826,7 @@ public class BioBlox : MonoBehaviour
 		if(simpleGame)
 		{
 			for (int i=0; i<mol.labels.Length; ++i) {
-				CreateLabel (new PDB_molecule.Label(p.mol.serial_to_atom[mol.labels[i].atomIndex],
-			 	                                   mol.labels[i].labelName),molNum);
+				CreateLabel (p.mol.labels[i],molNum,"Label"+ i +"mol"+name);
 			}
 		}
 		return obj;
@@ -998,7 +994,7 @@ public class BioBlox : MonoBehaviour
 						if(conMan.RegisterClick(p1,atomID))
 						{
 							//create a label at the selected atom to allow easier selection later
-							CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),0);
+							//CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),0);
 						}
 
 					}
@@ -1012,7 +1008,7 @@ public class BioBlox : MonoBehaviour
 
 						if(conMan.RegisterClick(p2,atomID))
 						{
-							CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),1);
+							//CreateLabel(new PDB_molecule.Label(atomID,"ConnectionPoint"),1);
 
 						}
 					}

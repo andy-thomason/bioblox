@@ -68,7 +68,7 @@ public class PDB_parser {
         List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
-		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>> ();
+		List<List<int>> labels = new List<List<int>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
@@ -125,16 +125,16 @@ public class PDB_parser {
 					int secondMeshAtom = int.Parse(line.Substring(13, 4));
 					springPairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
 				} else if (kind == "BBPAIR") {
-					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(13, 4));
-					pairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+					int firstMeshLabel = int.Parse(line.Substring(7, 4));
+					int secondMeshLabel = int.Parse(line.Substring(13, 4));
+					pairs.Add(new Tuple<int, int>(firstMeshLabel, secondMeshLabel));
 				} else if (kind == "BIOB  ") {
 					int atomIndex = int.Parse(line.Substring(7, 4));
 					int molIndex = int.Parse(line.Substring(12, 4));
 					string tag = line.Substring(17, 4);
 					while(labels.Count<=molIndex)
 					{
-						labels.Add(new List<PDB_molecule.Label>());
+						labels.Add(new List<int>());
 					}
 					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
 					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
