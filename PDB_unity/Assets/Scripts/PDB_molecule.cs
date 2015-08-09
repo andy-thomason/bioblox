@@ -396,36 +396,10 @@ public class PDB_molecule
 		return (1 - ((occlusion) / aoccRays.Length));
 	}
 
-	float fk = Mathf.Log(0.5f) / (1.25f*1.25f);
-	int[] mf_stack = new int [128];
-	float mf(float x, float y, float z) {
-		int sp = 0;
-		mf_stack[sp++] = 0;
-		float result = -0.5f;
-		while (sp != 0) {
-			int idx = mf_stack[--sp];
-			mf_stack[sp+0] = idx*2 + 1;
-			mf_stack[sp+1] = idx*2 + 2;
-			Vector3 centre = bvh_centres[idx];
-			float radius = bvh_radii[idx];
-			float dx = centre.x - x;
-			float dy = centre.y - y;
-			float dz = centre.z - z;
-			float dr = radius + 2.5f;
-			if (dx*dx + dy*dy + dz*dz < dr*dr) {
-				if (bvh_terminals[idx] != -1) {
-					result += Mathf.Exp(fk * (dx*dx + dy*dy + dz*dz));
-				} else {
-					sp += 2;
-				}
-			}
-		}
-		return result;
-		//return Mathf.Exp(fk * ((x+3)*(x+3) + y*y + z*z)) + Mathf.Exp(fk * ((x-3)*(x-3) + y*y + z*z)) - 0.5f;
-	}
-
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
+
+		// Create a 3D array for each molecule
 		Vector3 min = atom_centres[0];
 		Vector3 max = min;
 		for (int j = 0; j != atom_centres.Length; ++j)
@@ -443,38 +417,71 @@ public class PDB_molecule
 
 		int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
+		// Array contains values (-0.5..>1) positive means inside molecule.
+		// Normals are drived from values.
+		// Colours shaded by ambient occlusion (TODO). 
 		float[] mc_values = new float[xdim * ydim * zdim];
 		Vector3[] mc_normals = new Vector3[xdim * ydim * zdim];
 		Color[] mc_colours = new Color[xdim * ydim * zdim];
 		float diff = 0.125f, rec = 2.0f / diff;
-		for (int k = 0; k != zdim; ++k) {
-			for (int j = 0; j != ydim; ++j) {
-				for (int i = 0; i != xdim; ++i) {
-					int idx = (k * ydim + j) * xdim + i;
-					float x = x0 + i, y = y0 + j, z = z0 + k;
-					// exp(k*r*r) = t => k = ln(t)/(r*r)
-					mc_values[idx] = mf(x, y, z);
-					mc_normals[idx] = (new Vector3(
-						mf(x-diff, y, z) - mf(x+diff, y, z),
-						mf(x, y-diff, z) - mf(x, y+diff, z),
-						mf(x, y, z-diff) - mf(x, y, z+diff)
-					)).normalized;
-					mc_colours[idx] = new Color(1, 1, 1, 1);
-				}	
+		for (int i = 0; i != xdim * ydim * zdim; ++i) {
+			mc_values[i] = -0.5f;
+			mc_colours[i] = new Color(1, 1, 1, 1);
+		}
+
+		// For each atom add in the values and normals surrounding
+		// the centre up to a reasonable radius.
+		int acmax = atom_centres.Length;
+		for (int ac = 0; ac != acmax; ++ac) {
+			Vector3 c = atom_centres[ac];
+			float r = atom_radii[ac];
+
+			// define a box around the atom.
+			int cix = Mathf.FloorToInt(c.x);
+			int ciy = Mathf.FloorToInt(c.y);
+			int ciz = Mathf.FloorToInt(c.z);
+			int xmin = Mathf.Max(x0, cix-1);
+			int ymin = Mathf.Max(y0, ciy-1);
+			int zmin = Mathf.Max(z0, ciz-1);
+			int xmax = Mathf.Max(x1, cix+3);
+			int ymax = Mathf.Max(y1, ciy+3);
+			int zmax = Mathf.Max(z1, ciz+3);
+			float fk = Mathf.Log(0.5f) / (r * r);
+			for (int z = zmin; z != zmax; ++z) {
+				float fdz = z - c.z;
+				for (int y = ymin; y != ymax; ++y) {
+					float fdy = y - c.y;
+					int idx = ((z-z0) * ydim + (y-y0)) * xdim + (xmin-x0);
+					for (int x = xmin; x != xmax; ++x) {
+						float fdx = x - c.x;
+						float d2 = fdx*fdx + (fdy*fdy + fdz*fdz);
+						float val = Mathf.Exp(fk * d2);
+						mc_values[idx] += val;
+						mc_normals[idx] += val * (new Vector3(fdx, fdy, fdz)).normalized;
+						//if (ac < 4) Debug.Log(x + "," + y + "," + z + ": " + val);
+						idx++;
+					}
+				}
 			}
 		}
-                    
-		int[] edge_indices = new int[xdim*ydim*zdim*3];
-		byte[] masks = new byte[xdim*ydim*zdim];
+        
 		// This reproduced the vertex order of Paul Bourke's (borrowed) table.
+		// The indices in edge_indices have the following offsets.
 		//
 		//     7 6   y   z
 		// 3 2 4 5   | /
 		// 0 1       0 - x
+		//
 
-		// The indices in edge_indices have the following offsets.
+		// Now build the marching cubes triangles.
+		// Each cube owns three edges 0->1 0->3 0->4
+		int[] edge_indices = new int[xdim*ydim*zdim*3];
+		byte[] masks = new byte[xdim*ydim*zdim];
+
 		// We store three indices per cube for the edges closest to vertex 0
 		// All other indices can be derived from adjacent cubes.
+		// This gives a single index offset value for each edge.
+		// There are twelve edges here because we consider adjacent cubes also.
 		int dx = 3;
         int dy = xdim * 3;
 		int dz = xdim * ydim * 3;
@@ -502,15 +509,16 @@ public class PDB_molecule
 			edge_indices [i] = -1;
 		}
 
+		// Build the vertices first in two passes.
 		for (int pass = 0; pass != 2; ++pass) {
 			int num_edges = 0;
 
-			// x edges
 			for (int k = 0; k != zdim; ++k) {
 				for (int j = 0; j != ydim; ++j) {
 					for (int i = 0; i != xdim; ++i) {
 						int idx = (k * ydim + j) * xdim + i;
 						float v0 = mc_values [idx];
+						// x edges
 						if (i != xdim-1) {
 							float v1 = mc_values [idx + 1];
 							if (v0 * v1 < 0) {
@@ -525,6 +533,7 @@ public class PDB_molecule
 								num_edges++;
 							}
 						}
+						// y edges
 						if (j != ydim-1) {
 							float v1 = mc_values [idx + xdim];
 							if (v0 * v1 < 0) {
@@ -539,6 +548,7 @@ public class PDB_molecule
                                 num_edges++;
                             }
                         }
+						// z edges
 						if (k != zdim-1) {
                             float v1 = mc_values [idx + xdim*ydim];
 							if (v0 * v1 < 0) {
@@ -569,17 +579,22 @@ public class PDB_molecule
 			}
         }
         
-        // two passes for indices (pass = 0 sizes the array)
+        // Two passes for indices (pass = 0 sizes the array)
 		indices = null;
         for (int pass = 0; pass != 2; ++pass) {
 			int num_idx = 0;
+			// loop over all cubes
 			for (int k = 0; k != zdim-1; ++k) {
 				for (int j = 0; j != ydim-1; ++j) {
 					for (int i = 0; i != xdim-1; ++i) {
 						int idx = (k * ydim + j) * xdim + i;
 						Vector3 pos0 = new Vector3 (x0 + i, y0 + j, z0 + k);
 
-						// mask of vertices inside the isosurface
+						// Mask of vertices inside the isosurface
+						// Example:
+						//   00000001 means only vertex 0 is inside the surface.
+						//   10000000 means only vertex 7 is inside the surface.
+						//   11111111 all vertices are inside the surface.
 						int mask =
 							(mc_values [idx] < 0 ? 1 << 0 : 0) |
 							(mc_values [idx + 1] < 0 ? 1 << 1 : 0) |
