@@ -26,7 +26,7 @@ Light:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 199540}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 6
   m_Type: 2
   m_Color: {r: 1, g: .972413778, b: 0, a: 1}
@@ -84,6 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 828c3a01826801b49aad73625ac16b1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  atomIds: 
   owner: {fileID: 0}
   labelID: 0
   moleculeNumber: 0

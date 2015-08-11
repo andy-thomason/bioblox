@@ -38,7 +38,7 @@ public class BioBlox : MonoBehaviour
 	//all labels which are currently in the scene
 	List<LabelScript> activeLabels = new List<LabelScript> ();
 	//a number of selected labels, at the moment limited to 2, one from each molecule
-	LabelScript[] selectedLabelIndex = new LabelScript[2];
+	LabelScript[] selectedLabel = new LabelScript[2];
 	//a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 	//the molecules in the scene
@@ -138,17 +138,21 @@ public class BioBlox : MonoBehaviour
 
 	//calculates a label positions within a dome infront of the molecules
 	//stops labels from dissapering behind the molecules and uses the size of the largest collision sphere in the bvh
-	public void GetLabelPos (int atomID,int molNum, Transform t)
+	public void GetLabelPos (List<int> atomIds,int molNum, Transform t)
 	{
-
-		Vector3 atomPos = GetAtomPos (atomID,molNum);
+		Vector3 sumAtomPos = Vector3.zero;
+		for (int i = 0; i < atomIds.Count; ++i) {
+			sumAtomPos += GetAtomPos(atomIds[i],molNum);
+		}
+		sumAtomPos /= atomIds.Count;
 
 		//if the molecule does not exist, or the atom id is bad
-		if (molNum == -1) {
+		if (molNum == -1 || molecules.Length ==0) {
 			return;
 		}
+
 		PDB_mesh molMesh = molecules [molNum].GetComponent<PDB_mesh> ();
-		Vector3 atomPosW = molMesh.transform.TransformPoint (atomPos);
+		Vector3 atomPosW = molMesh.transform.TransformPoint (sumAtomPos);
 
 		Vector3 transToAt = atomPosW - molMesh.transform.position;
 		//atom is behind molecule
@@ -242,9 +246,9 @@ public class BioBlox : MonoBehaviour
 			}
 			yield return null;
 		}
-		if (selectedLabelIndex [molIndex]&&eventSystem.IsActive()) {
+		if (selectedLabel [molIndex]&&eventSystem.IsActive()) {
 			//if there is a selected label for our molecule return it to that orientation
-			LabelClicked (selectedLabelIndex [molIndex].gameObject);
+			LabelClicked (selectedLabel [molIndex].gameObject);
 		}
 		playerIsMoving[molIndex]=false;
 		r.angularVelocity=new Vector3(0,0,0);
@@ -415,17 +419,20 @@ public class BioBlox : MonoBehaviour
 	//The win conditions are order specific, .first is molecule[0] atomIndex
 	public void CheckPair ()
 	{
-		if (simpleGame && winCondition.Count > 0 && selectedLabelIndex [0] && selectedLabelIndex [1]) {
+		if (simpleGame && winCondition.Count > 0 && selectedLabel [0] && selectedLabel [1]) {
 			bool hasWon = true;
 			
 			
 			for (int i=0; i<winCondition.Count; ++i) {
 				int winCon1 = winCondition [i].First;
 				int winCon2 = winCondition [i].Second;
-				
-				int selected1 = selectedLabelIndex [0].labelID;
-				int selected2 = selectedLabelIndex [1].labelID;
-				
+
+
+				int selected1 = selectedLabel [0].labelID;
+				int selected2 = selectedLabel [1].labelID;
+
+				Debug.Log("Check :" + winCon1 + " = " + selected1);
+				Debug.Log("Check :" + winCon2 + " = " + selected2);
 				if (!(winCon1 == selected1 && winCon2 == selected2) &&
 				    !(winCon1 == selected2 && winCon2 == selected1)) {
 					hasWon = false;
@@ -639,26 +646,28 @@ public class BioBlox : MonoBehaviour
 	}
 
 	//creates a err label. The label object contains a atom id and name used to name the instance
-	void CreateLabel (List<int> atomIds, int molNum, string labelName)
+	void CreateLabel (PDB_molecule.Label argLabel, int molNum, string labelName, PDB_molecule mol)
 	{
 		GameObject newLabel = GameObject.Instantiate<GameObject> (prefabLabel);
 		if (!newLabel) {
 			Debug.Log ("Could not create Label");
 		}
+
 		LabelScript laSc = newLabel.GetComponent<LabelScript> ();
+		newLabel.name = labelName + laSc.labelID;
+
 		//assigned the label a new color from a random range
 		newLabel.GetComponent<Image> ().color = colorPool[(activeLabels.Count+randomColorPoolOffset) % colorPool.Count];
 		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
-		laSc.atomIds = atomIds;
+		laSc.atomIds = argLabel.atomIds;
 		laSc.moleculeNumber = molNum;
 		if (molNum==1) {
 			Vector3 scale = laSc.transform.localScale;
 			scale.x *= -1;
 			laSc.transform.localScale = scale;
-			
 		}
 		laSc.owner = this;
-		laSc.labelID = activeLabels.Count;
+		laSc.labelID = argLabel.uniqueLabelID;
 		//3D and 2D arrows see LabelScript
 		laSc.is3D = true;
 		//GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
@@ -667,67 +676,120 @@ public class BioBlox : MonoBehaviour
 		//we group all the labels under a single empty transform for convienence in the unity hierarchy
 		GameObject canvas = GameObject.Find ("Labels");
 		newLabel.transform.SetParent (canvas.transform);
-		newLabel.name = labelName + laSc.labelID;
-		activeLabels.Add (laSc);
+
+		laSc.Init (mol);
+		laSc.gameObject.SetActive (false);
+		while (activeLabels.Count < argLabel.uniqueLabelID + 1) {
+			activeLabels.Add(null);
+		}
+
+		activeLabels[argLabel.uniqueLabelID] = laSc;
 	}
 
 	//manages a left click on a label
 	//has two different functions depending on the gametype eg( simple or complicated)
 	public void LabelClicked (GameObject labelObj)
 	{
-		Debug.Log (labelObj.name + " was clicked");
+		//Debug.Log (labelObj.name + " was clicked");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
 		
 		int molNum = script.moleculeNumber;
-		int index = script.labelID;
 
+		if (script.atomIds.Count == 0) {
+			return;
+		}
 		PDB_mesh pdbMesh = molecules [molNum].GetComponent<PDB_mesh> ();
+		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
 		if (simpleGame) {
 			//here we update the selected label list
 			//and align the molecule so that the labeled atom is facing the other molecule
-			Vector3 atomPos = pdbMesh.mol.atom_centres[index];
+			Vector3 sumAtomPos = Vector3.zero;
+			for(int i=0; i < script.atomIds.Count; ++i)
+			{
+				sumAtomPos += GetAtomPos(script.atomIds[i],molNum);
+			}
+			sumAtomPos /= script.atomIds.Count;
 			int otherMolNum = 1 - molNum;
 			Vector3 alignDir = molecules [otherMolNum].transform.position -
 				molecules [molNum].transform.position;
-			pdbMesh.AlignAtomToVector(index,alignDir);
+			pdbMesh.AlignPointToVector(sumAtomPos,alignDir);
 			//logic to select which labels should glow
-			if (selectedLabelIndex [0]) {
-				selectedLabelIndex [0].shouldGlow = false;
+			if (selectedLabel [0]) {
+				selectedLabel [0].shouldGlow = false;
 			}
-			if (selectedLabelIndex [1]) {
-				selectedLabelIndex [1].shouldGlow = false;
+			if (selectedLabel [1]) {
+				selectedLabel [1].shouldGlow = false;
 			}
-			selectedLabelIndex [molNum] = script;
-			if (selectedLabelIndex [0]) {
-				selectedLabelIndex [0].shouldGlow = true;
+			selectedLabel [molNum] = script;
+			if (selectedLabel [0]) {
+				selectedLabel [0].shouldGlow = true;
 			}
-			if (selectedLabelIndex [1]) {
-				selectedLabelIndex [1].shouldGlow = true;
+			if (selectedLabel [1]) {
+				selectedLabel [1].shouldGlow = true;
 			}
+			Vector3 atomPos1 = new Vector3(0,100000,0);
+			Vector3 atomPos2 = atomPos1;
+			Vector3 atomPos3 = atomPos2;
+			if(script.atomIds.Count>0)
+			{
+				atomPos1 = pdbMesh.mol.atom_centres[script.atomIds[0]];
+			}
+			if(script.atomIds.Count>1)
+			{
+				atomPos2 = pdbMesh.mol.atom_centres[script.atomIds[1]];
+			}
+			if(script.atomIds.Count>2)
+			{
+				atomPos3 = pdbMesh.mol.atom_centres[script.atomIds[2]];
+			}
+
 			//set the sector we clicked to glow, this is done in the shader to stop us having to rebuild the mesh with new colours
 			MeshRenderer[] meshes = molecules [molNum].GetComponentsInChildren<MeshRenderer> ();
 			foreach (MeshRenderer r in meshes)
 			{
-				r.material.SetVector("_GlowPoint",atomPos);
-				r.material.SetFloat("_GlowRadius",5.0f);
+				r.material.SetVector("_GlowPoint1", atomPos1);
+				r.material.SetFloat("_GlowRadius1",5.0f);
 			}
-		} else {
+
+			foreach (MeshRenderer r in meshes)
+			{
+				r.material.SetVector("_GlowPoint2", atomPos2);
+				r.material.SetFloat("_GlowRadius2",5.0f);
+			}
+
+			foreach (MeshRenderer r in meshes)
+			{
+				r.material.SetVector("_GlowPoint3", atomPos3);
+				r.material.SetFloat("_GlowRadius3",5.0f);
+			}
+
+			if(selectedLabel[0] != null && selectedLabel[1] !=  null)
+			{
+				conMan.CreateLinks(molecules[0].GetComponent<PDB_mesh>(),
+				                   selectedLabel[0].atomIds.ToArray(),
+				                   molecules[1].GetComponent<PDB_mesh>(),
+				                   selectedLabel[1].atomIds.ToArray());
+
+			}
+
+
+		} /*else {
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
 			if (conMan.RegisterClick (molecules [molNum].GetComponent<PDB_mesh> (), index)) {
 				if(numLinks==0)
 				{
-					selectedLabelIndex[numLinks]=script;
+					selectedLabel[numLinks]=script;
 					script.shouldGlow = true;
 					numLinks++;
 				}
 				else{
-					selectedLabelIndex[0].shouldGlow=false;
+					selectedLabel[0].shouldGlow=false;
 					numLinks=0;
 				}
 			
 			}
-		}
+		}*/
 		//Handle label click, make active, focusd on atom //etc
 	}
 	
@@ -747,8 +809,8 @@ public class BioBlox : MonoBehaviour
 		loose = false;
 
 		//clears the selected index
-		selectedLabelIndex [0] = null;
-		selectedLabelIndex [1] = null;
+		selectedLabel [0] = null;
+		selectedLabel [1] = null;
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -795,7 +857,7 @@ public class BioBlox : MonoBehaviour
 		//the complex game requires a much harsher seperation force
 		//the speration force is the force applied when the molecules inter-penetrate to seperate them
 		if (simpleGame) {
-			p.seperationForce = 15.0f;
+			p.seperationForce = 3.0f;
 		} else {
 			p.seperationForce = 200.0f;
 		}
@@ -826,7 +888,10 @@ public class BioBlox : MonoBehaviour
 		if(simpleGame)
 		{
 			for (int i=0; i<mol.labels.Length; ++i) {
-				CreateLabel (p.mol.labels[i],molNum,"Label"+ i +"mol"+name);
+				if(mol.labels[i].atomIds.Count>0)
+				{
+					CreateLabel (p.mol.labels[i],molNum,"Label"+ i +"mol"+name,mol);
+				}
 			}
 		}
 		return obj;
@@ -881,9 +946,9 @@ public class BioBlox : MonoBehaviour
 		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
 
 		//create the win condition from the file specified paired atoms
-		for (int i=0; i<p1.mol.pairedAtoms.Length; ++i) {
-			winCondition.Add (new Tuple<int,int>(p1.mol.serial_to_atom[p1.mol.pairedAtoms[i].First],
-			                  p2.mol.serial_to_atom[p1.mol.pairedAtoms[i].Second]));
+		for (int i=0; i<p1.mol.pairedLabels.Length; ++i) {
+			winCondition.Add (new Tuple<int,int>(p1.mol.pairedLabels[i].First,
+			                 p1.mol.pairedLabels[i].Second));
 		}
 		//debug 3D texture
 		//GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
@@ -974,11 +1039,6 @@ public class BioBlox : MonoBehaviour
 			}
 			if(!simpleGame)// the complex game uses score minimisation
 			{
-				if(ScoreRMSD() < winScore || Input.GetKeyDown(KeyCode.L))
-				{
-					StartCoroutine("WinSplash",new Vector3(0,0,0));
-					yield break;
-				}
 				//this is where clicks to attach grapples between the molecules are performed
 				if(Input.GetMouseButtonDown(1))
 				{
@@ -1036,8 +1096,9 @@ public class BioBlox : MonoBehaviour
 					
 					//p1.AutoDockCheap();
 					//p2.AutoDockCheap();
-					p1.AutoDock();
-					while(!p1.HasDocked())
+					p1.AutoDock(selectedLabel[0].atomIds.ToArray(),
+					            selectedLabel[1].atomIds.ToArray());
+					while(ScoreRMSD() > 3.0f)
 					{
 						yield return null;
 					}
@@ -1066,8 +1127,8 @@ public class BioBlox : MonoBehaviour
 					moveVec1.y = 0;
 					moveVec2.y = 0;
 					
-					LabelClicked(selectedLabelIndex[0].gameObject);
-					LabelClicked(selectedLabelIndex[1].gameObject);
+					LabelClicked(selectedLabel[0].gameObject);
+					LabelClicked(selectedLabel[1].gameObject);
 					yield return new WaitForSeconds(0.9f);
 					if(sites[0])
 					{

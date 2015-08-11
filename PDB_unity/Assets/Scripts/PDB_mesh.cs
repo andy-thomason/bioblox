@@ -23,9 +23,9 @@ public class PDB_mesh : MonoBehaviour {
 	  
         mol = PDB_parser.get_molecule(this.name);
 	}
-	public void AlignAtomToVector(int atomIndex, Vector3 targetDir)
+	public void AlignPointToVector(Vector3 point, Vector3 targetDir)
 	{
-		Vector3 localPos = mol.atom_centres [atomIndex];
+		Vector3 localPos = point;
 		Vector3 startDir = localPos;
 		
 		Quaternion targetQ=Quaternion.LookRotation(targetDir);
@@ -102,7 +102,7 @@ public class PDB_mesh : MonoBehaviour {
 		j.spring = 0.5f;
 	}
 
-	public void AutoDock()
+	public void AutoDock(int[] thisAtomIndicies, int[] otherAtomIndicies)
 	{
 		shouldCollide = true;
 		allowInteraction = false;
@@ -116,9 +116,9 @@ public class PDB_mesh : MonoBehaviour {
 		r1.drag = 2.0f;
 		r2.drag = 2.0f;
 
-		for (int i=0; i<mol.spring_pairs.Length; ++i) {
-			int index1=mol.serial_to_atom[mol.spring_pairs[i].First];
-			int index2=otherMol.serial_to_atom[mol.spring_pairs[i].Second];
+		for (int i=0; i<thisAtomIndicies.Length; ++i) {
+			int index1=thisAtomIndicies[i];
+			int index2=otherAtomIndicies[i];
 
 			Vector3 atomPos1 = mol.atom_centres[index1];
 			Vector3 atomPos2 =otherMol.atom_centres[index2];
@@ -169,7 +169,9 @@ public class PDB_mesh : MonoBehaviour {
 			Vector3 wpos1=transform.TransformPoint(s.anchor);
 			Vector3 wpos2=other.transform.TransformPoint(s.connectedAnchor);
 
-			if((wpos1-wpos2).sqrMagnitude>(s.minDistance+0.2f)*(s.minDistance+0.2f))
+			float dist = (wpos1-wpos2).sqrMagnitude;
+
+			if(dist > s.minDistance*s.minDistance)
 			{
 				return false;
 			}
@@ -201,14 +203,13 @@ public class PDB_mesh : MonoBehaviour {
 				Physics.Raycast(r, out info);
 				if (info.collider == null)
 				{
-					
 					int hit = PDB_molecule.collide_ray (gameObject, mol,
 					                                    transform, r);
 					for(int i = 0; i < mol.serial_to_atom.Length; ++i)
 					{
 						if (mol.serial_to_atom[i] == hit)
 						{
-
+							Debug.Log (i);
 							break;
 						}
 
@@ -256,10 +257,6 @@ public class PDB_mesh : MonoBehaviour {
 				{
 					hasCollided=true;
 				}
-				
-				
-				
-				
 			}
 		}
 	}

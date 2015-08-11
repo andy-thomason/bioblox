@@ -51,6 +51,8 @@ public class ScoreSheet : MonoBehaviour {
 	List<float> bestLevelTimes;
 	List<float> bestLevelTimesToday;
 
+	float timeout = 4.0f;
+
 	int numComplete=0;
 	
 	//This function registers a new score with the score data provided
@@ -63,6 +65,15 @@ public class ScoreSheet : MonoBehaviour {
 		WWW php_print = new WWW (addScoreScriptAddress +
 		                         "level=" + WWW.EscapeURL(userScoreData.levelName) + "&name=" + userScoreData.initials +
 		                         "&post=" + userScoreData.postcode + "&score=" + userScoreData.score + "&hash="+hash);
+		float timeoutTimer = timeout;
+		while (php_print == null) {
+			timeoutTimer -=Time.deltaTime;
+			if(timeoutTimer<0)
+			{
+				yield break;
+			}
+			yield return null;
+		}
 		yield return php_print;
 		//Debug.Log ("Request Done");
 		if (php_print.error != null) {
@@ -86,7 +97,16 @@ public class ScoreSheet : MonoBehaviour {
 
 		WWW php_print = new WWW (address +
 			"level=" + WWW.EscapeURL (levelName) + "&hash=" + hash);
-		yield return php_print;
+		float timeoutTimer = timeout;
+		while (php_print == null) {
+			timeoutTimer -=Time.deltaTime;
+			if(timeoutTimer<0)
+			{
+				yield break;
+			}
+			yield return null;
+		}
+
 		if (php_print.error == null) {
 			Debug.Log (php_print.text);
 			if(!onlyTodaysScores)
@@ -151,9 +171,10 @@ public class ScoreSheet : MonoBehaviour {
 		StartCoroutine ("GetBestLevelTimes", false);
 		StartCoroutine ("GetBestLevelTimes", true);
 
+		scoreFlavourtext.text = "Comparing scores on database";
+
 		while (numComplete != 2)
 		{
-
 			yield return null;
 		}
 		float playerScore = scoreTimer.GetLastPlayerTime ();

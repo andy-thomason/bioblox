@@ -10,9 +10,9 @@ public class ConnectionManager : MonoBehaviour {
 
 	public float dampingFactor = 1.0f;
 	public float force = 10.0f;
-	public float minDistance = 40.0f;
+	public float minDistance = 100.0f;
 
-	public bool shouldContract = true;
+	public bool shouldContract = false;
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
@@ -20,6 +20,26 @@ public class ConnectionManager : MonoBehaviour {
 	{
 		connections.Clear ();
 
+	}
+
+	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,
+	                   PDB_mesh mol2, int[] mol2AtomIndicies)
+	{
+		connections.Clear ();
+		for(int i=0;i<mol1AtomIndicies.Length; ++i)
+		{
+			AtomConnection con = new Grappel();
+
+			con.molecules[0] = mol1;
+			con.molecules[1] = mol2;
+
+			con.atomIds[0]=mol1AtomIndicies[i];
+			con.atomIds[1]=mol2AtomIndicies[i];
+
+			con.isActive=true;
+
+			connections.Add(con);
+		}
 	}
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)

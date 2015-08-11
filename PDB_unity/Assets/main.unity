@@ -98,7 +98,6 @@ GameObject:
   - 33: {fileID: 42267347}
   - 23: {fileID: 42267345}
   - 54: {fileID: 42267349}
-  - 145: {fileID: 42267346}
   m_Layer: 0
   m_Name: Proto1
   m_TagString: Untagged
@@ -130,24 +129,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!145 &42267346
-SpringJoint:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 42267344}
-  m_ConnectedBody: {fileID: 0}
-  m_Anchor: {x: 0, y: .5, z: 0}
-  m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: .5, z: 0}
-  m_Spring: 10
-  m_Damper: .200000003
-  m_MinDistance: 0
-  m_MaxDistance: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
 --- !u!33 &42267347
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2829,7 +2810,7 @@ MonoBehaviour:
   exitWinSplash: 0
   molecules: []
   score: 10
-  winScore: 0
+  winScore: 3
   uiScrollSpeed: 3
   repulsiveForce: 400
 --- !u!114 &913013348
@@ -2886,7 +2867,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dampingFactor: .800000012
   force: 3
-  minDistance: 40
+  minDistance: 100
   shouldContract: 0
 --- !u!1 &923679147
 GameObject:

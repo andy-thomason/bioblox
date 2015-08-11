@@ -14,7 +14,7 @@ public class PDB_molecule
     public float[] atom_radii;
 
 
-	public Tuple<int,int>[] pairedAtoms=new Tuple<int, int>[0];
+	public Tuple<int,int>[] pairedLabels=new Tuple<int, int>[0];
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
@@ -28,7 +28,7 @@ public class PDB_molecule
     public int[] bvh_terminals;
 
 
-	public List<int>[] labels = new List<int>[0];
+	public PDB_molecule.Label[] labels = new PDB_molecule.Label[0];
 	public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
 	public int[] serial_to_atom;
 
@@ -314,6 +314,17 @@ public class PDB_molecule
     public static Mode mode = Mode.Metasphere;
     
     public string name;
+
+
+	public struct Label
+	{
+		public Label(int id){
+			uniqueLabelID = id;
+			atomIds = new List<int>();
+		}
+		public int uniqueLabelID;
+		public List<int> atomIds;
+	}
     
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     
