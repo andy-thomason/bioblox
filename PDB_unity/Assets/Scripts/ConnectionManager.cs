@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using AssemblyCSharp;
+using UnityEngine.UI;
+
 public class ConnectionManager : MonoBehaviour {
 
 	int numChainClicks = 0;
@@ -11,15 +13,22 @@ public class ConnectionManager : MonoBehaviour {
 	public float dampingFactor = 1.0f;
 	public float force = 10.0f;
 	public float minDistance = 100.0f;
+	public float maxDistance = 100.0f;
 
 	public bool shouldContract = false;
 
+	public Slider slider;
+
 	List<AtomConnection> connections = new List<AtomConnection> ();
+
 
 	public void Reset()
 	{
 		connections.Clear ();
-
+		slider.maxValue = 1.0f;
+		slider.minValue = 0.0f;
+		slider.value = 0.0f;
+		slider.gameObject.SetActive (false);
 	}
 
 	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,
@@ -40,6 +49,14 @@ public class ConnectionManager : MonoBehaviour {
 
 			connections.Add(con);
 		}
+		maxDistance = 60.0f;
+		minDistance = maxDistance;
+		shouldContract = true;
+		slider.maxValue = maxDistance;
+		slider.minValue = 2.7f;
+		slider.value = maxDistance;
+		
+		slider.gameObject.SetActive (true);
 	}
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)
@@ -80,6 +97,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		slider.gameObject.SetActive (false);
 	}
 
 
@@ -95,7 +113,9 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		shouldContract = true;
+		if (slider && slider.gameObject.activeSelf) {
+			minDistance = slider.value;
+		}
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			AtomConnection con = connections[connections.Count-1];
@@ -113,41 +133,41 @@ public class ConnectionManager : MonoBehaviour {
 			connections[i].Draw();
 		}
 
-		if (Input.GetMouseButtonDown (0) &&
-		    !Input.GetKey(KeyCode.LeftShift)) {
-			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
-			Ray cursorRay = c.ScreenPointToRay(Input.mousePosition);
-			for(int i = 0; i < connections.Count; ++i)
-			{
-				AtomConnection con=connections[i];
-				if(con.isActive)
-				{
-					Vector3 aPos = con.molecules[0].GetAtomWorldPositon(con.atomIds[0]);
-					Vector3 bPos = con.molecules[1].GetAtomWorldPositon(con.atomIds[1]);
-
-					Vector3 aToB = bPos - aPos;;
-					Plane p = new Plane(aPos,bPos,aPos+ new Vector3(0,1,0));
-					float distOut;
-					p.Raycast(cursorRay,out distOut);
-					Vector3 cursorWorldPos = cursorRay.GetPoint(distOut);
-
-					Vector3 aToCursor = cursorWorldPos - aPos;
-
-					float f = Vector3.Dot(aToCursor,aToB.normalized);
-
-					if(f < aToB.magnitude && f > 0)
-					{
-						Vector3 closestPoint = aPos + (aToB.normalized * f);
-						float dist = (cursorWorldPos - closestPoint).sqrMagnitude;
-
-						if(dist <1.0f)
-						{
-							connections.RemoveAt(i);
-						}
-					}
-				}
-			}
-		}
+//		if (Input.GetMouseButtonDown (0) &&
+//		    Input.GetKey(KeyCode.LeftShift)) {
+//			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
+//			Ray cursorRay = c.ScreenPointToRay(Input.mousePosition);
+//			for(int i = 0; i < connections.Count; ++i)
+//			{
+//				AtomConnection con=connections[i];
+//				if(con.isActive)
+//				{
+//					Vector3 aPos = con.molecules[0].GetAtomWorldPositon(con.atomIds[0]);
+//					Vector3 bPos = con.molecules[1].GetAtomWorldPositon(con.atomIds[1]);
+//
+//					Vector3 aToB = bPos - aPos;;
+//					Plane p = new Plane(aPos,bPos,aPos+ new Vector3(0,1,0));
+//					float distOut;
+//					p.Raycast(cursorRay,out distOut);
+//					Vector3 cursorWorldPos = cursorRay.GetPoint(distOut);
+//
+//					Vector3 aToCursor = cursorWorldPos - aPos;
+//
+//					float f = Vector3.Dot(aToCursor,aToB.normalized);
+//
+//					if(f < aToB.magnitude && f > 0)
+//					{
+//						Vector3 closestPoint = aPos + (aToB.normalized * f);
+//						float dist = (cursorWorldPos - closestPoint).sqrMagnitude;
+//
+//						if(dist <1.0f)
+//						{
+//							connections.RemoveAt(i);
+//						}
+//					}
+//				}
+//			}
+//		}
 
 	}
 }

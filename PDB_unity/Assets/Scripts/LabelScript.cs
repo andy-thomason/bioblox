@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class LabelScript : MonoBehaviour, IPointerClickHandler, IBeginDragHandler,
-IDragHandler,IEndDragHandler{
+public class LabelScript : MonoBehaviour, IPointerClickHandler{
 
 	// the 0th element of the atomId's list is assumed to be our location atom
 	public List<int> atomIds;
@@ -124,35 +123,6 @@ IDragHandler,IEndDragHandler{
 		}
 	}
 
-	public void OnBeginDrag (PointerEventData eventData)
-	{
-//		if (isInteractable) {
-//			if (linkIndex != -1) {
-//				owner.BreakLink (linkIndex);
-//			}
-//		}
-	}
-
-	public void OnDrag (PointerEventData eventData)
-	{
-
-	}
-
-	public void OnEndDrag (PointerEventData eventData)
-	{
-//		if (isInteractable) {
-//			GameObject first = eventData.pointerEnter;
-//			if (first) {
-//				LabelScript lab = first.GetComponent<LabelScript> ();
-//				if (lab) {
-//					if (lab.linkIndex != -1) {
-//						owner.BreakLink (lab.linkIndex);
-//					}
-//					owner.LinkPair (this, lab);
-//				}
-//			}
-//		}
-	}
 
 	void GenerateTail()
 	{

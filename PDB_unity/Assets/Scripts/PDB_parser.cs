@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -141,7 +141,6 @@ public class PDB_parser {
 					while(labels[molNumber].Count < labelIndex + 1)
 					{
 						labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
-						Debug.Log("NewLabel");
 					}
 					Debug.Log( atomSerial + " added to " + labelIndex);
 					labels[molNumber][labelIndex].atomIds.Add(atomSerial);

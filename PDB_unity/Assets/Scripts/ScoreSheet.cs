@@ -51,7 +51,7 @@ public class ScoreSheet : MonoBehaviour {
 	List<float> bestLevelTimes;
 	List<float> bestLevelTimesToday;
 
-	float timeout = 4.0f;
+	float timeout = 8.0f;
 
 	int numComplete=0;
 	
@@ -66,7 +66,7 @@ public class ScoreSheet : MonoBehaviour {
 		                         "level=" + WWW.EscapeURL(userScoreData.levelName) + "&name=" + userScoreData.initials +
 		                         "&post=" + userScoreData.postcode + "&score=" + userScoreData.score + "&hash="+hash);
 		float timeoutTimer = timeout;
-		while (php_print == null) {
+		while (php_print.isDone == false) {
 			timeoutTimer -=Time.deltaTime;
 			if(timeoutTimer<0)
 			{
@@ -98,7 +98,7 @@ public class ScoreSheet : MonoBehaviour {
 		WWW php_print = new WWW (address +
 			"level=" + WWW.EscapeURL (levelName) + "&hash=" + hash);
 		float timeoutTimer = timeout;
-		while (php_print == null) {
+		while (php_print.isDone == false) {
 			timeoutTimer -=Time.deltaTime;
 			if(timeoutTimer<0)
 			{
@@ -171,7 +171,7 @@ public class ScoreSheet : MonoBehaviour {
 		StartCoroutine ("GetBestLevelTimes", false);
 		StartCoroutine ("GetBestLevelTimes", true);
 
-		scoreFlavourtext.text = "Comparing scores on database";
+		scoreFlavourtext.text = "Comparing scores on database...";
 
 		while (numComplete != 2)
 		{
@@ -282,6 +282,7 @@ public class ScoreSheet : MonoBehaviour {
 			Continue ();
 		} else {
 			ResetUser();
+			Continue();
 		}
 
 	}
