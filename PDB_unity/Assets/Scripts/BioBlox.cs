@@ -73,6 +73,7 @@ public class BioBlox : MonoBehaviour
 	
 	int numLinks;
 
+	public Button lockButton;
 
 
 	// Use this for initialization
@@ -549,7 +550,7 @@ public class BioBlox : MonoBehaviour
 				Vector3 mousePos = Input.mousePosition;
 				Vector3 mouseDelta = mousePos - oldMousePos;
 				oldMousePos = mousePos;
-				r.AddTorque (new Vector3 (mouseDelta.y, -mouseDelta.x, 0));
+				r.AddTorque (new Vector3 (mouseDelta.y, -mouseDelta.x, 0)*10);
 			}
 			if (autoRotate) {
 				Vector3 dir = new Vector3 (
@@ -720,7 +721,7 @@ public class BioBlox : MonoBehaviour
 			int otherMolNum = 1 - molNum;
 			Vector3 alignDir = molecules [otherMolNum].transform.position -
 				molecules [molNum].transform.position;
-			pdbMesh.AlignPointToVector (sumAtomPos, alignDir);
+			//pdbMesh.AlignPointToVector (sumAtomPos, alignDir);
 			//logic to select which labels should glow
 			if (selectedLabel [0]) {
 				selectedLabel [0].shouldGlow = false;
@@ -793,7 +794,13 @@ public class BioBlox : MonoBehaviour
 		}*/
 		//Handle label click, make active, focusd on atom //etc
 	}
-	
+
+	public void Lock()
+	{
+		if (ScoreRMSD () < winScore) {
+			win=true;
+		}
+	}
 
 	void Reset ()
 	{
@@ -917,6 +924,9 @@ public class BioBlox : MonoBehaviour
 		if (filenameIndex >= filenames.Count) {
 			Debug.LogError ("No next level");
 		}
+		if (lockButton) {
+			lockButton.gameObject.SetActive(false);
+		}
 		string file = filenames [filenameIndex];
 		//create both molecules
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1, 8);
@@ -1038,7 +1048,19 @@ public class BioBlox : MonoBehaviour
 			}
 			ApplyReturnToOriginForce ();
 			if (ScoreRMSD () < winScore) {
-				win = true;
+				if(lockButton)
+				{
+					lockButton.gameObject.SetActive(true);
+				}
+				else{
+					win=true;
+				}
+			}
+			else {
+				if(lockButton)
+				{
+					lockButton.gameObject.SetActive(false);
+				}
 			}
 				if(win)
 				{
@@ -1053,6 +1075,7 @@ public class BioBlox : MonoBehaviour
 				if (sites [1]) {
 					PopOut (sites [1]);
 				}
+				lockButton.gameObject.SetActive(false);
 					
 				Debug.Log ("Docked");
 
