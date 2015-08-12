@@ -434,7 +434,7 @@ public class PDB_molecule
 		int acmax = atom_centres.Length;
 		for (int ac = 0; ac != acmax; ++ac) {
 			Vector3 c = atom_centres[ac];
-			float r = atom_radii[ac];
+			float r = atom_radii[ac] * 0.8f;
 
 			// define a box around the atom.
 			int cix = Mathf.FloorToInt(c.x);
@@ -590,11 +590,11 @@ public class PDB_molecule
 						int idx = (k * ydim + j) * xdim + i;
 						Vector3 pos0 = new Vector3 (x0 + i, y0 + j, z0 + k);
 
-						// Mask of vertices inside the isosurface
+						// Mask of vertices outside the isosurface (values are negative)
 						// Example:
-						//   00000001 means only vertex 0 is inside the surface.
-						//   10000000 means only vertex 7 is inside the surface.
-						//   11111111 all vertices are inside the surface.
+						//   00000001 means only vertex 0 is outside the surface.
+						//   10000000 means only vertex 7 is outside the surface.
+						//   11111111 all vertices are outside the surface.
 						int mask =
 							(mc_values [idx] < 0 ? 1 << 0 : 0) |
 							(mc_values [idx + 1] < 0 ? 1 << 1 : 0) |
