@@ -62,7 +62,7 @@ Material:
       data:
         first:
           name: _Specular
-        second: {r: .286764681, g: .286764681, b: .286764681, a: 1}
+        second: {r: .0627451017, g: .0627451017, b: .0627451017, a: 1}
       data:
         first:
           name: _CameraPos

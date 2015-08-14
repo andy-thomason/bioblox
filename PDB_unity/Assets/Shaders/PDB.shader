@@ -186,22 +186,22 @@
         float3 normal = normalize(i.normal);
         float2 screen_pos = i.sp.xy/i.sp.w*_ScreenParams.xy;
 
-		float2 dxy = frac(screen_pos * 0.25) - 0.5;
-		float2 dxy2 = dxy * dxy;
-        float half_tone = (dxy2.x + dxy2.y) * 4;
-        
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
         float3 view_dir = normalize(i.world_pos.xyz - _CameraPos.xyz);
         float3 reflect = view_dir - 2.0 * dot(normal, view_dir) * normal;
         float diffuse_factor = min(1.0f, dot(normal, light_dir));
         float specular_factor = pow(max(0.0, dot(reflect, light_dir)), _Shininess);
 
-      	float alpha = exp(_K * dot(i.model_pos.xyz-_CullPos,i.model_pos.xyz-_CullPos)) * 4;
-      	//alpha = 0.5;
-      	if (half_tone > alpha)
-      	{
-      		clip(-1.0f);
-      	}
+//		float2 dxy = frac(screen_pos * 0.25) - 0.5;
+//		float2 dxy2 = dxy * dxy;
+//        float half_tone = (dxy2.x + dxy2.y) * 4;
+//        
+//      	float alpha = exp(_K * dot(i.model_pos.xyz-_CullPos,i.model_pos.xyz-_CullPos)) * 4;
+//      	//alpha = 0.5;
+//      	if (half_tone > alpha)
+//      	{
+//      		clip(-1.0f);
+//      	}
 
       	float4 glowColor = float4(1, 1, 0, 1);
       	float glowVal = 0;

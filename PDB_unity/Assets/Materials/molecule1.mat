@@ -58,7 +58,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .282758713, g: 0, b: 1, a: 1}
+        second: {r: .551470578, g: .551470578, b: 1, a: 1}
       data:
         first:
           name: _SpecColor
@@ -66,7 +66,7 @@ Material:
       data:
         first:
           name: _Specular
-        second: {r: .191176474, g: .189770758, b: .189770758, a: 1}
+        second: {r: .0627451017, g: .0627451017, b: .0627451017, a: 1}
       data:
         first:
           name: _CameraPos
@@ -82,7 +82,7 @@ Material:
       data:
         first:
           name: _Ambient
-        second: {r: .333333343, g: .333333343, b: .333333343, a: 1}
+        second: {r: .299416095, g: .299416095, b: .522058845, a: 1}
       data:
         first:
           name: _DarkPoint
