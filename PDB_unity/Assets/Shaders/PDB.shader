@@ -9,9 +9,13 @@
     _CullPos ("CullPos", Vector) = (0,0,0,0)
     _K ("K transparrency", Float)=0
     _AmbientOcclusion ("TexRanger", 3D)="white"{}
-    _GlowPoint ("GlowPointLocal" , Vector) = (0,0,0,0)
-    _GlowRadius("GlowRadius" , Float) = 0
-    _DarkPoint ("DarkPointLocal" , Vector) = (0,0,0,0)
+    _GlowPoint1 ("GlowPointLocal1" , Vector) = (0,0,0,0)
+    _GlowRadius1("GlowRadius1" , Float) = 0
+    _GlowPoint2 ("GlowPointLocal2" , Vector) = (0,0,0,0)
+    _GlowRadius2("GlowRadius2" , Float) = 0
+    _GlowPoint3 ("GlowPointLocal3" , Vector) = (0,0,0,0)
+    _GlowRadius3("GlowRadius3" , Float) = 0
+    _DarkPoint ("DarkPointLoca3" , Vector) = (0,0,0,0)
     _DarkK("DarkK" , Float) = -0.01
   }
   SubShader {
@@ -151,8 +155,12 @@
       uniform float4 _CullPos;
       uniform float _K;
       
-      uniform float4 _GlowPoint;
-      uniform float _GlowRadius;
+      uniform float4 _GlowPoint1;
+      uniform float _GlowRadius1;
+      uniform float4 _GlowPoint2;
+      uniform float _GlowRadius2;
+      uniform float4 _GlowPoint3;
+      uniform float _GlowRadius3;
 
       uniform float4 _DarkPoint;
       uniform float _DarkK;
@@ -197,13 +205,28 @@
 
       	float4 glowColor = float4(1, 1, 0, 1);
       	float glowVal = 0;
-      	float dist = distance(i.model_pos, _GlowPoint);
-
-      	if(dist < _GlowRadius)
+      	float dist = distance(i.model_pos, _GlowPoint1);
+      	if(dist < _GlowRadius1)
       	{
-     		glowVal = _GlowRadius - dist;
+     		glowVal = _GlowRadius1 - dist;
      		glowVal *= abs(_SinTime.w);
       	}
+      	
+      	dist = distance(i.model_pos, _GlowPoint2);
+      	if(dist < _GlowRadius2)
+      	{
+     		glowVal = _GlowRadius2 - dist;
+     		glowVal *= abs(_SinTime.w);
+      	}
+      	
+      	dist = distance(i.model_pos, _GlowPoint3);
+      	if(dist < _GlowRadius3)
+      	{
+     		glowVal = _GlowRadius3 - dist;
+     		glowVal *= abs(_SinTime.w);
+      	}
+
+
 
       	float3 rpos = i.model_pos - _DarkPoint.xyz;
       	float d2 = dot(rpos, rpos);

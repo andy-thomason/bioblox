@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -33,17 +33,18 @@ using AssemblyCSharp;
 //27 - 31       Integer         serial        Serial number of bonded atom
 //------------------------------------------------------
 //1 -6          BioBlox name    "BBPAIR"
-//7 -11			Integer			index		Index of atom in first molecule to pair
-//13-16			Integer			index		Index of atom in second molecule to pair
+//7 -11			Integer			index		Index of the first label
+//13-16			Integer			index		Index of second label
 //------------------------------------------------------
 //1 -6			BioBlox name	"BBSPNG"
 //7 -11			Integer			index		Index of first atom in spring
 //13-16			Integer			index		Index of second atom in spring
 //------------------------------------------------------
-//1 -6			BioBlox name    "BIOB"
-//7-11			Integer			index		Index of labeled atom
-//12-16 		Integer			index		Molecule index
-//17-21			LString(8)      string		Tag for the atom
+//1-6			BioBlox name    "BIOB"
+//7-11			Integer			index		Label Index
+//12-16			Integer			index		Atom seriel
+//17-21			Integer			index		Molecule Index
+//22-26			LString(8)      string		Tag for the atom
 
 
 
@@ -68,7 +69,7 @@ public class PDB_parser {
         List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
-		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>> ();
+		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
@@ -121,23 +122,28 @@ public class PDB_parser {
                         pairs.Add((idx << 16) | c);
                     }*/
 				} else if(kind == "BBSPNG"){
-					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(13, 4));
-					springPairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+					int firstLabel = int.Parse(line.Substring(7, 4));
+					int secondLabel = int.Parse(line.Substring(13, 4));
+					springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
 				} else if (kind == "BBPAIR") {
-					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(13, 4));
-					pairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+					int firstLabel = int.Parse(line.Substring(7, 4));
+					int secondLabel = int.Parse(line.Substring(13, 4));
+					pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
 				} else if (kind == "BIOB  ") {
-					int atomIndex = int.Parse(line.Substring(7, 4));
-					int molIndex = int.Parse(line.Substring(12, 4));
-					string tag = line.Substring(17, 4);
-					while(labels.Count<=molIndex)
+					int labelIndex = int.Parse(line.Substring(7, 4));
+					int atomSerial = int.Parse(line.Substring(12, 4));
+					int molNumber = int.Parse(line.Substring(17, 4));
+					string tag = line.Substring(22, 4);
+					while(labels.Count < molNumber + 1)
 					{
 						labels.Add(new List<PDB_molecule.Label>());
 					}
-					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
-					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
+					while(labels[molNumber].Count < labelIndex + 1)
+					{
+						labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
+					}
+					Debug.Log( atomSerial + " added to " + labelIndex);
+					labels[molNumber][labelIndex].atomIds.Add(atomSerial);
 				} else if (kind == "TER   " || kind == "TER") {
 
                     cur = new PDB_molecule();
@@ -171,10 +177,11 @@ public class PDB_parser {
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
-			m.pairedAtoms=pairs.ToArray();
+			m.pairedLabels=pairs.ToArray();
 			m.spring_pairs=springPairs.ToArray();
 			if(labels.Count>i)
 			{
+				Debug.Log("Num labels = " + labels.Count);
 				m.labels=labels[i].ToArray();
 			}
             m.name = asset_name + "." + (i+1);

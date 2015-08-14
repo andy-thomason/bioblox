@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class LabelScript : MonoBehaviour, IPointerClickHandler, IBeginDragHandler,
-IDragHandler,IEndDragHandler{
+public class LabelScript : MonoBehaviour, IPointerClickHandler{
 
-
-	public PDB_molecule.Label label;
+	// the 0th element of the atomId's list is assumed to be our location atom
+	public List<int> atomIds;
 	public BioBlox owner;
 	public int labelID;
 	public int moleculeNumber;
@@ -33,7 +32,19 @@ IDragHandler,IEndDragHandler{
 	GameObject cloudStorer;
 	
 	// Use this for initialization
-	void Start () {
+
+
+	public void Start () {
+	
+	}
+
+	public void Init(PDB_molecule mol)
+	{
+		if (atomIds.Count == 0) {
+			Debug.LogError("Init called with no atomIDs");
+		}
+
+
 		gameObject.GetComponent<Light> ().enabled = false;
 		GameObject cloudSorter = new GameObject ();
 		cloudSorter.name = "Clouds" + this.name;
@@ -41,24 +52,32 @@ IDragHandler,IEndDragHandler{
 		cloudSorter.transform.localScale = new Vector3 (1, 1, 1);
 		cloudStorer = cloudSorter;
 
-		for (int i=0; i<sprites.Count; ++i) {
-			if(spriteNames[i] == label.labelName)
-			{
-				clicked = nonClicked = sprites[i];
+		for (int i = 0; i < atomIds.Count; ++i) {
+		
+			atomIds[i] = mol.serial_to_atom[atomIds[i]];
+		}
+
+
+		for (int j = 0; j < atomIds.Count; ++j) {
+			for (int i=0; i<numClouds; ++i) {
+				MakeCloud ();
 			}
 		}
 
-		for(int i=0;i<numClouds;++i)
-		{
-			MakeCloud(i);
-		}
+		/*
+		for (int i=0; i<sprites.Count; ++i) {
+			if(spriteNames[i] == this.name)
+			{
+				clicked = nonClicked = sprites[i];
+			}
+		}*/
 	}
 
-	void MakeCloud(int i)
+	void MakeCloud()
 	{
 		GameObject c = GameObject.Instantiate (cloudPrefab);
 		if (!cloudIs3D) {
-			c.transform.SetParent (GameObject.Find ("Clouds" + this.name).transform);
+			c.transform.SetParent (cloudStorer.transform);
 		} 
 			clouds.Add (c);
 	}
@@ -104,68 +123,39 @@ IDragHandler,IEndDragHandler{
 		}
 	}
 
-	public void OnBeginDrag (PointerEventData eventData)
-	{
-//		if (isInteractable) {
-//			if (linkIndex != -1) {
-//				owner.BreakLink (linkIndex);
-//			}
-//		}
-	}
-
-	public void OnDrag (PointerEventData eventData)
-	{
-
-	}
-
-	public void OnEndDrag (PointerEventData eventData)
-	{
-//		if (isInteractable) {
-//			GameObject first = eventData.pointerEnter;
-//			if (first) {
-//				LabelScript lab = first.GetComponent<LabelScript> ();
-//				if (lab) {
-//					if (lab.linkIndex != -1) {
-//						owner.BreakLink (lab.linkIndex);
-//					}
-//					owner.LinkPair (this, lab);
-//				}
-//			}
-//		}
-	}
 
 	void GenerateTail()
 	{
-		Vector3 atomPos = owner.GetAtomWorldPos (label.atomIndex,moleculeNumber);
-		Vector3 toAtom = atomPos - this.transform.position;
-		float tIncrement = 1.0f / clouds.Count;
-		//Sprite s = this.GetComponent<Image> ().sprite;
-		Vector3 scale = new Vector3 (1.0f, 1.0f, 1.0f);
-		if(cloudIs3D)
-		{
-		  scale = new Vector3 (6.0f, 6.0f, 6.0f);
-		}
-		Vector3 targetScale = new Vector3 (0.1f, 0.1f, 0.1f);
-		Vector3 scaleDiff = targetScale - scale;
-		for (int i=0; i<clouds.Count; ++i) {
-		clouds[i].transform.position=this.transform.position+
-				toAtom*tIncrement*(i+1);
-			clouds[i].transform.localScale=scale+
-				scaleDiff*tIncrement*(i+1);
-
-			if(!cloudIs3D)
-			{
-			Vector3 back = new Vector3 (0,0,1);
-			Vector3 up = Vector3.Cross(toAtom,back);
-			Vector3 down = Vector3.Cross(up,toAtom);
-			clouds[i].transform.rotation = Quaternion.LookRotation(
-				down,up);
-
-			//clouds[i].GetComponent<Image>().sprite=s;
+		for (int j = 0; j < atomIds.Count; ++j) {
+			Vector3 atomPos = owner.GetAtomWorldPos (atomIds [j], moleculeNumber);
+			Vector3 toAtom = atomPos - this.transform.position;
+			float tIncrement = 1.0f / numClouds;
+			//Sprite s = this.GetComponent<Image> ().sprite;
+			Vector3 scale = new Vector3 (1.0f, 1.0f, 1.0f);
+			if (cloudIs3D) {
+				scale = new Vector3 (6.0f, 6.0f, 6.0f);
 			}
-			else{
-				clouds[i].transform.rotation=Quaternion.LookRotation(
-					toAtom,new Vector3(0,1,0));
+			Vector3 targetScale = new Vector3 (0.1f, 0.1f, 0.1f);
+			Vector3 scaleDiff = targetScale - scale;
+			for (int i = 0; i < numClouds; ++i) {
+				int offset = numClouds * j; 
+				clouds [i + offset].transform.position = this.transform.position +
+					toAtom * tIncrement * (i + 1);
+				clouds [i + offset].transform.localScale = scale +
+					scaleDiff * tIncrement * (i + 1);
+
+				if (!cloudIs3D) {
+					Vector3 back = new Vector3 (0, 0, 1);
+					Vector3 up = Vector3.Cross (toAtom, back);
+					Vector3 down = Vector3.Cross (up, toAtom);
+					clouds [i + offset].transform.rotation = Quaternion.LookRotation (
+				down, up);
+
+					//clouds[i].GetComponent<Image>().sprite=s;
+				} else {
+					clouds [i + offset].transform.rotation = Quaternion.LookRotation (
+					toAtom, new Vector3 (0, 1, 0));
+				}
 			}
 		}
 	}
@@ -175,14 +165,22 @@ IDragHandler,IEndDragHandler{
 		if (is3D) {
 			//Vector3 toCamera =c.transform.position-atomPos;
 			//toCamera=toCamera.normalized*3;
-			owner.GetLabelPos(label.atomIndex,moleculeNumber,this.transform);
+			owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
 
+			GameObject cam = GameObject.Find("Main Camera");
+			GameObject mol = owner.molecules[moleculeNumber];
+
+			if(mol)
+			{
+				Vector3 toMol = mol.transform.position - this.transform.position;
+				this.transform.LookAt(cam.transform,-toMol);
+			}
 		}
 		if (shouldGlow) {
-			this.GetComponent<Image>().sprite=clicked;
+			//this.GetComponent<Image>().sprite=clicked;
 			gameObject.GetComponent<Light> ().enabled = true;
 		} else {
-			this.GetComponent<Image>().sprite=nonClicked;
+			//this.GetComponent<Image>().sprite=nonClicked;
 			gameObject.GetComponent<Light> ().enabled = false;
 		}
 		GenerateTail();
