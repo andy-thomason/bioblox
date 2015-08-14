@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 namespace AssemblyCSharp
 {
 	public class AtomConnection
@@ -38,16 +39,27 @@ namespace AssemblyCSharp
 
 	public class Grappel:AtomConnection
 	{
+		float minDist;
+		List<Vector3> points;
+		List<Vector3> forces;
 		public Grappel(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
+			Init ();
 		}
 		public Grappel()
 		{
+			Init ();
+		}
+
+		void Init()
+		{
+
 		}
 
 		public override void Update(float dampingFactor, float springFactor, float minDistance)
 		{
 			if (isActive) {
+				minDist=minDistance;
 				int atomIndex1 = atomIds [0];
 				int atomIndex2 = atomIds [1];
 				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
@@ -87,7 +99,6 @@ namespace AssemblyCSharp
 				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
 				Debug.DrawLine(worldAtomPos1,worldAtomPos2);
-			
 			}
 		}
 	}

@@ -376,9 +376,10 @@ public class BioBlox : MonoBehaviour
 		return Mathf.Sqrt (rmsd / count);
 	}
 
-
-	public void HandleSlider(Slider slide)
+	//Handle the dock slider inputs
+	public void HandleDockSlider(Slider slide)
 	{
+		//if we are at the max value then reveal labels
 		if (slide.value == slide.maxValue) {
 			if (!activeLabels [0].gameObject.activeSelf) {
 				for (int i=0; i<activeLabels.Count; ++i) {
@@ -390,8 +391,24 @@ public class BioBlox : MonoBehaviour
 				activeLabels[i].gameObject.SetActive(false);
 			}
 		}
+	}
+
+	public void HandleCameraSlider(Slider slide)
+	{
+		Transform t = GameObject.Find ("Main Camera").transform;
+		float dist = t.position.magnitude;
+
+		Vector3 dir = new Vector3 (Mathf.Cos(Mathf.Deg2Rad * slide.value),
+		                          0,
+		                          Mathf.Sin(Mathf.Deg2Rad * slide.value));
+
+		Vector3 pos = dir * dist;
+		t.position = pos;
+		t.rotation = Quaternion.LookRotation (-dir, Vector3.up);
 
 	}
+
+
 	//changes variables in the shader to fade the molecules everywhere but two points
 	//this is to emphisie the docking site
 	IEnumerator FadeMolecules ()
@@ -721,7 +738,7 @@ public class BioBlox : MonoBehaviour
 			int otherMolNum = 1 - molNum;
 			Vector3 alignDir = molecules [otherMolNum].transform.position -
 				molecules [molNum].transform.position;
-			//pdbMesh.AlignPointToVector (sumAtomPos, alignDir);
+			pdbMesh.AlignPointToVector (sumAtomPos, alignDir);
 			//logic to select which labels should glow
 			if (selectedLabel [0]) {
 				selectedLabel [0].shouldGlow = false;

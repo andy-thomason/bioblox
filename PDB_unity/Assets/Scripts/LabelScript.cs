@@ -167,12 +167,20 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 			//toCamera=toCamera.normalized*3;
 			owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
 
+			GameObject cam = GameObject.Find("Main Camera");
+			GameObject mol = owner.molecules[moleculeNumber];
+
+			if(mol)
+			{
+				Vector3 toMol = mol.transform.position - this.transform.position;
+				this.transform.LookAt(cam.transform,-toMol);
+			}
 		}
 		if (shouldGlow) {
-			this.GetComponent<Image>().sprite=clicked;
+			//this.GetComponent<Image>().sprite=clicked;
 			gameObject.GetComponent<Light> ().enabled = true;
 		} else {
-			this.GetComponent<Image>().sprite=nonClicked;
+			//this.GetComponent<Image>().sprite=nonClicked;
 			gameObject.GetComponent<Light> ().enabled = false;
 		}
 		GenerateTail();
