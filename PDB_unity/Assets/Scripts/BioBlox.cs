@@ -65,21 +65,20 @@ public class BioBlox : MonoBehaviour
 
 	//whether we have won or lost
 	bool win = false;
-	bool loose = false;
 
 	//colors of the labels and an offset that is randomly decided randomize colours
-	List<Color> colorPool = new List<Color> ();
+	List<Color> colorPool = new List<Color>();
 	int randomColorPoolOffset;
-	
-	int numLinks;
 
 	public Button lockButton;
 
-
+	public float triangleOffset = 10.0f;
+	GameObject[] featureTriangle =new GameObject[2];
 	// Use this for initialization
 	void Start ()
 	{
-		numLinks = 0;
+		Time.fixedDeltaTime = 0.001f;
+
 		colorPool.Add (Color.red);
 		colorPool.Add (Color.blue);
 		colorPool.Add (Color.cyan);
@@ -279,7 +278,17 @@ public class BioBlox : MonoBehaviour
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
-
+		if (molecules [0] && molecules [1]) {
+			GameObject cam = GameObject.Find ("Main Camera");
+			MeshRenderer[] meshes = molecules [0].GetComponentsInChildren<MeshRenderer> ();
+			foreach (MeshRenderer r in meshes) {
+				r.material.SetVector ("_LightPos", cam.transform.position + new Vector3(-50,0,0));
+			}
+			meshes = molecules [1].GetComponentsInChildren<MeshRenderer> ();
+			foreach (MeshRenderer r in meshes) {
+				r.material.SetVector ("_LightPos", cam.transform.position + new Vector3(-50,0,0));
+			}
+		}
 	}
 
 	void PopInSound (GameObject g)
@@ -380,7 +389,7 @@ public class BioBlox : MonoBehaviour
 	public void HandleDockSlider(Slider slide)
 	{
 		//if we are at the max value then reveal labels
-		if (slide.value == slide.maxValue) {
+		if (slide.value > slide.maxValue - 10.0f) {
 			if (!activeLabels [0].gameObject.activeSelf) {
 				for (int i=0; i<activeLabels.Count; ++i) {
 					activeLabels[i].gameObject.SetActive(true);
@@ -405,7 +414,6 @@ public class BioBlox : MonoBehaviour
 		Vector3 pos = dir * dist;
 		t.position = pos;
 		t.rotation = Quaternion.LookRotation (-dir, Vector3.up);
-
 	}
 
 
@@ -481,9 +489,7 @@ public class BioBlox : MonoBehaviour
 			}
 			if (hasWon) {
 				win = true;
-			} else {
-				loose = true;
-			}
+			} 
 			this.GetComponent<AudioManager> ().Play ("Drum");
 		}
 	}
@@ -595,10 +601,7 @@ public class BioBlox : MonoBehaviour
 		GameObject.Destroy (molecules [0].gameObject);
 		GameObject.Destroy (molecules [1].gameObject);
 		GameObject.Destroy (parent);
-		/*
-		if (gene) {
-			gene.SetActive (true);
-		}*/
+
 
 		//transform the camera to its original position
 		eventSystem.enabled = true;
@@ -783,13 +786,32 @@ public class BioBlox : MonoBehaviour
 				r.material.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
+			Vector3 molPos = pdbMesh.transform.position;
+
+			Mesh featureTriMesh = new Mesh();
+			MeshFilter meshF = featureTriangle[script.moleculeNumber].GetComponent<MeshFilter>();
+			Vector3 [] verts = new Vector3[3];
+			verts[0] = GetAtomPos(script.atomIds[0],script.moleculeNumber);
+			verts[1] = GetAtomPos(script.atomIds[1],script.moleculeNumber);
+			verts[2] = GetAtomPos(script.atomIds[2],script.moleculeNumber);
+
+			verts[0] = verts[0].normalized * triangleOffset;
+			verts[1] = verts[1].normalized * triangleOffset;
+			verts[2] = verts[2].normalized * triangleOffset;
+
+
+
+			featureTriMesh.vertices= verts;
+			featureTriMesh.triangles = new int[]{0,1,2,0,2,1};
+
+			meshF.mesh = featureTriMesh;
+
 			if (selectedLabel [0] != null && selectedLabel [1] != null) {
 				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
 				                   selectedLabel [0].atomIds.ToArray (),
 				                   molecules [1].GetComponent<PDB_mesh> (),
 				                   selectedLabel [1].atomIds.ToArray ());
 				uiScrollSpeed =900;
-
 			}
 
 
@@ -831,7 +853,6 @@ public class BioBlox : MonoBehaviour
 
 		//deactivates any states
 		win = false;
-		loose = false;
 
 		//clears the selected index
 		selectedLabel [0] = null;
@@ -878,13 +899,9 @@ public class BioBlox : MonoBehaviour
 		make_molecule_mesh (p, proto, layerNum);
 		Debug.Log (mol.mesh [0].vertices.Length);
 
-		//the complex game requires a much harsher seperation force
 		//the speration force is the force applied when the molecules inter-penetrate to seperate them
-		if (simpleGame) {
-			p.seperationForce = 200.0f;
-		} else {
-			p.seperationForce = 200.0f;
-		}
+		p.seperationForce = 200.0f;
+		
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
 		ri.useGravity = false;
@@ -931,6 +948,17 @@ public class BioBlox : MonoBehaviour
 			}
 		}
 	}
+
+	public void DebugDock()
+	{
+		if (molecules [0] && molecules [1]) {
+			molecules[0].GetComponent<PDB_mesh>().AutoDockCheap();
+			molecules[1].GetComponent<PDB_mesh>().AutoDockCheap();
+			repulsiveForce = 0;
+			Debug.Log("Docking");
+		}
+
+	}
 	
 
 	//main meat of the initilisation logic and level completion logic
@@ -948,6 +976,33 @@ public class BioBlox : MonoBehaviour
 		//create both molecules
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1, 8);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1, 9);
+
+
+		MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
+
+		featureTriangle [0] = new GameObject ();
+		featureTriangle [0].AddComponent<MeshFilter> ();
+		featureTriangle [0].AddComponent<MeshRenderer> ().material = pdbr.material;
+		featureTriangle [0].GetComponent<MeshRenderer> ().material.SetFloat ("_Mode", 3);
+		featureTriangle [0].GetComponent<MeshRenderer> ().material.color = new Color (0.7f, 0.7f, 1, 0.5f);
+
+		featureTriangle [0].name = "FeatureTriangle1";
+		featureTriangle [0].transform.position = Vector3.zero;
+		featureTriangle [0].transform.SetParent (mol1.transform, false);
+
+		
+		featureTriangle [1] = new GameObject ();
+		featureTriangle [1].AddComponent<MeshFilter> ();
+		featureTriangle [1].AddComponent<MeshRenderer> ().material = pdbr.material;
+		featureTriangle [1].GetComponent<MeshRenderer> ().material.SetFloat ("_Mode", 3);
+		featureTriangle [1].GetComponent<MeshRenderer> ().material.color = new Color (1, 0.7f, 0.7f, 0.5f);
+
+		featureTriangle [1].name = "FeatureTriangle2";
+		featureTriangle [1].transform.position = Vector3.zero;
+		featureTriangle [1].transform.SetParent (mol2.transform, false);
+
+
+		GameObject.Destroy (pdbr.gameObject);
 
 		originPosition [0] = mol1.transform.position;
 		originPosition [1] = mol2.transform.position;

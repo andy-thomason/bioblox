@@ -1346,7 +1346,7 @@ public class PDB_molecule
             //Debug.Log("distance=" + distance
             if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				normal*=seperationForce;
+				normal *= seperationForce;
 				r0.AddForceAtPosition(normal,c0);
                 r1.AddForceAtPosition(-normal, c1);
             }

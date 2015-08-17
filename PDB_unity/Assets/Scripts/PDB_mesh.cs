@@ -181,13 +181,9 @@ public class PDB_mesh : MonoBehaviour {
 	//at the moment very fake
 	public void AutoDockCheap()
 	{
-		allowInteraction = false;
-		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
-		startRotation = false;
-		t = 0;
-		//mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
-		//mover.AddTransformPoint(mol.pos,Quaternion.identity);
-		mover.StartTransform();
+		shouldCollide = false;
+		this.transform.position = mol.pos;
+		this.transform.rotation = Quaternion.identity;
 	}
 
 

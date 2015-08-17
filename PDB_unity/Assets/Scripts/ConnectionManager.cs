@@ -19,6 +19,8 @@ public class ConnectionManager : MonoBehaviour {
 
 	public Slider slider;
 
+	public float slideBackSpeed = 2.0f;
+
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
 
@@ -37,7 +39,7 @@ public class ConnectionManager : MonoBehaviour {
 		connections.Clear ();
 		for(int i=0;i<mol1AtomIndicies.Length; ++i)
 		{
-			AtomConnection con = new Grappel();
+			AtomConnection con = new Rope();
 
 			con.molecules[0] = mol1;
 			con.molecules[1] = mol2;
@@ -115,6 +117,10 @@ public class ConnectionManager : MonoBehaviour {
 	void Update () {
 		if (slider && slider.gameObject.activeSelf) {
 			minDistance = slider.value;
+			if(!Input.GetMouseButton(0))
+			{
+				slider.value += Time.deltaTime *slideBackSpeed;
+			}
 		}
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();

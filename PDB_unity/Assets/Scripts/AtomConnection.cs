@@ -41,61 +41,100 @@ namespace AssemblyCSharp
 	{
 		public class Point
 		{
+			public Point()
+			{
+				force = vel = pos = Vector3.zero;
+				invMass = 1;
+			}
 
-			Vector3 pos;
-			Vector3 vel;
-			Vector3 force;
-			float mass; 
+			public Vector3 pos;
+			public Vector3 vel;
+			public Vector3 force;
+			public float invMass;  
 
-			void Update()
+			public void FixedUpdate(float friction)
 			{
 				vel += force;
 				force = Vector3.zero;
 
+				pos += vel * Time.fixedDeltaTime * invMass;
+				vel *= friction;
+			}
+		}
 
+		public class Spring
+		{
+			Point point1;
+			Point point2;
+			float springVal;
+			public Spring(Point a, Point b, float val)
+			{
+				point1 = a;
+				point2 = b;
+				springVal = val;
+			}
 
+			public void FixedUpdate(float springLength)
+			{
+				Vector3 firstToSecond = point2.pos - point1.pos;
+
+				//if the distance is too long
+				if (point1.invMass != 0 || point2.invMass !=0) { 
+					Vector3 springForce = firstToSecond.normalized * (firstToSecond.magnitude - springLength) * springVal;
+
+					float totalMass = point1.invMass + point2.invMass;
+
+					point1.force +=springForce * (point1.invMass / totalMass);
+					point2.force -=springForce * (point2.invMass / totalMass);
+				}
 			}
 
 		}
 
 
-		float minDist;
-		List<GameObject> points = new List<GameObject>();
+		List<Point> points = new List<Point>();
+		List<Spring> springs = new List<Spring>();
+
 		public Rope(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
-			Init ();
+
 		}
+
 		public Rope()
 		{
 			Init ();
 		}
+
 		void Init()
 		{
 			int numPoints = 10;
-		
-			
-			Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIds[0]]);
-			Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIds[1]]);
-			
-			
 			for (int i=0; i < numPoints; ++i) {
+				float div = (float)i / numPoints;
+				Point potentialPoint = new Point();
+				if(i==0 || i == numPoints -1)
+				{
+					potentialPoint.invMass = 0;
+				}
+				if (i > 0) {
+					springs.Add(new Spring(points[i-1],potentialPoint,8.0f));
 
+					//make a spring
+				}
+				points.Add(potentialPoint);
 			}
 		}
 
 		public override void Update(float dampingFactor, float springFactor, float minDistance)
 		{
+			int atomIndex1 = atomIds [0];
+			int atomIndex2 = atomIds [1];
+			Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
+			Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
+
+			Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
+			float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
 			if (isActive) {
-				int atomIndex1 = atomIds [0];
-				int atomIndex2 = atomIds [1];
-				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
-				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
-
-				Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
-				float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
-
-				if(distance > minDist)
-				{
+				if (distance > minDistance) {
 
 					Rigidbody mol1_rb = molecules [0].GetComponent<Rigidbody> ();
 					Rigidbody mol2_rb = molecules [1].GetComponent<Rigidbody> ();
@@ -111,26 +150,47 @@ namespace AssemblyCSharp
 					Vector3 damping2 = -dampingFactor * atom2Velocity;
 				
 					Vector3 force = new Vector3 (0, 0, 0);
-					if(distance > minDist)
-					{
-					force = dir * (distance - minDistance) * springFactor;
+					if (distance > minDistance) {
+						force = dir * (distance - minDistance) * springFactor;
 					
 				
-					mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
-					mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
+						mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
+						mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 					}
 				}
 			}
+			points [0].pos = worldAtomPos1;
+			points [points.Count - 1].pos = worldAtomPos2;
+
+			float springLength = (minDistance - distance) / springs.Count;
+			if (springLength <= 0) {
+				springLength = 0.0001f;
+			}
+			for(int i = 0; i < springs.Count; ++i)
+			{
+				springs[i].FixedUpdate(springLength);
+			}
+
+			for(int i = 0; i < points.Count; ++i)
+			{
+				Vector3 gravity = new Vector3(0,-1,0);
+				points[i].force += gravity;
+				points[i].FixedUpdate(0.95f);
+			}
+			
 		}
+
 		public override void Draw()
 		{
 			if (isActive) {
-				int atomIndex1 = atomIds [0];
-				int atomIndex2 = atomIds [1];
-				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
-				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
-				
-				Debug.DrawLine(worldAtomPos1,worldAtomPos2);
+
+				for(int i=0; i < points.Count; ++i)
+				{
+					if(i>0)
+					{
+						Debug.DrawLine(points[i-1].pos,points[i].pos);
+					}
+				}
 			}
 		}
 
