@@ -63,9 +63,10 @@ public class PDB_parser {
     };
 
     static public List<PDB_molecule> parse(string asset_name) {
-        List<Vector3> atom_centres = new List<Vector3>();
-        List<float> atom_radii = new List<float>();
-        List<int> names = new List<int>();
+		List<Vector3> atom_centres = new List<Vector3>();
+		List<float> atom_radii = new List<float>();
+		List<Color> atom_colours = new List<Color>();
+		List<int> names = new List<int>();
         List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
@@ -92,19 +93,41 @@ public class PDB_parser {
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
-                    int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
+					string id = line.Substring(13, 7);
+					string atom = line.Substring(6, 5);
+
+					Color col = new Color(1, 1, 1, 1);
+					if (atom == " 1641") {
+						col = new Color(1, 0, 0, 1);
+					}
+					if (id == "NZ  LYS" || id == "NH2 ARG") {
+						//col = new Color(1, 0, 0, 1);
+					/*} else if (id == )
+					{
+						col = new Color(1, 0, 0, 1);*/
+					}
+					/*if (residue == "LYS" &&  || residue == "ARG") {
+						col = new Color(1, 0, 0, 1);
+					} else if (residue == "ASP" || residue == "GLU") {
+						col = new Color(0, 0, 1, 1);
+					}*/
+
+					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
                     if (name == PDB_molecule.atom_N) {
                         residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
                         residues.Add(names.Count);
                     }
+
                     names.Add(name);
 					if (serial >= 0) {
 						while (serial >= serial_to_atom.Count) serial_to_atom.Add (-1);
 						serial_to_atom[serial] = atom_centres.Count;
 					}
+
                     atom_centres.Add(new Vector3(x, y, z));
-                    atom_radii.Add(r);
-                    minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
+					atom_radii.Add(r);
+					atom_colours.Add(col);
+					minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
                     maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
                 } else if (kind == "CONECT") {
                     /*int len = line.Length;
@@ -154,6 +177,7 @@ public class PDB_parser {
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
                     cur.atom_centres = new Vector3[atom_centres.Count];
+					cur.atom_colours = atom_colours.ToArray();
                     cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
 					cur.serial_to_atom = serial_to_atom.ToArray();
                     for (int j = 0; j != names.Count; ++j) {
@@ -177,8 +201,8 @@ public class PDB_parser {
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
-			m.pairedLabels=pairs.ToArray();
-			m.spring_pairs=springPairs.ToArray();
+			m.pairedLabels = pairs.ToArray();
+			m.spring_pairs = springPairs.ToArray();
 			if(labels.Count>i)
 			{
 				Debug.Log("Num labels = " + labels.Count);

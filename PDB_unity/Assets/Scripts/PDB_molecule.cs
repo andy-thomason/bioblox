@@ -12,7 +12,7 @@ public class PDB_molecule
 	// the molecule data itself.
     public Vector3[] atom_centres;
     public float[] atom_radii;
-
+	public Color[] atom_colours;
 
 	public Tuple<int,int>[] pairedLabels=new Tuple<int, int>[0];
     public int[] names;
@@ -438,6 +438,7 @@ public class PDB_molecule
 		for (int ac = 0; ac != acmax; ++ac) {
 			Vector3 c = atom_centres[ac];
 			float r = atom_radii[ac] * 0.8f;
+			Color colour = atom_colours[ac];
 
 			// define a box around the atom.
 			int cix = Mathf.FloorToInt(c.x);
@@ -461,6 +462,7 @@ public class PDB_molecule
 						float val = Mathf.Exp(fk * d2);
 						mc_values[idx] += val;
 						mc_normals[idx] += val * (new Vector3(fdx, fdy, fdz)).normalized;
+						mc_colours[idx] = Color.Lerp(colour, mc_colours[idx], val);
 						//if (ac < 4) Debug.Log(x + "," + y + "," + z + ": " + val);
 						idx++;
 					}
