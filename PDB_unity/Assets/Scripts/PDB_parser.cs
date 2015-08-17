@@ -94,23 +94,15 @@ public class PDB_parser {
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
 					string id = line.Substring(13, 7);
-					string atom = line.Substring(6, 5);
+					int atom = int.Parse(line.Substring(6, 5));
 
 					Color col = new Color(1, 1, 1, 1);
-					if (atom == " 1641") {
-						col = new Color(1, 0, 0, 1);
-					}
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
-						//col = new Color(1, 0, 0, 1);
-					/*} else if (id == )
-					{
-						col = new Color(1, 0, 0, 1);*/
-					}
-					/*if (residue == "LYS" &&  || residue == "ARG") {
 						col = new Color(1, 0, 0, 1);
-					} else if (residue == "ASP" || residue == "GLU") {
+					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
+					{
 						col = new Color(0, 0, 1, 1);
-					}*/
+					}
 
 					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
                     if (name == PDB_molecule.atom_N) {
@@ -165,7 +157,7 @@ public class PDB_parser {
 					{
 						labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
 					}
-					Debug.Log( atomSerial + " added to " + labelIndex);
+					//Debug.Log( atomSerial + " added to " + labelIndex);
 					labels[molNumber][labelIndex].atomIds.Add(atomSerial);
 				} else if (kind == "TER   " || kind == "TER") {
 

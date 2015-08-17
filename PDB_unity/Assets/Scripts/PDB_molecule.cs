@@ -311,7 +311,7 @@ public class PDB_molecule
 	};
     
     public enum Mode { Ball, Ribbon, Metasphere };
-    public static Mode mode = Mode.Metasphere;
+	public static Mode mode = Mode.Metasphere;
     
     public string name;
 
@@ -411,6 +411,7 @@ public class PDB_molecule
 			min = Vector3.Min(min, atom_centres[j] - r);
 			max = Vector3.Max(max, atom_centres[j] + r);
 		}
+
 		int x0 = Mathf.FloorToInt (min.x);
 		int y0 = Mathf.FloorToInt (min.y);
 		int z0 = Mathf.FloorToInt (min.z);
@@ -435,6 +436,7 @@ public class PDB_molecule
 		// For each atom add in the values and normals surrounding
 		// the centre up to a reasonable radius.
 		int acmax = atom_centres.Length;
+		DateTime start_time = DateTime.Now;
 		for (int ac = 0; ac != acmax; ++ac) {
 			Vector3 c = atom_centres[ac];
 			float r = atom_radii[ac] * 0.8f;
@@ -447,29 +449,38 @@ public class PDB_molecule
 			int xmin = Mathf.Max(x0, cix-1);
 			int ymin = Mathf.Max(y0, ciy-1);
 			int zmin = Mathf.Max(z0, ciz-1);
-			int xmax = Mathf.Max(x1, cix+3);
-			int ymax = Mathf.Max(y1, ciy+3);
-			int zmax = Mathf.Max(z1, ciz+3);
+			int xmax = Mathf.Max(x1, cix+2);
+			int ymax = Mathf.Max(y1, ciy+2);
+			int zmax = Mathf.Max(z1, ciz+2);
 			float fk = Mathf.Log(0.5f) / (r * r);
+			float fkk = -fk * 0.5f;
 			for (int z = zmin; z != zmax; ++z) {
 				float fdz = z - c.z;
 				for (int y = ymin; y != ymax; ++y) {
 					float fdy = y - c.y;
 					int idx = ((z-z0) * ydim + (y-y0)) * xdim + (xmin-x0);
+					float d2_base = fdy*fdy + fdz*fdz;
 					for (int x = xmin; x != xmax; ++x) {
 						float fdx = x - c.x;
-						float d2 = fdx*fdx + (fdy*fdy + fdz*fdz);
-						float val = Mathf.Exp(fk * d2);
-						mc_values[idx] += val;
-						mc_normals[idx] += val * (new Vector3(fdx, fdy, fdz)).normalized;
-						mc_colours[idx] = Color.Lerp(colour, mc_colours[idx], val);
-						//if (ac < 4) Debug.Log(x + "," + y + "," + z + ": " + val);
+						float d2 = fdx*fdx + d2_base;
+						float v = fkk * d2;
+						if (v < 1) {
+							float val = (2 * v - 3) * v * v + 1;
+							mc_values[idx] += val;
+							float rcp = val / Mathf.Sqrt(d2);
+							mc_normals[idx].x += fdx * rcp;
+							mc_normals[idx].y += fdy * rcp;
+							mc_normals[idx].z += fdz * rcp;
+							mc_colours[idx] = colour; //Color.Lerp(mc_colours[idx], colour, Mathf.Min(val*4, 1.0f));
+						}
 						idx++;
 					}
 				}
 			}
 		}
-        
+		Debug.Log (DateTime.Now - start_time + "s to make values");
+		start_time = DateTime.Now;
+
 		// This reproduced the vertex order of Paul Bourke's (borrowed) table.
 		// The indices in edge_indices have the following offsets.
 		//
@@ -482,6 +493,7 @@ public class PDB_molecule
 		// Each cube owns three edges 0->1 0->3 0->4
 		int[] edge_indices = new int[xdim*ydim*zdim*3];
 		byte[] masks = new byte[xdim*ydim*zdim];
+
 
 		// We store three indices per cube for the edges closest to vertex 0
 		// All other indices can be derived from adjacent cubes.
@@ -632,7 +644,8 @@ public class PDB_molecule
             }
 		}
 		//debug.Flush();
-    }
+		Debug.Log (DateTime.Now - start_time + "s to make mesh");
+	}
 	
 	void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
         //debug.WriteLine("building mesh");
@@ -649,9 +662,11 @@ public class PDB_molecule
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = atom_centres[j];
-			Color col=new 
+			/*Color col=new 
 				Color(0.1f,0.1f,0.1f,
 			    CalcAmbientOcclusion(pos,pos.normalized,atom_radii[j]));
+			*/
+			Color col = atom_colours[j];
             //if (j < 10) debug.WriteLine(pos);
             float r = atom_radii[j];
             for (int i = 0; i != vlen; ++i) {
