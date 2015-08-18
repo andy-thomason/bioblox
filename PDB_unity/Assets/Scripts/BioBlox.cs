@@ -791,13 +791,24 @@ public class BioBlox : MonoBehaviour
 			Mesh featureTriMesh = new Mesh();
 			MeshFilter meshF = featureTriangle[script.moleculeNumber].GetComponent<MeshFilter>();
 			Vector3 [] verts = new Vector3[3];
+
 			verts[0] = GetAtomPos(script.atomIds[0],script.moleculeNumber);
 			verts[1] = GetAtomPos(script.atomIds[1],script.moleculeNumber);
 			verts[2] = GetAtomPos(script.atomIds[2],script.moleculeNumber);
+			Vector3 normal = verts[0] + verts[1] + verts[2];
 
-			verts[0] = verts[0].normalized * triangleOffset;
-			verts[1] = verts[1].normalized * triangleOffset;
-			verts[2] = verts[2].normalized * triangleOffset;
+			float dot0 = Vector3.Dot (normal.normalized,verts[0]);
+			float dot1 = Vector3.Dot (normal.normalized,verts[1]);
+			float dot2 = Vector3.Dot (normal.normalized,verts[2]);
+
+			float extraDist0 = triangleOffset - dot0;
+			float extraDist1 = triangleOffset - dot1;
+			float extraDist2 = triangleOffset - dot2;
+
+
+			verts[0] += normal.normalized * extraDist0;
+			verts[1] += normal.normalized * extraDist1;
+			verts[2] += normal.normalized * extraDist2;
 
 
 
