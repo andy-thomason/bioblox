@@ -96,7 +96,7 @@ public class PDB_parser {
 					string id = line.Substring(13, 7);
 					int atom = int.Parse(line.Substring(6, 5));
 
-					Color col = new Color(1, 1, 1, 1);
+					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
 						col = new Color(1, 0, 0, 1);
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
