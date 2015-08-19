@@ -114,7 +114,7 @@ public class PDB_parser {
 					aminoAcidName[chainNumber - 1] = aminoAcid;
 					aminoAcidAtomIDs[chainNumber - 1].Add(serial);
 
-					Color col = new Color(1, 1, 1, 1);
+					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
 						col = new Color(1, 0, 0, 1);
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")

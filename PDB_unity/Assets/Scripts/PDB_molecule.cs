@@ -416,23 +416,29 @@ public class PDB_molecule
 
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
+		const float grid_spacing = 0.5f;
+		const float rgs = 1.0f / grid_spacing;
 
 		// Create a 3D array for each molecule
 		Vector3 min = atom_centres[0];
 		Vector3 max = min;
+		float max_r = 0.0f;
 		for (int j = 0; j != atom_centres.Length; ++j)
 		{
-			Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]);
-			min = Vector3.Min(min, atom_centres[j] - r);
-			max = Vector3.Max(max, atom_centres[j] + r);
+			//Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]) + 1.0f;
+			float r = atom_radii[j];
+			max_r = Mathf.Max(max_r, r);
+			min = Vector3.Min(min, atom_centres[j]);
+			max = Vector3.Max(max, atom_centres[j]);
 		}
 
-		int x0 = Mathf.FloorToInt (min.x);
-		int y0 = Mathf.FloorToInt (min.y);
-		int z0 = Mathf.FloorToInt (min.z);
-		int x1 = Mathf.CeilToInt (max.x);
-		int y1 = Mathf.CeilToInt (max.y);
-		int z1 = Mathf.CeilToInt (max.z);
+		int irgs = Mathf.CeilToInt (max_r * rgs) + 1;
+		int x0 = Mathf.FloorToInt (min.x * rgs) - irgs;
+		int y0 = Mathf.FloorToInt (min.y * rgs) - irgs;
+		int z0 = Mathf.FloorToInt (min.z * rgs) - irgs;
+		int x1 = Mathf.CeilToInt (max.x * rgs) + irgs;
+		int y1 = Mathf.CeilToInt (max.y * rgs) + irgs;
+		int z1 = Mathf.CeilToInt (max.z * rgs) + irgs;
 
 		int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
@@ -454,39 +460,45 @@ public class PDB_molecule
 		DateTime start_time = DateTime.Now;
 		for (int ac = 0; ac != acmax; ++ac) {
 			Vector3 c = atom_centres[ac];
-			float r = atom_radii[ac] * 0.8f;
+			float r = atom_radii[ac] * 0.8f * rgs;
 			Color colour = atom_colours[ac];
+			float cx = c.x * rgs;
+			float cy = c.y * rgs;
+			float cz = c.z * rgs;
 
 			// define a box around the atom.
-			int cix = Mathf.FloorToInt(c.x);
-			int ciy = Mathf.FloorToInt(c.y);
-			int ciz = Mathf.FloorToInt(c.z);
-			int xmin = Mathf.Max(x0, cix-1);
-			int ymin = Mathf.Max(y0, ciy-1);
-			int zmin = Mathf.Max(z0, ciz-1);
-			int xmax = Mathf.Max(x1, cix+2);
-			int ymax = Mathf.Max(y1, ciy+2);
-			int zmax = Mathf.Max(z1, ciz+2);
+			int cix = Mathf.FloorToInt(c.x * rgs);
+			int ciy = Mathf.FloorToInt(c.y * rgs);
+			int ciz = Mathf.FloorToInt(c.z * rgs);
+			int xmin = Mathf.Max(x0, cix-irgs);
+			int ymin = Mathf.Max(y0, ciy-irgs);
+			int zmin = Mathf.Max(z0, ciz-irgs);
+			int xmax = Mathf.Max(x1, cix+irgs);
+			int ymax = Mathf.Max(y1, ciy+irgs);
+			int zmax = Mathf.Max(z1, ciz+irgs);
 			float fk = Mathf.Log(0.5f) / (r * r);
-			float fkk = -fk * 0.5f;
+			float fkk = -fk * 0.5f; // 0.5 is a magic number!
+			bool wcol = colour != Color.white;
+
 			for (int z = zmin; z != zmax; ++z) {
-				float fdz = z - c.z;
+				float fdz = z - cz;
 				for (int y = ymin; y != ymax; ++y) {
-					float fdy = y - c.y;
+					float fdy = y - cy;
 					int idx = ((z-z0) * ydim + (y-y0)) * xdim + (xmin-x0);
 					float d2_base = fdy*fdy + fdz*fdz;
 					for (int x = xmin; x != xmax; ++x) {
-						float fdx = x - c.x;
+						float fdx = x - cx;
 						float d2 = fdx*fdx + d2_base;
 						float v = fkk * d2;
 						if (v < 1) {
+							// a little like exp(-v)
 							float val = (2 * v - 3) * v * v + 1;
 							mc_values[idx] += val;
 							float rcp = val / Mathf.Sqrt(d2);
 							mc_normals[idx].x += fdx * rcp;
 							mc_normals[idx].y += fdy * rcp;
 							mc_normals[idx].z += fdz * rcp;
-							mc_colours[idx] = colour; //Color.Lerp(mc_colours[idx], colour, Mathf.Min(val*4, 1.0f));
+							if (wcol) mc_colours[idx] = colour;
 						}
 						idx++;
 					}
@@ -557,7 +569,7 @@ public class PDB_molecule
 								if (pass == 1) {
 									float lambda = v0 / (v0 - v1);
 									edge_indices[idx*3+0] = num_edges;
-									vertices[num_edges] = new Vector3(x0 + i + lambda, y0 + j, z0 + k);
+									vertices[num_edges] = new Vector3(x0 + i + lambda, y0 + j, z0 + k) * grid_spacing;
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+1], lambda);
 									//debug.WriteLine("x " + normals[num_edges]);
@@ -572,7 +584,7 @@ public class PDB_molecule
 								if (pass == 1) {
 									float lambda = v0 / (v0 - v1);
 									edge_indices[idx*3+1] = num_edges;
-									vertices[num_edges] = new Vector3(x0 + i, y0 + j + lambda, z0 + k);
+									vertices[num_edges] = new Vector3(x0 + i, y0 + j + lambda, z0 + k) * grid_spacing;
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+xdim], lambda);
 									//debug.WriteLine("y " + normals[num_edges]);
@@ -587,7 +599,7 @@ public class PDB_molecule
 								if (pass == 1) {
 									float lambda = v0 / (v0 - v1);
 									edge_indices[idx*3+2] = num_edges;
-									vertices[num_edges] = new Vector3(x0 + i, y0 + j, z0 + k + lambda);
+									vertices[num_edges] = new Vector3(x0 + i, y0 + j, z0 + k + lambda) * grid_spacing;
 									normals[num_edges] = Vector3.Lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalized;
 									colours[num_edges] = Color.Lerp (mc_colours[idx], mc_colours[idx+xdim*ydim], lambda);
 									//debug.WriteLine("z " + normals[num_edges]);

@@ -532,7 +532,6 @@ public class BioBlox : MonoBehaviour
 		//create a pearent that is moved to rotate both molecules on player interaction
 		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 
-
 		if (winShouldFadeMol) {
 			StartCoroutine ("FadeMolecules");
 		}
