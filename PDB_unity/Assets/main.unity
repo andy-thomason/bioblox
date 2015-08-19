@@ -3361,9 +3361,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 383050495}
-  rotate: .5
 --- !u!23 &383050498
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4054,9 +4051,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 485633723}
-  rotate: 2
 --- !u!1 &486278900
 GameObject:
   m_ObjectHideFlags: 0
@@ -4228,9 +4222,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 510699231}
-  rotate: .300000012
 --- !u!1 &519795494
 GameObject:
   m_ObjectHideFlags: 0
@@ -5000,9 +4991,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 595436201}
-  rotate: .300000012
 --- !u!1 &600536220
 GameObject:
   m_ObjectHideFlags: 0
@@ -5848,10 +5836,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3e19c554720984d96680135216b9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 820595324}
-  molNum: 0
-  maxRadius: 22
-  scrollSpeed: 2
 --- !u!1 &732988910
 GameObject:
   m_ObjectHideFlags: 0
@@ -9163,9 +9147,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 1140725135}
-  rotate: 1
 --- !u!1 &1153456581
 GameObject:
   m_ObjectHideFlags: 0
@@ -10253,10 +10234,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3e19c554720984d96680135216b9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cam: {fileID: 1508865456}
-  molNum: 1
-  maxRadius: 22
-  scrollSpeed: 2
 --- !u!1 &1236462492
 GameObject:
   m_ObjectHideFlags: 0
@@ -10786,9 +10763,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 1268044986}
-  rotate: .300000012
 --- !u!1 &1269528157
 GameObject:
   m_ObjectHideFlags: 0
@@ -11238,13 +11212,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8d8edc16c7f09d46a6671fd6ea6507d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rightCamera: {fileID: 1508865456}
-  leftCamera: {fileID: 820595324}
-  leftScreen: {fileID: 722705335}
-  rightScreen: {fileID: 1235559452}
-  rightTex: {fileID: 8400000, guid: af049b1b443bf52479b9f304c5eebf9a, type: 2}
-  leftTex: {fileID: 8400000, guid: 1da8a44d07b8b8448b357745a00d9327, type: 2}
-  shader: {fileID: 4800000, guid: 0669a728b30cf23409ed3a06f668f492, type: 3}
 --- !u!1 &1356369608
 GameObject:
   m_ObjectHideFlags: 0
@@ -13868,29 +13835,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bb2263327018994ca37a1388d545e0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  endoplasmic:
-  - {fileID: 1636775233}
-  rotVal: 8
-  rend:
-  - {fileID: 1950799791}
-  - {fileID: 1369609990}
-  - {fileID: 197200255}
-  - {fileID: 737203893}
-  - {fileID: 985589047}
-  - {fileID: 1269528159}
-  - {fileID: 871637255}
-  - {fileID: 752214794}
-  - {fileID: 800761742}
-  colora:
-    r: .941176474
-    g: .103806213
-    b: .103806213
-    a: 0
-  colorb:
-    r: .904411793
-    g: .881663799
-    b: .0798010603
-    a: 0
 --- !u!1 &1646593287
 GameObject:
   m_ObjectHideFlags: 0
@@ -14443,9 +14387,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba90f6cdc26ea824a82c91fe14dd911d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  proteins:
-  - {fileID: 1719406999}
-  rotate: 2
 --- !u!95 &1719407002
 Animator:
   serializedVersion: 3
