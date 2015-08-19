@@ -19,7 +19,8 @@ public class PDB_molecule
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
-
+	public List<string> aminoAcidsNames;
+	public List<int[]> aminoAcidsAtomIds;
 	// bounding volume heirachy to accelerate collisions
 	public Mesh[] mesh;
 
@@ -310,7 +311,7 @@ public class PDB_molecule
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 	};
     
-    public enum Mode { Ball, Ribbon, Metasphere };
+	public enum Mode { Ball, Ribbon, Metasphere };
 	public static Mode mode = Mode.Metasphere;
     
     public string name;
@@ -329,6 +330,20 @@ public class PDB_molecule
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
+
+
+	List<int> GetAminoIndexes(string aminoName)
+	{
+		List<int> returnList = new List<int> ();
+		for(int i = 0; i < aminoAcidsNames.Count; ++i)
+		{
+			if(aminoName == aminoAcidsNames[i])
+			{
+				returnList.Add(i);
+			}
+		}
+		return returnList;
+	}
 
     void build_sphere() {
         int num_tris = iproto.Length / 3;

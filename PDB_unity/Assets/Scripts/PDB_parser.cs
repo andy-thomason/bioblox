@@ -71,6 +71,8 @@ public class PDB_parser {
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
 		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
+		List<string> aminoAcidName = new List<string>();
+		List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
@@ -86,15 +88,31 @@ public class PDB_parser {
                 string kind = line.Substring(0, Mathf.Min(6, line.Length));
 				if(line.Length < 5)
 				{Debug.Log("(" + kind + ")");}
-                if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
+
+				if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
                 {
                     int serial = int.Parse(line.Substring(7 - 1, 5));
+					int chainNumber = int.Parse(line.Substring(23, 3));
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
 					string id = line.Substring(13, 7);
+					string aminoAcid = id.Substring(3);
 					int atom = int.Parse(line.Substring(6, 5));
+
+					while(aminoAcidName.Count < chainNumber)
+					{
+						aminoAcidName.Add(null);
+					}
+
+					while(aminoAcidAtomIDs.Count < chainNumber)
+					{
+						aminoAcidAtomIDs.Add(new List<int>());
+					}
+
+					aminoAcidName[chainNumber - 1] = aminoAcid;
+					aminoAcidAtomIDs[chainNumber - 1].Add(serial);
 
 					Color col = new Color(1, 1, 1, 1);
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
@@ -168,6 +186,17 @@ public class PDB_parser {
                     cur.pos.y = (maxy + miny) * 0.5f;
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
+					cur.aminoAcidsNames = new List<string>();
+					cur.aminoAcidsAtomIds = new List<int[]>();
+					for(int i = 0; i < aminoAcidName.Count; ++i)
+					{
+						if(aminoAcidName[i] != null)
+						{
+							cur.aminoAcidsNames.Add(aminoAcidName[i]);
+							cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
+						}
+					}
+				
                     cur.atom_centres = new Vector3[atom_centres.Count];
 					cur.atom_colours = atom_colours.ToArray();
                     cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
@@ -184,6 +213,8 @@ public class PDB_parser {
                     atom_radii.Clear();
                     residues.Clear();
 					serial_to_atom.Clear();
+					aminoAcidName.Clear();
+					aminoAcidAtomIDs.Clear();
                 } 
             }
         }

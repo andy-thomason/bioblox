@@ -88,7 +88,6 @@ namespace AssemblyCSharp
 					point2.force -=springForce * (point2.invMass / totalMass);
 				}
 			}
-
 		}
 
 
@@ -117,10 +116,35 @@ namespace AssemblyCSharp
 				}
 				if (i > 0) {
 					springs.Add(new Spring(points[i-1],potentialPoint,8.0f));
-
 					//make a spring
 				}
+				potentialPoint.pos = Vector3.zero;
 				points.Add(potentialPoint);
+			}
+		}
+
+		void UpdateCollisions()
+		{
+			for (int i = 1; i < points.Count-1; ++ i) {
+				PDB_molecule.BvhSphereCollider collider = new PDB_molecule.BvhSphereCollider(
+					molecules[0].mol,points[i].pos,
+					0.6f);
+
+				for(int j = 0; j < collider.results.Count; ++j)
+				{
+					Vector3 atomPos = molecules[0].transform.TransformPoint(molecules[0].mol.atom_centres[collider.results[j].index]);
+					float rad = molecules[0].mol.atom_radii[collider.results[j].index];
+
+					float minDist = 0.6f + rad;
+					Vector3 normal = points[i].pos - atomPos;
+					Vector3 fromMolecule = points[i].pos - molecules[0].transform.position;
+
+					float dist = normal.magnitude;
+
+					normal *= (minDist - dist);
+					points[i].force += normal *0.2f;
+					points[i].force += fromMolecule *0.4f;
+				}
 			}
 		}
 
@@ -152,8 +176,6 @@ namespace AssemblyCSharp
 					Vector3 force = new Vector3 (0, 0, 0);
 					if (distance > minDistance) {
 						force = dir * (distance - minDistance) * springFactor;
-					
-				
 						mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
 						mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 					}
@@ -170,6 +192,8 @@ namespace AssemblyCSharp
 			{
 				springs[i].FixedUpdate(springLength);
 			}
+
+			//UpdateCollisions ();
 
 			for(int i = 0; i < points.Count; ++i)
 			{
