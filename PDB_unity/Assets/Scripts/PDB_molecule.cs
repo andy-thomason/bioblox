@@ -378,7 +378,6 @@ public class PDB_molecule
 
 	float CalcAmbientOcclusion(Vector3 pos, Vector3 norm, float radius)
 	{
-
 		float occlusion = 0;
 		float maxDist = 7;
 		for(int i=0;i<aoccRays.Length;++i)
@@ -995,6 +994,7 @@ public class PDB_molecule
 
     }
 
+#if XXX
     public class BvhCollider
     {
         PDB_molecule mol0;
@@ -1287,6 +1287,7 @@ public class PDB_molecule
 			collide_recursiveNT(0);
 		}
 	}
+#endif
 
 	static public int collide_ray(
 		GameObject obj, PDB_molecule mol, Transform t,
