@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class LabelScript : MonoBehaviour, IPointerClickHandler{
+public class LabelScript : MonoBehaviour{
 
 	// the 0th element of the atomId's list is assumed to be our location atom
 	public List<int> atomIds;
@@ -22,9 +22,12 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 	Sprite nonClicked;
 //	private int linkIndex=-1;
 
-	public bool is3D =false;
-	public bool isInteractable=true;
-	public bool shouldGlow=false;
+	public bool is3D = false;
+	public bool isInteractable = true;
+	public bool shouldGlow = false;
+	public bool useMiniLabel = true;
+
+	List<MiniLabel> miniLabels = new List<MiniLabel> ();
 
 	public bool cloudIs3D;
 	
@@ -35,7 +38,7 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 
 
 	public void Start () {
-	
+
 	}
 
 	public void Init(PDB_molecule mol)
@@ -43,25 +46,38 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 		if (atomIds.Count == 0) {
 			Debug.LogError("Init called with no atomIDs");
 		}
-
-
 		gameObject.GetComponent<Light> ().enabled = false;
-		GameObject cloudSorter = new GameObject ();
-		cloudSorter.name = "Clouds" + this.name;
-		cloudSorter.transform.SetParent(GameObject.Find ("Clouds").transform);
-		cloudSorter.transform.localScale = new Vector3 (1, 1, 1);
-		cloudStorer = cloudSorter;
-
 		for (int i = 0; i < atomIds.Count; ++i) {
-		
+			
 			atomIds[i] = mol.serial_to_atom[atomIds[i]];
 		}
 
-
-		for (int j = 0; j < atomIds.Count; ++j) {
-			for (int i=0; i<numClouds; ++i) {
-				MakeCloud ();
+		if (!useMiniLabel) {
+			GameObject cloudSorter = new GameObject ();
+			cloudSorter.name = "Clouds" + this.name;
+			cloudSorter.transform.SetParent (GameObject.Find ("Clouds").transform);
+			cloudSorter.transform.localScale = new Vector3 (1, 1, 1);
+			cloudStorer = cloudSorter;
+			for (int j = 0; j < atomIds.Count; ++j) {
+				for (int i=0; i<numClouds; ++i) {
+					MakeCloud ();
+				}
 			}
+		} else {
+			GameObject prefab = GameObject.Instantiate(this.gameObject);
+			for(int i = 0; i < atomIds.Count; ++ i)
+			{
+				GameObject miniLab = GameObject.Instantiate(prefab);
+				GameObject.Destroy(miniLab.GetComponent<LabelScript>());
+				miniLab.AddComponent<MiniLabel>().owner = this;
+				miniLabels.Add(miniLab.GetComponent<MiniLabel>());
+				miniLab.name = "MiniLabel" + i;
+				miniLab.transform.SetParent(this.transform,false);
+				miniLab.transform.localScale = new Vector3(1,1,1);
+			}
+			GameObject.Destroy(prefab);
+			GameObject.Destroy(gameObject.GetComponent<Image>());
+			GameObject.Destroy(gameObject.GetComponent<Light>());
 		}
 
 		/*
@@ -84,21 +100,40 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 
 	public void OnDisable()
 	{
-		if (cloudStorer) {
+		if (cloudStorer && !useMiniLabel) {
 			cloudStorer.SetActive (false);
+		}
+		if (useMiniLabel) {
+			for(int i = 0; i < miniLabels.Count; ++i)
+			{
+				miniLabels[i].enabled = false;
+			}
 		}
 	}
 	public void OnEnable()
 	{
-		if (cloudStorer) {
+		if (cloudStorer && !useMiniLabel) {
 			cloudStorer.SetActive (true);
+		}
+		if (useMiniLabel) {
+			for(int i = 0; i < miniLabels.Count; ++i)
+			{
+				miniLabels[i].enabled = true;
+			}
 		}
 	}
 
 	public void OnDestroy()
 	{
-		GameObject.Destroy (cloudStorer);
-
+		if (cloudStorer) {
+			GameObject.Destroy (cloudStorer);
+		}
+		if (useMiniLabel) {
+			for(int i = 0; i < miniLabels.Count; ++i)
+			{
+				GameObject.Destroy(miniLabels[i]);
+			}
+		}
 	}
 //	public void BreakLink()
 //	{
@@ -163,26 +198,62 @@ public class LabelScript : MonoBehaviour, IPointerClickHandler{
 	// Update is called once per frame
 	void Update () {
 		if (is3D) {
-			//Vector3 toCamera =c.transform.position-atomPos;
-			//toCamera=toCamera.normalized*3;
 			owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
+
+			if(useMiniLabel)
+			{
+				for(int i = 0; i < miniLabels.Count; ++i)
+				{
+					owner.GetMiniLabelPos(atomIds[i],moleculeNumber,miniLabels[i].transform);
+				}
+			}
 
 			GameObject cam = GameObject.Find("Main Camera");
 			GameObject mol = owner.molecules[moleculeNumber];
 
-			if(mol)
+			if(!useMiniLabel && mol)
 			{
 				Vector3 toMol = mol.transform.position - this.transform.position;
 				this.transform.LookAt(cam.transform,-toMol);
 			}
+			else if(useMiniLabel)
+			{
+				for(int i = 0; i < miniLabels.Count; ++i)
+				{
+					Vector3 toAtom = owner.GetAtomWorldPos(atomIds[i],moleculeNumber) - miniLabels[i].transform.position;
+					Vector3 toCamera = cam.transform.position - miniLabels[i].transform.position;
+					miniLabels[i].transform.LookAt(cam.transform,-toAtom);
+					miniLabels[i].transform.position +=toCamera.normalized*5;
+				}
+			}
 		}
 		if (shouldGlow) {
-			//this.GetComponent<Image>().sprite=clicked;
-			gameObject.GetComponent<Light> ().enabled = true;
-		} else {
-			//this.GetComponent<Image>().sprite=nonClicked;
-			gameObject.GetComponent<Light> ().enabled = false;
+			if(!useMiniLabel)
+			{
+				gameObject.GetComponent<Light> ().enabled = true;
+			}
+			else
+			{
+				for(int i = 0; i < miniLabels.Count; ++i)
+				{
+					miniLabels[i].GetComponent<Light>().enabled = true;
+				}
+			}
+		} else 
+		{
+			if(!useMiniLabel)
+			{
+				gameObject.GetComponent<Light> ().enabled = false;
+			}
+			else{
+				for(int i = 0; i < miniLabels.Count; ++i)
+				{
+					miniLabels[i].GetComponent<Light>().enabled = false;
+				}
+			}
 		}
-		GenerateTail();
+		if (!useMiniLabel) {
+			GenerateTail ();
+		}
 	}
 }

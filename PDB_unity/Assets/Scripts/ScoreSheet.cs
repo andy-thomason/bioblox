@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using AssemblyCSharp;
+
 public class ScoreSheet : MonoBehaviour {
 
 	struct UserData

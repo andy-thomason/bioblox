@@ -169,6 +169,30 @@ public class BioBlox : MonoBehaviour
 		t.position += new Vector3 (0, 0, -10);
 	}
 
+	public void GetMiniLabelPos(int atomID, int molNum, Transform t)
+	{
+
+		Vector3 atomPos = GetAtomPos (atomID, molNum);
+		//if the molecule does not exist, or the atom id is bad
+		if (molNum == -1 || molecules.Length == 0) {
+			return;
+		}
+		
+		PDB_mesh molMesh = molecules [molNum].GetComponent<PDB_mesh> ();
+		Vector3 atomPosW = molMesh.transform.TransformPoint (atomPos);
+		
+		Vector3 transToAt = atomPosW - molMesh.transform.position;
+		//atom is behind molecule
+		if (atomPosW.z > molMesh.transform.position.z) {
+			//we project onto a circle on the xy plan
+			transToAt.z = 0;
+		}
+		//project the label onto the first bvh radius
+		//transToAt = transToAt.normalized * molMesh.mol.bvh_radii [0];
+		atomPosW = transToAt + molMesh.transform.position;
+		t.position = atomPosW + new Vector3 (-3, 3, 0);
+	}
+
 	//returns an atoms local position from a atom index and molecule index	
 	public Vector3 GetAtomPos (int atomID, int molNum)
 	{
@@ -274,6 +298,13 @@ public class BioBlox : MonoBehaviour
 			filenameIndex=0;
 		} else {
 			StartCoroutine (game_loop ());
+		}
+	}
+
+	void FixedUpdate()
+	{
+		if (eventSystem.IsActive ()) {
+			ApplyReturnToOriginForce ();
 		}
 	}
 
@@ -630,8 +661,7 @@ public class BioBlox : MonoBehaviour
 
 	public void SiteClicked (GameObject labelObj)
 	{
-		activeLabels.Remove (labelObj.GetComponent<LabelScript> ());
-		GameObject.Destroy (labelObj);
+		
 
 		//this is site picking code, it basically takes atoms local to the selected one
 		//and creates a new mesh with that subset
@@ -696,11 +726,7 @@ public class BioBlox : MonoBehaviour
 		newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
 		laSc.atomIds = argLabel.atomIds;
 		laSc.moleculeNumber = molNum;
-		if (molNum == 1) {
-			Vector3 scale = laSc.transform.localScale;
-			scale.x *= -1;
-			laSc.transform.localScale = scale;
-		}
+
 		laSc.owner = this;
 		laSc.labelID = argLabel.uniqueLabelID;
 		//3D and 2D arrows see LabelScript
@@ -794,6 +820,7 @@ public class BioBlox : MonoBehaviour
 
 			Vector3 molPos = pdbMesh.transform.position;
 
+			/*
 			Mesh featureTriMesh = new Mesh();
 			MeshFilter meshF = featureTriangle[script.moleculeNumber].GetComponent<MeshFilter>();
 			Vector3 [] verts = new Vector3[3];
@@ -811,7 +838,6 @@ public class BioBlox : MonoBehaviour
 			float extraDist1 = triangleOffset - dot1;
 			float extraDist2 = triangleOffset - dot2;
 
-
 			//verts[0] += normal.normalized * extraDist0;
 			//verts[1] += normal.normalized * extraDist1;
 			//verts[2] += normal.normalized * extraDist2;
@@ -822,6 +848,7 @@ public class BioBlox : MonoBehaviour
 			featureTriMesh.triangles = new int[]{0,1,2,0,2,1};
 
 			meshF.mesh = featureTriMesh;
+			*/
 
 			if (selectedLabel [0] != null && selectedLabel [1] != null) {
 				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
@@ -1137,7 +1164,7 @@ public class BioBlox : MonoBehaviour
 					}
 				}
 			}
-			ApplyReturnToOriginForce ();
+
 			if (ScoreRMSD () < winScore) {
 				if(lockButton)
 				{
