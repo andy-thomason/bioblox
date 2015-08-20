@@ -92,6 +92,8 @@ public class BioBlox : MonoBehaviour
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
 
+		//filenames.Add ("2W9G");
+
 		//filenames.Add ("betabarrel_b");
 		filenames.Add ("pdb2ptcWithTags");
 
@@ -405,11 +407,16 @@ public class BioBlox : MonoBehaviour
 	public void HandleCameraSlider(Slider slide)
 	{
 		Transform t = GameObject.Find ("Main Camera").transform;
+		GameObject cellCam = GameObject.Find ("Camera");
 		float dist = t.position.magnitude;
 
 		Vector3 dir = new Vector3 (Mathf.Cos(Mathf.Deg2Rad * slide.value),
 		                          0,
 		                          Mathf.Sin(Mathf.Deg2Rad * slide.value));
+
+		if (cellCam) {
+			cellCam.transform.localRotation = Quaternion.Euler(new Vector3(0,slide.value + 90,0));
+		}
 
 		Vector3 pos = dir * dist;
 		t.position = pos;
@@ -524,7 +531,6 @@ public class BioBlox : MonoBehaviour
 
 		//create a pearent that is moved to rotate both molecules on player interaction
 		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-
 
 		if (winShouldFadeMol) {
 			StartCoroutine ("FadeMolecules");
@@ -791,13 +797,24 @@ public class BioBlox : MonoBehaviour
 			Mesh featureTriMesh = new Mesh();
 			MeshFilter meshF = featureTriangle[script.moleculeNumber].GetComponent<MeshFilter>();
 			Vector3 [] verts = new Vector3[3];
+
 			verts[0] = GetAtomPos(script.atomIds[0],script.moleculeNumber);
 			verts[1] = GetAtomPos(script.atomIds[1],script.moleculeNumber);
 			verts[2] = GetAtomPos(script.atomIds[2],script.moleculeNumber);
+			Vector3 normal = verts[0] + verts[1] + verts[2];
 
-			verts[0] = verts[0].normalized * triangleOffset;
-			verts[1] = verts[1].normalized * triangleOffset;
-			verts[2] = verts[2].normalized * triangleOffset;
+			float dot0 = Vector3.Dot (normal.normalized,verts[0]);
+			float dot1 = Vector3.Dot (normal.normalized,verts[1]);
+			float dot2 = Vector3.Dot (normal.normalized,verts[2]);
+
+			float extraDist0 = triangleOffset - dot0;
+			float extraDist1 = triangleOffset - dot1;
+			float extraDist2 = triangleOffset - dot2;
+
+
+			//verts[0] += normal.normalized * extraDist0;
+			//verts[1] += normal.normalized * extraDist1;
+			//verts[2] += normal.normalized * extraDist2;
 
 
 
@@ -989,6 +1006,7 @@ public class BioBlox : MonoBehaviour
 		featureTriangle [0].name = "FeatureTriangle1";
 		featureTriangle [0].transform.position = Vector3.zero;
 		featureTriangle [0].transform.SetParent (mol1.transform, false);
+		featureTriangle [0].layer = 5;
 
 		
 		featureTriangle [1] = new GameObject ();
@@ -1000,6 +1018,7 @@ public class BioBlox : MonoBehaviour
 		featureTriangle [1].name = "FeatureTriangle2";
 		featureTriangle [1].transform.position = Vector3.zero;
 		featureTriangle [1].transform.SetParent (mol2.transform, false);
+		featureTriangle [1].layer = 5;
 
 
 		GameObject.Destroy (pdbr.gameObject);

@@ -19,7 +19,8 @@ public class PDB_molecule
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
-
+	public List<string> aminoAcidsNames;
+	public List<int[]> aminoAcidsAtomIds;
 	// bounding volume heirachy to accelerate collisions
 	public Mesh[] mesh;
 
@@ -310,7 +311,7 @@ public class PDB_molecule
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 	};
     
-    public enum Mode { Ball, Ribbon, Metasphere };
+	public enum Mode { Ball, Ribbon, Metasphere };
 	public static Mode mode = Mode.Metasphere;
     
     public string name;
@@ -329,6 +330,20 @@ public class PDB_molecule
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
+
+
+	List<int> GetAminoIndexes(string aminoName)
+	{
+		List<int> returnList = new List<int> ();
+		for(int i = 0; i < aminoAcidsNames.Count; ++i)
+		{
+			if(aminoName == aminoAcidsNames[i])
+			{
+				returnList.Add(i);
+			}
+		}
+		return returnList;
+	}
 
     void build_sphere() {
         int num_tris = iproto.Length / 3;
@@ -756,55 +771,93 @@ public class PDB_molecule
 			numMesh += 1;
 		}
 
-		int atomsPerMesh = atom_centres.Length / numMesh;
+		List<Mesh> meshes = new List<Mesh> ();
 
-		int vertsPerMesh = atomsPerMesh * vsphere.Length;
-		int indiciesPerMesh = atomsPerMesh * isphere.Length;
-		   
-		mesh = new Mesh[numMesh];
-		for (int i = 0; i < mesh.Length; ++i) {
-			int vOff = vertsPerMesh*i;
-			int iOff = indiciesPerMesh*i;
+		bool breakout = false;
+		int indexOffset = 0;
+		while(indexOffset < indices.Length) {
+			int[] vertexCounter = new int[vertices.Length];
+			List<Vector3> vtx = new List<Vector3>();
+			List<Vector3> nrm = new List<Vector3>();
+			List<Vector2> uv = new List<Vector2>();
+			List<Color> col = new List<Color>();
+			List<int> idx = new List<int>();
 
-			int delta = vertices.Length-(vOff +vertsPerMesh);
-			if(delta <0)
+			for(int i = 0; i < vertexCounter.Length; ++i)
 			{
-				Debug.LogError("BAD VERTS PER MESH ASSIGN");
+				vertexCounter[i] = -1;
 			}
 
+			int numVertices = 0;
+			for (int i = indexOffset; i < indices.Length; indexOffset=(i+=3)) {
 
-			mesh [i]= new Mesh();
-			mesh [i].Clear ();
-			mesh [i].name = "ball view" + i;
+				int index1 = indices [i];
+				int index2 = indices [i + 1];
+				int index3 = indices [i + 2];
 
-			Vector3[] v = new Vector3[vertsPerMesh];
-			Array.Copy(vertices, vOff, v, 0, vertsPerMesh);
-			mesh [i].vertices = v;
+				if (vertexCounter [index1]==-1) {
+					vtx.Add(vertices[index1]);
+					nrm.Add(normals[index1]);
+					uv.Add(uvs[index1]);
+					col.Add(colors[index1]);
 
-			//reusing V as it is the appropriate size
-			Array.Copy(normals, vOff, v, 0, vertsPerMesh);
-			mesh [i].normals = v;
-
-			Vector2[] u = new Vector2[vertsPerMesh];
-			Array.Copy (uvs, vOff, u, 0, vertsPerMesh);
-			mesh [i].uv = u;
-
-			Color[] c = new Color[vertsPerMesh];
-			Array.Copy(colors, vOff, c, 0, vertsPerMesh);
-			mesh [i].colors = c;
-
-			int[] index = new int[indiciesPerMesh];
-			Array.Copy(indices, iOff, index, 0, indiciesPerMesh);
-			if(i!=0)
-			{
-				for(int j = 0; j < index.Length; ++j)
+					vertexCounter[index1] = vtx.Count-1;
+					index1 = vertexCounter[index1];
+					numVertices += 1;
+				}
+				else
 				{
-					index[j] -= vOff;
+					index1 = vertexCounter[index1];
+				}
 
+				if (vertexCounter [index2]==-1) {
+					vtx.Add(vertices[index2]);
+					nrm.Add(normals[index2]);
+					uv.Add(uvs[index2]);
+					col.Add(colors[index2]);
+					
+					vertexCounter[index2] = vtx.Count-1;
+					index2 = vertexCounter[index2];
+					numVertices += 1;
+				}
+				else
+				{
+					index2 = vertexCounter[index2];
+				}
+
+				if (vertexCounter [index3]==-1) {
+					vtx.Add(vertices[index3]);
+					nrm.Add(normals[index3]);
+					uv.Add(uvs[index3]);
+					col.Add(colors[index3]);
+					
+					vertexCounter[index3] = vtx.Count-1;
+					index3 = vertexCounter[index3];
+					numVertices += 1;
+				}
+				else
+				{
+					index3 = vertexCounter[index3];
+				}
+				idx.Add(index1);
+				idx.Add(index2);
+				idx.Add(index3);
+
+				if (numVertices >= 64996) {
+					break;
 				}
 			}
-			mesh [i].triangles = index;
+			Mesh m = new Mesh();
+			m.Clear();
+			m.name = "Mesh" + meshes.Count;
+			m.vertices = vtx.ToArray();
+			m.normals = nrm.ToArray();
+			m.colors = col.ToArray();
+			m.uv = uv.ToArray();
+			m.triangles = idx.ToArray();
+			meshes.Add(m);
 		}
+		mesh = meshes.ToArray ();
 	}
 
     static public int encode(char a, char b, char c, char d) {
@@ -979,6 +1032,8 @@ public class PDB_molecule
 			construct_unity_meshes (verts, normals, uvs, color, index);
 		} else if (mode == Mode.Metasphere) {
 			build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
+			construct_unity_meshes (verts, normals, uvs, color, index);
+			/*
 			mesh = new Mesh[1];
 			mesh [0]= new Mesh();
 			mesh [0].Clear ();
@@ -988,6 +1043,7 @@ public class PDB_molecule
 			mesh [0].uv = uvs;
             mesh [0].colors = color;
 			mesh [0].triangles = index;
+			*/
 		} else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
