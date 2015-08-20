@@ -74,6 +74,12 @@ public class BioBlox : MonoBehaviour
 
 	public float triangleOffset = 10.0f;
 	GameObject[] featureTriangle =new GameObject[2];
+
+	// shape scoring
+	public int num_touching_0 = 0;
+	public int num_touching_1 = 0;
+	public float water_dia = 1.0f;
+
 	// Use this for initialization
 	void Start ()
 	{

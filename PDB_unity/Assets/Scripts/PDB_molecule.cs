@@ -21,10 +21,10 @@ public class PDB_molecule
     public Vector3 pos;
 	public List<string> aminoAcidsNames;
 	public List<int[]> aminoAcidsAtomIds;
-	// bounding volume heirachy to accelerate collisions
 	public Mesh[] mesh;
 
-	public Vector3[] bvh_centres;
+	// bounding volume heirachy to accelerate collisions
+    public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
 
@@ -37,8 +37,8 @@ public class PDB_molecule
     const float e = 0.52573111f;
     const float d = 0.8506508f;
     // icosphere (http://en.wikipedia.org/wiki/Icosahedron#Cartesian_coordinates)
-    float[] vproto = {-e,d,0,e,d,0,-e,-d,0,e,-d,0,0,-e,d,0,e,d,0,-e,-d,0,e,-d,d,0,-e,d,0,e,-d,0,-e,-d,0,e};
-    int[] iproto = {0,11,5,0,5,1,0,1,7,0,7,10,0,10,11,1,5,9,5,11,4,11,10,2,10,7,6,7,1,8,3,9,4,3,4,2,3,2,6,3,6,8,3,8,9,4,9,5,2,4,11,6,2,10,8,6,7,9,8,1};
+    readonly float[] vproto = {-e,d,0,e,d,0,-e,-d,0,e,-d,0,0,-e,d,0,e,d,0,-e,-d,0,e,-d,d,0,-e,d,0,e,-d,0,-e,-d,0,e};
+	readonly int[] iproto = {0,11,5,0,5,1,0,1,7,0,7,10,0,10,11,1,5,9,5,11,4,11,10,2,10,7,6,7,1,8,3,9,4,3,4,2,3,2,6,3,6,8,3,8,9,4,9,5,2,4,11,6,2,10,8,6,7,9,8,1};
     Vector3 [] vsphere;
     int [] isphere;
 
@@ -357,7 +357,6 @@ public class PDB_molecule
 
 		List<Mesh> meshes = new List<Mesh> ();
 
-		bool breakout = false;
 		int indexOffset = 0;
 		while(indexOffset < indices.Length) {
 			int[] vertexCounter = new int[vertices.Length];
@@ -687,7 +686,7 @@ public class PDB_molecule
 		GameObject obj1, PDB_molecule mol1, Transform t1
 		)
 	{
-		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
+		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, 0);
 		foreach (BvhCollider.Result r in b.results) {
 			Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
 			Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
@@ -704,15 +703,25 @@ public class PDB_molecule
 	static public bool pysics_collide(
 		GameObject obj0, PDB_molecule mol0, Transform t0,
 		GameObject obj1, PDB_molecule mol1, Transform t1,
-		float seperationForce
+		float seperationForce,
+		float water_dia,
+		out int num_touching_0,
+		out int num_touching_1
 		)
-	{
-		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1);
+    {
+		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
         Rigidbody r0 = obj0.GetComponent<Rigidbody>();
         Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+		num_touching_0 = num_touching_1 = 0;
 		if (!r0 || !r1) {
 			return false;
 		}
+
+		BitArray ba0 = new BitArray (mol0.atom_centres.Length);
+		BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+		num_touching_0 = 0;
+		num_touching_1 = 0;
+
         foreach (BvhCollider.Result r in b.results) {
             Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
             Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
@@ -725,8 +734,14 @@ public class PDB_molecule
 				r0.AddForceAtPosition(normal,c0);
                 r1.AddForceAtPosition(-normal, c1);
             }
+
+			if (distance < min_d + water_dia) {
+				//Debug.Log(r.i0 + ", " + r.i1);
+				if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+			}
         }
-		if (b.results.Count > 0) {
+        if (b.results.Count > 0) {
 			return true;
 		}
 		return false;

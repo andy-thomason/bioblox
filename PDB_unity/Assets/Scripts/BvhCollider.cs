@@ -72,18 +72,6 @@ public class BvhCollider
         }
     }
 
-    public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1)
-    {
-        //debug.WriteLine("colliding " + mol0.name + "/" + mol0.bvh_centres.Length + " with " + mol1.name + "/" + mol1.bvh_centres.Length);
-        this.mol0 = mol0;
-        this.t0 = t0;
-        this.mol1 = mol1;
-        this.t1 = t1;
-        results = new List<Result>();
-        collide_recursive(0, 0);
-        //Debug.Log("hits=" + results.Count + " work=" + work_done + "/" + ((mol0.atom_centres.Length + 1) * mol1.atom_centres.Length / 2));
-    }
-
 	public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1, float inflation)
 	{
 		this.mol0 = mol0;
@@ -91,7 +79,7 @@ public class BvhCollider
 		this.mol1 = mol1;
 		this.t1 = t1;
 		results = new List<Result>();
-		radiusInflate=inflation;
+		radiusInflate = inflation;
 		collide_recursive(0, 0);
 	}
 };
