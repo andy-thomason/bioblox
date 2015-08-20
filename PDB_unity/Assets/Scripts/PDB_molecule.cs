@@ -727,8 +727,8 @@ public class PDB_molecule
             Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
             float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
             float distance = (c1 - c0).magnitude;
-            //Debug.Log("distance=" + distance
-            if (distance < min_d) {
+
+			if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
 				normal *= seperationForce;
 				r0.AddForceAtPosition(normal,c0);
@@ -741,6 +741,7 @@ public class PDB_molecule
 				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
 			}
         }
+
         if (b.results.Count > 0) {
 			return true;
 		}

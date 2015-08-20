@@ -16,7 +16,7 @@ public class PDB_mesh : MonoBehaviour {
 	public float seperationForce =100.0f;
 	float t=0;
 
-	public bool hasCollided=false;
+	//public bool hasCollided=false;
 
 	// Use this for initialization
 	void Start () {
@@ -241,7 +241,8 @@ public class PDB_mesh : MonoBehaviour {
 					}
 				}
 			}
-			if(shouldCollide)
+
+			/*if(shouldCollide)
 			{
 				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
 				BioBlox bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
@@ -257,7 +258,7 @@ public class PDB_mesh : MonoBehaviour {
 				{
 					hasCollided=true;
 				}
-			}
+			}*/
 		}
 	}
 }
