@@ -126,7 +126,7 @@ namespace AssemblyCSharp
 		void UpdateCollisions()
 		{
 			for (int i = 1; i < points.Count-1; ++ i) {
-				PDB_molecule.BvhSphereCollider collider = new PDB_molecule.BvhSphereCollider(
+				BvhSphereCollider collider = new BvhSphereCollider(
 					molecules[0].mol,points[i].pos,
 					0.6f);
 
