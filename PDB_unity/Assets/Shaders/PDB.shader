@@ -8,7 +8,7 @@
     _CameraPos ("_CameraPos", Vector) = (0, 0, -50, 0)
     _CullPos ("CullPos", Vector) = (0,0,0,0)
     _K ("K transparrency", Float)=0
-    _AmbientOcclusion ("TexRanger", 3D)="white"{}
+    _GlowTexture ("GlowTexture", 2D)= "white"{}
     _GlowPoint1 ("GlowPointLocal1" , Vector) = (0,0,0,0)
     _GlowRadius1("GlowRadius1" , Float) = 0
     _GlowPoint2 ("GlowPointLocal2" , Vector) = (0,0,0,0)
@@ -144,8 +144,8 @@
         float3 normal : NORMAL;
         float4 world_pos : TEXCOORD;
         float4 color : COLOR;
-        float4 sp : TEXCOORD1;
         float4 model_pos : TEXCOORD2;
+        float4 scrPos : TEXCOORD1;
       };
       
       uniform float4 _Color;
@@ -165,7 +165,7 @@
       uniform float4 _DarkPoint;
       uniform float _DarkK;
       
-      uniform sampler3D _AmbientOcclusion;
+      uniform sampler2D _GlowTexture;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
@@ -178,13 +178,16 @@
         o.model_pos = v.vertex;
         o.world_pos = mul (_Object2World, v.vertex);
         o.color = v.color;
-        o.sp= ComputeScreenPos(o.projection_pos);
+        o.scrPos = ComputeScreenPos(o.projection_pos);
         return o;
       }
 
       fixed4 frag(varying_t i) : COLOR {
         float3 normal = normalize(i.normal);
-        float2 screen_pos = i.sp.xy/i.sp.w*_ScreenParams.xy;
+ 		
+ 		float2 screen_pos = (i.scrPos.xy/i.scrPos.w);
+        
+        float4 glowRead = tex2D(_GlowTexture,screen_pos);
 
         float3 light_dir = normalize(_LightPos.xyz - i.world_pos.xyz);
         float3 view_dir = normalize(i.world_pos.xyz - _CameraPos.xyz);
@@ -231,7 +234,7 @@
       	float3 rpos = i.model_pos - _DarkPoint.xyz;
       	float d2 = dot(rpos, rpos);
       	float dark = 1.0 - exp(_DarkK * d2);
-      	
+   
       	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal * 0.25 + _Specular.xyz * specular_factor * dark, _Color.w);
       }
 

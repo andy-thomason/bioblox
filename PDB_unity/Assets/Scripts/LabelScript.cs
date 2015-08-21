@@ -6,31 +6,35 @@ using UnityEngine.EventSystems;
 
 public class LabelScript : MonoBehaviour{
 
-	// the 0th element of the atomId's list is assumed to be our location atom
+	//A list of atoms this label represents
 	public List<int> atomIds;
+	//Our owner, the BioBlox script
 	public BioBlox owner;
+	//A unique ID that is the index of this label in the BioBlox activeLabels vector
 	public int labelID;
+	//The index of the molecule that this label is attached to
 	public int moleculeNumber;
 
+	//a prefab for the "arrow cloud" prefabs
 	public GameObject cloudPrefab;
+	//number of clouds that should be spawned, read once at start
 	public int numClouds;
 
-	public List<Sprite> sprites;
-	public List<string> spriteNames;
-
-	Sprite clicked;
-	Sprite nonClicked;
-//	private int linkIndex=-1;
-
-	public bool is3D = false;
+	//are the cloud prefabs 3D or 2D objects
+	public bool cloudIs3D;
+	//can we be interacted with?
 	public bool isInteractable = true;
+	//should the light glow behind the label
 	public bool shouldGlow = false;
+	//should we use several mini labels rather then one label pointing to each atom
+	//the mini labels and clouds are mutually exclusive
 	public bool useMiniLabel = true;
 
+	//the list of mini labels
 	List<MiniLabel> miniLabels = new List<MiniLabel> ();
-
-	public bool cloudIs3D;
 	
+
+	//a list of all the clouds
 	List<GameObject> clouds = new List<GameObject> ();
 	GameObject cloudStorer;
 	
@@ -43,12 +47,13 @@ public class LabelScript : MonoBehaviour{
 
 	public void Init(PDB_molecule mol)
 	{
+		//init should be called after variable initilisation
 		if (atomIds.Count == 0) {
 			Debug.LogError("Init called with no atomIDs");
 		}
 		gameObject.GetComponent<Light> ().enabled = false;
 		for (int i = 0; i < atomIds.Count; ++i) {
-			
+			//convert atom serial to atom index
 			atomIds[i] = mol.serial_to_atom[atomIds[i]];
 		}
 
@@ -67,6 +72,7 @@ public class LabelScript : MonoBehaviour{
 			GameObject prefab = GameObject.Instantiate(this.gameObject);
 			for(int i = 0; i < atomIds.Count; ++ i)
 			{
+				//mini labels are almost an exact copy of this object except they use their own script
 				GameObject miniLab = GameObject.Instantiate(prefab);
 				GameObject.Destroy(miniLab.GetComponent<LabelScript>());
 				miniLab.AddComponent<MiniLabel>().owner = this;
@@ -75,6 +81,7 @@ public class LabelScript : MonoBehaviour{
 				miniLab.transform.SetParent(this.transform,false);
 				miniLab.transform.localScale = new Vector3(1,1,1);
 			}
+			//since we are using mini labels we wont need the visual components for this object
 			GameObject.Destroy(prefab);
 			GameObject.Destroy(gameObject.GetComponent<Image>());
 			GameObject.Destroy(gameObject.GetComponent<Light>());
@@ -152,6 +159,7 @@ public class LabelScript : MonoBehaviour{
 		    !Input.GetKey(KeyCode.LeftShift)) {
 			owner.LabelClicked (this.gameObject);
 		}
+		//slight legacy, use for right click interaction
 		if (eventData.button == PointerEventData.InputButton.Left &&
 		    Input.GetKey(KeyCode.LeftShift)) {
 			owner.SiteClicked (this.gameObject);
@@ -165,7 +173,6 @@ public class LabelScript : MonoBehaviour{
 			Vector3 atomPos = owner.GetAtomWorldPos (atomIds [j], moleculeNumber);
 			Vector3 toAtom = atomPos - this.transform.position;
 			float tIncrement = 1.0f / numClouds;
-			//Sprite s = this.GetComponent<Image> ().sprite;
 			Vector3 scale = new Vector3 (1.0f, 1.0f, 1.0f);
 			if (cloudIs3D) {
 				scale = new Vector3 (6.0f, 6.0f, 6.0f);
@@ -197,7 +204,7 @@ public class LabelScript : MonoBehaviour{
 
 	// Update is called once per frame
 	void Update () {
-		if (is3D) {
+			
 			owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
 
 			if(useMiniLabel)
@@ -226,7 +233,7 @@ public class LabelScript : MonoBehaviour{
 					miniLabels[i].transform.position +=toCamera.normalized*5;
 				}
 			}
-		}
+		
 		if (shouldGlow) {
 			if(!useMiniLabel)
 			{

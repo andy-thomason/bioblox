@@ -730,7 +730,7 @@ public class BioBlox : MonoBehaviour
 		laSc.owner = this;
 		laSc.labelID = argLabel.uniqueLabelID;
 		//3D and 2D arrows see LabelScript
-		laSc.is3D = true;
+		laSc.cloudIs3D = true;
 		//GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
 		//newLabel.transform.position = foundObject.transform.position;
 
