@@ -108,7 +108,7 @@ public class ConnectionManager : MonoBehaviour {
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
-				connections[i].Update(dampingFactor, force, minDistance);
+					connections[i].Update(dampingFactor, force, minDistance);
 			}
 		}
 	}

@@ -7473,9 +7473,13 @@ MonoBehaviour:
   score: 10
   winScore: 5
   uiScrollSpeed: 3
-  repulsiveForce: 1500
+  repulsiveForce: 200
   lockButton: {fileID: 8995607}
   triangleOffset: 30
+  num_touching_0: 0
+  num_touching_1: 0
+  water_dia: 1
+  seperationForce: 10
 --- !u!114 &913013348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7529,7 +7533,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dampingFactor: .800000012
-  force: 5
+  force: 1
   minDistance: 100
   maxDistance: 100
   shouldContract: 0

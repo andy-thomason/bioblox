@@ -307,13 +307,6 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 
-	void FixedUpdate()
-	{
-		if (eventSystem.IsActive ()) {
-			ApplyReturnToOriginForce ();
-		}
-	}
-
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
@@ -950,7 +943,7 @@ public class BioBlox : MonoBehaviour
 		Debug.Log (mol.mesh [0].vertices.Length);
 
 		//the speration force is the force applied when the molecules inter-penetrate to seperate them
-		p.seperationForce = 200.0f;
+		p.seperationForce = 20.0f;
 		
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
@@ -994,7 +987,7 @@ public class BioBlox : MonoBehaviour
 			Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
 			if (molToOrigin.sqrMagnitude > 1.0f) {
 				Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
-				rb.AddForce (molToOrigin.normalized * repulsiveForce);
+				rb.AddForce (molToOrigin.normalized * repulsiveForce * Time.fixedDeltaTime);
 			}
 		}
 	}
@@ -1096,8 +1089,6 @@ public class BioBlox : MonoBehaviour
 			yield return new WaitForSeconds (0.1f);
 			PopInSound (activeLabels [i].gameObject);
 		}
-
-		p1.shouldCollide = true;
 
 		//this is the connection manager for the complex game, it handles grappling between the molecules
 		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
@@ -1232,10 +1223,9 @@ public class BioBlox : MonoBehaviour
 
 	// Physics simulation
 	void FixedUpdate() {
-		Object[] meshes = GameObject.FindObjectsOfType (typeof(PDB_mesh));
-		if (meshes.Length == 2) {
-			GameObject obj0 = (GameObject)meshes[0];
-			GameObject obj1 = (GameObject)meshes[1];
+		if (molecules.Length >= 2) {
+			GameObject obj0 = molecules[0];
+			GameObject obj1 = molecules[1];
 			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
 			PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
 			if (PDB_molecule.pysics_collide (
@@ -1248,7 +1238,11 @@ public class BioBlox : MonoBehaviour
 			)) {
 				//hasCollided = true;
 			}
-		}        
+		}  
+		if (eventSystem.IsActive ()) {
+			ApplyReturnToOriginForce ();
+		}
     }
+
 }
 
