@@ -74,10 +74,16 @@ public class BioBlox : MonoBehaviour
 
 	public float triangleOffset = 10.0f;
 	GameObject[] featureTriangle =new GameObject[2];
+
+	// shape scoring
+	public int num_touching_0 = 0;
+	public int num_touching_1 = 0;
+	public float water_dia = 1.0f;
+
 	// Use this for initialization
 	void Start ()
 	{
-		Time.fixedDeltaTime = 0.001f;
+		Time.fixedDeltaTime = 0.033f;
 
 		colorPool.Add (Color.red);
 		colorPool.Add (Color.blue);
@@ -1221,5 +1227,28 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 	}
+
+	public float seperationForce = 10.0f;
+
+	// Physics simulation
+	void FixedUpdate() {
+		Object[] meshes = GameObject.FindObjectsOfType (typeof(PDB_mesh));
+		if (meshes.Length == 2) {
+			GameObject obj0 = (GameObject)meshes[0];
+			GameObject obj1 = (GameObject)meshes[1];
+			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
+			PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
+			if (PDB_molecule.pysics_collide (
+				obj0, mesh0.mol, obj0.transform,
+				obj1, mesh1.mol, obj1.transform,
+				seperationForce,
+				water_dia,
+				out num_touching_0,
+				out num_touching_1
+			)) {
+				//hasCollided = true;
+			}
+		}        
+    }
 }
 

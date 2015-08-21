@@ -16,7 +16,7 @@ public class PDB_mesh : MonoBehaviour {
 	public float seperationForce =100.0f;
 	float t=0;
 
-	public bool hasCollided=false;
+	//public bool hasCollided=false;
 
 	// Use this for initialization
 	void Start () {
@@ -241,19 +241,24 @@ public class PDB_mesh : MonoBehaviour {
 					}
 				}
 			}
-			if(shouldCollide)
+
+			/*if(shouldCollide)
 			{
 				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
+				BioBlox bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
 				
 				if(PDB_molecule.pysics_collide (
 					gameObject, mol, transform,
-					other, other_mesh.mol, other.transform
-					,seperationForce
-					))
+					other, other_mesh.mol, other.transform,
+					seperationForce,
+					bb.water_dia,
+					out bb.num_touching_0,
+					out bb.num_touching_1
+				))
 				{
 					hasCollided=true;
 				}
-			}
+			}*/
 		}
 	}
 }
