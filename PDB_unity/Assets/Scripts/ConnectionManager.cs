@@ -12,12 +12,13 @@ public class ConnectionManager : MonoBehaviour {
 
 	public float dampingFactor = 1.0f;
 	public float force = 10.0f;
-	public float minDistance = 100.0f;
-	public float maxDistance = 100.0f;
+	public float minDistance = 0.0f;
+	public float maxDistance = 60.0f;
+
+	public float[] connectionMinDistances;
 
 	public bool shouldContract = false;
-
-	public Slider slider;
+	
 
 	public float slideBackSpeed = 2.0f;
 
@@ -27,10 +28,6 @@ public class ConnectionManager : MonoBehaviour {
 	public void Reset()
 	{
 		connections.Clear ();
-		slider.maxValue = 1.0f;
-		slider.minValue = 0.0f;
-		slider.value = 0.0f;
-		slider.gameObject.SetActive (false);
 	}
 
 	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,
@@ -51,14 +48,12 @@ public class ConnectionManager : MonoBehaviour {
 
 			connections.Add(con);
 		}
-		maxDistance = 60.0f;
-		minDistance = maxDistance;
+		connectionMinDistances = new float[mol1AtomIndicies.Length];
+		for (int i = 0; i < connectionMinDistances.Length; ++i) {
+			connectionMinDistances[i] = maxDistance;
+		}
 		shouldContract = true;
-		slider.maxValue = maxDistance;
-		slider.minValue = 2.7f;
-		slider.value = maxDistance;
-		
-		slider.gameObject.SetActive (true);
+
 	}
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)
@@ -99,7 +94,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		slider.gameObject.SetActive (false);
+	
 	}
 
 
@@ -108,20 +103,13 @@ public class ConnectionManager : MonoBehaviour {
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
-					connections[i].Update(dampingFactor, force, minDistance);
+					connections[i].Update(dampingFactor, force, connectionMinDistances[i]);
 			}
 		}
 	}
 
 	// Update is called once per frame
 	void Update () {
-		if (slider && slider.gameObject.activeSelf) {
-			minDistance = slider.value;
-			if(!Input.GetMouseButton(0))
-			{
-				slider.value += Time.deltaTime *slideBackSpeed;
-			}
-		}
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			AtomConnection con = connections[connections.Count-1];

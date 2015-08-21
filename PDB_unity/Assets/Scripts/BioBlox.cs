@@ -44,7 +44,7 @@ public class BioBlox : MonoBehaviour
 	//the molecules in the scene
 	public GameObject[] molecules;
 
-	// NOT CURRENT IN USE
+	// NOT CURRENTLY IN USE
 	// sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
 	GameObject[] sites = new GameObject[2];
 	// wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
@@ -62,7 +62,12 @@ public class BioBlox : MonoBehaviour
 	public float uiScrollSpeed = 10.0f;
 	//force being applied to molecules to return them to their origin positions
 	public float repulsiveForce = 30.0f;
+	
 
+	public Slider overrideSlider;
+	public List<Slider> dockSliders = new List<Slider> ();
+	List<bool> sliderConstarinedByOverride = new List<bool>();
+	public float dockOverrideOffset = 1.0f;
 	//whether we have won or lost
 	bool win = false;
 
@@ -420,18 +425,9 @@ public class BioBlox : MonoBehaviour
 	//Handle the dock slider inputs
 	public void HandleDockSlider(Slider slide)
 	{
-		//if we are at the max value then reveal labels
-		if (slide.value > slide.maxValue - 10.0f) {
-			if (!activeLabels [0].gameObject.activeSelf) {
-				for (int i=0; i<activeLabels.Count; ++i) {
-					activeLabels[i].gameObject.SetActive(true);
-				}
-			}
-		} else if (activeLabels [0].gameObject.activeSelf){
-			for (int i=0; i<activeLabels.Count; ++i) {
-				activeLabels[i].gameObject.SetActive(false);
-			}
-		}
+		//if we are at the max value then reveal labelsif (slide.value > slide.maxValue - 10.0f) {
+
+
 	}
 
 	public void HandleCameraSlider(Slider slide)
@@ -658,6 +654,47 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
+
+	public void ManageSliders()
+	{
+		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
+
+		bool allInPickZone = true;
+		if (overrideSlider.gameObject.activeSelf) {
+			for(int i = 0; i < dockSliders.Count; ++i)
+			{
+				if(dockSliders[i].value < overrideSlider.value)
+				{
+					sliderConstarinedByOverride[i] = false;
+				}
+				if(dockSliders[i].value > overrideSlider.value)
+				{
+					dockSliders[i].value = overrideSlider.value - dockOverrideOffset;
+					sliderConstarinedByOverride[i] = true;
+				}
+				conMan.connectionMinDistances[i] = dockSliders[i].value;
+				if(dockSliders[i].value < dockSliders[i].maxValue-5)
+				{
+					allInPickZone = false;
+				}
+			}
+		}
+
+		if (allInPickZone) {
+			if (!activeLabels [0].gameObject.activeSelf) {
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					activeLabels [i].gameObject.SetActive (true);
+				}
+			}
+		} else {
+			if(activeLabels[0].gameObject.activeSelf){
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					activeLabels [i].gameObject.SetActive (false);
+				}
+			}
+		}
+	}
+
 	public void SiteClicked (GameObject labelObj)
 	{
 		
@@ -854,6 +891,11 @@ public class BioBlox : MonoBehaviour
 				                   selectedLabel [0].atomIds.ToArray (),
 				                   molecules [1].GetComponent<PDB_mesh> (),
 				                   selectedLabel [1].atomIds.ToArray ());
+				for(int i = 0; i < dockSliders.Count; ++i)
+				{
+					dockSliders[i].gameObject.SetActive(true);
+					overrideSlider.gameObject.SetActive(true);
+				}
 				uiScrollSpeed =900;
 			}
 
@@ -987,7 +1029,7 @@ public class BioBlox : MonoBehaviour
 			Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
 			if (molToOrigin.sqrMagnitude > 1.0f) {
 				Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
-				rb.AddForce (molToOrigin.normalized * repulsiveForce * Time.fixedDeltaTime);
+				rb.AddForce (molToOrigin.normalized * repulsiveForce);
 			}
 		}
 	}
@@ -1019,6 +1061,8 @@ public class BioBlox : MonoBehaviour
 		//create both molecules
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1, 8);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1, 9);
+
+
 
 
 		MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
@@ -1093,6 +1137,19 @@ public class BioBlox : MonoBehaviour
 		//this is the connection manager for the complex game, it handles grappling between the molecules
 		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
 
+		for (int i = 0; i < dockSliders.Count; ++i) {
+			dockSliders[i].maxValue =  conMan.maxDistance;
+			dockSliders[i].minValue = conMan.minDistance;
+			dockSliders[i].value =conMan.maxDistance;
+			dockSliders[i].gameObject.SetActive(false);
+			sliderConstarinedByOverride.Add(true);
+		}
+
+		overrideSlider.maxValue = conMan.maxDistance;
+		overrideSlider.minValue = conMan.minDistance;
+		overrideSlider.value = conMan.maxDistance;
+		overrideSlider.gameObject.SetActive (false);
+
 		mol1.transform.localScale = new Vector3 (1, 1, 1);
 		mol2.transform.localScale = new Vector3 (1, 1, 1);
 		yield return new WaitForSeconds (0.1f);
@@ -1110,8 +1167,8 @@ public class BioBlox : MonoBehaviour
 			}
 			//test if we should move the molecules with quick ray casts
 			if (eventSystem.IsActive ()) {
+				ManageSliders();
 				if (Input.GetMouseButton (0)) {
-					
 					//Using this system we dont allow the player to move the two molecules at the same time
 					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 					Ray r = c.ScreenPointToRay (Input.mousePosition);

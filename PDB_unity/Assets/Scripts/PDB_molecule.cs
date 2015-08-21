@@ -730,7 +730,7 @@ public class PDB_molecule
 
 			if (distance < min_d) {
                 Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				normal *= seperationForce * Time.fixedDeltaTime;
+				normal *= seperationForce;
 				r0.AddForceAtPosition(normal,c0);
                 r1.AddForceAtPosition(-normal, c1);
             }

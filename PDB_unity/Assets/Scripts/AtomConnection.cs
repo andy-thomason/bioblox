@@ -57,7 +57,7 @@ namespace AssemblyCSharp
 				vel += force;
 				force = Vector3.zero;
 
-				pos += vel * Time.fixedDeltaTime * invMass;
+				pos += vel * invMass;
 				vel *= friction;
 			}
 		}
@@ -176,7 +176,6 @@ namespace AssemblyCSharp
 					Vector3 force = new Vector3 (0, 0, 0);
 					if (distance > minDistance) {
 						force = dir * (distance - minDistance) * springFactor;
-						force *= Time.fixedDeltaTime;
 						mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
 						mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 					}
