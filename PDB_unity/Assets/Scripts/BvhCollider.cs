@@ -6,25 +6,31 @@ using System.IO;
 using System;
 using AssemblyCSharp;
 
+// This class generates a list of collisions given two molecules with a BVH sphere tree
 public class BvhCollider
 {
+	// basic paramaters of the search.
     PDB_molecule mol0;
     Transform t0;
     PDB_molecule mol1;
     Transform t1;
     int work_done = 0;
 
+	// allow us to inflate the search to return more pairs.
 	float radiusInflate = 0.0f;
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"D:\BioBlox\BvhCollider.txt");
 
-    public struct Result {
+	// Result record. i0 and i1 index the atom_* arrays.
+	public struct Result {
         public int i0;
         public int i1;
         public Result(int i0, int i1) { this.i0 = i0; this.i1 = i1; }
     };
 
+	// List of results returned by the collider.
     public List<Result> results;
 
+	// Collide by subdivision. Reduce the size of the search space by half on each call.
     public void collide_recursive(int bvh0, int bvh1)
     {
         if (work_done++ == 100000) return;
@@ -43,10 +49,13 @@ public class BvhCollider
 		r0 += radiusInflate;
 		r1 += radiusInflate;
 
+		// collide two spheres at this level
         if ((c0 - c1).sqrMagnitude < (r0 + r1)*(r0 + r1) && r0 > 0 && r1 > 0)
         {
+			// spheres collide.
             if (bt0 == -1) {
                 if (bt1 == -1) {
+					// neither is a terminal, continue to descend on bvh0 and hbv1
                     collide_recursive(bvh0*2+1, bvh1*2+1);
                     collide_recursive(bvh0*2+1, bvh1*2+2);
                     collide_recursive(bvh0*2+2, bvh1*2+1);
@@ -54,24 +63,28 @@ public class BvhCollider
                 }
                 else
                 {
-                    collide_recursive(bvh0*2+1, bvh1);
+					// bt1 is a terminal, continue to descend on bvh0.
+					collide_recursive(bvh0*2+1, bvh1);
                     collide_recursive(bvh0*2+2, bvh1);
                 }
             }
             else
             {
                 if (bt1 == -1) {
-                    collide_recursive(bvh0, bvh1*2+1);
+					// bt0 is a terminal, continue to descend on bvh1.
+					collide_recursive(bvh0, bvh1*2+1);
                     collide_recursive(bvh0, bvh1*2+2);
                 }
                 else
                 {
-                    results.Add(new Result(bt0, bt1));
+					// both are terminals, collect result.
+					results.Add(new Result(bt0, bt1));
                 }
             }
         }
     }
 
+	// Constructor: generate a list of collision pairs.
 	public BvhCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1, float inflation)
 	{
 		this.mol0 = mol0;
