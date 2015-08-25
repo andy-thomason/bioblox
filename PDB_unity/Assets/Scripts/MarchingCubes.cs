@@ -275,6 +275,7 @@ public class MarchingCubes
 	public Color[] colours;
 	public int[] indices;
 
+	// Given a 3D lattice of values (mc_values) generate triangles where values transition from positive to negative.
 	public MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
 		DateTime start_time = DateTime.Now;
 		float rgs = 1.0f / grid_spacing;
