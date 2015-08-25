@@ -54,15 +54,19 @@ public class BioBlox : MonoBehaviour
 	//game object target of the "popping" co-routines to shrink and grow the object out of and into the scene
 	GameObject popTarget;
 
-	//current score
+	// current score
 	public float score = 10.0f;
-	//score to achive to win
+	// score to achive to win
 	public float winScore = 10.0f;
-	//torque applied to the molecule to move them when player drags
+	// torque applied to the molecule to move them when player drags
 	public float uiScrollSpeed = 10.0f;
-	//force being applied to molecules to return them to their origin positions
-	public float repulsiveForce = 30.0f;
-	
+
+	// force being applied to molecules to return them to their origin positions
+	public float repulsiveForce = 30000.0f;
+	// force used for physics
+	public float seperationForce = 10000.0f;
+	// force applied by string
+	public float stringForce = 20000.0f;
 
 	public Slider overrideSlider;
 	public List<Slider> dockSliders = new List<Slider> ();
@@ -986,10 +990,16 @@ public class BioBlox : MonoBehaviour
 
 		//the speration force is the force applied when the molecules inter-penetrate to seperate them
 		p.seperationForce = 20.0f;
-		
+
+
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
 		ri.useGravity = false;
+		ri.mass = 1000;
+
+		float r = mol.bvh_radii [0] * 0.5f;
+		float val = 0.4f * ri.mass * r * r;
+		ri.inertiaTensor = new Vector3 (val, val, val);
 
 		//save their original positions them move them to oppose oneanother
 		//very messy, should really clean this up, either use points in the world or do it dynamically
@@ -1275,8 +1285,6 @@ public class BioBlox : MonoBehaviour
 			yield return null;
 		}
 	}
-
-	public float seperationForce = 10.0f;
 
 	// Physics simulation
 	void FixedUpdate() {
