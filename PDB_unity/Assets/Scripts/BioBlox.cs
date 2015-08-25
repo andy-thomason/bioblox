@@ -1010,11 +1010,6 @@ public class BioBlox : MonoBehaviour
 		obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
-		//obj.GetComponent<TransformLerper> ().AddTransformPoint (obj.transform.rotation);
-
-		//obj.GetComponent<TransformLerper> ().AddTransformPoint (originMolPos,
-		//                                                       originalMolRot);
-		//obj.GetComponent<TransformLerper> ().speed =1.0f;
 
 		//extract the molecule number from the name .1 = 0 .2 = 1
 		int molNum = (int)char.GetNumericValue (name [name.Length - 1]) - 1;
