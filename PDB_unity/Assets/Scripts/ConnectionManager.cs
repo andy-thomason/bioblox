@@ -11,7 +11,7 @@ public class ConnectionManager : MonoBehaviour {
 	int contractionKVal;
 
 	public float dampingFactor = 1.0f;
-	public float force = 10.0f;
+	//public float force = 10.0f;
 	public float minDistance = 0.0f;
 	public float maxDistance = 60.0f;
 
@@ -100,10 +100,11 @@ public class ConnectionManager : MonoBehaviour {
 
 	void FixedUpdate()
 	{
+		BioBlox bb = (BioBlox)GameObject.FindObjectOfType (typeof(BioBlox));
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
-					connections[i].Update(dampingFactor, force, connectionMinDistances[i]);
+				connections[i].Update(dampingFactor, bb.stringForce, connectionMinDistances[i]);
 			}
 		}
 	}
