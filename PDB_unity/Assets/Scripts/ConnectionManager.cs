@@ -14,6 +14,7 @@ public class ConnectionManager : MonoBehaviour {
 	//public float force = 10.0f;
 	public float minDistance = 0.0f;
 	public float maxDistance = 60.0f;
+	public float spring_constant = 1000.0f;
 
 	public float[] connectionMinDistances;
 
@@ -105,7 +106,7 @@ public class ConnectionManager : MonoBehaviour {
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
-				connections[i].Update(dampingFactor, bb.stringForce, connectionMinDistances[i]);
+				connections[i].Update(spring_constant, dampingFactor, bb.stringForce, connectionMinDistances[i]);
 			}
 		}
 	}

@@ -72,7 +72,7 @@ public class BioBlox : MonoBehaviour
 	public Slider overrideSlider;
 	public List<Slider> dockSliders = new List<Slider> ();
 	List<bool> sliderConstarinedByOverride = new List<bool>();
-	public float dockOverrideOffset = 1.0f;
+	public float dockOverrideOffset = 0.0f;
 	//whether we have won or lost
 	bool win = false;
 	bool do_physics_collision = false;
@@ -321,7 +321,7 @@ public class BioBlox : MonoBehaviour
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
-		if (molecules [0] && molecules [1]) {
+		if (molecules.Length >= 2 && molecules [0] && molecules [1]) {
 			GameObject cam = GameObject.Find ("Main Camera");
 			MeshRenderer[] meshes = molecules [0].GetComponentsInChildren<MeshRenderer> ();
 			foreach (MeshRenderer r in meshes) {
@@ -669,12 +669,12 @@ public class BioBlox : MonoBehaviour
 		if (overrideSlider.gameObject.activeSelf) {
 			for(int i = 0; i < dockSliders.Count; ++i)
 			{
-				if(dockSliders[i].value < overrideSlider.value)
+				if(dockSliders[i].value < overrideSlider.value - dockOverrideOffset)
 				{
 					sliderConstarinedByOverride[i] = false;
-				}
-				if(dockSliders[i].value > overrideSlider.value)
-				{
+				} else {
+				//if(dockSliders[i].value > overrideSlider.value - dockOverrideOffset)
+				//{
 					dockSliders[i].value = overrideSlider.value - dockOverrideOffset;
 					sliderConstarinedByOverride[i] = true;
 				}
@@ -1326,7 +1326,7 @@ public class BioBlox : MonoBehaviour
 				//hasCollided = true;
 			}
 		}  
-		if (eventSystem.IsActive ()) {
+		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
     }

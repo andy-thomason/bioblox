@@ -31,13 +31,13 @@ namespace AssemblyCSharp
 			isActive = false;
 		}
 
-		virtual public void Update(float dampingFactor, float force, float minDist)
+		virtual public void Update(float spring_constant, float dampingFactor, float force, float minDist)
 		{}
 		virtual public void Draw()
 		{}
 	}
 
-	public class Rope:AtomConnection
+	public class Rope : AtomConnection
 	{
 		public class Point
 		{
@@ -54,42 +54,14 @@ namespace AssemblyCSharp
 
 			public void FixedUpdate(float friction, float timestep)
 			{
+				// Euler integration
 				vel += force * invMass * timestep;
-				force = Vector3.zero;
-
 				pos += vel * timestep;
 				vel *= friction;
 			}
 		}
 
-		public class Spring
-		{
-			Point point1;
-			Point point2;
-			float springVal;
-
-			public Spring(Point a, Point b, float val)
-			{
-				point1 = a;
-				point2 = b;
-				springVal = val;
-			}
-
-			public void FixedUpdate(float springLength, float timestep)
-			{
-				Vector3 firstToSecond = point2.pos - point1.pos;
-
-				Vector3 springForce = firstToSecond.normalized * (firstToSecond.magnitude - springLength) * springVal;
-
-				float totalMass = point1.invMass + point2.invMass;
-				point1.force += springForce;
-				point1.force -= springForce;
-			}
-		}
-
-
 		List<Point> points = new List<Point>();
-		List<Spring> springs = new List<Spring>();
 
 		public Rope(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
@@ -103,23 +75,23 @@ namespace AssemblyCSharp
 		void Init()
 		{
 			int numPoints = 10;
-			for (int i=0; i < numPoints; ++i) {
-				float div = (float)i / numPoints;
+			for (int i = 0; i < numPoints; ++i) {
+				float div = i * (1.0f / (numPoints-1));
 				Point potentialPoint = new Point();
-				if(i==0 || i == numPoints -1)
+				if (i == 0 || i == numPoints-1)
 				{
 					potentialPoint.invMass = 0;
 				}
-				if (i > 0) {
-					springs.Add(new Spring(points[i-1],potentialPoint,8.0f));
+				/*if (i > 0) {
 					//make a spring
-				}
+					springs.Add(new Spring(points[i-1], potentialPoint));
+				}*/
 				potentialPoint.pos = Vector3.zero;
 				points.Add(potentialPoint);
 			}
 		}
 
-		void UpdateCollisions()
+		/*void UpdateCollisions()
 		{
 			for (int i = 1; i < points.Count-1; ++ i) {
 				BvhSphereCollider collider = new BvhSphereCollider(
@@ -142,9 +114,9 @@ namespace AssemblyCSharp
 					points[i].force += fromMolecule *0.4f;
 				}
 			}
-		}
+		}*/
 
-		public override void Update(float dampingFactor, float springFactor, float minDistance)
+		public override void Update(float spring_constant, float dampingFactor, float springFactor, float string_length)
 		{
 			int atomIndex1 = atomIds [0];
 			int atomIndex2 = atomIds [1];
@@ -154,50 +126,51 @@ namespace AssemblyCSharp
 			Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
 			float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
 			if (isActive) {
-				if (distance > minDistance) {
+				if (distance > string_length) {
 
 					Rigidbody mol1_rb = molecules [0].GetComponent<Rigidbody> ();
 					Rigidbody mol2_rb = molecules [1].GetComponent<Rigidbody> ();
 				
-					// .    .                   .
-					// vp = vb + cross(posW, rotV)
-					Vector3 atom1Velocity = mol1_rb.GetPointVelocity (worldAtomPos1);
-					Vector3 atom2Velocity = mol2_rb.GetPointVelocity (worldAtomPos2);
-				
-					//Vector3 relativeVelocity1To2 = atom1Velocity - atom2Velocity;
-				
-					Vector3 damping1 = -dampingFactor * atom1Velocity;
-					Vector3 damping2 = -dampingFactor * atom2Velocity;
-				
 					Vector3 force = new Vector3 (0, 0, 0);
-					if (distance > minDistance) {
-						force = dir * (distance - minDistance) * springFactor;
-						mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
-						mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
+					if (distance > string_length) {
+						force = dir * (distance - string_length) * springFactor;
+						mol1_rb.AddForceAtPosition (force, worldAtomPos1);
+						mol2_rb.AddForceAtPosition (-force, worldAtomPos2);
 					}
 				}
 			}
 			points [0].pos = worldAtomPos1;
 			points [points.Count - 1].pos = worldAtomPos2;
 
-			float springLength = (minDistance - distance) / springs.Count;
-			if (springLength <= 0) {
-				springLength = 0.0001f;
-			}
+			// natural length of a section of string.
+			float spring_length = string_length / (points.Count-1);
 
-			float timestep = Time.fixedDeltaTime;
-			for(int i = 0; i < springs.Count; ++i)
-			{
-				springs[i].FixedUpdate(springLength, timestep);
-			}
+			//Debug.Log ("spring_length=" + spring_length + " distance=" + distance + " string_length=" + string_length);
 
-			//UpdateCollisions ();
+			int max_iters = 10;
+			float timestep = Time.fixedDeltaTime / max_iters;
+			Vector3 gravity = new Vector3 (0, -100, 0);
 
-			for(int i = 0; i < points.Count; ++i)
-			{
-				Vector3 gravity = new Vector3(0,-1,0);
-				points[i].force += gravity;
-				points[i].FixedUpdate(0.95f, timestep);
+			for (int iter = 0; iter != max_iters; ++iter) {
+				for (int i = 0; i < points.Count; ++i) {
+					points [i].force = gravity;
+				}
+
+				for (int i = 0; i < points.Count-1; ++i) {
+					Point point1 = points [i];
+					Point point2 = points [i + 1];
+					Vector3 firstToSecond = point2.pos - point1.pos;
+					float d = firstToSecond.magnitude;
+					if (d > spring_length) {
+						Vector3 springForce = firstToSecond.normalized * (d - spring_length) * spring_constant;
+						point1.force += springForce;
+						point2.force -= springForce;
+					}
+				}
+
+				for (int i = 0; i < points.Count; ++i) {
+					points [i].FixedUpdate (0.95f, timestep);
+				}
 			}
 			
 		}
@@ -232,7 +205,7 @@ namespace AssemblyCSharp
 
 
 
-		public override void Update(float dampingFactor, float springFactor, float minDistance)
+		public override void Update(float spring_constant, float dampingFactor, float springFactor, float string_length)
 		{
 			if (isActive) {
 				int atomIndex1 = atomIds [0];
@@ -257,8 +230,8 @@ namespace AssemblyCSharp
 				Vector3 damping2 = -dampingFactor * atom2Velocity;
 
 				Vector3 force = new Vector3 (0, 0, 0);
-				if (distance > minDistance) {
-					force = dir * (distance - minDistance) * springFactor;
+				if (distance > string_length) {
+					force = dir * (distance - string_length) * springFactor;
 				}
 
 				mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);

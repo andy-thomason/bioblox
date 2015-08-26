@@ -31,7 +31,7 @@ public class LabelScript : MonoBehaviour{
 	public bool useMiniLabel = true;
 
 	//the list of mini labels
-	List<MiniLabel> miniLabels = new List<MiniLabel> ();
+	public List<MiniLabel> miniLabels = new List<MiniLabel> ();
 	
 
 	//a list of all the clouds
@@ -79,7 +79,7 @@ public class LabelScript : MonoBehaviour{
 				miniLabels.Add(miniLab.GetComponent<MiniLabel>());
 				miniLab.name = "MiniLabel" + i;
 				miniLab.transform.SetParent(this.transform,false);
-				miniLab.transform.localScale = new Vector3(1,1,1);
+				miniLab.transform.localScale = new Vector3(1, 1, 1);
 			}
 			//since we are using mini labels we wont need the visual components for this object
 			GameObject.Destroy(prefab);
@@ -205,34 +205,34 @@ public class LabelScript : MonoBehaviour{
 	// Update is called once per frame
 	void Update () {
 			
-			owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
+		owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
 
-			if(useMiniLabel)
+		if(useMiniLabel)
+		{
+			for(int i = 0; i < miniLabels.Count; ++i)
 			{
-				for(int i = 0; i < miniLabels.Count; ++i)
-				{
-					owner.GetMiniLabelPos(atomIds[i],moleculeNumber,miniLabels[i].transform);
-				}
+				owner.GetMiniLabelPos(atomIds[i], moleculeNumber, miniLabels[i].transform);
 			}
+		}
 
-			GameObject cam = GameObject.Find("Main Camera");
-			GameObject mol = owner.molecules[moleculeNumber];
+		GameObject cam = GameObject.Find("Main Camera");
+		GameObject mol = owner.molecules[moleculeNumber];
 
-			if(!useMiniLabel && mol)
+		if(!useMiniLabel && mol)
+		{
+			Vector3 toMol = mol.transform.position - this.transform.position;
+			this.transform.LookAt(cam.transform, -toMol);
+		}
+		else if(useMiniLabel)
+		{
+			for(int i = 0; i < miniLabels.Count; ++i)
 			{
-				Vector3 toMol = mol.transform.position - this.transform.position;
-				this.transform.LookAt(cam.transform,-toMol);
+				Vector3 toAtom = owner.GetAtomWorldPos(atomIds[i],moleculeNumber) - miniLabels[i].transform.position;
+				Vector3 toCamera = cam.transform.position - miniLabels[i].transform.position;
+				miniLabels[i].transform.LookAt(cam.transform,-toAtom);
+				miniLabels[i].transform.position += toCamera.normalized * 5;
 			}
-			else if(useMiniLabel)
-			{
-				for(int i = 0; i < miniLabels.Count; ++i)
-				{
-					Vector3 toAtom = owner.GetAtomWorldPos(atomIds[i],moleculeNumber) - miniLabels[i].transform.position;
-					Vector3 toCamera = cam.transform.position - miniLabels[i].transform.position;
-					miniLabels[i].transform.LookAt(cam.transform,-toAtom);
-					miniLabels[i].transform.position +=toCamera.normalized*5;
-				}
-			}
+		}
 		
 		if (shouldGlow) {
 			if(!useMiniLabel)
