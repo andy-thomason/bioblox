@@ -41,6 +41,7 @@ public class BioBlox : MonoBehaviour
 	LabelScript[] selectedLabel = new LabelScript[2];
 	//a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
+
 	//the molecules in the scene
 	public GameObject[] molecules;
 
@@ -74,6 +75,7 @@ public class BioBlox : MonoBehaviour
 	public float dockOverrideOffset = 1.0f;
 	//whether we have won or lost
 	bool win = false;
+	bool do_physics_collision = false;
 
 	//colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
@@ -103,7 +105,7 @@ public class BioBlox : MonoBehaviour
 		colorPool.Add (Color.white);
 		colorPool.Add (Color.gray);
 		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
-		randomColorPoolOffset = Random.Range (0, colorPool.Count - 1);
+		randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
 
@@ -690,12 +692,14 @@ public class BioBlox : MonoBehaviour
 					activeLabels [i].gameObject.SetActive (true);
 				}
 			}
+			do_physics_collision = false;
 		} else {
 			if(activeLabels[0].gameObject.activeSelf){
 				for (int i = 0; i < activeLabels.Count; ++i) {
 					activeLabels [i].gameObject.SetActive (false);
 				}
 			}
+			do_physics_collision = true;
 		}
 	}
 
@@ -923,13 +927,40 @@ public class BioBlox : MonoBehaviour
 		//Handle label click, make active, focusd on atom //etc
 	}
 
+	// The pick button resets the sliders to the right.
+	public void Pick()
+	{
+		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+		
+		for (int i = 0; i < dockSliders.Count; ++i) {
+			dockSliders [i].value = conMan.maxDistance;
+		}
+		overrideSlider.value = conMan.maxDistance;
+
+		selectedLabel [0] = null;
+		selectedLabel [1] = null;
+	}
+	
+	// The dock button resets the sliders to the middle.
+	public void Dock()
+	{
+		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+		
+		for (int i = 0; i < dockSliders.Count; ++i) {
+			dockSliders [i].value = conMan.maxDistance * 0.5f;
+		}
+		overrideSlider.value = conMan.maxDistance * 0.5f;
+
+	}
+	
+	// The lock button establishes the "win" state.
 	public void Lock()
 	{
 		if (ScoreRMSD () < winScore) {
-			win=true;
+			win = true;
 		}
 	}
-
+	
 	void Reset ()
 	{
 		//clears the molecules and re-randomizes the colour range
@@ -969,7 +1000,7 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 
-	//creates the molecule objects including the PDB_mesh script
+	// Creates the molecule objects including the PDB_mesh script.
 	GameObject make_molecule (
 		string name, string proto, float xoffset, int layerNum
 	)
@@ -987,10 +1018,6 @@ public class BioBlox : MonoBehaviour
 		p.mol = mol;
 		make_molecule_mesh (p, proto, layerNum);
 		Debug.Log (mol.mesh [0].vertices.Length);
-
-		//the speration force is the force applied when the molecules inter-penetrate to seperate them
-		p.seperationForce = 20.0f;
-
 
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
@@ -1283,7 +1310,7 @@ public class BioBlox : MonoBehaviour
 
 	// Physics simulation
 	void FixedUpdate() {
-		if (molecules.Length >= 2) {
+		if (do_physics_collision && molecules.Length >= 2) {
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
 			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();

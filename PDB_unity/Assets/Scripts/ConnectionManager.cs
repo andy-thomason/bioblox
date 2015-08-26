@@ -48,12 +48,13 @@ public class ConnectionManager : MonoBehaviour {
 
 			connections.Add(con);
 		}
+
 		connectionMinDistances = new float[mol1AtomIndicies.Length];
 		for (int i = 0; i < connectionMinDistances.Length; ++i) {
 			connectionMinDistances[i] = maxDistance;
 		}
-		shouldContract = true;
 
+		shouldContract = true;
 	}
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)

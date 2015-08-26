@@ -52,12 +52,12 @@ namespace AssemblyCSharp
 			public Vector3 force;
 			public float invMass;  
 
-			public void FixedUpdate(float friction)
+			public void FixedUpdate(float friction, float timestep)
 			{
-				vel += force;
+				vel += force * invMass * timestep;
 				force = Vector3.zero;
 
-				pos += vel * invMass;
+				pos += vel * timestep;
 				vel *= friction;
 			}
 		}
@@ -67,6 +67,7 @@ namespace AssemblyCSharp
 			Point point1;
 			Point point2;
 			float springVal;
+
 			public Spring(Point a, Point b, float val)
 			{
 				point1 = a;
@@ -74,19 +75,15 @@ namespace AssemblyCSharp
 				springVal = val;
 			}
 
-			public void FixedUpdate(float springLength)
+			public void FixedUpdate(float springLength, float timestep)
 			{
 				Vector3 firstToSecond = point2.pos - point1.pos;
 
-				//if the distance is too long
-				if (point1.invMass != 0 || point2.invMass !=0) { 
-					Vector3 springForce = firstToSecond.normalized * (firstToSecond.magnitude - springLength) * springVal;
+				Vector3 springForce = firstToSecond.normalized * (firstToSecond.magnitude - springLength) * springVal;
 
-					float totalMass = point1.invMass + point2.invMass;
-
-					point1.force +=springForce * (point1.invMass / totalMass);
-					point2.force -=springForce * (point2.invMass / totalMass);
-				}
+				float totalMass = point1.invMass + point2.invMass;
+				point1.force += springForce;
+				point1.force -= springForce;
 			}
 		}
 
@@ -96,7 +93,6 @@ namespace AssemblyCSharp
 
 		public Rope(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
-
 		}
 
 		public Rope()
@@ -188,9 +184,11 @@ namespace AssemblyCSharp
 			if (springLength <= 0) {
 				springLength = 0.0001f;
 			}
+
+			float timestep = Time.fixedDeltaTime;
 			for(int i = 0; i < springs.Count; ++i)
 			{
-				springs[i].FixedUpdate(springLength);
+				springs[i].FixedUpdate(springLength, timestep);
 			}
 
 			//UpdateCollisions ();
@@ -199,7 +197,7 @@ namespace AssemblyCSharp
 			{
 				Vector3 gravity = new Vector3(0,-1,0);
 				points[i].force += gravity;
-				points[i].FixedUpdate(0.95f);
+				points[i].FixedUpdate(0.95f, timestep);
 			}
 			
 		}

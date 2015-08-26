@@ -12,8 +12,7 @@ public class PDB_mesh : MonoBehaviour {
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
-	public bool shouldCollide =false;
-	public float seperationForce =100.0f;
+	public bool shouldCollide = false;
 	float t=0;
 
 	//public bool hasCollided=false;
