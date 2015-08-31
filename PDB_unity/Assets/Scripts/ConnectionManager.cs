@@ -14,7 +14,7 @@ public class ConnectionManager : MonoBehaviour {
 	//public float force = 10.0f;
 	public float minDistance = 0.0f;
 	public float maxDistance = 60.0f;
-	public float spring_constant = 1000.0f;
+	public float spring_constant = 10000.0f;
 
 	public float[] connectionMinDistances;
 

@@ -7,77 +7,79 @@ using UnityEngine.UI;
 
 public class BioBlox : MonoBehaviour
 {
-
-	//dictaing which gametype, puzzle or museum
+	// dictaing which gametype, puzzle or museum
 	bool simpleGame = true;
 
-	//controls whether the win state should attempt to fade out the molecules
+	// controls whether the win state should attempt to fade out the molecules
 	public bool winShouldFadeMol = false;
 
-	//score card for saving scores. 
+	// score card for saving scores. 
 	ScoreSheet scoreCard;
 
-	//filenames for the levels, without the .txt
+	// filenames for the levels, without the .txt
 	public List<string> filenames = new List<string> ();
-	//the level we are currently on, incremented at the end of a level
-	int filenameIndex = 0;
-	//a holder variable for the current event system
+
+	// the level we are currently on, incremented at the end of a level
+	int current_level = 0;
+
+	// a holder variable for the current event system
 	EventSystem eventSystem;
-	//prefab of the labels used to point to atoms on the molecules, must have label script attached
+
+	// prefab of the labels used to point to atoms on the molecules, must have label script attached
 	public GameObject prefabLabel;
-	//the win and loose spash images
+
+	// the win and loose spash images
 	public GameObject winSplash;
 	public GameObject looseSplash;
 	public GameObject goSplash;
-	//a variable controlling the size of the area faded out during the win state
+
+	// a variable controlling the size of the area faded out during the win state
 	public float shaderKVal = -0.03f;
 	
-	//a bool that will exit the win splash if set to true
+	// a bool that will exit the win splash if set to true
 	public bool exitWinSplash = false;
 
-	//all labels which are currently in the scene
+	// all labels which are currently in the scene
 	List<LabelScript> activeLabels = new List<LabelScript> ();
-	//a number of selected labels, at the moment limited to 2, one from each molecule
+	// a number of selected labels, at the moment limited to 2, one from each molecule
 	LabelScript[] selectedLabel = new LabelScript[2];
-	//a list of win conditions where two atoms must be paired
+	// a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 
-	//the molecules in the scene
+	// the molecules in the scene
 	public GameObject[] molecules;
 
-	// NOT CURRENTLY IN USE
-	// sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
+	//  NOT CURRENTLY IN USE
+	//  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
 	GameObject[] sites = new GameObject[2];
-	// wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
+	//  wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
 	bool[] playerIsMoving = new bool[2]{false,false};
-	//the original positions of the molecules, used to provide a returning force during the puzzle mode
+	// the original positions of the molecules, used to provide a returning force during the puzzle mode
 	Vector3[] originPosition = new Vector3[2];
-	//game object target of the "popping" co-routines to shrink and grow the object out of and into the scene
+	// game object target of the "popping" co-routines to shrink and grow the object out of and into the scene
 	GameObject popTarget;
 
-	// current score
-	public float score = 10.0f;
-	// score to achive to win
+	//  score to achive to win
 	public float winScore = 10.0f;
-	// torque applied to the molecule to move them when player drags
+	//  torque applied to the molecule to move them when player drags
 	public float uiScrollSpeed = 10.0f;
 
-	// force being applied to molecules to return them to their origin positions
+	//  force being applied to molecules to return them to their origin positions
 	public float repulsiveForce = 30000.0f;
-	// force used for physics
+	//  force used for physics
 	public float seperationForce = 10000.0f;
-	// force applied by string
+	//  force applied by string
 	public float stringForce = 20000.0f;
 
+	public Slider rmsScoreSlider;
 	public Slider overrideSlider;
 	public List<Slider> dockSliders = new List<Slider> ();
 	List<bool> sliderConstarinedByOverride = new List<bool>();
 	public float dockOverrideOffset = 0.0f;
-	//whether we have won or lost
-	bool win = false;
+
 	bool do_physics_collision = false;
 
-	//colors of the labels and an offset that is randomly decided randomize colours
+	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
 	int randomColorPoolOffset;
 
@@ -91,9 +93,21 @@ public class BioBlox : MonoBehaviour
 	public int num_touching_1 = 0;
 	public float water_dia = 1.0f;
 
+	public enum GameState {
+		Setup,
+		Waiting,
+		Picking,
+		Docking,
+		Locked
+	}
+
+	public GameState game_state;
+
 	// Use this for initialization
 	void Start ()
 	{
+		game_state = GameState.Setup;
+
 		Time.fixedDeltaTime = 0.033f;
 
 		colorPool.Add (Color.red);
@@ -122,7 +136,7 @@ public class BioBlox : MonoBehaviour
 		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
 		scoreCard.gameObject.SetActive (false);
 
-		//game_loop loads the file at filenames[filenameIndex]
+		//game_loop loads the file at filenames[current_level]
 		StartCoroutine (game_loop ());
 		eventSystem = EventSystem.current;
 
@@ -133,7 +147,7 @@ public class BioBlox : MonoBehaviour
 
 	public string GetCurrentLevelName ()
 	{
-		return filenames [filenameIndex];
+		return filenames [current_level];
 	}
 
 	//converts an atom serial number (unique file identifier) into a index
@@ -308,11 +322,11 @@ public class BioBlox : MonoBehaviour
 
 	public void Reload ()
 	{
-		filenameIndex++;
+		current_level++;
 		Reset ();
-		if (filenameIndex == filenames.Count) {
+		if (current_level == filenames.Count) {
 			Debug.Log ("End of levels");
-			filenameIndex=0;
+			current_level=0;
 		} else {
 			StartCoroutine (game_loop ());
 		}
@@ -504,7 +518,7 @@ public class BioBlox : MonoBehaviour
 	//Meant for the simple game
 	//Checks to see if the win-conditions are satisfied
 	//The win conditions are order specific, .first is molecule[0] atomIndex
-	public void CheckPair ()
+	/*public void CheckPair ()
 	{
 		if (simpleGame && winCondition.Count > 0 && selectedLabel [0] && selectedLabel [1]) {
 			bool hasWon = true;
@@ -531,7 +545,7 @@ public class BioBlox : MonoBehaviour
 			} 
 			this.GetComponent<AudioManager> ().Play ("Drum");
 		}
-	}
+	}*/
 
 	//Interactive win splash state before transitioning to the next level. 
 	IEnumerator WinSplash (Vector3 focusPoint)
@@ -944,39 +958,39 @@ public class BioBlox : MonoBehaviour
 	// The dock button resets the sliders to the middle.
 	public void Dock()
 	{
-		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-		
-		for (int i = 0; i < dockSliders.Count; ++i) {
-			dockSliders [i].value = conMan.maxDistance * 0.5f;
+		if (game_state == GameState.Picking || game_state == GameState.Docking) {
+			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+			
+			for (int i = 0; i < dockSliders.Count; ++i) {
+				dockSliders [i].value = conMan.maxDistance * 0.5f;
+			}
+			overrideSlider.value = conMan.maxDistance * 0.5f;
 		}
-		overrideSlider.value = conMan.maxDistance * 0.5f;
-
 	}
 	
-	// The lock button establishes the "win" state.
+	// The lock button establishes the Locked state.
 	public void Lock()
 	{
-		if (ScoreRMSD () < winScore) {
-			win = true;
+		if (game_state == GameState.Docking) {
+			game_state = GameState.Locked;
 		}
 	}
 	
 	void Reset ()
 	{
 		//clears the molecules and re-randomizes the colour range
-		randomColorPoolOffset = Random.Range (0, colorPool.Count - 1);
+		randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		GameObject.Destroy (molecules [0].gameObject);
 		GameObject.Destroy (molecules [1].gameObject);
 
 		//clear the old win condition
 		winCondition.Clear ();
 
-		//deactivates any states
-		win = false;
-
 		//clears the selected index
 		selectedLabel [0] = null;
 		selectedLabel [1] = null;
+
+		game_state = GameState.Picking;
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -984,7 +998,6 @@ public class BioBlox : MonoBehaviour
 	{
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
-
 
 		for (int i=0; i<mesh.mol.mesh.Length; ++i) {
 			Mesh cur = mesh.mol.mesh [i];
@@ -1076,26 +1089,25 @@ public class BioBlox : MonoBehaviour
 		}
 
 	}
-	
 
 	//main meat of the initilisation logic and level completion logic
 	IEnumerator game_loop ()
 	{
 		//if true, we have no more levels listed in the vector
 		//to be replaced with level selection. Talk to andy on PDB file selection
-		if (filenameIndex >= filenames.Count) {
+		if (current_level >= filenames.Count) {
 			Debug.LogError ("No next level");
 		}
+
 		if (lockButton) {
 			lockButton.gameObject.SetActive(false);
 		}
-		string file = filenames [filenameIndex];
+
+		string file = filenames [current_level];
+
 		//create both molecules
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1, 8);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1, 9);
-
-
-
 
 		MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
 
@@ -1186,24 +1198,50 @@ public class BioBlox : MonoBehaviour
 		mol2.transform.localScale = new Vector3 (1, 1, 1);
 		yield return new WaitForSeconds (0.1f);
 		eventSystem.enabled = true;
-		while (true) {
-			if (Input.anyKey && playerClock.clockStopped) {
-				//any input should start the timer
-				if (goSplash) {
-					PopInWaitDisappear (goSplash, 1.0f);
-				}
-				playerClock.StartPlayerTimer ();
+
+
+		// Enter waiting state
+		game_state = GameState.Waiting;
+
+		//any input should start the timer
+		while (!Input.anyKey || !playerClock.clockStopped) {
+			// start the new frame
+			yield return new WaitForEndOfFrame();
+		}
+
+		if (goSplash) {
+			PopInWaitDisappear (goSplash, 1.0f);
+		}
+
+		playerClock.StartPlayerTimer ();
+
+		// Enter picking state
+		game_state = GameState.Picking;
+
+		// In this loop, the game state is either Picking or Docking.
+		while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
+			// start the new frame
+			yield return new WaitForEndOfFrame();
+
+			// measure the score
+			float rms_distance_score = ScoreRMSD ();
+			if (rmsScoreSlider) {
+				rmsScoreSlider.value = rms_distance_score;
 			}
-			if (Input.GetKeyDown (KeyCode.L)) {
-				win = true;
+
+			if (lockButton) {
+				lockButton.gameObject.SetActive (rms_distance_score < winScore);
 			}
+
 			//test if we should move the molecules with quick ray casts
 			if (eventSystem.IsActive ()) {
-				ManageSliders();
+				ManageSliders ();
 				if (Input.GetMouseButton (0)) {
 					//Using this system we dont allow the player to move the two molecules at the same time
 					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 					Ray r = c.ScreenPointToRay (Input.mousePosition);
+
+					// Starting cooroutines is grubby, we should avoid this.
 					if (PDB_molecule.collide_ray_quick (
 						molecules [0],
 						molecules [0].GetComponent<PDB_mesh> ().mol,
@@ -1211,32 +1249,31 @@ public class BioBlox : MonoBehaviour
 						r)) {
 						//uncomment this line to stop players moving two molecules at once
 						//playerIsMoving[1]=false;#
-						if(!playerIsMoving[0])
-						{
+						if (!playerIsMoving [0]) {
 							playerIsMoving [0] = true;
 							StartCoroutine ("PlayerMoveMolecule", 0);
 						}
-					} else{
-						playerIsMoving[0] = false;
-
+					} else {
+						playerIsMoving [0] = false;
 					} 
+
 					if (PDB_molecule.collide_ray_quick (
 						molecules [1],
 						molecules [1].GetComponent<PDB_mesh> ().mol,
 						molecules [1].transform,
 						r)) {
+
 						//uncomment this line to stop players moving two molecules at once
 						//playerIsMoving[0]=false;
-						if(!playerIsMoving[1])
-						{
+						if (!playerIsMoving [1]) {
 							playerIsMoving [1] = true;
 							StartCoroutine ("PlayerMoveMolecule", 1);
 						}
-					}
-					else{
-						playerIsMoving[1]=false;
+					} else {
+						playerIsMoving [1] = false;
 					}
 				}
+
 				if (sites [0]) {
 					sites [0].transform.rotation = molecules [0].transform.rotation;
 					if (simpleGame) {
@@ -1251,59 +1288,46 @@ public class BioBlox : MonoBehaviour
 				}
 			}
 
-			if (ScoreRMSD () < winScore) {
-				if(lockButton)
-				{
-					lockButton.gameObject.SetActive(true);
-				}
-				else{
-					win=true;
-				}
-			}
-			else {
-				if(lockButton)
-				{
-					lockButton.gameObject.SetActive(false);
-				}
-			}
-				if(win)
-				{
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					PopOut (activeLabels [i].gameObject);
-				}
-				eventSystem.enabled = false;
-				//StartCoroutine("DockingOneAxis");
-				if (sites [0]) {
-					PopOut (sites [0]);
-				}
-				if (sites [1]) {
-					PopOut (sites [1]);
-				}
-				lockButton.gameObject.SetActive(false);
-					
-				Debug.Log ("Docked");
+		}
 
-				this.GetComponent<AudioManager> ().Play ("Win");
+		if (game_state == GameState.Locked) {
+			for (int i = 0; i < activeLabels.Count; ++i) {
+				PopOut (activeLabels [i].gameObject);
+			}
+			eventSystem.enabled = false;
 
-				GameObject parent = new GameObject ();
-				Rigidbody r = parent.AddComponent<Rigidbody> ();
-				molecules [0].transform.SetParent (parent.transform, true);
-				molecules [1].transform.SetParent (parent.transform, true);
+			//StartCoroutine("DockingOneAxis");
+			if (sites [0]) {
+				PopOut (sites [0]);
+			}
+
+			if (sites [1]) {
+				PopOut (sites [1]);
+			}
+
+			lockButton.gameObject.SetActive(false);
 				
-				r.angularDrag = 1.0f;
-				r.constraints = RigidbodyConstraints.FreezePosition;
-				r.useGravity = false;
-				parent.name = "MoveableParent";
+			Debug.Log ("Docked");
 
-				//this is to stop the molecules rumbling around as they inherit the pearents velocity
-				Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
-				Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
-					
-				StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
-				GameObject.Destroy (sites [0]);
-				GameObject.Destroy (sites [1]);
-				yield break;
-				}
+			this.GetComponent<AudioManager> ().Play ("Win");
+
+			GameObject parent = new GameObject ();
+			Rigidbody r = parent.AddComponent<Rigidbody> ();
+			molecules [0].transform.SetParent (parent.transform, true);
+			molecules [1].transform.SetParent (parent.transform, true);
+			
+			r.angularDrag = 1.0f;
+			r.constraints = RigidbodyConstraints.FreezePosition;
+			r.useGravity = false;
+			parent.name = "MoveableParent";
+
+			//this is to stop the molecules rumbling around as they inherit the pearents velocity
+			Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
+			Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
+				
+			StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
+			GameObject.Destroy (sites [0]);
+			GameObject.Destroy (sites [1]);
 			yield return null;
 		}
 	}
