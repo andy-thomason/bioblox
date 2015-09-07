@@ -829,6 +829,7 @@ public class BioBlox : MonoBehaviour
 		if (script.atomIds.Count == 0) {
 			return;
 		}
+
 		PDB_mesh pdbMesh = molecules [molNum].GetComponent<PDB_mesh> ();
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
@@ -959,10 +960,10 @@ public class BioBlox : MonoBehaviour
 		if (game_state == GameState.Picking || game_state == GameState.Docking) {
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
 		
+			overrideSlider.value = conMan.maxDistance;
 			for (int i = 0; i < dockSliders.Count; ++i) {
 				dockSliders [i].value = conMan.maxDistance;
 			}
-			overrideSlider.value = conMan.maxDistance;
 
 			//conMan.Reset ();
 
@@ -980,10 +981,10 @@ public class BioBlox : MonoBehaviour
 		if (game_state == GameState.Picking || game_state == GameState.Docking) {
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
 			
+			overrideSlider.value = conMan.maxDistance * 0.5f;
 			for (int i = 0; i < dockSliders.Count; ++i) {
 				dockSliders [i].value = conMan.maxDistance * 0.5f;
 			}
-			overrideSlider.value = conMan.maxDistance * 0.5f;
 			ManageSliders ();
 		}
 	}
@@ -998,19 +999,17 @@ public class BioBlox : MonoBehaviour
 	
 	public void SolidClicked()
 	{
-		foreach (GameObject obj in molecules)
-		{
-			//PDB_mesh mesh = obj.GetComponent<PDB_mesh> ().mol;
-			//mesh.SetRenderMode(mesh.RenderMode.Solid);
-		}
+		make_molecules (false, MeshTopology.Triangles);
 	}
 	
 	public void PointClicked()
 	{
+		make_molecules (false, MeshTopology.Points);
 	}
 	
 	public void WireClicked()
 	{
+		make_molecules (false, MeshTopology.Lines);
 	}
 
 
@@ -1410,6 +1409,8 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 
+	public int work_done = 0;
+
 	// Physics simulation
 	void FixedUpdate() {
 		if (do_physics_collision && molecules.Length >= 2) {
@@ -1425,15 +1426,18 @@ public class BioBlox : MonoBehaviour
 			PDB_molecule mol0 = mesh0.mol;
 			PDB_molecule mol1 = mesh1.mol;
 			water_dia = 0;
-			BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
+			//BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
+			GridCollider b = new GridCollider(mol0, t0, mol1, t1, water_dia);
+			work_done = b.work_done;
 
-			//BitArray ba0 = new BitArray (mol0.atom_centres.Length);
-			//BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+			BitArray ba0 = new BitArray (mol0.atom_centres.Length);
+			BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+
 			num_touching_0 = 0;
 			num_touching_1 = 0;
 
 			// Apply forces to the rigid bodies.
-			foreach (BvhCollider.Result r in b.results) {
+			foreach (GridCollider.Result r in b.results) {
 				Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
 				Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
 				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
@@ -1446,16 +1450,10 @@ public class BioBlox : MonoBehaviour
 						r0.AddForceAtPosition(normal,c0);
 						r1.AddForceAtPosition(-normal, c1);
 					}
-					num_touching_1++;
 				}
 				
-				num_touching_0++;
-				
-				/*if (distance < min_d + water_dia) {
-				//Debug.Log(r.i0 + ", " + r.i1);
 				if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
 				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-			}*/
 			}
 		}  
 		if (eventSystem != null && eventSystem.IsActive ()) {

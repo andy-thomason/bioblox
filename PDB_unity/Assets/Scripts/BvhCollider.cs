@@ -14,7 +14,7 @@ public class BvhCollider
     Transform t0;
     PDB_molecule mol1;
     Transform t1;
-    int work_done = 0;
+    public int work_done = 0;
 
 	// allow us to inflate the search to return more pairs.
 	float radiusInflate = 0.0f;
