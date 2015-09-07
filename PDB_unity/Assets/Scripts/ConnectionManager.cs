@@ -25,7 +25,6 @@ public class ConnectionManager : MonoBehaviour {
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
-
 	public void Reset()
 	{
 		connections.Clear ();

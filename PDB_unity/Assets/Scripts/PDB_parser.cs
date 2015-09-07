@@ -49,11 +49,11 @@ using AssemblyCSharp;
 
 
 public class PDB_parser {
-    static private Dictionary<string, int> colour = new Dictionary<string, int> {
+    /*static private Dictionary<string, int> colour = new Dictionary<string, int> {
         {" H", 0xcccccc},{" C", 0xaaaaaa},{" O", 0xcc0000},{" N", 0x0000cc},{" S", 0xcccc00},
         {" P", 0x6622cc},{" F", 0x00cc00},{"CL", 0x00cc00},{"BR", 0x882200},{" I", 0x6600aa},
         {"FE", 0xcc6600},{"CA", 0x8888aa},
-    };
+    };*/
 
     // Reference: glMol / A. Bondi, J. Phys. Chem., 1964, 68, 441.
     static private Dictionary<string, float> radii = new Dictionary<string, float> {
@@ -99,7 +99,7 @@ public class PDB_parser {
                     float r = radii[line.Substring(77 - 1, 2)];
 					string id = line.Substring(13, 7);
 					string aminoAcid = id.Substring(3);
-					int atom = int.Parse(line.Substring(6, 5));
+					//int atom = int.Parse(line.Substring(6, 5));
 
 					while(aminoAcidName.Count < chainNumber)
 					{
@@ -166,7 +166,7 @@ public class PDB_parser {
 					int labelIndex = int.Parse(line.Substring(7, 4));
 					int atomSerial = int.Parse(line.Substring(12, 4));
 					int molNumber = int.Parse(line.Substring(17, 4));
-					string tag = line.Substring(22, 4);
+					//string tag = line.Substring(22, 4);
 					while(labels.Count < molNumber + 1)
 					{
 						labels.Add(new List<PDB_molecule.Label>());

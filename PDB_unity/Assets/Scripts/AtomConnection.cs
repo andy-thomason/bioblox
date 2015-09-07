@@ -76,16 +76,11 @@ namespace AssemblyCSharp
 		{
 			int numPoints = 10;
 			for (int i = 0; i < numPoints; ++i) {
-				float div = i * (1.0f / (numPoints-1));
 				Point potentialPoint = new Point();
 				if (i == 0 || i == numPoints-1)
 				{
 					potentialPoint.invMass = 0;
 				}
-				/*if (i > 0) {
-					//make a spring
-					springs.Add(new Spring(points[i-1], potentialPoint));
-				}*/
 				potentialPoint.pos = Vector3.zero;
 				points.Add(potentialPoint);
 			}

@@ -278,7 +278,7 @@ public class MarchingCubes
 	// Given a 3D lattice of values (mc_values) generate triangles where values transition from positive to negative.
 	public MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
 		DateTime start_time = DateTime.Now;
-		float rgs = 1.0f / grid_spacing;
+		//float rgs = 1.0f / grid_spacing;
 
 		// This reproduced the vertex order of Paul Bourke's (borrowed) table.
 		// The indices in edge_indices have the following offsets.
@@ -291,7 +291,7 @@ public class MarchingCubes
 		// Now build the marching cubes triangles.
 		// Each cube owns three edges 0->1 0->3 0->4
 		int[] edge_indices = new int[xdim*ydim*zdim*3];
-		byte[] masks = new byte[xdim*ydim*zdim];
+		//byte[] masks = new byte[xdim*ydim*zdim];
 
 
 		// We store three indices per cube for the edges closest to vertex 0
@@ -404,7 +404,7 @@ public class MarchingCubes
 				for (int j = 0; j != ydim-1; ++j) {
 					for (int i = 0; i != xdim-1; ++i) {
 						int idx = (k * ydim + j) * xdim + i;
-						Vector3 pos0 = new Vector3 (x0 + i, y0 + j, z0 + k);
+						//Vector3 pos0 = new Vector3 (x0 + i, y0 + j, z0 + k);
 
 						// Mask of vertices outside the isosurface (values are negative)
 						// Example:

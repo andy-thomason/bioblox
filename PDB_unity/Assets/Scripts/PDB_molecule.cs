@@ -187,7 +187,7 @@ public class PDB_molecule
 		float[] mc_values = new float[xdim * ydim * zdim];
 		Vector3[] mc_normals = new Vector3[xdim * ydim * zdim];
 		Color[] mc_colours = new Color[xdim * ydim * zdim];
-		float diff = 0.125f, rec = 2.0f / diff;
+		//float diff = 0.125f, rec = 2.0f / diff;
 		for (int i = 0; i != xdim * ydim * zdim; ++i) {
 			mc_values[i] = -0.5f;
 			mc_colours[i] = new Color(1, 1, 1, 1);
@@ -700,52 +700,5 @@ public class PDB_molecule
 		return false;
 	}
 	
-	static public bool pysics_collide(
-		GameObject obj0, PDB_molecule mol0, Transform t0,
-		GameObject obj1, PDB_molecule mol1, Transform t1,
-		float seperationForce,
-		float water_dia,
-		out int num_touching_0,
-		out int num_touching_1
-		)
-    {
-		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
-        Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-        Rigidbody r1 = obj1.GetComponent<Rigidbody>();
-		num_touching_0 = num_touching_1 = 0;
-		if (!r0 || !r1) {
-			return false;
-		}
-
-		BitArray ba0 = new BitArray (mol0.atom_centres.Length);
-		BitArray ba1 = new BitArray (mol1.atom_centres.Length);
-		num_touching_0 = 0;
-		num_touching_1 = 0;
-
-        foreach (BvhCollider.Result r in b.results) {
-            Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-            Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
-            float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
-            float distance = (c1 - c0).magnitude;
-
-			if (distance < min_d) {
-                Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-				normal *= seperationForce;
-				r0.AddForceAtPosition(normal,c0);
-                r1.AddForceAtPosition(-normal, c1);
-            }
-
-			if (distance < min_d + water_dia) {
-				//Debug.Log(r.i0 + ", " + r.i1);
-				if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-			}
-        }
-
-        if (b.results.Count > 0) {
-			return true;
-		}
-		return false;
-    }
 };
 

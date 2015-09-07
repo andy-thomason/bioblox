@@ -74,7 +74,6 @@ public class BioBlox : MonoBehaviour
 	public Slider rmsScoreSlider;
 	public Slider overrideSlider;
 	public List<Slider> dockSliders = new List<Slider> ();
-	List<bool> sliderConstarinedByOverride = new List<bool>();
 	public float dockOverrideOffset = 0.0f;
 
 	bool do_physics_collision = false;
@@ -91,7 +90,7 @@ public class BioBlox : MonoBehaviour
 	// shape scoring
 	public int num_touching_0 = 0;
 	public int num_touching_1 = 0;
-	public float water_dia = 1.0f;
+	public float water_dia = 0.0f;
 
 	public enum GameState {
 		Setup,
@@ -299,9 +298,9 @@ public class BioBlox : MonoBehaviour
 					Vector3 mousePos = Input.mousePosition;
 					Vector3 mouseDelta = mousePos - lastMousePos;
 					//find the world position of the atom
-					Vector3 atomPos = GetAtomWorldPos (atomID, molIndex);
+					//Vector3 atomPos = GetAtomWorldPos (atomID, molIndex);
 
-					GameObject other = molecules[1-molIndex];
+					//GameObject other = molecules[1-molIndex];
 
 					Vector3 dirRight = Vector3.right;
 					Vector3 dirUp = Vector3.up;
@@ -474,12 +473,12 @@ public class BioBlox : MonoBehaviour
 	//this is to emphisie the docking site
 	IEnumerator FadeMolecules ()
 	{
-		GameObject mol1 = molecules [0];
-		GameObject mol2 = molecules [1];
+		//GameObject mol1 = molecules [0];
+		//GameObject mol2 = molecules [1];
 		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
 		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
-		PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
-		PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
+		//PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
+		//PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
 
 		//it is necessary to loop through the children as the mesh may be split into seveal sections
 		//due to vertex number limitations in unity
@@ -674,26 +673,47 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
-
 	public void ManageSliders()
 	{
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
 		bool allInPickZone = true;
-		if (overrideSlider.gameObject.activeSelf) {
-			for(int i = 0; i < dockSliders.Count; ++i)
+		if (overrideSlider.gameObject.activeSelf && conMan.connectionMinDistances.Length == dockSliders.Count) {
+			float slider_pos = overrideSlider.value - dockOverrideOffset;
+
+			// see if the sliders are in the "sticky" region near the constrainer
+			float val0 = dockSliders[0].value;
+			bool all_together = true;
+			for (int i = 1; i < dockSliders.Count; ++i)
 			{
-				if(dockSliders[i].value < overrideSlider.value - dockOverrideOffset)
+				all_together = all_together && dockSliders[i].value == val0;
+			}
+
+			if (all_together && val0 >= slider_pos - 2)
+			{
+				// all sliders are being moved by the master
+				for (int i = 0; i < dockSliders.Count; ++i)
 				{
-					sliderConstarinedByOverride[i] = false;
-				} else {
-				//if(dockSliders[i].value > overrideSlider.value - dockOverrideOffset)
-				//{
-					dockSliders[i].value = overrideSlider.value - dockOverrideOffset;
-					sliderConstarinedByOverride[i] = true;
+					dockSliders[i].value = slider_pos;
+					conMan.connectionMinDistances[i] = dockSliders[i].value;
 				}
-				conMan.connectionMinDistances[i] = dockSliders[i].value;
-				if(dockSliders[i].value < dockSliders[i].maxValue-5)
+			} else
+			{
+				// sliders are individual.
+				for (int i = 0; i < dockSliders.Count; ++i)
+				{
+					if (dockSliders[i].value >= slider_pos)
+					{
+						dockSliders[i].value = slider_pos;
+					}
+					conMan.connectionMinDistances[i] = dockSliders[i].value;
+				}
+			}
+
+			// Return to pick state if all on the right.
+			for (int i = 1; i < dockSliders.Count; ++i)
+			{
+				if (dockSliders[i].value < dockSliders[i].maxValue-5)
 				{
 					allInPickZone = false;
 				}
@@ -876,7 +896,7 @@ public class BioBlox : MonoBehaviour
 				r.material.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
-			Vector3 molPos = pdbMesh.transform.position;
+			//Vector3 molPos = pdbMesh.transform.position;
 
 			/*
 			Mesh featureTriMesh = new Mesh();
@@ -944,15 +964,22 @@ public class BioBlox : MonoBehaviour
 	// The pick button resets the sliders to the right.
 	public void Pick()
 	{
-		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+		if (game_state == GameState.Picking || game_state == GameState.Docking) {
+			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
 		
-		for (int i = 0; i < dockSliders.Count; ++i) {
-			dockSliders [i].value = conMan.maxDistance;
-		}
-		overrideSlider.value = conMan.maxDistance;
+			for (int i = 0; i < dockSliders.Count; ++i) {
+				dockSliders [i].value = conMan.maxDistance;
+			}
+			overrideSlider.value = conMan.maxDistance;
 
-		selectedLabel [0] = null;
-		selectedLabel [1] = null;
+			//conMan.Reset ();
+
+			//selectedLabel [0] = null;
+			//selectedLabel [1] = null;
+			//game_state = GameState.Picking;
+
+			ManageSliders ();
+		}
 	}
 	
 	// The dock button resets the sliders to the middle.
@@ -965,6 +992,7 @@ public class BioBlox : MonoBehaviour
 				dockSliders [i].value = conMan.maxDistance * 0.5f;
 			}
 			overrideSlider.value = conMan.maxDistance * 0.5f;
+			ManageSliders ();
 		}
 	}
 	
@@ -975,6 +1003,25 @@ public class BioBlox : MonoBehaviour
 			game_state = GameState.Locked;
 		}
 	}
+	
+	public void SolidClicked()
+	{
+		foreach (GameObject obj in molecules)
+		{
+			PDB_mesh mesh = obj.GetComponent<PDB_mesh> ().mol;
+			//mesh.SetRenderMode(mesh.RenderMode.Solid);
+		}
+	}
+	
+	public void PointClicked()
+	{
+	}
+	
+	public void WireClicked()
+	{
+	}
+
+
 	
 	void Reset ()
 	{
@@ -1044,8 +1091,8 @@ public class BioBlox : MonoBehaviour
 		//save their original positions them move them to oppose oneanother
 		//very messy, should really clean this up, either use points in the world or do it dynamically
 		obj.transform.Rotate (0, 0, 270);
-		Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
-		Quaternion originalMolRot = obj.transform.rotation;
+		//Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
+		//Quaternion originalMolRot = obj.transform.rotation;
 		obj.transform.Rotate (0, 0, -270); 
 		obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
@@ -1186,7 +1233,7 @@ public class BioBlox : MonoBehaviour
 			dockSliders[i].minValue = conMan.minDistance;
 			dockSliders[i].value =conMan.maxDistance;
 			dockSliders[i].gameObject.SetActive(false);
-			sliderConstarinedByOverride.Add(true);
+			//sliderConstarinedByOverride.Add(true);
 		}
 
 		overrideSlider.maxValue = conMan.maxDistance;
@@ -1290,10 +1337,15 @@ public class BioBlox : MonoBehaviour
 
 		}
 
+		Debug.Log ("exited docking loop " + game_state);
+
 		if (game_state == GameState.Locked) {
+			Debug.Log ("locking");
+
 			for (int i = 0; i < activeLabels.Count; ++i) {
 				PopOut (activeLabels [i].gameObject);
 			}
+
 			eventSystem.enabled = false;
 
 			//StartCoroutine("DockingOneAxis");
@@ -1335,25 +1387,54 @@ public class BioBlox : MonoBehaviour
 	// Physics simulation
 	void FixedUpdate() {
 		if (do_physics_collision && molecules.Length >= 2) {
+			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
 			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
 			PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
-			if (PDB_molecule.pysics_collide (
-				obj0, mesh0.mol, obj0.transform,
-				obj1, mesh1.mol, obj1.transform,
-				seperationForce,
-				water_dia,
-				out num_touching_0,
-				out num_touching_1
-			)) {
-				//hasCollided = true;
+			Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+			Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+			Transform t0 = obj0.transform;
+			Transform t1 = obj1.transform;
+			PDB_molecule mol0 = mesh0.mol;
+			PDB_molecule mol1 = mesh1.mol;
+			water_dia = 0;
+			BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
+
+			//BitArray ba0 = new BitArray (mol0.atom_centres.Length);
+			//BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+			num_touching_0 = 0;
+			num_touching_1 = 0;
+
+			// Apply forces to the rigid bodies.
+			foreach (BvhCollider.Result r in b.results) {
+				Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+				Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+				float distance = (c1 - c0).magnitude;
+				
+				if (distance < min_d) {
+					Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+					normal *= seperationForce;
+					if (r0 != null && r1 != null) {
+						r0.AddForceAtPosition(normal,c0);
+						r1.AddForceAtPosition(-normal, c1);
+					}
+					num_touching_1++;
+				}
+				
+				num_touching_0++;
+				
+				/*if (distance < min_d + water_dia) {
+				//Debug.Log(r.i0 + ", " + r.i1);
+				if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+			}*/
 			}
 		}  
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
     }
-
 }
 
