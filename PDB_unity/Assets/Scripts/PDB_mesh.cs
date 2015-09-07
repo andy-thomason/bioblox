@@ -22,6 +22,7 @@ public class PDB_mesh : MonoBehaviour {
 	  
         mol = PDB_parser.get_molecule(this.name);
 	}
+
 	public void AlignPointToVector(Vector3 point, Vector3 targetDir)
 	{
 		Vector3 localPos = point;

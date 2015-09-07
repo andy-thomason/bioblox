@@ -1008,7 +1008,7 @@ public class BioBlox : MonoBehaviour
 	{
 		foreach (GameObject obj in molecules)
 		{
-			PDB_mesh mesh = obj.GetComponent<PDB_mesh> ().mol;
+			//PDB_mesh mesh = obj.GetComponent<PDB_mesh> ().mol;
 			//mesh.SetRenderMode(mesh.RenderMode.Solid);
 		}
 	}
@@ -1041,19 +1041,29 @@ public class BioBlox : MonoBehaviour
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
-	void make_molecule_mesh (PDB_mesh mesh, string proto, int layerNum)
+	void make_molecule_mesh (PDB_mesh mesh, Material material, int layerNum, MeshTopology mesh_type)
 	{
-		GameObject pdb = GameObject.Find (proto);
-		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
+
+		foreach (GameObject child in transform) {
+			Destroy(child);
+		}
 
 		for (int i=0; i<mesh.mol.mesh.Length; ++i) {
 			Mesh cur = mesh.mol.mesh [i];
+			if (mesh_type != MeshTopology.Triangles) {
+				Mesh new_mesh = new Mesh();
+				new_mesh.vertices = cur.vertices;
+				new_mesh.colors = cur.colors;
+				new_mesh.normals = cur.normals;
+				new_mesh.SetIndices(cur.GetIndices(0), mesh_type, 0);
+				cur = new_mesh;
+			}
 			GameObject obj = new GameObject ();
 			obj.name = cur.name;
 			obj.layer = layerNum;
 			MeshFilter f = obj.AddComponent<MeshFilter> ();
 			MeshRenderer r = obj.AddComponent<MeshRenderer> ();
-			r.material = pdbr.material;
+			r.material = material;
 			f.mesh = cur;
 			obj.transform.SetParent (mesh.transform);
 			obj.transform.position = Vector3.zero;
@@ -1061,9 +1071,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 	// Creates the molecule objects including the PDB_mesh script.
-	GameObject make_molecule (
-		string name, string proto, float xoffset, int layerNum
-	)
+	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type)
 	{
 		GameObject obj = new GameObject ();
 		obj.SetActive (true);
@@ -1072,12 +1080,21 @@ public class BioBlox : MonoBehaviour
 		obj.layer = layerNum;
 
 		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
-		Rigidbody ri = obj.AddComponent<Rigidbody> ();
 
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
-		make_molecule_mesh (p, proto, layerNum);
-		Debug.Log (mol.mesh [0].vertices.Length);
+		GameObject pdb = GameObject.Find (proto);
+		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
+		make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
+		return obj;
+	}
+
+	// set the object to its initial position etc.
+	void reset_molecule(GameObject obj, float xoffset)
+	{
+		PDB_mesh p = obj.GetComponent<PDB_mesh> ();
+		Rigidbody ri = obj.AddComponent<Rigidbody> ();
+		PDB_molecule mol = p.mol;
 
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
@@ -1090,10 +1107,10 @@ public class BioBlox : MonoBehaviour
 
 		//save their original positions them move them to oppose oneanother
 		//very messy, should really clean this up, either use points in the world or do it dynamically
-		obj.transform.Rotate (0, 0, 270);
+		//obj.transform.Rotate (0, 0, 270);
 		//Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
 		//Quaternion originalMolRot = obj.transform.rotation;
-		obj.transform.Rotate (0, 0, -270); 
+		//obj.transform.Rotate (0, 0, -270); 
 		obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
@@ -1110,7 +1127,6 @@ public class BioBlox : MonoBehaviour
 				}
 			}
 		}
-		return obj;
 	}
 
 
@@ -1137,6 +1153,27 @@ public class BioBlox : MonoBehaviour
 
 	}
 
+	// create both molecules
+	void make_molecules(bool init, MeshTopology mesh_type) {
+		string file = filenames [current_level];
+		
+		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
+		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type);
+
+		if (init) {
+			molecules = new GameObject[2];
+			molecules [0] = mol1.gameObject;
+			molecules [1] = mol2.gameObject;
+
+			float offset = -1;
+			foreach (GameObject obj in molecules)
+			{
+				reset_molecule(obj, offset);
+				offset += 2;
+			}
+		}
+	}
+
 	//main meat of the initilisation logic and level completion logic
 	IEnumerator game_loop ()
 	{
@@ -1150,13 +1187,13 @@ public class BioBlox : MonoBehaviour
 			lockButton.gameObject.SetActive(false);
 		}
 
-		string file = filenames [current_level];
+		make_molecules (true, MeshTopology.Triangles);
 
-		//create both molecules
-		GameObject mol1 = make_molecule (file + ".1", "Proto1", -1, 8);
-		GameObject mol2 = make_molecule (file + ".2", "Proto2", 1, 9);
+		// This is very grubby, must generalise.
+		GameObject mol1 = molecules [0];
+		GameObject mol2 = molecules [1];
 
-		MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
+		/*MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
 
 		featureTriangle [0] = new GameObject ();
 		featureTriangle [0].AddComponent<MeshFilter> ();
@@ -1179,10 +1216,10 @@ public class BioBlox : MonoBehaviour
 		featureTriangle [1].name = "FeatureTriangle2";
 		featureTriangle [1].transform.position = Vector3.zero;
 		featureTriangle [1].transform.SetParent (mol2.transform, false);
-		featureTriangle [1].layer = 5;
+		featureTriangle [1].layer = 5;*/
 
 
-		GameObject.Destroy (pdbr.gameObject);
+		//GameObject.Destroy (pdbr.gameObject);
 
 		originPosition [0] = mol1.transform.position;
 		originPosition [1] = mol2.transform.position;
@@ -1195,11 +1232,6 @@ public class BioBlox : MonoBehaviour
 		playerClock.ResetTimer ();
 		playerClock.timeText.enabled = false;
 	
-		molecules = new GameObject[2];
-		molecules [0] = mol1.gameObject;
-		mol1.layer = 7;
-		molecules [1] = mol2.gameObject;
-		mol1.layer = 8;
 		PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
 		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
 
