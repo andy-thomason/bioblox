@@ -40,9 +40,9 @@ public class BioBlox : MonoBehaviour
 	public bool exitWinSplash = false;
 
 	// all labels which are currently in the scene
-	List<LabelScript> activeLabels = new List<LabelScript> ();
+	public List<LabelScript> activeLabels = new List<LabelScript> ();
 	// a number of selected labels, at the moment limited to 2, one from each molecule
-	LabelScript[] selectedLabel = new LabelScript[2];
+	public LabelScript[] selectedLabel = new LabelScript[2];
 	// a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 
@@ -201,7 +201,6 @@ public class BioBlox : MonoBehaviour
 
 	public void GetMiniLabelPos(int atomID, int molNum, Transform t)
 	{
-
 		Vector3 atomPos = GetAtomPos (atomID, molNum);
 		//if the molecule does not exist, or the atom id is bad
 		if (molNum == -1 || molecules.Length == 0) {
@@ -226,30 +225,23 @@ public class BioBlox : MonoBehaviour
 	//returns an atoms local position from a atom index and molecule index	
 	public Vector3 GetAtomPos (int atomID, int molNum)
 	{
-		if (molecules.Length == 2) {
-
-			if (atomID == -1) {
-				Debug.LogError ("Bad index");
-			}
-			if (molecules [molNum] == null) {
-				return Vector3.zero;
-			}
-			return  molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID];
+		if (atomID == -1 || molNum >= molecules.Length || molecules [molNum] == null) {
+			Debug.LogError ("Bad index");
+			return Vector3.zero;
 		}
-		return new Vector3 (0, 0, 0);
+		return molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID];
 	}
 
 	//returns an atoms world position from atom index and molecule index
 	public Vector3 GetAtomWorldPos (int atomID, int molNum)
 	{
-		if (molecules.Length == 2) {
-			if (atomID == -1) {
-				Debug.LogError ("Bad index");
-			}
-			return  molecules [molNum].transform.TransformPoint (
-				molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID]);
+		if (atomID == -1 || molNum >= molecules.Length || molecules [molNum] == null) {
+			Debug.LogError ("Bad index");
+			return Vector3.zero;
 		}
-		return new Vector3 (0, 0, 0);
+		return molecules [molNum].transform.TransformPoint (
+			molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID]
+		);
 	}
     
 
@@ -1090,7 +1082,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 	// set the object to its initial position etc.
-	void reset_molecule(GameObject obj, float xoffset)
+	void reset_molecule(GameObject obj, float xoffset, int molNum)
 	{
 		PDB_mesh p = obj.GetComponent<PDB_mesh> ();
 		Rigidbody ri = obj.AddComponent<Rigidbody> ();
@@ -1116,7 +1108,7 @@ public class BioBlox : MonoBehaviour
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 
 		//extract the molecule number from the name .1 = 0 .2 = 1
-		int molNum = (int)char.GetNumericValue (name [name.Length - 1]) - 1;
+		//int molNum = (int)char.GetNumericValue (obj.name [obj.name.Length - 1]) - 1;
 		obj.transform.rotation = Random.rotation;
 
 		//if this is the simple game load in labels from the file
@@ -1155,6 +1147,7 @@ public class BioBlox : MonoBehaviour
 
 	// create both molecules
 	void make_molecules(bool init, MeshTopology mesh_type) {
+		Debug.Log ("make_molecules");
 		string file = filenames [current_level];
 		
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
@@ -1166,9 +1159,10 @@ public class BioBlox : MonoBehaviour
 			molecules [1] = mol2.gameObject;
 
 			float offset = -1;
+			int molNum = 0;
 			foreach (GameObject obj in molecules)
 			{
-				reset_molecule(obj, offset);
+				reset_molecule(obj, offset, molNum++);
 				offset += 2;
 			}
 		}

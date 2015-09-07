@@ -204,8 +204,7 @@ public class LabelScript : MonoBehaviour{
 
 	// Update is called once per frame
 	void Update () {
-			
-		owner.GetLabelPos(atomIds,moleculeNumber,this.transform);
+		owner.GetLabelPos(atomIds, moleculeNumber, this.transform);
 
 		if(useMiniLabel)
 		{
