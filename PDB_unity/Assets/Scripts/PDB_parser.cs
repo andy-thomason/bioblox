@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -33,26 +33,27 @@ using AssemblyCSharp;
 //27 - 31       Integer         serial        Serial number of bonded atom
 //------------------------------------------------------
 //1 -6          BioBlox name    "BBPAIR"
-//7 -11			Integer			index		Index of atom in first molecule to pair
-//13-16			Integer			index		Index of atom in second molecule to pair
+//7 -11			Integer			index		Index of the first label
+//13-16			Integer			index		Index of second label
 //------------------------------------------------------
 //1 -6			BioBlox name	"BBSPNG"
 //7 -11			Integer			index		Index of first atom in spring
 //13-16			Integer			index		Index of second atom in spring
 //------------------------------------------------------
-//1 -6			BioBlox name    "BIOB"
-//7-11			Integer			index		Index of labeled atom
-//12-16 		Integer			index		Molecule index
-//17-21			LString(8)      string		Tag for the atom
+//1-6			BioBlox name    "BIOB"
+//7-11			Integer			index		Label Index
+//12-16			Integer			index		Atom seriel
+//17-21			Integer			index		Molecule Index
+//22-26			LString(8)      string		Tag for the atom
 
 
 
 public class PDB_parser {
-    static private Dictionary<string, int> colour = new Dictionary<string, int> {
+    /*static private Dictionary<string, int> colour = new Dictionary<string, int> {
         {" H", 0xcccccc},{" C", 0xaaaaaa},{" O", 0xcc0000},{" N", 0x0000cc},{" S", 0xcccc00},
         {" P", 0x6622cc},{" F", 0x00cc00},{"CL", 0x00cc00},{"BR", 0x882200},{" I", 0x6600aa},
         {"FE", 0xcc6600},{"CA", 0x8888aa},
-    };
+    };*/
 
     // Reference: glMol / A. Bondi, J. Phys. Chem., 1964, 68, 441.
     static private Dictionary<string, float> radii = new Dictionary<string, float> {
@@ -62,13 +63,16 @@ public class PDB_parser {
     };
 
     static public List<PDB_molecule> parse(string asset_name) {
-        List<Vector3> atom_centres = new List<Vector3>();
-        List<float> atom_radii = new List<float>();
-        List<int> names = new List<int>();
+		List<Vector3> atom_centres = new List<Vector3>();
+		List<float> atom_radii = new List<float>();
+		List<Color> atom_colours = new List<Color>();
+		List<int> names = new List<int>();
         List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
-		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>> ();
+		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
+		List<string> aminoAcidName = new List<string>();
+		List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
@@ -84,26 +88,56 @@ public class PDB_parser {
                 string kind = line.Substring(0, Mathf.Min(6, line.Length));
 				if(line.Length < 5)
 				{Debug.Log("(" + kind + ")");}
-                if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
+
+				if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
                 {
                     int serial = int.Parse(line.Substring(7 - 1, 5));
+					int chainNumber = int.Parse(line.Substring(23, 3));
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
-                    int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
+					string id = line.Substring(13, 7);
+					string aminoAcid = id.Substring(3);
+					//int atom = int.Parse(line.Substring(6, 5));
+
+					while(aminoAcidName.Count < chainNumber)
+					{
+						aminoAcidName.Add(null);
+					}
+
+					while(aminoAcidAtomIDs.Count < chainNumber)
+					{
+						aminoAcidAtomIDs.Add(new List<int>());
+					}
+
+					aminoAcidName[chainNumber - 1] = aminoAcid;
+					aminoAcidAtomIDs[chainNumber - 1].Add(serial);
+
+					Color col = Color.white;
+					if (id == "NZ  LYS" || id == "NH2 ARG") {
+						col = new Color(1, 0, 0, 1);
+					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
+					{
+						col = new Color(0, 0, 1, 1);
+					}
+
+					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
                     if (name == PDB_molecule.atom_N) {
                         residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
                         residues.Add(names.Count);
                     }
+
                     names.Add(name);
 					if (serial >= 0) {
 						while (serial >= serial_to_atom.Count) serial_to_atom.Add (-1);
 						serial_to_atom[serial] = atom_centres.Count;
 					}
+
                     atom_centres.Add(new Vector3(x, y, z));
-                    atom_radii.Add(r);
-                    minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
+					atom_radii.Add(r);
+					atom_colours.Add(col);
+					minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
                     maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
                 } else if (kind == "CONECT") {
                     /*int len = line.Length;
@@ -121,23 +155,28 @@ public class PDB_parser {
                         pairs.Add((idx << 16) | c);
                     }*/
 				} else if(kind == "BBSPNG"){
-					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(13, 4));
-					springPairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+					int firstLabel = int.Parse(line.Substring(7, 4));
+					int secondLabel = int.Parse(line.Substring(13, 4));
+					springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
 				} else if (kind == "BBPAIR") {
-					int firstMeshAtom = int.Parse(line.Substring(7, 4));
-					int secondMeshAtom = int.Parse(line.Substring(13, 4));
-					pairs.Add(new Tuple<int, int>(firstMeshAtom, secondMeshAtom));
+					int firstLabel = int.Parse(line.Substring(7, 4));
+					int secondLabel = int.Parse(line.Substring(13, 4));
+					pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
 				} else if (kind == "BIOB  ") {
-					int atomIndex = int.Parse(line.Substring(7, 4));
-					int molIndex = int.Parse(line.Substring(12, 4));
-					string tag = line.Substring(17, 4);
-					while(labels.Count<=molIndex)
+					int labelIndex = int.Parse(line.Substring(7, 4));
+					int atomSerial = int.Parse(line.Substring(12, 4));
+					int molNumber = int.Parse(line.Substring(17, 4));
+					//string tag = line.Substring(22, 4);
+					while(labels.Count < molNumber + 1)
 					{
 						labels.Add(new List<PDB_molecule.Label>());
 					}
-					Debug.Log(tag+" attached to " + atomIndex + " on molecule " + molIndex);
-					labels[molIndex-1].Add(new PDB_molecule.Label(atomIndex, tag));
+					while(labels[molNumber].Count < labelIndex + 1)
+					{
+						labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
+					}
+					//Debug.Log( atomSerial + " added to " + labelIndex);
+					labels[molNumber][labelIndex].atomIds.Add(atomSerial);
 				} else if (kind == "TER   " || kind == "TER") {
 
                     cur = new PDB_molecule();
@@ -147,7 +186,19 @@ public class PDB_parser {
                     cur.pos.y = (maxy + miny) * 0.5f;
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
+					cur.aminoAcidsNames = new List<string>();
+					cur.aminoAcidsAtomIds = new List<int[]>();
+					for(int i = 0; i < aminoAcidName.Count; ++i)
+					{
+						if(aminoAcidName[i] != null)
+						{
+							cur.aminoAcidsNames.Add(aminoAcidName[i]);
+							cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
+						}
+					}
+				
                     cur.atom_centres = new Vector3[atom_centres.Count];
+					cur.atom_colours = atom_colours.ToArray();
                     cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
 					cur.serial_to_atom = serial_to_atom.ToArray();
                     for (int j = 0; j != names.Count; ++j) {
@@ -162,6 +213,8 @@ public class PDB_parser {
                     atom_radii.Clear();
                     residues.Clear();
 					serial_to_atom.Clear();
+					aminoAcidName.Clear();
+					aminoAcidAtomIDs.Clear();
                 } 
             }
         }
@@ -171,10 +224,11 @@ public class PDB_parser {
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
-			m.pairedAtoms=pairs.ToArray();
-			m.spring_pairs=springPairs.ToArray();
+			m.pairedLabels = pairs.ToArray();
+			m.spring_pairs = springPairs.ToArray();
 			if(labels.Count>i)
 			{
+				Debug.Log("Num labels = " + labels.Count);
 				m.labels=labels[i].ToArray();
 			}
             m.name = asset_name + "." + (i+1);

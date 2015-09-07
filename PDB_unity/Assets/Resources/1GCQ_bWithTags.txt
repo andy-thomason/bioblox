@@ -1,13 +1,18 @@
-BBPAIR 865   1468
-BBSPNG 865   1468  
-BBSPNG 633   1421 
-BIOB   1468  2   Knob 
-BIOB   1372  2   Knob
-//BIOB   1130  2   Knob
-BIOB   865   1   Hole
-BIOB   558   1   Hole
-//BIOB   481   1   Hole
-
+BBPAIR 0     1   
+BBSPNG 865   1468     
+BBSPNG 633   1421      
+BIOB   0    865  0    Flat
+BIOB   0    633  0    Flat
+BIOB   0    922  0    Flat
+BIOB   1    1468 1    Flat
+BIOB   1    1421 1    Flat
+BIOB   1    952  1    Knob
+BIOB   2    1372 1    Flat
+BIOB   2    1400 1    Flat
+BIOB   2    1089 1    Flat
+BIOB   3    558  0    Flat
+BIOB   3    575  0    Flat
+BIOB   3    565  0    Flat
 ATOM    457  N   THR B 159      19.072   4.457  42.625  1.00 36.42           N  
 ATOM    458  CA  THR B 159      18.993   5.712  41.815  1.00 36.11           C  
 ATOM    459  C   THR B 159      17.630   6.359  42.014  1.00 32.52           C  

@@ -3,3 +3,6 @@ obj
 ProjectSettings
 Temp
 *.suo
+*.sln
+*.csproj
+

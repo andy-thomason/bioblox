@@ -9,6 +9,7 @@
 //------------------------------------------------------------------------------
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 namespace AssemblyCSharp
 {
 	public class AtomConnection
@@ -30,29 +31,176 @@ namespace AssemblyCSharp
 			isActive = false;
 		}
 
-		virtual public void Update()
+		virtual public void Update(float spring_constant, float dampingFactor, float force, float minDist)
 		{}
 		virtual public void Draw()
 		{}
 	}
 
+	public class Rope : AtomConnection
+	{
+		public class Point
+		{
+			public Point()
+			{
+				force = vel = pos = Vector3.zero;
+				invMass = 1;
+			}
+
+			public Vector3 pos;
+			public Vector3 vel;
+			public Vector3 force;
+			public float invMass;  
+
+			public void FixedUpdate(float friction, float timestep)
+			{
+				// Euler integration
+				vel += force * invMass * timestep;
+				pos += vel * timestep;
+				vel *= friction;
+			}
+		}
+
+		List<Point> points = new List<Point>();
+
+		public Rope(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
+		{
+		}
+
+		public Rope()
+		{
+			Init ();
+		}
+
+		void Init()
+		{
+			int numPoints = 10;
+			for (int i = 0; i < numPoints; ++i) {
+				Point potentialPoint = new Point();
+				if (i == 0 || i == numPoints-1)
+				{
+					potentialPoint.invMass = 0;
+				}
+				potentialPoint.pos = Vector3.zero;
+				points.Add(potentialPoint);
+			}
+		}
+
+		/*void UpdateCollisions()
+		{
+			for (int i = 1; i < points.Count-1; ++ i) {
+				BvhSphereCollider collider = new BvhSphereCollider(
+					molecules[0].mol,points[i].pos,
+					0.6f);
+
+				for(int j = 0; j < collider.results.Count; ++j)
+				{
+					Vector3 atomPos = molecules[0].transform.TransformPoint(molecules[0].mol.atom_centres[collider.results[j].index]);
+					float rad = molecules[0].mol.atom_radii[collider.results[j].index];
+
+					float minDist = 0.6f + rad;
+					Vector3 normal = points[i].pos - atomPos;
+					Vector3 fromMolecule = points[i].pos - molecules[0].transform.position;
+
+					float dist = normal.magnitude;
+
+					normal *= (minDist - dist);
+					points[i].force += normal *0.2f;
+					points[i].force += fromMolecule *0.4f;
+				}
+			}
+		}*/
+
+		public override void Update(float spring_constant, float dampingFactor, float springFactor, float string_length)
+		{
+			int atomIndex1 = atomIds [0];
+			int atomIndex2 = atomIds [1];
+			Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
+			Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
+
+			Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
+			float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
+			if (isActive) {
+				if (distance > string_length) {
+
+					Rigidbody mol1_rb = molecules [0].GetComponent<Rigidbody> ();
+					Rigidbody mol2_rb = molecules [1].GetComponent<Rigidbody> ();
+				
+					Vector3 force = new Vector3 (0, 0, 0);
+					if (distance > string_length) {
+						force = dir * (distance - string_length) * springFactor;
+						mol1_rb.AddForceAtPosition (force, worldAtomPos1);
+						mol2_rb.AddForceAtPosition (-force, worldAtomPos2);
+					}
+				}
+			}
+			points [0].pos = worldAtomPos1;
+			points [points.Count - 1].pos = worldAtomPos2;
+
+			// natural length of a section of string.
+			float spring_length = string_length / (points.Count-1);
+
+			//Debug.Log ("spring_length=" + spring_length + " distance=" + distance + " string_length=" + string_length);
+
+			int max_iters = 10;
+			float timestep = Time.fixedDeltaTime / max_iters;
+			Vector3 gravity = new Vector3 (0, -100, 0);
+
+			for (int iter = 0; iter != max_iters; ++iter) {
+				for (int i = 0; i < points.Count; ++i) {
+					points [i].force = gravity;
+				}
+
+				for (int i = 0; i < points.Count-1; ++i) {
+					Point point1 = points [i];
+					Point point2 = points [i + 1];
+					Vector3 firstToSecond = point2.pos - point1.pos;
+					float d = firstToSecond.magnitude;
+					if (d > spring_length) {
+						Vector3 springForce = firstToSecond.normalized * (d - spring_length) * spring_constant;
+						point1.force += springForce;
+						point2.force -= springForce;
+					}
+				}
+
+				for (int i = 0; i < points.Count; ++i) {
+					points [i].FixedUpdate (0.95f, timestep);
+				}
+			}
+			
+		}
+
+		public override void Draw()
+		{
+			if (isActive) {
+
+				for(int i=0; i < points.Count; ++i)
+				{
+					if(i>0)
+					{
+						Debug.DrawLine(points[i-1].pos,points[i].pos);
+					}
+				}
+			}
+		}
+
+	}
+
 	public class Grappel:AtomConnection
 	{
-		float force;
-		float minDistance;
+
 		public Grappel(PDB_mesh mol1,PDB_mesh mol2, int at1, int at2): base(mol1,mol2,at1,at2)
 		{
-			force = 1;
-			minDistance = 2;
 
 		}
 		public Grappel()
 		{
-			force = 1;
-			minDistance = 10;
+
 		}
 
-		public override void Update()
+
+
+		public override void Update(float spring_constant, float dampingFactor, float springFactor, float string_length)
 		{
 			if (isActive) {
 				int atomIndex1 = atomIds [0];
@@ -60,17 +208,29 @@ namespace AssemblyCSharp
 				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
 				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
-				Vector3 dir1to2 = worldAtomPos2 - worldAtomPos1;
-				if (dir1to2.sqrMagnitude < minDistance * minDistance) {
-					return;
-				}
-				Vector3 dir2to1 = worldAtomPos1 - worldAtomPos2;
+				Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
+				float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
 
 				Rigidbody mol1_rb = molecules [0].GetComponent<Rigidbody> ();
 				Rigidbody mol2_rb = molecules [1].GetComponent<Rigidbody> ();
 
-				mol1_rb.AddForceAtPosition (dir1to2.normalized * force, worldAtomPos1);
-				mol2_rb.AddForceAtPosition (dir2to1.normalized * force, worldAtomPos2);
+				// .    .                   .
+				// vp = vb + cross(posW, rotV)
+				Vector3 atom1Velocity = mol1_rb.GetPointVelocity (worldAtomPos1);
+				Vector3 atom2Velocity = mol2_rb.GetPointVelocity (worldAtomPos2);
+			
+				//Vector3 relativeVelocity1To2 = atom1Velocity - atom2Velocity;
+
+				Vector3 damping1 = -dampingFactor * atom1Velocity;
+				Vector3 damping2 = -dampingFactor * atom2Velocity;
+
+				Vector3 force = new Vector3 (0, 0, 0);
+				if (distance > string_length) {
+					force = dir * (distance - string_length) * springFactor;
+				}
+
+				mol1_rb.AddForceAtPosition (force + damping1, worldAtomPos1);
+				mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 			}
 		}
 		public override void Draw()
@@ -82,7 +242,6 @@ namespace AssemblyCSharp
 				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
 				Debug.DrawLine(worldAtomPos1,worldAtomPos2);
-			
 			}
 		}
 	}

@@ -12,19 +12,20 @@ public class PDB_mesh : MonoBehaviour {
 	Quaternion start;
 	Quaternion end;
 	bool startRotation=false;
-	public bool shouldCollide =false;
+	public bool shouldCollide = false;
 	float t=0;
 
-	public bool hasCollided=false;
+	//public bool hasCollided=false;
 
 	// Use this for initialization
 	void Start () {
 	  
         mol = PDB_parser.get_molecule(this.name);
 	}
-	public void AlignAtomToVector(int atomIndex, Vector3 targetDir)
+
+	public void AlignPointToVector(Vector3 point, Vector3 targetDir)
 	{
-		Vector3 localPos = mol.atom_centres [atomIndex];
+		Vector3 localPos = point;
 		Vector3 startDir = localPos;
 		
 		Quaternion targetQ=Quaternion.LookRotation(targetDir);
@@ -36,6 +37,11 @@ public class PDB_mesh : MonoBehaviour {
 		end=toFront;
 		startRotation=true;
 		t=0;
+	}
+
+	public Vector3 GetAtomWorldPositon(int atomIndex)
+	{
+		return transform.TransformPoint (mol.atom_centres [atomIndex]);
 	}
 
 	public void BringAtomToFocus(int atomIndex)
@@ -96,7 +102,7 @@ public class PDB_mesh : MonoBehaviour {
 		j.spring = 0.5f;
 	}
 
-	public void AutoDock()
+	public void AutoDock(int[] thisAtomIndicies, int[] otherAtomIndicies)
 	{
 		shouldCollide = true;
 		allowInteraction = false;
@@ -110,9 +116,9 @@ public class PDB_mesh : MonoBehaviour {
 		r1.drag = 2.0f;
 		r2.drag = 2.0f;
 
-		for (int i=0; i<mol.spring_pairs.Length; ++i) {
-			int index1=mol.serial_to_atom[mol.spring_pairs[i].First];
-			int index2=otherMol.serial_to_atom[mol.spring_pairs[i].Second];
+		for (int i=0; i<thisAtomIndicies.Length; ++i) {
+			int index1=thisAtomIndicies[i];
+			int index2=otherAtomIndicies[i];
 
 			Vector3 atomPos1 = mol.atom_centres[index1];
 			Vector3 atomPos2 =otherMol.atom_centres[index2];
@@ -128,7 +134,7 @@ public class PDB_mesh : MonoBehaviour {
 			j.connectedAnchor=atomPos2;
 			j.damper=3.0f;
 			j.spring=3.0f;
-			j.minDistance=atomRad1+atomRad2-0.2f;
+			j.minDistance=atomRad1 + atomRad2 -0.5f;
 		}
 	}
 
@@ -163,7 +169,9 @@ public class PDB_mesh : MonoBehaviour {
 			Vector3 wpos1=transform.TransformPoint(s.anchor);
 			Vector3 wpos2=other.transform.TransformPoint(s.connectedAnchor);
 
-			if((wpos1-wpos2).sqrMagnitude>(s.minDistance+0.2f)*(s.minDistance+0.2f))
+			float dist = (wpos1-wpos2).sqrMagnitude;
+
+			if(dist > s.minDistance*s.minDistance)
 			{
 				return false;
 			}
@@ -173,13 +181,9 @@ public class PDB_mesh : MonoBehaviour {
 	//at the moment very fake
 	public void AutoDockCheap()
 	{
-		allowInteraction = false;
-		TransformLerper mover = gameObject.GetComponent<TransformLerper>();
-		startRotation = false;
-		t = 0;
-		//mover.AddTransformPoint (autoDockStartPos, autoDockStartRotation);
-		//mover.AddTransformPoint(mol.pos,Quaternion.identity);
-		mover.StartTransform();
+		shouldCollide = false;
+		this.transform.position = mol.pos;
+		this.transform.rotation = Quaternion.identity;
 	}
 
 
@@ -195,14 +199,13 @@ public class PDB_mesh : MonoBehaviour {
 				Physics.Raycast(r, out info);
 				if (info.collider == null)
 				{
-					
 					int hit = PDB_molecule.collide_ray (gameObject, mol,
 					                                    transform, r);
 					for(int i = 0; i < mol.serial_to_atom.Length; ++i)
 					{
 						if (mol.serial_to_atom[i] == hit)
 						{
-							Debug.Log("atom " + i + "clicked");
+							Debug.Log (i);
 							break;
 						}
 
@@ -237,19 +240,25 @@ public class PDB_mesh : MonoBehaviour {
 						t = 0;
 					}
 				}
-				if(shouldCollide)
-				{
-					PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
-					
-					if(PDB_molecule.pysics_collide (
-						gameObject, mol, transform,
-						other, other_mesh.mol, other.transform
-						))
-					{
-						hasCollided=true;
-					}
-				}
 			}
+
+			/*if(shouldCollide)
+			{
+				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
+				BioBlox bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
+				
+				if(PDB_molecule.pysics_collide (
+					gameObject, mol, transform,
+					other, other_mesh.mol, other.transform,
+					seperationForce,
+					bb.water_dia,
+					out bb.num_touching_0,
+					out bb.num_touching_1
+				))
+				{
+					hasCollided=true;
+				}
+			}*/
 		}
 	}
 }

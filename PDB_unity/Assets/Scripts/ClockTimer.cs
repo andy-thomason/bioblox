@@ -9,7 +9,7 @@ public class ClockTimer : MonoBehaviour {
 	public Text timeText;
 
 	float playTime=0.0f;
-	bool clockStopped=true;
+	public bool clockStopped {get;private set;}
 
 	public GameObject levelTimePrefab;
 	public GameObject clockArmPrefab;
@@ -17,7 +17,7 @@ public class ClockTimer : MonoBehaviour {
 	public List<float> playerLevelTimes = new List<float>();
 
 	GameObject playerTimeZone;
-	bool shouldAddLevelTimes=true;
+	bool shouldAddLevelTimes=false;
 
 
 	GameObject g;
@@ -108,8 +108,15 @@ public class ClockTimer : MonoBehaviour {
 		timeText.enabled = true;
 	}
 
+	public float GetLastPlayerTime()
+	{
+		return playerLevelTimes [playerLevelTimes.Count - 1];
+
+	}
+
 	// Use this for initialization
 	void Start () {
+		clockStopped = true;
 		playerTimeZone = GameObject.Find ("LevelTimesZone");
 		if (!playerTimeZone) {
 			Debug.LogError("Cannot find layout zone for level times, disabling level time UI");
