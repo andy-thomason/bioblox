@@ -1064,9 +1064,13 @@ public class BioBlox : MonoBehaviour
 	// Creates the molecule objects including the PDB_mesh script.
 	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type)
 	{
-		GameObject obj = new GameObject ();
-		obj.SetActive (true);
+		GameObject obj = GameObject.Find (name);
+		if (obj == null) {
+			obj = new GameObject ();
+		}
+
 		obj.name = name;
+		obj.SetActive (true);
 		//the layer numbers are to seperate the molecules in certain cameras
 		obj.layer = layerNum;
 
@@ -1087,27 +1091,20 @@ public class BioBlox : MonoBehaviour
 		Rigidbody ri = obj.AddComponent<Rigidbody> ();
 		PDB_molecule mol = p.mol;
 
+		float mass = 1000;
+		float r = mol.bvh_radii [0] * 0.5f;
+		float val = 0.4f * mass * r * r;
+
 		ri.drag = 2f;
 		ri.angularDrag = 5f;
 		ri.useGravity = false;
-		ri.mass = 1000;
-
-		float r = mol.bvh_radii [0] * 0.5f;
-		float val = 0.4f * ri.mass * r * r;
+		ri.mass = mass;
 		ri.inertiaTensor = new Vector3 (val, val, val);
 
-		//save their original positions them move them to oppose oneanother
-		//very messy, should really clean this up, either use points in the world or do it dynamically
-		//obj.transform.Rotate (0, 0, 270);
-		//Vector3 originMolPos = obj.transform.TransformPoint (mol.pos);
-		//Quaternion originalMolRot = obj.transform.rotation;
-		//obj.transform.Rotate (0, 0, -270); 
 		obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 
-		//extract the molecule number from the name .1 = 0 .2 = 1
-		//int molNum = (int)char.GetNumericValue (obj.name [obj.name.Length - 1]) - 1;
 		obj.transform.rotation = Random.rotation;
 
 		//if this is the simple game load in labels from the file
@@ -1446,14 +1443,13 @@ public class BioBlox : MonoBehaviour
 				if (distance < min_d) {
 					Vector3 normal = (c0 - c1).normalized * (min_d - distance);
 					normal *= seperationForce;
-					if (r0 != null && r1 != null) {
-						r0.AddForceAtPosition(normal,c0);
-						r1.AddForceAtPosition(-normal, c1);
-					}
+					r0.AddForceAtPosition(normal,c0);
+					r1.AddForceAtPosition(-normal, c1);
+
+					if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+					if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
 				}
 				
-				if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-				if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
 			}
 		}  
 		if (eventSystem != null && eventSystem.IsActive ()) {

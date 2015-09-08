@@ -96,8 +96,8 @@ public class GridCollider
 		int len1 = mol1.atom_centres.Length;
 		Vector3[] ac1 = mol1.atom_centres;
 		for (int i = 0; i != len1; ++i) {
-			Vector3 pos = t0.TransformPoint(ac1[i]);
-			pos = t1.InverseTransformPoint(pos);
+			Vector3 pos = t1.TransformPoint(ac1[i]);
+			pos = t0.InverseTransformPoint(pos);
 			int xmin = Mathf.FloorToInt ((pos.x - rtot) * rgs) - x0;
 			int ymin = Mathf.FloorToInt ((pos.y - rtot) * rgs) - y0;
 			int zmin = Mathf.FloorToInt ((pos.z - rtot) * rgs) - z0;
@@ -112,12 +112,10 @@ public class GridCollider
 			zmax = Mathf.Min(zdim-1, zmin);
 			for (int z = zmin; z <= zmax; ++z) {
 				for (int y = ymin; y <= ymax; ++y) {
-					for (int x = xmin; x <= xmax; ++x) {
-						int idx = (z * ydim + y) * xdim + x;
-						int b = cells[idx], e = cells[idx+1];
-						for (int j = b; j != e; ++j) {
-							results.Add(new Result(cells[j], i));
-						}
+					int idx = (z * ydim + y) * xdim;
+					int b = cells[idx + xmin], e = cells[idx+xmax+1];
+					for (int j = b; j != e; ++j) {
+						results.Add(new Result(cells[j], i));
 					}
 				}
 			}
