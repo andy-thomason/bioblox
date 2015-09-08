@@ -67,7 +67,6 @@ public class PDB_parser {
 		List<float> atom_radii = new List<float>();
 		List<Color> atom_colours = new List<Color>();
 		List<int> names = new List<int>();
-        List<int> residues = new List<int>();
 		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
 		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
@@ -120,15 +119,18 @@ public class PDB_parser {
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
 					{
 						col = new Color(0, 0, 1, 1);
+					} else if (id == "SG  CYS") {
+						col = new Color(1, 1, 0, 1);
 					}
 
 					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
-                    if (name == PDB_molecule.atom_N) {
-                        residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
-                        residues.Add(names.Count);
-                    }
+					/*if (name == PDB_molecule.atom_N) {
+						residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
+						residues.Add(names.Count);
+					}*/
+					
+					names.Add(name);
 
-                    names.Add(name);
 					if (serial >= 0) {
 						while (serial >= serial_to_atom.Count) serial_to_atom.Add (-1);
 						serial_to_atom[serial] = atom_centres.Count;
@@ -180,7 +182,6 @@ public class PDB_parser {
 				} else if (kind == "TER   " || kind == "TER") {
 
                     cur = new PDB_molecule();
-                    cur.residues = residues.ToArray();
                     cur.names = names.ToArray();
                     cur.pos.x = (maxx + minx) * 0.5f;
                     cur.pos.y = (maxy + miny) * 0.5f;
@@ -212,7 +213,6 @@ public class PDB_parser {
                     atom_centres.Clear();
                     atom_radii.Clear();
 					atom_colours.Clear();
-                    residues.Clear();
 					serial_to_atom.Clear();
 					aminoAcidName.Clear();
 					aminoAcidAtomIDs.Clear();
