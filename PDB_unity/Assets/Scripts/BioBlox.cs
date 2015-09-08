@@ -681,7 +681,7 @@ public class BioBlox : MonoBehaviour
 				all_together = all_together && dockSliders[i].value == val0;
 			}
 
-			if (all_together && val0 >= slider_pos - 2)
+			if (true || all_together && val0 >= slider_pos - 2)
 			{
 				// all sliders are being moved by the master
 				for (int i = 0; i < dockSliders.Count; ++i)
