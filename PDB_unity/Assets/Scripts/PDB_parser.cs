@@ -121,6 +121,8 @@ public class PDB_parser {
 						col = new Color(0, 0, 1, 1);
 					} else if (id == "SG  CYS") {
 						col = new Color(1, 1, 0, 1);
+					} else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+						col = new Color(0, 1, 1, 1);
 					}
 
 					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);

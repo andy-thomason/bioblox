@@ -90,6 +90,8 @@ public class BioBlox : MonoBehaviour
 	// shape scoring
 	public int num_touching_0 = 0;
 	public int num_touching_1 = 0;
+	public int num_invalid = 0;
+	public int num_connections = 0;
 	public float water_dia = 0.0f;
 
 	public enum GameState {
@@ -1102,10 +1104,11 @@ public class BioBlox : MonoBehaviour
 		ri.inertiaTensor = new Vector3 (val, val, val);
 
 		obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
+		//obj.transform.Translate (xoffset * 30, 0, 0);
 		obj.transform.Rotate (0, 0, 270);
 		obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 
-		obj.transform.rotation = Random.rotation;
+		//obj.transform.rotation = Random.rotation;
 
 		//if this is the simple game load in labels from the file
 		if (simpleGame) {
@@ -1422,7 +1425,6 @@ public class BioBlox : MonoBehaviour
 			Transform t1 = obj1.transform;
 			PDB_molecule mol0 = mesh0.mol;
 			PDB_molecule mol1 = mesh1.mol;
-			water_dia = 0;
 			//BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
 			GridCollider b = new GridCollider(mol0, t0, mol1, t1, water_dia);
 			work_done = b.work_done;
@@ -1432,6 +1434,8 @@ public class BioBlox : MonoBehaviour
 
 			num_touching_0 = 0;
 			num_touching_1 = 0;
+			num_invalid = 0;
+			num_connections = 0;
 
 			// Apply forces to the rigid bodies.
 			foreach (GridCollider.Result r in b.results) {
@@ -1440,6 +1444,8 @@ public class BioBlox : MonoBehaviour
 				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
 				float distance = (c1 - c0).magnitude;
 				
+				num_connections++;
+
 				if (distance < min_d) {
 					Vector3 normal = (c0 - c1).normalized * (min_d - distance);
 					normal *= seperationForce;
@@ -1448,6 +1454,9 @@ public class BioBlox : MonoBehaviour
 
 					if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
 					if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+					if (distance < min_d * 0.5) {
+						num_invalid++;
+					}
 				}
 				
 			}
