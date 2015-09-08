@@ -211,6 +211,7 @@ public class PDB_parser {
                     names.Clear();
                     atom_centres.Clear();
                     atom_radii.Clear();
+					atom_colours.Clear();
                     residues.Clear();
 					serial_to_atom.Clear();
 					aminoAcidName.Clear();

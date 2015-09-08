@@ -237,7 +237,7 @@ public class PDB_molecule
 							mc_normals[idx].x += fdx * rcp;
 							mc_normals[idx].y += fdy * rcp;
 							mc_normals[idx].z += fdz * rcp;
-							if (wcol) mc_colours[idx] = colour;
+							if (wcol) mc_colours[idx] = Color.Lerp(mc_colours[idx], colour, val*2);
 						}
 						idx++;
 					}
