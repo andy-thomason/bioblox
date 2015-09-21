@@ -11,10 +11,12 @@ public class LineRenderer : MonoBehaviour {
 		public Vector2 uv0;
 		public Vector2 uv1;
 
-		Line(Vector3 start, Vector3 end, float width, Vector2 uv0, Vector2 uv1) {
+		public Line(Vector3 start, Vector3 end) {
 			this.start = start;
 			this.end = end;
-			this.width = width;
+			this.width = 0.1f;
+			Vector2 uv0=new Vector2(0,0);
+			Vector2 uv1=new Vector2(0,0);
 			this.uv0 = uv0;
 			this.uv1 = uv1;
 		}
@@ -31,7 +33,7 @@ public class LineRenderer : MonoBehaviour {
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (lookat_camera == null) {
@@ -68,15 +70,20 @@ public class LineRenderer : MonoBehaviour {
 
 		MeshFilter mf = GetComponent<MeshFilter> ();
 		Mesh mesh = mf.mesh;
+		mesh.Clear ();
 		mesh.vertices = vertices;
 		mesh.uv = uvs;
 		mesh.triangles = indices;
-		mesh.UploadMeshData (true);
+		mf.mesh = mesh;
 	}
 
 	public Line add_line(Line line) {
 		lines.Add (line);
 		return line;
+	}
+
+	public void clear() {
+		lines.Clear ();
 	}
 
 	public void delete_line(Line line) {

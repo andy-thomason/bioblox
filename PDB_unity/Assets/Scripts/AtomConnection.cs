@@ -33,7 +33,7 @@ namespace AssemblyCSharp
 
 		virtual public void Update(float spring_constant, float dampingFactor, float force, float minDist)
 		{}
-		virtual public void Draw()
+		virtual public void Draw(LineRenderer line_renderer)
 		{}
 	}
 
@@ -170,7 +170,7 @@ namespace AssemblyCSharp
 			
 		}
 
-		public override void Draw()
+		public override void Draw(LineRenderer line_renderer)
 		{
 			if (isActive) {
 
@@ -179,6 +179,7 @@ namespace AssemblyCSharp
 					if(i>0)
 					{
 						Debug.DrawLine(points[i-1].pos,points[i].pos);
+						line_renderer.add_line (new LineRenderer.Line(points[i-1].pos,points[i].pos));
 					}
 				}
 			}
@@ -233,7 +234,7 @@ namespace AssemblyCSharp
 				mol2_rb.AddForceAtPosition (-force + damping2, worldAtomPos2);
 			}
 		}
-		public override void Draw()
+		public override void Draw(LineRenderer line_renderer)
 		{
 			if (isActive) {
 				int atomIndex1 = atomIds [0];

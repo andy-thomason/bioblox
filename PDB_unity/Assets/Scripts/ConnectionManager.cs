@@ -25,6 +25,8 @@ public class ConnectionManager : MonoBehaviour {
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
+	LineRenderer line_renderer;
+
 	public void Reset()
 	{
 		connections.Clear ();
@@ -112,6 +114,11 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		if (line_renderer == null) {
+			line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
+		}
+		if (line_renderer) line_renderer.clear ();
+
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			AtomConnection con = connections[connections.Count-1];
@@ -121,12 +128,19 @@ public class ConnectionManager : MonoBehaviour {
 			                         Input.mousePosition.y,
 			                        -c.transform.position.z);
 			to=c.ScreenToWorldPoint(to);
-			Debug.DrawLine(con.molecules[0].transform.TransformPoint(atomCenter),
-			               to);
+			Vector3 from = con.molecules[0].transform.TransformPoint(atomCenter);
+			//Debug.DrawLine(from, to);
 		}
 
+		/*if (line_renderer) {
+			Debug.Log("zzz");
+			Vector2 uv0 = new Vector2(0, 0);
+			Vector2 uv1 = new Vector2(1, 1);
+			line_renderer.add_line(new LineRenderer.Line(from, to, 0.1f, uv0, uv1));
+		}*/
+
 		for (int i = 0; i < connections.Count; ++i) {
-			connections[i].Draw();
+			connections[i].Draw(line_renderer);
 		}
 
 //		if (Input.GetMouseButtonDown (0) &&
