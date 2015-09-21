@@ -37,6 +37,7 @@ public class LineRenderer : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (lookat_camera == null) {
+			Debug.Log("warning: lookat_camera missing");
 			return;
 		}
 

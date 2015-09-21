@@ -72,6 +72,7 @@ public class BioBlox : MonoBehaviour
 	public float stringForce = 20000.0f;
 
 	public Slider rmsScoreSlider;
+	public Slider heuristicScoreSlider;
 	public Slider overrideSlider;
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
@@ -1036,9 +1037,8 @@ public class BioBlox : MonoBehaviour
 	//since a molecule may be too large for one mesh we may have to make several
 	void make_molecule_mesh (PDB_mesh mesh, Material material, int layerNum, MeshTopology mesh_type)
 	{
-
-		foreach (GameObject child in transform) {
-			Destroy(child);
+		foreach (Transform child in mesh.transform) {
+			Destroy(child.gameObject);
 		}
 
 		for (int i=0; i<mesh.mol.mesh.Length; ++i) {
@@ -1059,7 +1059,8 @@ public class BioBlox : MonoBehaviour
 			r.material = material;
 			f.mesh = cur;
 			obj.transform.SetParent (mesh.transform);
-			obj.transform.position = Vector3.zero;
+			obj.transform.localPosition = Vector3.zero;
+			obj.transform.localRotation = Quaternion.identity;
 		}
 	}
 
@@ -1146,7 +1147,7 @@ public class BioBlox : MonoBehaviour
 
 	// create both molecules
 	void make_molecules(bool init, MeshTopology mesh_type) {
-		Debug.Log ("make_molecules");
+		//Debug.Log ("make_molecules");
 		string file = filenames [current_level];
 		
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
@@ -1298,7 +1299,7 @@ public class BioBlox : MonoBehaviour
 			// measure the score
 			float rms_distance_score = ScoreRMSD ();
 			if (rmsScoreSlider) {
-				rmsScoreSlider.value = rms_distance_score;
+				rmsScoreSlider.value = rms_distance_score * 0.1f;
 			}
 
 			if (lockButton) {
@@ -1460,6 +1461,8 @@ public class BioBlox : MonoBehaviour
 				}
 				
 			}
+
+			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 		}  
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();

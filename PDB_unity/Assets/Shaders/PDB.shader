@@ -70,62 +70,56 @@
 //
 //      ENDCG
 //    }
-//     Pass {
-//      Tags {"Queue" = "Opaque" }
-//      Tags {"LightMode" = "ForwardBase" }
-//      Cull Front
-//      Blend SrcAlpha OneMinusSrcAlpha
-//      Fog { Mode Off }
-//
-//      CGPROGRAM
-//      #pragma vertex vert
-//      #pragma fragment frag
-//      #pragma target 3.0
-//
-//      #include "UnityCG.cginc"
-//      #include "Lighting.cginc"
-//      
-//      struct varying_t {
-//        float4 projection_pos : POSITION;
-//        float3 normal : NORMAL;
-//        float4 world_pos : TEXCOORD;
-//        float4 col:COLOR;
-//      };
-//      
-//      uniform float4 _Color;
-//      uniform float4 _Specular;
-//      uniform float _Shininess;
-//      uniform float4 _CullPos;
-//      uniform float _Cull;
-//      uniform float _K;
-//
-//      // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
-//      uniform float3 _LightPos;
-//      uniform float3 _CameraPos;
-//
-//      varying_t vert(appdata_full v) {
-//        varying_t o;
-//        o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
-//        o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
-//        o.world_pos = mul (_Object2World, v.vertex);
-//        o.col=v.color;
-//        return o;
-//      }
-//
-//      fixed4 frag(varying_t i) : COLOR {
-//        float half_tone = 0.5f;
-//      	float alpha = exp(_K * dot(i.world_pos.xyz-_CullPos,i.world_pos.xyz-_CullPos)) * 4;
-//      	if (half_tone > alpha)
-//      	{
-//      		clip(-1.0f);
-//      	}
-//        return fixed4(_Color.xyz*0.6f,1.0f);
-//      }
-//
-//      ENDCG
-//    }
-    Pass {
+     Pass {
       Tags {"Queue" = "Opaque" }
+      Tags {"LightMode" = "ForwardBase" }
+      Cull Front
+      Blend SrcAlpha OneMinusSrcAlpha
+      Fog { Mode Off }
+
+      CGPROGRAM
+      #pragma vertex vert
+      #pragma fragment frag
+      #pragma target 3.0
+
+      #include "UnityCG.cginc"
+      #include "Lighting.cginc"
+      
+      struct varying_t {
+        float4 projection_pos : POSITION;
+        float3 normal : NORMAL;
+        float4 world_pos : TEXCOORD;
+        float4 col:COLOR;
+      };
+      
+      uniform float4 _Color;
+      uniform float4 _Specular;
+      uniform float _Shininess;
+      uniform float4 _CullPos;
+      uniform float _Cull;
+      uniform float _K;
+
+      // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
+      uniform float3 _LightPos;
+      uniform float3 _CameraPos;
+
+      varying_t vert(appdata_full v) {
+        varying_t o;
+        o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
+        o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
+        o.world_pos = mul (_Object2World, v.vertex);
+        o.col=v.color;
+        return o;
+      }
+
+      fixed4 frag(varying_t i) : COLOR {
+        return fixed4(_Color.xyz*0.6f,1.0f);
+      }
+
+      ENDCG
+    }
+    Pass {
+      Tags {"Queue" = "Transparent" }
       Tags {"LightMode" = "ForwardBase" }
       Cull Back
       Blend SrcAlpha OneMinusSrcAlpha
@@ -212,30 +206,27 @@
       	if(dist < _GlowRadius1)
       	{
      		glowVal = _GlowRadius1 - dist;
-     		glowVal *= abs(_SinTime.w);
       	}
       	
       	dist = distance(i.model_pos, _GlowPoint2);
       	if(dist < _GlowRadius2)
       	{
      		glowVal = _GlowRadius2 - dist;
-     		glowVal *= abs(_SinTime.w);
       	}
       	
       	dist = distance(i.model_pos, _GlowPoint3);
       	if(dist < _GlowRadius3)
       	{
      		glowVal = _GlowRadius3 - dist;
-     		glowVal *= abs(_SinTime.w);
       	}
 
-
+  		glowVal *= _SinTime.w * _SinTime.w * 0.05;
 
       	float3 rpos = i.model_pos - _DarkPoint.xyz;
       	float d2 = dot(rpos, rpos);
       	float dark = 1.0 - exp(_DarkK * d2);
    
-      	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal * 0.25 + _Specular.xyz * specular_factor * dark, _Color.w);
+      	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal + _Specular.xyz * specular_factor * dark, _Color.w);
       }
 
       ENDCG
