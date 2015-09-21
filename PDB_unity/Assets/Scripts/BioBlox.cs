@@ -1304,6 +1304,7 @@ public class BioBlox : MonoBehaviour
 
 		// Enter picking state
 		game_state = GameState.Picking;
+		bool prev_button = false;
 
 		// In this loop, the game state is either Picking or Docking.
 		while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
@@ -1323,7 +1324,8 @@ public class BioBlox : MonoBehaviour
 			//test if we should move the molecules with quick ray casts
 			if (eventSystem.IsActive ()) {
 				ManageSliders ();
-				if (Input.GetMouseButton (0)) {
+				bool cur_button = Input.GetMouseButton (0);
+				if (cur_button && !prev_button) {
 					//Using this system we dont allow the player to move the two molecules at the same time
 					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
 					Ray r = c.ScreenPointToRay (Input.mousePosition);
@@ -1373,6 +1375,7 @@ public class BioBlox : MonoBehaviour
 						sites [1].transform.Rotate (new Vector3 (0, -90, 0), Space.World);
 					}
 				}
+				prev_button = cur_button;
 			}
 
 		}
