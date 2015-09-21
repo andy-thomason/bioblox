@@ -74,6 +74,8 @@ public class BioBlox : MonoBehaviour
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
 	public Slider overrideSlider;
+	public Slider cutawaySlider;
+	public Text invalidDockText;
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 
@@ -329,15 +331,33 @@ public class BioBlox : MonoBehaviour
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
-		if (molecules.Length >= 2 && molecules [0] && molecules [1]) {
-			GameObject cam = GameObject.Find ("Main Camera");
-			MeshRenderer[] meshes = molecules [0].GetComponentsInChildren<MeshRenderer> ();
-			foreach (MeshRenderer r in meshes) {
-				r.material.SetVector ("_LightPos", cam.transform.position + new Vector3(-50,0,0));
+		LineRenderer line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
+		Camera camera = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
+		if (line_renderer && camera) {
+			line_renderer.clear ();
+			if (cutawaySlider && cutawaySlider.value > cutawaySlider.minValue) {
+				for (int x = -50; x <= 50; x += 10) {
+					Vector3 p0 = camera.transform.TransformPoint(new Vector3( x, -50, cutawaySlider.value));
+					Vector3 p1 = camera.transform.TransformPoint(new Vector3( x,  50, cutawaySlider.value));
+					line_renderer.add_line(new LineRenderer.Line(p0, p1));
+				}
+				for (int y = -50; y <= 50; y += 10) {
+					Vector3 p0 = camera.transform.TransformPoint(new Vector3( -50, y, cutawaySlider.value));
+					Vector3 p1 = camera.transform.TransformPoint(new Vector3(  50, y, cutawaySlider.value));
+					line_renderer.add_line(new LineRenderer.Line(p0, p1));
+				}
 			}
-			meshes = molecules [1].GetComponentsInChildren<MeshRenderer> ();
+		}
+
+		GameObject cam = GameObject.Find ("Main Camera");
+		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
+		foreach (GameObject mol in molecules) {
+			MeshRenderer[] meshes = mol.GetComponentsInChildren<MeshRenderer> ();
 			foreach (MeshRenderer r in meshes) {
-				r.material.SetVector ("_LightPos", cam.transform.position + new Vector3(-50,0,0));
+				r.material.SetVector ("_LightPos", light_pos);
+				if (cutawaySlider) {
+					r.material.SetFloat ("_CutawayDepth", cutawaySlider.value);
+				}
 			}
 		}
 	}
@@ -880,14 +900,8 @@ public class BioBlox : MonoBehaviour
 			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_GlowPoint1", atomPos1);
 				r.material.SetFloat ("_GlowRadius1", 5.0f);
-			}
-
-			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_GlowPoint2", atomPos2);
 				r.material.SetFloat ("_GlowRadius2", 5.0f);
-			}
-
-			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_GlowPoint3", atomPos3);
 				r.material.SetFloat ("_GlowRadius3", 5.0f);
 			}
@@ -1414,6 +1428,11 @@ public class BioBlox : MonoBehaviour
 
 	// Physics simulation
 	void FixedUpdate() {
+		num_touching_0 = 0;
+		num_touching_1 = 0;
+		num_invalid = 0;
+		num_connections = 0;
+		
 		if (do_physics_collision && molecules.Length >= 2) {
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
@@ -1432,11 +1451,6 @@ public class BioBlox : MonoBehaviour
 
 			BitArray ba0 = new BitArray (mol0.atom_centres.Length);
 			BitArray ba1 = new BitArray (mol1.atom_centres.Length);
-
-			num_touching_0 = 0;
-			num_touching_1 = 0;
-			num_invalid = 0;
-			num_connections = 0;
 
 			// Apply forces to the rigid bodies.
 			foreach (GridCollider.Result r in b.results) {
@@ -1463,10 +1477,13 @@ public class BioBlox : MonoBehaviour
 			}
 
 			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
-		}  
+		}
+
+		invalidDockText.enabled = num_invalid != 0;
+
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
-    }
+	}
 }
 

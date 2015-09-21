@@ -17,6 +17,8 @@
     _GlowRadius3("GlowRadius3" , Float) = 0
     _DarkPoint ("DarkPointLoca3" , Vector) = (0,0,0,0)
     _DarkK("DarkK" , Float) = -0.01
+    _CutawayDepth("CutawayDepth", Float) = 0.0
+    _CutawayColor("CutawayDepth", Color) = (1,1,1,1)
   }
   SubShader {
     Pass {
@@ -87,33 +89,22 @@
       
       struct varying_t {
         float4 projection_pos : POSITION;
-        float3 normal : NORMAL;
-        float4 world_pos : TEXCOORD;
-        float4 col:COLOR;
       };
       
-      uniform float4 _Color;
-      uniform float4 _Specular;
-      uniform float _Shininess;
-      uniform float4 _CullPos;
-      uniform float _Cull;
-      uniform float _K;
-
-      // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
-      uniform float3 _LightPos;
-      uniform float3 _CameraPos;
+      uniform float _CutawayDepth;
+      uniform float4 _CutawayColor;
 
       varying_t vert(appdata_full v) {
         varying_t o;
         o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
-        o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
-        o.world_pos = mul (_Object2World, v.vertex);
-        o.col=v.color;
         return o;
       }
 
       fixed4 frag(varying_t i) : COLOR {
-        return fixed4(_Color.xyz*0.6f,1.0f);
+      	if (i.projection_pos.w < _CutawayDepth) {
+      		clip(-1);
+      	}
+        return fixed4(_CutawayColor.xyz, 1.0f);
       }
 
       ENDCG
@@ -164,6 +155,7 @@
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
       uniform float3 _CameraPos;
+      uniform float _CutawayDepth;
 
       varying_t vert(appdata_full v) {
         varying_t o;
@@ -226,6 +218,9 @@
       	float d2 = dot(rpos, rpos);
       	float dark = 1.0 - exp(_DarkK * d2);
    
+      	if (i.projection_pos.w < _CutawayDepth) {
+      		clip(-1);
+      	}
       	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal + _Specular.xyz * specular_factor * dark, _Color.w);
       }
 

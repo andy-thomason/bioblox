@@ -25,8 +25,6 @@ public class ConnectionManager : MonoBehaviour {
 
 	List<AtomConnection> connections = new List<AtomConnection> ();
 
-	LineRenderer line_renderer;
-
 	public void Reset()
 	{
 		connections.Clear ();
@@ -114,10 +112,8 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (line_renderer == null) {
-			line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
-		}
-		if (line_renderer) line_renderer.clear ();
+		LineRenderer line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
+		//if (line_renderer) line_renderer.clear ();
 
 		if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();

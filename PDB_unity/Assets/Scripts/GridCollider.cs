@@ -21,6 +21,8 @@ public class GridCollider
 	// List of results returned by the collider.
 	public List<Result> results = new List<Result>();
 
+	public bool show_grid = false;
+
 	// Constructor: generate a list of collision pairs.
 	public GridCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1, float inflation)
 	{
@@ -74,20 +76,22 @@ public class GridCollider
 
 		//Debug.DrawLine (min, max);
 
-		/*for (int z = z0; z <= z1; z += z1-z0) {
-			for (int x = x0; x <= x1; ++x) {
-				Debug.DrawLine (
-					grid_spacing * new Vector3 (x, y0, z),
-					grid_spacing * new Vector3 (x, y1, z)
-				);
+		if (show_grid) {
+			for (int z = z0; z <= z1; z += z1-z0) {
+				for (int x = x0; x <= x1; ++x) {
+					Debug.DrawLine (
+						grid_spacing * new Vector3 (x, y0, z),
+						grid_spacing * new Vector3 (x, y1, z)
+					);
+				}
+				for (int y = y0; y <= y1; ++y) {
+					Debug.DrawLine (
+						grid_spacing * new Vector3 (x0, y, z),
+						grid_spacing * new Vector3 (x1, y, z)
+					);
+				}
 			}
-			for (int y = y0; y <= y1; ++y) {
-				Debug.DrawLine (
-					grid_spacing * new Vector3 (x0, y, z),
-					grid_spacing * new Vector3 (x1, y, z)
-				);
-			}
-		}*/
+		}
 
 		int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
