@@ -107,6 +107,10 @@ public class BioBlox : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		winSplash.SetActive (false);
+		looseSplash.SetActive (false);
+		goSplash.SetActive (false);
+
 		game_state = GameState.Setup;
 
 		Time.fixedDeltaTime = 0.033f;
@@ -138,12 +142,9 @@ public class BioBlox : MonoBehaviour
 		scoreCard.gameObject.SetActive (false);
 
 		//game_loop loads the file at filenames[current_level]
-		StartCoroutine (game_loop ());
 		eventSystem = EventSystem.current;
 
-		winSplash.SetActive (false);
-		looseSplash.SetActive (false);
-		goSplash.SetActive (false);
+		StartCoroutine (game_loop ());
 	}
 
 	public string GetCurrentLevelName ()
@@ -228,7 +229,7 @@ public class BioBlox : MonoBehaviour
 	public Vector3 GetAtomPos (int atomID, int molNum)
 	{
 		if (atomID == -1 || molNum >= molecules.Length || molecules [molNum] == null) {
-			Debug.LogError ("Bad index");
+			Debug.LogError ("Bad index " + atomID + " " + molNum + " " + molecules.Length);
 			return Vector3.zero;
 		}
 		return molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID];
@@ -471,7 +472,7 @@ public class BioBlox : MonoBehaviour
 
 	//changes variables in the shader to fade the molecules everywhere but two points
 	//this is to emphisie the docking site
-	IEnumerator FadeMolecules ()
+	/*IEnumerator FadeMolecules ()
 	{
 		//GameObject mol1 = molecules [0];
 		//GameObject mol2 = molecules [1];
@@ -511,7 +512,7 @@ public class BioBlox : MonoBehaviour
 		for (int i=0; i<meshes2.Length; ++i) {
 			meshes2 [i].material.SetFloat ("_K", targetKVal);
 		}
-	}
+	}*/
 
 
 	public void ManageSliders()
@@ -582,11 +583,11 @@ public class BioBlox : MonoBehaviour
 
 	public void SiteClicked (GameObject labelObj)
 	{
-		
+		/*
+
 
 		//this is site picking code, it basically takes atoms local to the selected one
 		//and creates a new mesh with that subset
-		/*
 		Debug.Log (labelObj.name + "'s site was selected");
 		LabelScript script = labelObj.GetComponent<LabelScript> ();
 		int molNum = -1;

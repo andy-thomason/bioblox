@@ -45,6 +45,11 @@ public class LabelScript : MonoBehaviour{
 
 	}
 
+	public void Reset() {
+		atomIds = null;
+		miniLabels.Clear ();
+	}
+
 	public void Init(PDB_molecule mol)
 	{
 		//init should be called after variable initilisation
