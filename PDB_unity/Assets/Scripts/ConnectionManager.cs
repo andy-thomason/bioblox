@@ -28,6 +28,7 @@ public class ConnectionManager : MonoBehaviour {
 	public void Reset()
 	{
 		connections.Clear ();
+		connectionMinDistances = null;
 	}
 
 	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,
@@ -41,8 +42,8 @@ public class ConnectionManager : MonoBehaviour {
 			con.molecules[0] = mol1;
 			con.molecules[1] = mol2;
 
-			con.atomIds[0]=mol1AtomIndicies[i];
-			con.atomIds[1]=mol2AtomIndicies[i];
+			con.atomIds[0] = mol1AtomIndicies[i];
+			con.atomIds[1] = mol2AtomIndicies[i];
 
 			con.isActive=true;
 

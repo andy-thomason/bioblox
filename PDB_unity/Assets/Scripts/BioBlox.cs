@@ -93,7 +93,6 @@ public class BioBlox : MonoBehaviour
 	public int num_touching_1 = 0;
 	public int num_invalid = 0;
 	public int num_connections = 0;
-	public float water_dia = 0.0f;
 
 	public enum GameState {
 		Setup,
@@ -314,18 +313,6 @@ public class BioBlox : MonoBehaviour
 		yield break;
 	}
 
-	public void Reload ()
-	{
-		current_level++;
-		Reset ();
-		if (current_level == filenames.Count) {
-			Debug.Log ("End of levels");
-			current_level=0;
-		} else {
-			StartCoroutine (game_loop ());
-		}
-	}
-
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
@@ -526,166 +513,6 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 
-
-	//Meant for the simple game
-	//Checks to see if the win-conditions are satisfied
-	//The win conditions are order specific, .first is molecule[0] atomIndex
-	/*public void CheckPair ()
-	{
-		if (simpleGame && winCondition.Count > 0 && selectedLabel [0] && selectedLabel [1]) {
-			bool hasWon = true;
-			
-			
-			for (int i=0; i<winCondition.Count; ++i) {
-				int winCon1 = winCondition [i].First;
-				int winCon2 = winCondition [i].Second;
-
-
-				int selected1 = selectedLabel [0].labelID;
-				int selected2 = selectedLabel [1].labelID;
-
-				Debug.Log ("Check :" + winCon1 + " = " + selected1);
-				Debug.Log ("Check :" + winCon2 + " = " + selected2);
-				if (!(winCon1 == selected1 && winCon2 == selected2) &&
-					!(winCon1 == selected2 && winCon2 == selected1)) {
-					hasWon = false;
-					break;
-				}
-			}
-			if (hasWon) {
-				win = true;
-			} 
-			this.GetComponent<AudioManager> ().Play ("Drum");
-		}
-	}*/
-
-	//Interactive win splash state before transitioning to the next level. 
-	IEnumerator WinSplash (Vector3 focusPoint)
-	{
-		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-		conMan.Reset ();
-		//disable label clicking and other interactions
-		eventSystem.enabled = false;
-		//save the players time to complete the level
-		gameObject.GetComponent<ClockTimer> ().LogPlayerTime ();
-		gameObject.GetComponent<ClockTimer> ().StopPlayerTimer ();
-		//put animation for win splash here
-		for (int i=0; i<activeLabels.Count; ++i) {
-			PopOut (activeLabels [i].gameObject);
-		}
-		activeLabels.Clear ();
-
-
-		GameObject parent = GameObject.Find ("MoveableParent");
-		Rigidbody r = parent.GetComponent<Rigidbody> ();
-
-		PopIn (winSplash);
-		//if gene is in the scene make him shrink away
-		//this is a bit of legacy when we used to have a mascot for the game. Fun times
-		/*GameObject gene = GameObject.Find ("Gene");
-		if (gene) {
-			gene.SetActive (false);
-		}*/
-
-		//create a pearent that is moved to rotate both molecules on player interaction
-		Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-
-		if (winShouldFadeMol) {
-			StartCoroutine ("FadeMolecules");
-		}
-		//values to sort out camera rotation and zoom
-		float zoomValue = 30.0f;
-		float radRot = (3.0f * Mathf.PI) / 2;
-		float camRot = 0;
-		Vector3 start = c.transform.position;
-		Vector3 moveDir = focusPoint + new Vector3 (0, 0, -30) - c.transform.position;
-		//zoom in the camera
-		for (float t=0; t<1.0f; t+=Time.deltaTime) {
-			c.transform.position = start + moveDir * t;
-			yield return null;
-		}
-		//if we just won the simple version then we need to destroy the spring joints that docked the molecules
-		if (simpleGame) {
-			SpringJoint [] joints = molecules [0].GetComponents<SpringJoint> ();
-			for (int i=0; i<joints.Length; ++i) {
-				Component.Destroy (joints [i]);
-			}
-		}
-
-		//the winstate expires regardless of player input
-		float timeoutTimer = 40.0f;
-		// and auto-rotate will resume after a period of inactivity
-		const float nonInteractionTimeOut = 2.0f;
-		float nonInteractionTimer = 0.0f;
-		bool autoRotate = true;
-		
-		Vector3 oldMousePos = Input.mousePosition;
-
-		// the molecules will be auto-rotate around untill there is some player input
-		while (true) {
-			nonInteractionTimer += Time.deltaTime;
-			timeoutTimer -= Time.deltaTime;
-			if (nonInteractionTimer > nonInteractionTimeOut) {
-				autoRotate = true;
-			}
-			if (Input.GetMouseButton (0)) {
-				if (nonInteractionTimer > 0.3f) {
-					oldMousePos = Input.mousePosition;
-				}
-				nonInteractionTimer = 0;
-				autoRotate = false;
-				Vector3 mousePos = Input.mousePosition;
-				Vector3 mouseDelta = mousePos - oldMousePos;
-				oldMousePos = mousePos;
-				r.AddTorque (new Vector3 (mouseDelta.y, -mouseDelta.x, 0)*10);
-			}
-			if (autoRotate) {
-				Vector3 dir = new Vector3 (
-					Mathf.Cos (radRot),
-					0,
-					Mathf.Sin (radRot));
-				dir = dir.normalized * zoomValue;
-				c.transform.position = dir;
-				c.transform.rotation = Quaternion.LookRotation (focusPoint - c.transform.position);
-				radRot += Time.deltaTime;
-				camRot += Time.deltaTime;
-			}
-			if ((Input.anyKeyDown && !Input.GetMouseButtonDown (0)) || exitWinSplash || timeoutTimer < 0) {
-				exitWinSplash = false;
-				break;
-			}
-			yield return null;
-		}
-
-		//clearing out the scene for the reset
-		PopOut (molecules [0].gameObject);
-		PopOut (molecules [1].gameObject);
-		PopOut (winSplash);
-		yield return new WaitForSeconds (1.0f);
-		GameObject.Destroy (molecules [0].gameObject);
-		GameObject.Destroy (molecules [1].gameObject);
-		GameObject.Destroy (parent);
-
-
-		//transform the camera to its original position
-		eventSystem.enabled = true;
-		scoreCard.ScorePlayer ();
-
-		
-		Vector3 target = start;
-		start = c.transform.position;
-		Quaternion startQ = c.transform.rotation;
-		for (float t=0; t<1.0f; t+=Time.deltaTime) {
-			c.transform.position = Vector3.Lerp (start, target, t);
-			c.transform.rotation = Quaternion.Slerp (startQ, Quaternion.identity, t);
-			yield return null;
-		}
-
-
-		Debug.Log ("Reloading");
-		Reload ();
-		yield break;
-	}
 
 	public void ManageSliders()
 	{
@@ -907,38 +734,6 @@ public class BioBlox : MonoBehaviour
 				r.material.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
-			//Vector3 molPos = pdbMesh.transform.position;
-
-			/*
-			Mesh featureTriMesh = new Mesh();
-			MeshFilter meshF = featureTriangle[script.moleculeNumber].GetComponent<MeshFilter>();
-			Vector3 [] verts = new Vector3[3];
-
-			verts[0] = GetAtomPos(script.atomIds[0],script.moleculeNumber);
-			verts[1] = GetAtomPos(script.atomIds[1],script.moleculeNumber);
-			verts[2] = GetAtomPos(script.atomIds[2],script.moleculeNumber);
-			Vector3 normal = verts[0] + verts[1] + verts[2];
-
-			float dot0 = Vector3.Dot (normal.normalized,verts[0]);
-			float dot1 = Vector3.Dot (normal.normalized,verts[1]);
-			float dot2 = Vector3.Dot (normal.normalized,verts[2]);
-
-			float extraDist0 = triangleOffset - dot0;
-			float extraDist1 = triangleOffset - dot1;
-			float extraDist2 = triangleOffset - dot2;
-
-			//verts[0] += normal.normalized * extraDist0;
-			//verts[1] += normal.normalized * extraDist1;
-			//verts[2] += normal.normalized * extraDist2;
-
-
-
-			featureTriMesh.vertices= verts;
-			featureTriMesh.triangles = new int[]{0,1,2,0,2,1};
-
-			meshF.mesh = featureTriMesh;
-			*/
-
 			if (selectedLabel [0] != null && selectedLabel [1] != null) {
 				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
 				                   selectedLabel [0].atomIds.ToArray (),
@@ -951,25 +746,7 @@ public class BioBlox : MonoBehaviour
 				}
 				uiScrollSpeed =900;
 			}
-
-
-		} /*else {
-			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
-			if (conMan.RegisterClick (molecules [molNum].GetComponent<PDB_mesh> (), index)) {
-				if(numLinks==0)
-				{
-					selectedLabel[numLinks]=script;
-					script.shouldGlow = true;
-					numLinks++;
-				}
-				else{
-					selectedLabel[0].shouldGlow=false;
-					numLinks=0;
-				}
-			
-			}
-		}*/
-		//Handle label click, make active, focusd on atom //etc
+		}
 	}
 
 	// The pick button resets the sliders to the right.
@@ -1190,10 +967,12 @@ public class BioBlox : MonoBehaviour
 	{
 		// for each level
 		for (;;) {
+			Debug.Log ("start level " + current_level);
 			//if true, we have no more levels listed in the vector
 			//to be replaced with level selection. Talk to andy on PDB file selection
 			if (current_level >= filenames.Count) {
 				Debug.LogError ("No next level");
+				current_level = 0;
 			}
 
 			if (lockButton) {
@@ -1408,7 +1187,10 @@ public class BioBlox : MonoBehaviour
 					Debug.Log ("End of levels");
 					current_level = 0;
 				}
+				conMan.Reset();
 				Reset ();
+				molecules = null;
+				activeLabels.Clear();
 			}
 		}
 	}
@@ -1434,8 +1216,7 @@ public class BioBlox : MonoBehaviour
 			Transform t1 = obj1.transform;
 			PDB_molecule mol0 = mesh0.mol;
 			PDB_molecule mol1 = mesh1.mol;
-			//BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, water_dia);
-			GridCollider b = new GridCollider(mol0, t0, mol1, t1, water_dia);
+			GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
 			work_done = b.work_done;
 
 			BitArray ba0 = new BitArray (mol0.atom_centres.Length);

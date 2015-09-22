@@ -299,7 +299,7 @@ public class ScoreSheet : MonoBehaviour {
 	public void Continue()
 	{
 		gameObject.SetActive (false);
-		bioblox.Reload ();
+		//bioblox.Reload ();
 	}
 
 	public void ResetUser()
