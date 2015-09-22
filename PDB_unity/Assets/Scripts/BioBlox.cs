@@ -79,8 +79,6 @@ public class BioBlox : MonoBehaviour
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 
-	bool do_physics_collision = false;
-
 	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
 	int randomColorPoolOffset;
@@ -685,6 +683,7 @@ public class BioBlox : MonoBehaviour
 
 
 		Debug.Log ("Reloading");
+		Reload ();
 		yield break;
 	}
 
@@ -735,20 +734,22 @@ public class BioBlox : MonoBehaviour
 			}
 		}
 
-		if (allInPickZone) {
-			if (!activeLabels [0].gameObject.activeSelf) {
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					activeLabels [i].gameObject.SetActive (true);
+		if (game_state == GameState.Picking || game_state == GameState.Docking) {
+			if (allInPickZone) {
+				if (!activeLabels [0].gameObject.activeSelf) {
+					for (int i = 0; i < activeLabels.Count; ++i) {
+						activeLabels [i].gameObject.SetActive (true);
+					}
 				}
-			}
-			do_physics_collision = false;
-		} else {
-			if(activeLabels[0].gameObject.activeSelf){
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					activeLabels [i].gameObject.SetActive (false);
+				game_state = GameState.Picking;
+			} else {
+				if (activeLabels [0].gameObject.activeSelf) {
+					for (int i = 0; i < activeLabels.Count; ++i) {
+						activeLabels [i].gameObject.SetActive (false);
+					}
 				}
+				game_state = GameState.Docking;
 			}
-			do_physics_collision = true;
 		}
 	}
 
@@ -1009,7 +1010,9 @@ public class BioBlox : MonoBehaviour
 	// The lock button establishes the Locked state.
 	public void Lock()
 	{
+		Debug.Log ("Lock: " + game_state);
 		if (game_state == GameState.Docking) {
+			Debug.Log("ok");
 			game_state = GameState.Locked;
 		}
 	}
@@ -1185,245 +1188,228 @@ public class BioBlox : MonoBehaviour
 	//main meat of the initilisation logic and level completion logic
 	IEnumerator game_loop ()
 	{
-		//if true, we have no more levels listed in the vector
-		//to be replaced with level selection. Talk to andy on PDB file selection
-		if (current_level >= filenames.Count) {
-			Debug.LogError ("No next level");
-		}
-
-		if (lockButton) {
-			lockButton.gameObject.SetActive(false);
-		}
-
-		make_molecules (true, MeshTopology.Triangles);
-
-		// This is very grubby, must generalise.
-		GameObject mol1 = molecules [0];
-		GameObject mol2 = molecules [1];
-
-		/*MeshRenderer pdbr = GameObject.CreatePrimitive (PrimitiveType.Cube).GetComponent<MeshRenderer> ();
-
-		featureTriangle [0] = new GameObject ();
-		featureTriangle [0].AddComponent<MeshFilter> ();
-		featureTriangle [0].AddComponent<MeshRenderer> ().material = pdbr.material;
-		featureTriangle [0].GetComponent<MeshRenderer> ().material.SetFloat ("_Mode", 3);
-		featureTriangle [0].GetComponent<MeshRenderer> ().material.color = new Color (0.7f, 0.7f, 1, 0.5f);
-
-		featureTriangle [0].name = "FeatureTriangle1";
-		featureTriangle [0].transform.position = Vector3.zero;
-		featureTriangle [0].transform.SetParent (mol1.transform, false);
-		featureTriangle [0].layer = 5;
-
-		
-		featureTriangle [1] = new GameObject ();
-		featureTriangle [1].AddComponent<MeshFilter> ();
-		featureTriangle [1].AddComponent<MeshRenderer> ().material = pdbr.material;
-		featureTriangle [1].GetComponent<MeshRenderer> ().material.SetFloat ("_Mode", 3);
-		featureTriangle [1].GetComponent<MeshRenderer> ().material.color = new Color (1, 0.7f, 0.7f, 0.5f);
-
-		featureTriangle [1].name = "FeatureTriangle2";
-		featureTriangle [1].transform.position = Vector3.zero;
-		featureTriangle [1].transform.SetParent (mol2.transform, false);
-		featureTriangle [1].layer = 5;*/
-
-
-		//GameObject.Destroy (pdbr.gameObject);
-
-		originPosition [0] = mol1.transform.position;
-		originPosition [1] = mol2.transform.position;
-
-		for (int i = 0; i < activeLabels.Count; ++i) {
-			activeLabels [i].gameObject.SetActive (false);
-		}
-
-		ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
-		playerClock.ResetTimer ();
-		playerClock.timeText.enabled = false;
-	
-		PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
-		PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
-
-		//create the win condition from the file specified paired atoms
-		for (int i=0; i<p1.mol.pairedLabels.Length; ++i) {
-			winCondition.Add (new Tuple<int,int> (p1.mol.pairedLabels [i].First,
-			                 p1.mol.pairedLabels [i].Second));
-		}
-		//debug 3D texture
-		//GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
-		p1.other = p2.gameObject;
-		p2.other = p1.gameObject;
-		p1.gameObject.SetActive (false);
-		p2.gameObject.SetActive (false);
-	
-		//pop the molecules in for a visually pleasing effect
-		PopInSound (mol1.gameObject);
-		yield return new WaitForSeconds (0.2f);
-		PopInSound (mol2.gameObject);
-
-		for (int i = 0; i < activeLabels.Count; ++i) {
-			yield return new WaitForSeconds (0.1f);
-			PopInSound (activeLabels [i].gameObject);
-		}
-
-		//this is the connection manager for the complex game, it handles grappling between the molecules
-		ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-
-		for (int i = 0; i < dockSliders.Count; ++i) {
-			dockSliders[i].maxValue =  conMan.maxDistance;
-			dockSliders[i].minValue = conMan.minDistance;
-			dockSliders[i].value =conMan.maxDistance;
-			dockSliders[i].gameObject.SetActive(false);
-			//sliderConstarinedByOverride.Add(true);
-		}
-
-		overrideSlider.maxValue = conMan.maxDistance;
-		overrideSlider.minValue = conMan.minDistance;
-		overrideSlider.value = conMan.maxDistance;
-		overrideSlider.gameObject.SetActive (false);
-
-		mol1.transform.localScale = new Vector3 (1, 1, 1);
-		mol2.transform.localScale = new Vector3 (1, 1, 1);
-		yield return new WaitForSeconds (0.1f);
-		eventSystem.enabled = true;
-
-
-		// Enter waiting state
-		game_state = GameState.Waiting;
-
-		//any input should start the timer
-		while (!Input.anyKey || !playerClock.clockStopped) {
-			// start the new frame
-			yield return new WaitForEndOfFrame();
-		}
-
-		if (goSplash) {
-			PopInWaitDisappear (goSplash, 1.0f);
-		}
-
-		playerClock.StartPlayerTimer ();
-
-		// Enter picking state
-		game_state = GameState.Picking;
-		bool prev_button = false;
-
-		// In this loop, the game state is either Picking or Docking.
-		while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
-			// start the new frame
-			yield return new WaitForEndOfFrame();
-
-			// measure the score
-			float rms_distance_score = ScoreRMSD ();
-			if (rmsScoreSlider) {
-				rmsScoreSlider.value = rms_distance_score * 0.1f;
+		// for each level
+		for (;;) {
+			//if true, we have no more levels listed in the vector
+			//to be replaced with level selection. Talk to andy on PDB file selection
+			if (current_level >= filenames.Count) {
+				Debug.LogError ("No next level");
 			}
 
 			if (lockButton) {
-				lockButton.gameObject.SetActive (rms_distance_score < winScore);
+				lockButton.gameObject.SetActive(false);
 			}
 
-			//test if we should move the molecules with quick ray casts
-			if (eventSystem.IsActive ()) {
-				ManageSliders ();
-				bool cur_button = Input.GetMouseButton (0);
-				if (cur_button && !prev_button) {
-					//Using this system we dont allow the player to move the two molecules at the same time
-					Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-					Ray r = c.ScreenPointToRay (Input.mousePosition);
+			make_molecules (true, MeshTopology.Triangles);
 
-					// Starting cooroutines is grubby, we should avoid this.
-					if (PDB_molecule.collide_ray_quick (
-						molecules [0],
-						molecules [0].GetComponent<PDB_mesh> ().mol,
-						molecules [0].transform,
-						r)) {
-						//uncomment this line to stop players moving two molecules at once
-						//playerIsMoving[1]=false;#
-						if (!playerIsMoving [0]) {
-							playerIsMoving [0] = true;
-							StartCoroutine ("PlayerMoveMolecule", 0);
-						}
-					} else {
-						playerIsMoving [0] = false;
-					} 
+			// This is very grubby, must generalise.
+			GameObject mol1 = molecules [0];
+			GameObject mol2 = molecules [1];
 
-					if (PDB_molecule.collide_ray_quick (
-						molecules [1],
-						molecules [1].GetComponent<PDB_mesh> ().mol,
-						molecules [1].transform,
-						r)) {
-
-						//uncomment this line to stop players moving two molecules at once
-						//playerIsMoving[0]=false;
-						if (!playerIsMoving [1]) {
-							playerIsMoving [1] = true;
-							StartCoroutine ("PlayerMoveMolecule", 1);
-						}
-					} else {
-						playerIsMoving [1] = false;
-					}
-				}
-
-				if (sites [0]) {
-					sites [0].transform.rotation = molecules [0].transform.rotation;
-					if (simpleGame) {
-						sites [0].transform.Rotate (new Vector3 (0, 90, 0), Space.World);
-					}
-				}
-				if (sites [1]) {
-					sites [1].transform.rotation = molecules [1].transform.rotation;
-					if (simpleGame) {
-						sites [1].transform.Rotate (new Vector3 (0, -90, 0), Space.World);
-					}
-				}
-				prev_button = cur_button;
-			}
-
-		}
-
-		Debug.Log ("exited docking loop " + game_state);
-
-		if (game_state == GameState.Locked) {
-			Debug.Log ("locking");
+			originPosition [0] = mol1.transform.position;
+			originPosition [1] = mol2.transform.position;
 
 			for (int i = 0; i < activeLabels.Count; ++i) {
-				PopOut (activeLabels [i].gameObject);
+				activeLabels [i].gameObject.SetActive (false);
 			}
 
-			eventSystem.enabled = false;
+			ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
+			playerClock.ResetTimer ();
+			playerClock.timeText.enabled = false;
+		
+			PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
+			PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
 
-			//StartCoroutine("DockingOneAxis");
-			if (sites [0]) {
-				PopOut (sites [0]);
+			//create the win condition from the file specified paired atoms
+			for (int i=0; i<p1.mol.pairedLabels.Length; ++i) {
+				winCondition.Add (new Tuple<int,int> (p1.mol.pairedLabels [i].First,
+				                 p1.mol.pairedLabels [i].Second));
+			}
+			//debug 3D texture
+			//GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
+			p1.other = p2.gameObject;
+			p2.other = p1.gameObject;
+			p1.gameObject.SetActive (false);
+			p2.gameObject.SetActive (false);
+		
+			//pop the molecules in for a visually pleasing effect
+			PopInSound (mol1.gameObject);
+			yield return new WaitForSeconds (0.2f);
+			PopInSound (mol2.gameObject);
+
+			for (int i = 0; i < activeLabels.Count; ++i) {
+				yield return new WaitForSeconds (0.1f);
+				PopInSound (activeLabels [i].gameObject);
 			}
 
-			if (sites [1]) {
-				PopOut (sites [1]);
+			//this is the connection manager for the complex game, it handles grappling between the molecules
+			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
+
+			for (int i = 0; i < dockSliders.Count; ++i) {
+				dockSliders[i].maxValue =  conMan.maxDistance;
+				dockSliders[i].minValue = conMan.minDistance;
+				dockSliders[i].value =conMan.maxDistance;
+				dockSliders[i].gameObject.SetActive(false);
+				//sliderConstarinedByOverride.Add(true);
 			}
 
-			lockButton.gameObject.SetActive(false);
+			overrideSlider.maxValue = conMan.maxDistance;
+			overrideSlider.minValue = conMan.minDistance;
+			overrideSlider.value = conMan.maxDistance;
+			overrideSlider.gameObject.SetActive (false);
+
+			mol1.transform.localScale = new Vector3 (1, 1, 1);
+			mol2.transform.localScale = new Vector3 (1, 1, 1);
+			yield return new WaitForSeconds (0.1f);
+			eventSystem.enabled = true;
+
+
+			// Enter waiting state
+			game_state = GameState.Waiting;
+
+			//any input should start the timer
+			while (!Input.anyKey || !playerClock.clockStopped) {
+				// start the new frame
+				yield return new WaitForEndOfFrame();
+			}
+
+			if (goSplash) {
+				PopInWaitDisappear (goSplash, 1.0f);
+			}
+
+			playerClock.StartPlayerTimer ();
+
+			// Enter picking state
+			game_state = GameState.Picking;
+			bool prev_button = false;
+
+			// In this loop, the game state is either Picking or Docking.
+			while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
+				// start the new frame
+				yield return new WaitForEndOfFrame();
+				//Debug.Log ("gs = " + game_state);
+
+				// measure the score
+				float rms_distance_score = ScoreRMSD ();
+				if (rmsScoreSlider) {
+					rmsScoreSlider.value = rms_distance_score * 0.1f;
+				}
+
+				if (lockButton) {
+					lockButton.gameObject.SetActive (rms_distance_score < winScore);
+				}
+
+				//test if we should move the molecules with quick ray casts
+				if (eventSystem.IsActive ()) {
+					ManageSliders ();
+					bool cur_button = Input.GetMouseButton (0);
+					if (cur_button && !prev_button) {
+						//Using this system we dont allow the player to move the two molecules at the same time
+						Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
+						Ray r = c.ScreenPointToRay (Input.mousePosition);
+
+						// Starting cooroutines is grubby, we should avoid this.
+						if (PDB_molecule.collide_ray_quick (
+							molecules [0],
+							molecules [0].GetComponent<PDB_mesh> ().mol,
+							molecules [0].transform,
+							r)) {
+							//uncomment this line to stop players moving two molecules at once
+							//playerIsMoving[1]=false;#
+							if (!playerIsMoving [0]) {
+								playerIsMoving [0] = true;
+								StartCoroutine ("PlayerMoveMolecule", 0);
+							}
+						} else {
+							playerIsMoving [0] = false;
+						} 
+
+						if (PDB_molecule.collide_ray_quick (
+							molecules [1],
+							molecules [1].GetComponent<PDB_mesh> ().mol,
+							molecules [1].transform,
+							r)) {
+
+							//uncomment this line to stop players moving two molecules at once
+							//playerIsMoving[0]=false;
+							if (!playerIsMoving [1]) {
+								playerIsMoving [1] = true;
+								StartCoroutine ("PlayerMoveMolecule", 1);
+							}
+						} else {
+							playerIsMoving [1] = false;
+						}
+					}
+
+					if (sites [0]) {
+						sites [0].transform.rotation = molecules [0].transform.rotation;
+						if (simpleGame) {
+							sites [0].transform.Rotate (new Vector3 (0, 90, 0), Space.World);
+						}
+					}
+					if (sites [1]) {
+						sites [1].transform.rotation = molecules [1].transform.rotation;
+						if (simpleGame) {
+							sites [1].transform.Rotate (new Vector3 (0, -90, 0), Space.World);
+						}
+					}
+					prev_button = cur_button;
+				}
+
+			}
+
+			Debug.Log ("exited docking loop " + game_state);
+
+			if (game_state == GameState.Locked) {
+				Debug.Log ("locking");
+
+				for (int i = 0; i < activeLabels.Count; ++i) {
+					PopOut (activeLabels [i].gameObject);
+				}
+
+				eventSystem.enabled = false;
+
+				//StartCoroutine("DockingOneAxis");
+				if (sites [0]) {
+					PopOut (sites [0]);
+				}
+
+				if (sites [1]) {
+					PopOut (sites [1]);
+				}
+
+				lockButton.gameObject.SetActive(false);
+					
+				Debug.Log ("Docked");
+
+				this.GetComponent<AudioManager> ().Play ("Win");
+
+				GameObject parent = new GameObject ();
+				Rigidbody r = parent.AddComponent<Rigidbody> ();
+				molecules [0].transform.SetParent (parent.transform, true);
+				molecules [1].transform.SetParent (parent.transform, true);
 				
-			Debug.Log ("Docked");
+				r.angularDrag = 1.0f;
+				r.constraints = RigidbodyConstraints.FreezePosition;
+				r.useGravity = false;
+				parent.name = "MoveableParent";
 
-			this.GetComponent<AudioManager> ().Play ("Win");
+				//this is to stop the molecules rumbling around as they inherit the pearents velocity
+				Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
+				Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
+					
+				//StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
+				GameObject.Destroy (sites [0]);
+				GameObject.Destroy (sites [1]);
 
-			GameObject parent = new GameObject ();
-			Rigidbody r = parent.AddComponent<Rigidbody> ();
-			molecules [0].transform.SetParent (parent.transform, true);
-			molecules [1].transform.SetParent (parent.transform, true);
-			
-			r.angularDrag = 1.0f;
-			r.constraints = RigidbodyConstraints.FreezePosition;
-			r.useGravity = false;
-			parent.name = "MoveableParent";
-
-			//this is to stop the molecules rumbling around as they inherit the pearents velocity
-			Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
-			Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
-				
-			StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
-			GameObject.Destroy (sites [0]);
-			GameObject.Destroy (sites [1]);
-			yield return null;
+				Debug.Log("current_level=" + current_level);
+				current_level++;
+				if (current_level == filenames.Count) {
+					Debug.Log ("End of levels");
+					current_level = 0;
+				}
+				Reset ();
+			}
 		}
 	}
 
@@ -1436,7 +1422,7 @@ public class BioBlox : MonoBehaviour
 		num_invalid = 0;
 		num_connections = 0;
 		
-		if (do_physics_collision && molecules.Length >= 2) {
+		if (game_state == GameState.Docking && molecules.Length >= 2) {
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
