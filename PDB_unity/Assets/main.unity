@@ -1975,10 +1975,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e795907052d499c44b3a393b0d42b52a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  score: 0
-  debugText: {fileID: 259342975}
-  scoreBarObj: {fileID: 591135931}
-  winScoreBar: {fileID: 120629636}
 --- !u!1 &569938522
 GameObject:
   m_ObjectHideFlags: 0
@@ -3647,7 +3643,6 @@ MonoBehaviour:
   num_touching_1: 0
   num_invalid: 0
   num_connections: 0
-  water_dia: 1
   game_state: 0
   work_done: 0
 --- !u!114 &913013348
@@ -4955,10 +4950,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1597978761}
   m_HandleRect: {fileID: 1439199342}
   m_Direction: 2
-  m_MinValue: 30
-  m_MaxValue: 120
+  m_MinValue: -30
+  m_MaxValue: 30
   m_WholeNumbers: 0
-  m_Value: 30
+  m_Value: -30
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

@@ -17,8 +17,8 @@
     _GlowRadius3("GlowRadius3" , Float) = 0
     _DarkPoint ("DarkPointLoca3" , Vector) = (0,0,0,0)
     _DarkK("DarkK" , Float) = -0.01
-    _CutawayDepth("CutawayDepth", Float) = 0.0
-    _CutawayColor("CutawayDepth", Color) = (1,1,1,1)
+    _CutawayPlane("CutawayPlane", Vector) = (0,0,1,0)
+    _CutawayColor("CutawayColor", Color) = (1,1,1,1)
   }
   SubShader {
     Pass {
@@ -89,19 +89,21 @@
       
       struct varying_t {
         float4 projection_pos : POSITION;
+        float4 world_pos : TEXCOORD;
       };
       
-      uniform float _CutawayDepth;
+      uniform float4 _CutawayPlane;
       uniform float4 _CutawayColor;
 
       varying_t vert(appdata_full v) {
         varying_t o;
         o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
+        o.world_pos = mul (_Object2World, v.vertex);
         return o;
       }
 
       fixed4 frag(varying_t i) : COLOR {
-      	if (i.projection_pos.w < _CutawayDepth) {
+      	if (dot(float4(i.world_pos.xyz, 1), _CutawayPlane) < 0) {
       		clip(-1);
       	}
         return fixed4(_CutawayColor.xyz, 1.0f);
@@ -155,6 +157,7 @@
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
       uniform float3 _LightPos;
       uniform float3 _CameraPos;
+      uniform float4 _CutawayPlane;
       uniform float _CutawayDepth;
 
       varying_t vert(appdata_full v) {
@@ -218,7 +221,7 @@
       	float d2 = dot(rpos, rpos);
       	float dark = 1.0 - exp(_DarkK * d2);
    
-      	if (i.projection_pos.w < _CutawayDepth) {
+      	if (dot(float4(i.world_pos.xyz, 1), _CutawayPlane) < 0) {
       		clip(-1);
       	}
       	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal + _Specular.xyz * specular_factor * dark, _Color.w);

@@ -323,13 +323,17 @@ public class BioBlox : MonoBehaviour
 			line_renderer.clear ();
 			if (cutawaySlider && cutawaySlider.value > cutawaySlider.minValue) {
 				for (int x = -50; x <= 50; x += 10) {
-					Vector3 p0 = camera.transform.TransformPoint(new Vector3( x, -50, cutawaySlider.value));
-					Vector3 p1 = camera.transform.TransformPoint(new Vector3( x,  50, cutawaySlider.value));
+					//Vector3 p0 = camera.transform.TransformPoint(new Vector3( x, -50, cutawaySlider.value));
+					//Vector3 p1 = camera.transform.TransformPoint(new Vector3( x,  50, cutawaySlider.value));
+					Vector3 p0 = new Vector3( x, -50, cutawaySlider.value);
+					Vector3 p1 = new Vector3( x, 50, cutawaySlider.value);
 					line_renderer.add_line(new LineRenderer.Line(p0, p1));
 				}
 				for (int y = -50; y <= 50; y += 10) {
-					Vector3 p0 = camera.transform.TransformPoint(new Vector3( -50, y, cutawaySlider.value));
-					Vector3 p1 = camera.transform.TransformPoint(new Vector3(  50, y, cutawaySlider.value));
+					Vector3 p0 = new Vector3( -50, y, cutawaySlider.value);
+					Vector3 p1 = new Vector3( 50, y, cutawaySlider.value);
+					//Vector3 p0 = camera.transform.TransformPoint(new Vector3( -50, y, cutawaySlider.value));
+					//Vector3 p1 = camera.transform.TransformPoint(new Vector3(  50, y, cutawaySlider.value));
 					line_renderer.add_line(new LineRenderer.Line(p0, p1));
 				}
 			}
@@ -342,7 +346,8 @@ public class BioBlox : MonoBehaviour
 			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_LightPos", light_pos);
 				if (cutawaySlider) {
-					r.material.SetFloat ("_CutawayDepth", cutawaySlider.value);
+					Vector4 plane = new Vector4(0, 0, 1, -cutawaySlider.value);
+					r.material.SetVector ("_CutawayPlane", plane);
 				}
 			}
 		}
