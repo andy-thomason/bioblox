@@ -29,8 +29,8 @@ public class BioBlox : MonoBehaviour
 	public GameObject prefabLabel;
 
 	// the win and loose spash images
-	public GameObject winSplash;
-	public GameObject looseSplash;
+	//public GameObject winSplash;
+	//public GameObject looseSplash;
 	public GameObject goSplash;
 
 	// a variable controlling the size of the area faded out during the win state
@@ -107,8 +107,8 @@ public class BioBlox : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		winSplash.SetActive (false);
-		looseSplash.SetActive (false);
+		//winSplash.SetActive (false);
+		//looseSplash.SetActive (false);
 		goSplash.SetActive (false);
 
 		game_state = GameState.Setup;
