@@ -1,2 +1,12 @@
 *.userprefs
 *.TMP
+*.sdf
+*.suo
+*.log
+*.tlog
+*.pdb
+*.exe
+*.obj
+*.idb
+*.ilk
+
