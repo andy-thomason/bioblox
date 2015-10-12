@@ -188,7 +188,7 @@ namespace game_server {
     std::array<char, 2048> buffer_;
 
     /// set this to debug network problems
-    bool logging = true;
+    bool logging = false;
 
     /// general strings used for responses
     std::string header_;

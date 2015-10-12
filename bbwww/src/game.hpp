@@ -14,11 +14,10 @@ namespace game_server {
 
     // simulate the game
     void do_frame(const std::string &data_in, std::string &data_out) {
-      json input(data_in);
+      json input = json::parse(data_in.c_str());
       json output;
 
       update(input, output);
-
       frame_number_++;
 
       data_out = output.dump();
