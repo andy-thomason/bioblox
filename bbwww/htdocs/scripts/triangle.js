@@ -5,7 +5,7 @@
 "use strict";
 
 /// A geometry component
-class Bioblox extends Scene {
+class Triangle extends Scene {
   constructor() {
     super(function (scene) {
       var gl = scene.gl;
@@ -35,6 +35,6 @@ class Bioblox extends Scene {
   }
 
   update() {
-    this.scene.molecule.rotate(0.01, [0, 0, 1]);
+    this.scene.molecule.rotate(1, [0, 0, 1]);
   }
 }

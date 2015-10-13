@@ -56,13 +56,7 @@ class Shader {
       alert("could not compile " + shader_name);
     }
 
-    /*this.uniform_locations = {
-      model_to_camera: gl.getUniformLocation(program, "model_to_camera"),
-      model_to_perspective: gl.getUniformLocation(program, "model_to_perspective"),
-    }*/
-
     this.attribute_locations = {}
-
     var num_attribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
     for (var i = 0; i != num_attribs; ++i) {
       var ai = gl.getActiveAttrib(program, i);
@@ -70,7 +64,6 @@ class Shader {
     }
 
     this.uniform_locations = {}
-
     var num_uniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
     for (var i = 0; i != num_uniforms; ++i) {
       var ai = gl.getActiveUniform(program, i);
@@ -91,6 +84,7 @@ class Material {
 class Node {
   constructor() {
     this.node_to_parent = mat4.create();
+    mat4.identity(this.node_to_parent);
     this.parent = null;
   }
 
@@ -110,7 +104,7 @@ class Node {
   }
 
   rotate(angle, axis) {
-    mat4.rotate(this.node_to_parent, angle, axis);
+    mat4.rotate(this.node_to_parent, angle * (3.141592653/180), axis);
   }
 
   identity() {
@@ -134,7 +128,7 @@ class Node {
 
   get_node_to_world(dest) {
     var node = this;
-    mat4.set(dest, this.node_to_parent);
+    mat4.set(this.node_to_parent, dest);
     while (node.parent != null) {
       node = node.parent;
       // todo: check the order of the multiply here.
@@ -217,10 +211,15 @@ class Scene {
     //if (e) throw ("WebGL error: " + e);
   }
 
+  update() {
+  }
+
   /// render the current frame
   do_frame(request) {
     this.from_server = request;
     var to_server = {}
+
+    this.update();
 
     var gl = this.gl;
 
@@ -251,16 +250,16 @@ class Scene {
       var node = this.scene[s];
       var geometry = node.geometry;
       if (geometry) {
+        node.get_node_to_world(model_to_world);
         //console.log(s + ": " + node.geometry.components.length);
-        var model_to_world = node.node_to_parent;
         //console.log("model_to_world=" + mat4.str(model_to_world));
 
-        //mat4.set(world_to_camera, model_to_camera);
-        //mat4.multiply(model_to_world, model_to_camera, model_to_camera);
+        mat4.set(world_to_camera, model_to_camera);
+        mat4.multiply(model_to_world, model_to_camera, model_to_camera);
         //console.log("model_to_camera=" + mat4.str(model_to_camera));
 
-        //mat4.set(model_to_camera, model_to_perspective);
-        //mat4.multiply(camera_to_perspective, model_to_perspective, model_to_perspective);
+        mat4.set(model_to_camera, model_to_perspective);
+        mat4.multiply(camera_to_perspective, model_to_perspective, model_to_perspective);
 
         //console.log("model_to_perspective=" + mat4.str(model_to_perspective));
 
@@ -268,8 +267,8 @@ class Scene {
         //mat4.multiplyVec4(camera_to_perspective, [0, 0, 0, 1], tmp);
         //console.log("t=" + tmp);
 
-        mat4.identity(model_to_perspective);
-        mat4.identity(model_to_camera);
+        //mat4.identity(model_to_perspective);
+        //mat4.identity(model_to_camera);
 
         var material = geometry.material;
         var shader = geometry.material.shader;

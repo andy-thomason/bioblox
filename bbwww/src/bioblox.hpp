@@ -8,7 +8,7 @@ namespace game_server {
     }
 
     void update(const json &input, const json &output) {
-      std::cout << input.dump();
+      //std::cout << input.dump();
     }
   private:
   };
