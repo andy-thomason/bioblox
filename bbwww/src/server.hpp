@@ -7,7 +7,7 @@ namespace game_server {
   public:
     server(boost::asio::io_service &io) :
       io_(io),
-      acceptor_(io, tcp::endpoint(tcp::v4(), 8000)),
+      acceptor_(io, tcp::endpoint(tcp::v4(), 8888)),
       socket_(io)
     {
       // todo: add lobbying

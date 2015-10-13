@@ -2,9 +2,10 @@
   <head>
     <script src="scripts/glmatrix.js"></script>
     <script src="scripts/scene.js"></script>
+    <script src="scripts/bioblox.js"></script>
     <title>Bioblox Web Edition</title>
   </head>
-  <body onload="var scene = new Scene(); scene.run(event)" onkeydown="scene.keydown(event)" onkeyup="scene.keyup(event)">
+  <body onload="scene = new Bioblox(); scene.run(event)" onkeydown="scene.keydown(event)" onkeyup="scene.keyup(event)">
     <h1>Bioblox Web Edition</h1>
     <canvas id="canvas" width="1024" height="768"/>
   </body>

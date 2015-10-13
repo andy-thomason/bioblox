@@ -8,30 +8,81 @@
 
 /// A geometry component
 class Component {
-  constructor(gl, vertices, indices) {
+  constructor(gl, vertices, indices, stride, attrs) {
     this.vbo = gl.createBuffer();
-    var v = new Float32Array(vertices);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, v, gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+    //check_error();
 
     this.ibo = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int32Array(indices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+    //check_error();
 
     this.num_indices = indices.length;
-    this.stride = 36;
-    this.attrs = [
-      { semantic: "POSITION", size: 3, type: gl.FLOAT, normalized: false, offset: 0 },
-      { semantic: "NORMAL", size: 3, type: gl.FLOAT, normalized: false, offset: 12 },
-      { semantic: "COLOR", size: 3, type: gl.FLOAT, normalized: false, offset: 24 },
-    ];
+    this.stride = stride;
+    this.attrs = attrs;
+  }
+}
+
+class Shader {
+  constructor(gl, url) {
+    function make_shader(gl, src, shader_type) {
+      var def = shader_type == gl.FRAGMENT_SHADER ? "#define FRAGMENT_SHADER 1\n\n" : "#define VERTEX_SHADER 1\n\n";
+      var shader = gl.createShader(shader_type);
+
+      gl.shaderSource(shader, def + src);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+      }
+
+      return shader;
+    }
+
+    var req = new XMLHttpRequest();
+    req.open("GET", url, false);
+    req.send(null);
+    //console.log(req.responseText);
+
+    var program = this.program = gl.createProgram();
+    gl.attachShader(program, make_shader(gl, req.responseText, gl.VERTEX_SHADER));
+    gl.attachShader(program, make_shader(gl, req.responseText, gl.FRAGMENT_SHADER));
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      alert("could not compile " + shader_name);
+    }
+
+    /*this.uniform_locations = {
+      model_to_camera: gl.getUniformLocation(program, "model_to_camera"),
+      model_to_perspective: gl.getUniformLocation(program, "model_to_perspective"),
+    }*/
+
+    this.attribute_locations = {}
+
+    var num_attribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+    for (var i = 0; i != num_attribs; ++i) {
+      var ai = gl.getActiveAttrib(program, i);
+      this.attribute_locations[ai.name] = gl.getAttribLocation(program, ai.name);
+    }
+
+    this.uniform_locations = {}
+
+    var num_uniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (var i = 0; i != num_uniforms; ++i) {
+      var ai = gl.getActiveUniform(program, i);
+      this.uniform_locations[ai.name] = gl.getUniformLocation(program, ai.name);
+    }
   }
 }
 
 /// A material with uniforms and a shader program
 class Material {
-  constructor(program, uniforms) {
-    this.program = program;
+  constructor(shader, uniforms) {
+    this.shader = shader;
     this.uniforms = uniforms;
   }
 }
@@ -119,7 +170,7 @@ class CameraNode extends Node {
 /// A scene with cameras and lights
 class Scene {
   /// construct a scene object.
-  constructor() {
+  constructor(func) {
     this.canvas = document.getElementById("canvas");
     console.log("canvas=" + this.canvas);
 
@@ -138,28 +189,32 @@ class Scene {
 
     this.gl = gl;
 
-    var indices = [0, 1, 2];
-    var vertices = [
-      -1, -1,  0, 0, 0, 1, 1, 0, 0,
-      -1,  1,  0, 0, 0, 1, 1, 0, 0,
-        1, -1,  0, 0, 0, 1, 1, 0, 0
-    ];
-    var commponents = [new Component(gl, vertices, indices)];
-    var program = this.make_program("shaders/molecule.glsl");
-    var material = new Material(program, {});
+    this.scene = func(this);
 
-    this.scene = {
-      camera: new CameraNode(45, 0.1, 1000.0).translate([0, 0, 5]),
-      molecule: new GeometryNode(commponents, material),
+    this.active_camera = null;
+
+    for (var c in this.scene) {
+      var sc = this.scene[c];
+      if (sc.optics) {
+        this.active_camera = sc;
+        break;
+      }
     }
 
-    this.active_camera = this.scene.camera;
+    if (!this.active_camera) {
+      alert("No camera found");
+    }
 
     // this object contains information to communticate to the server
     this.to_server = {}
 
     // this object contains information from the server
     this.from_server = {}
+  }
+
+  check_error() {
+    var e = this.gl.getError();
+    //if (e) throw ("WebGL error: " + e);
   }
 
   /// render the current frame
@@ -169,10 +224,15 @@ class Scene {
 
     var gl = this.gl;
 
+    gl.getError();
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    this.check_error();
     gl.clearColor(.5, .5, .5, 1);
+    this.check_error();
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    this.check_error();
     gl.enable(gl.DEPTH_TEST);
+    this.check_error();
 
     var camera_to_perspective = mat4.create();
     var model_to_camera = mat4.create();
@@ -208,82 +268,59 @@ class Scene {
         //mat4.multiplyVec4(camera_to_perspective, [0, 0, 0, 1], tmp);
         //console.log("t=" + tmp);
 
-        mat3.identity(model_to_perspective);
-        mat3.identity(model_to_camera);
+        mat4.identity(model_to_perspective);
+        mat4.identity(model_to_camera);
 
         var material = geometry.material;
-        var program = geometry.material.program;
-        gl.useProgram(program);
-        gl.uniformMatrix4fv(program.model_to_perspective, false, model_to_perspective);
-        gl.uniformMatrix4fv(program.model_to_camera, false, model_to_camera);
+        var shader = geometry.material.shader;
+        var uniform_locations = shader.uniform_locations;
+        var attribute_locations = shader.attribute_locations;
+        gl.useProgram(shader.program);
+
+        if (uniform_locations.model_to_perspective) gl.uniformMatrix4fv(uniform_locations.model_to_perspective, false, model_to_perspective);
+        if (uniform_locations.model_to_camera) gl.uniformMatrix4fv(uniform_locations.model_to_camera, false, model_to_camera);
+
+        for (var uname in material.uniforms) {
+          var ul = uniform_locations[uname];
+          if (ul) gl.uniform4fv(ul, material.uniforms[uname]);
+        }
 
         var components = node.geometry.components;
         for (var c in components) {
           var component = components[c];
-          console.log("c: " + component.vbo + " i: " + component.ibo);
 
           gl.bindBuffer(gl.ARRAY_BUFFER, component.vbo);
+          this.check_error();
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, component.ibo);
+          this.check_error();
 
           for (var a in component.attrs) {
             var attr = component.attrs[a];
-            var attr_index = gl.getAttribLocation(program, attr.semantic);
-            console.log("attr[" + attr_index + "] n=" + attr.semantic + " s=" + attr.size + " t=" + attr.type + " n=" + attr.normalized + " st=" + component.stride + " o=" + attr.offset);
-            gl.vertexAttribPointer(attr_index, attr.size, attr.type, attr.normalized, component.stride, attr.offset);
-            gl.enableVertexAttribArray(attr_index);
-            attr.index = attr_index;
+            var index = attribute_locations[a];
+            if (index != undefined) {
+              gl.vertexAttribPointer(index, attr.size, attr.type, attr.normalized, component.stride, attr.offset);
+              this.check_error();
+              gl.enableVertexAttribArray(index);
+              this.check_error();
+            }
           }
 
-          gl.drawElements(gl.TRIANGLES, component.num_indices, gl.UNSIGNED_SHORT, 0);
+          //gl.drawElements(gl.TRIANGLES, component.num_indices, gl.UNSIGNED_INT, 0);
+          gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0);
+          this.check_error();
 
           for (var a in component.attrs) {
-            var attr = component.attrs[a];
-            var attr_index = gl.getAttribLocation(program, attr.semantic);
-            gl.disableVertexAttribArray(attr_index);
+            var index = attribute_locations[a];
+            if (index != undefined) {
+              gl.disableVertexAttribArray(index);
+              this.check_error();
+            }
           }
         }
       }
     }
 
     return to_server;
-  }
-
-  /// make a shader program from a .glsl file
-  make_program(shader_name) {
-    function make_shader(gl, src, shader_type) {
-      var def = shader_type == gl.FRAGMENT_SHADER ? "#define FRAGMENT_SHADER 1\n\n" : "#define VERTEX_SHADER 1\n\n";
-      var shader = gl.createShader(shader_type);
-
-      gl.shaderSource(shader, def + src);
-      gl.compileShader(shader);
-
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        alert(gl.getShaderInfoLog(shader));
-        return null;
-      }
-
-      return shader;
-    }
-
-    var gl = this.gl;
-
-    var req = new XMLHttpRequest();
-    req.open("GET", shader_name, false);
-    req.send(null);
-    console.log(req.responseText);
-
-    var program = gl.createProgram();
-    gl.attachShader(program, make_shader(gl, req.responseText, gl.VERTEX_SHADER));
-    gl.attachShader(program, make_shader(gl, req.responseText, gl.FRAGMENT_SHADER));
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      alert("could not compile " + shader_name);
-    }
-
-    program.model_to_camera = gl.getUniformLocation(program, "model_to_camera");
-    program.model_to_perspective = gl.getUniformLocation(program, "model_to_perspective");
-    return program;
   }
 
   /// handle key down events
@@ -303,14 +340,13 @@ class Scene {
   /// run the game loop
   run(e) {
     var request = new XMLHttpRequest();
-    var thiz = this;
+    var self = this;
     request.responseType = "json";
     request.onreadystatechange = function () {
       if (request.readyState == 4 && request.status == 200) {
         //if (request.response) display(ctx, request.response);
         //console.log(request.response);
-        console.log(thiz);
-        var to_server = thiz.do_frame(request)
+        var to_server = self.do_frame(request)
 
         var str = JSON.stringify(to_server);
         request.open("PUT", "/data", true);
@@ -318,12 +354,13 @@ class Scene {
       }
     }
 
-    var to_server = thiz.do_frame(request)
+    var to_server = self.do_frame(request)
 
     var str = JSON.stringify(to_server);
     request.open("PUT", "/data", true);
     request.send(str);
   }
+
 }
 
 
