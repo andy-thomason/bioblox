@@ -136,7 +136,7 @@
   <ItemGroup>
     <None Include="..\..\htdocs\index.html" />
     <None Include="..\..\htdocs\scripts\glmatrix.js" />
-    <None Include="..\..\htdocs\scripts\bioblox.js" />
+    <None Include="..\..\htdocs\scripts\scene.js" />
     <None Include="..\..\htdocs\shaders\molecule.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

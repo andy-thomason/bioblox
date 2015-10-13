@@ -35,7 +35,7 @@
     <None Include="..\..\htdocs\index.html">
       <Filter>htdocs</Filter>
     </None>
-    <None Include="..\..\htdocs\scripts\bioblox.js">
+    <None Include="..\..\htdocs\scripts\scene.js">
       <Filter>scripts</Filter>
     </None>
   </ItemGroup>

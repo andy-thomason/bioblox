@@ -1,8 +1,14 @@
+/// @file scene.js
+/// Classes for a simple retained-mode scene
+/// (C) Andy Thomason 2015
+/// https://opensource.org/licenses/MIT
+
+// This is necessary to use modern Javascript classes.
 "use strict";
 
-// A geometry component
+/// A geometry component
 class Component {
-  constructor(gl, vertices,  indices) {
+  constructor(gl, vertices, indices) {
     this.vbo = gl.createBuffer();
     var v = new Float32Array(vertices);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -22,6 +28,7 @@ class Component {
   }
 }
 
+/// A material with uniforms and a shader program
 class Material {
   constructor(program, uniforms) {
     this.program = program;
@@ -29,19 +36,64 @@ class Material {
   }
 }
 
-// A node in the heirachy with a transform
+/// A node in the heirachy with a transform
 class Node {
   constructor() {
     this.node_to_parent = mat4.create();
+    this.parent = null;
+  }
+
+  add_child(child) {
+    if (this.children == null) {
+      this.children = [child];
+    } else {
+      this.children.push_back(child);
+    }
+    child.parent = this;
+    return this;
   }
 
   translate(value) {
     mat4.translate(this.node_to_parent, value);
     return this;
   }
+
+  rotate(angle, axis) {
+    mat4.rotate(this.node_to_parent, angle, axis);
+  }
+
+  identity() {
+    mat4.identity(this.node_to_parent);
+    return this;
+  }
+
+  set_mat4(value) {
+    mat4.set(this.node_to_parent, value);
+    return this;
+  }
+
+  set_mat3(value) {
+    mat3.toMat4(this.node_to_parent, value);
+    return this;
+  }
+
+  toString() {
+    return mat4.str(this.node_to_parent);
+  }
+
+  get_node_to_world(dest) {
+    var node = this;
+    mat4.set(dest, this.node_to_parent);
+    while (node.parent != null) {
+      node = node.parent;
+      // todo: check the order of the multiply here.
+      mat4.multiply(this.node_to_parent, dest, dest);
+    }
+    return this;
+  }
 }
 
-// A drawable node
+/// A drawable node
 class GeometryNode extends Node {
   constructor(components, material) {
     super();
@@ -52,6 +104,7 @@ class GeometryNode extends Node {
   }
 }
 
+/// A camera node
 class CameraNode extends Node {
   constructor(yfov, znear, zfar) {
     super();
@@ -63,15 +116,16 @@ class CameraNode extends Node {
   }
 }
 
-// An application
-class App {
+/// A scene with cameras and lights
+class Scene {
+  /// construct a scene object.
   constructor() {
     this.canvas = document.getElementById("canvas");
     console.log("canvas=" + this.canvas);
 
     var gl = null;
     try {
-      gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      gl = this.canvas.getContext("webgl") || this.canvas.getContext("experimental-webgl");
       gl.viewportWidth = canvas.width;
       gl.viewportHeight = canvas.height;
     } catch (e) {
@@ -85,7 +139,11 @@ class App {
     this.gl = gl;
 
     var indices = [0, 1, 2];
-    var vertices = [-1, -1, 0, 0, 0, 1, 1, 0, 0,  -1, 1, 0, 0, 0, 1, 1, 0, 0,  1, -1, 0, 0, 0, 1, 1, 0, 0];
+    var vertices = [
+      -1, -1,  0, 0, 0, 1, 1, 0, 0,
+      -1,  1,  0, 0, 0, 1, 1, 0, 0,
+        1, -1,  0, 0, 0, 1, 1, 0, 0
+    ];
     var commponents = [new Component(gl, vertices, indices)];
     var program = this.make_program("shaders/molecule.glsl");
     var material = new Material(program, {});
@@ -104,6 +162,7 @@ class App {
     this.from_server = {}
   }
 
+  /// render the current frame
   do_frame(request) {
     this.from_server = request;
     var to_server = {}
@@ -116,14 +175,17 @@ class App {
     gl.enable(gl.DEPTH_TEST);
 
     var camera_to_perspective = mat4.create();
-    var world_to_camera = mat4.create();
     var model_to_camera = mat4.create();
     var model_to_perspective = mat4.create();
     var model_to_world = mat4.create();
+    var world_to_camera = mat4.create();
+    var camera_to_world = mat4.create();
+
+    this.active_camera.get_node_to_world(camera_to_world);
+    mat4.inverse(camera_to_world, world_to_camera);
 
     var optics = this.active_camera.optics;
-    mat4.perspective(optics.yfov, gl.viewportWidth / gl.viewportHeight, optics.znear, optics.zfar, this.camera_to_perspective);
-    mat4.inverse(this.active_camera.node_to_parent, this.world_to_camera);
+    mat4.perspective(optics.yfov, gl.viewportWidth / gl.viewportHeight, optics.znear, optics.zfar, camera_to_perspective);
 
     for (var s in this.scene) {
       var node = this.scene[s];
@@ -158,7 +220,7 @@ class App {
         var components = node.geometry.components;
         for (var c in components) {
           var component = components[c];
-          //console.log("c: " + component.vbo + " i: " + component.ibo);
+          console.log("c: " + component.vbo + " i: " + component.ibo);
 
           gl.bindBuffer(gl.ARRAY_BUFFER, component.vbo);
           gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, component.ibo);
@@ -166,7 +228,7 @@ class App {
           for (var a in component.attrs) {
             var attr = component.attrs[a];
             var attr_index = gl.getAttribLocation(program, attr.semantic);
-            //console.log("attr[" + attr_index + "] n=" + attr.semantic + " s=" + attr.size + " t=" + attr.type + " n=" + attr.normalized + " st=" + component.stride + " o=" + attr.offset);
+            console.log("attr[" + attr_index + "] n=" + attr.semantic + " s=" + attr.size + " t=" + attr.type + " n=" + attr.normalized + " st=" + component.stride + " o=" + attr.offset);
             gl.vertexAttribPointer(attr_index, attr.size, attr.type, attr.normalized, component.stride, attr.offset);
             gl.enableVertexAttribArray(attr_index);
             attr.index = attr_index;
@@ -186,24 +248,23 @@ class App {
     return to_server;
   }
 
-  make_shader(src, shader_type) {
-    var gl = this.gl;
+  /// make a shader program from a .glsl file
+  make_program(shader_name) {
+    function make_shader(gl, src, shader_type) {
+      var def = shader_type == gl.FRAGMENT_SHADER ? "#define FRAGMENT_SHADER 1\n\n" : "#define VERTEX_SHADER 1\n\n";
+      var shader = gl.createShader(shader_type);
 
-    var def = shader_type == gl.FRAGMENT_SHADER ? "#define FRAGMENT_SHADER 1\n\n" : "#define VERTEX_SHADER 1\n\n";
-    var shader = gl.createShader(shader_type);
+      gl.shaderSource(shader, def + src);
+      gl.compileShader(shader);
 
-    gl.shaderSource(shader, def + src);
-    gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+      }
 
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      alert(gl.getShaderInfoLog(shader));
-      return null;
+      return shader;
     }
 
-    return shader;
-  }
-
-  make_program(shader_name) {
     var gl = this.gl;
 
     var req = new XMLHttpRequest();
@@ -212,8 +273,8 @@ class App {
     console.log(req.responseText);
 
     var program = gl.createProgram();
-    gl.attachShader(program, this.make_shader(req.responseText, gl.VERTEX_SHADER));
-    gl.attachShader(program, this.make_shader(req.responseText, gl.FRAGMENT_SHADER));
+    gl.attachShader(program, make_shader(gl, req.responseText, gl.VERTEX_SHADER));
+    gl.attachShader(program, make_shader(gl, req.responseText, gl.FRAGMENT_SHADER));
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
@@ -224,43 +285,45 @@ class App {
     program.model_to_perspective = gl.getUniformLocation(program, "model_to_perspective");
     return program;
   }
-}
 
-var app;
-
-function do_get(request) {
-  var to_server = app.do_frame(request)
-
-  var str = JSON.stringify(to_server);
-  //request.setRequestHeader("Content-length", str.length);
-  request.open("PUT", "/data", true);
-  request.send(str);
-}
-
-function keydown(event) {
-  var key = event.keyCode || event.which;
-  app.to_server["key" + key] = true;
-  console.log(to_server);
-}
-
-function keyup(event) {
-  var key = event.keyCode || event.which;
-  delete app.to_server["key" + key];
-  console.log(to_server);
-}
-
-function run(e) {
-  app = new App();
-
-  var request = new XMLHttpRequest();
-  request.responseType = "json";
-  request.onreadystatechange = function () {
-    if (request.readyState == 4 && request.status == 200) {
-      //if (request.response) display(ctx, request.response);
-      //console.log(request.response);
-      do_get(request);
-    }
+  /// handle key down events
+  keydown(event) {
+    var key = event.keyCode || event.which;
+    this.to_server["key" + key] = true;
+    console.log(to_server);
   }
-  do_get(request);
+
+  /// handle key up events
+  keyup(event) {
+    var key = event.keyCode || event.which;
+    delete this.to_server["key" + key];
+    console.log(to_server);
+  }
+
+  /// run the game loop
+  run(e) {
+    var request = new XMLHttpRequest();
+    var thiz = this;
+    request.responseType = "json";
+    request.onreadystatechange = function () {
+      if (request.readyState == 4 && request.status == 200) {
+        //if (request.response) display(ctx, request.response);
+        //console.log(request.response);
+        console.log(thiz);
+        var to_server = thiz.do_frame(request)
+
+        var str = JSON.stringify(to_server);
+        request.open("PUT", "/data", true);
+        request.send(str);
+      }
+    }
+
+    var to_server = thiz.do_frame(request)
+
+    var str = JSON.stringify(to_server);
+    request.open("PUT", "/data", true);
+    request.send(str);
+  }
 }
+
 
