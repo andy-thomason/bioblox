@@ -877,7 +877,9 @@ public class BioBlox : MonoBehaviour
 		//the layer numbers are to seperate the molecules in certain cameras
 		obj.layer = layerNum;
 
-		PDB_mesh p = obj.AddComponent<PDB_mesh> ();
+		//just the one PDB_mesh component should be sufficient...
+		PDB_mesh p = obj.GetComponent<PDB_mesh>();
+		if (!p) p = obj.AddComponent<PDB_mesh>();
 
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
