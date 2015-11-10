@@ -83,6 +83,10 @@ public class BioBlox : MonoBehaviour
 	public Text invalidDockText;
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
+	//Animator of the tools menu
+	public Animator ToolMenuAnimator;
+	public GameObject OpenToolImage;
+	public GameObject CloseToolImage;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
@@ -114,7 +118,7 @@ public class BioBlox : MonoBehaviour
 	{
 		//winSplash.SetActive (false);
 		//looseSplash.SetActive (false);
-		goSplash.SetActive (false);
+		//goSplash.SetActive (false);
 
 		game_state = GameState.Setup;
 
@@ -1067,9 +1071,9 @@ public class BioBlox : MonoBehaviour
 				yield return new WaitForEndOfFrame();
 			}
 
-			if (goSplash) {
+			/*if (goSplash) {
 				PopInWaitDisappear (goSplash, 1.0f);
-			}
+			}*/
 
 			playerClock.StartPlayerTimer ();
 
@@ -1287,6 +1291,13 @@ public class BioBlox : MonoBehaviour
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
+	}
+
+	public void ToogleToolMenu(bool Status)
+	{
+		ToolMenuAnimator.SetBool ("Open", Status);
+		OpenToolImage.SetActive (!Status);
+		CloseToolImage.SetActive (Status);
 	}
 }
 
