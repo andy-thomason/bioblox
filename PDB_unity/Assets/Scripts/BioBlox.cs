@@ -70,9 +70,14 @@ public class BioBlox : MonoBehaviour
 	public float seperationForce = 10000.0f;
 	//  force applied by string
 	public float stringForce = 20000.0f;
+	private float ScoreScaleSize;
+	private float ScoreScaleValue;
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
+	public RectTransform heuristicScore;
+	public Text GameScoreValue;
+	public RectTransform GameScore;
 	public Slider overrideSlider;
 	public Slider cutawaySlider;
 	public Text invalidDockText;
@@ -745,11 +750,13 @@ public class BioBlox : MonoBehaviour
 				                   selectedLabel [0].atomIds.ToArray (),
 				                   molecules [1].GetComponent<PDB_mesh> (),
 				                   selectedLabel [1].atomIds.ToArray ());
-				for(int i = 0; i < dockSliders.Count; ++i)
+				/*for(int i = 0; i < dockSliders.Count; ++i)
 				{
 					dockSliders[i].gameObject.SetActive(true);
 					overrideSlider.gameObject.SetActive(true);
-				}
+				}*/				
+				overrideSlider.interactable = true;
+
 				uiScrollSpeed =900;
 			}
 		}
@@ -982,7 +989,8 @@ public class BioBlox : MonoBehaviour
 			}
 
 			if (lockButton) {
-				lockButton.gameObject.SetActive(false);
+				//lockButton.gameObject.SetActive(false);
+				lockButton.interactable = false;
 			}
 
 			make_molecules (true, MeshTopology.Triangles);
@@ -1034,14 +1042,15 @@ public class BioBlox : MonoBehaviour
 				dockSliders[i].maxValue =  conMan.maxDistance;
 				dockSliders[i].minValue = conMan.minDistance;
 				dockSliders[i].value =conMan.maxDistance;
-				dockSliders[i].gameObject.SetActive(false);
+				//dockSliders[i].gameObject.SetActive(false);
 				//sliderConstarinedByOverride.Add(true);
 			}
 
 			overrideSlider.maxValue = conMan.maxDistance;
 			overrideSlider.minValue = conMan.minDistance;
 			overrideSlider.value = conMan.maxDistance;
-			overrideSlider.gameObject.SetActive (false);
+			
+			overrideSlider.interactable = false;
 
 			mol1.transform.localScale = new Vector3 (1, 1, 1);
 			mol2.transform.localScale = new Vector3 (1, 1, 1);
@@ -1078,10 +1087,22 @@ public class BioBlox : MonoBehaviour
 				float rms_distance_score = ScoreRMSD ();
 				if (rmsScoreSlider) {
 					rmsScoreSlider.value = rms_distance_score * 0.1f;
+					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
+					{
+						GameScore.localScale = new Vector3(scaleGameScore,scaleGameScore,scaleGameScore);						
+						GameScoreValue.text = ((int)(scaleGameScore * 1250)).ToString();
+					}
+					else
+					{
+						GameScore.localScale = new Vector3(0,0,0);
+						GameScoreValue.text = "0";
+					}
 				}
 
 				if (lockButton) {
-					lockButton.gameObject.SetActive (rms_distance_score < winScore);
+					//lockButton.gameObject.SetActive (rms_distance_score < winScore);
+					lockButton.interactable = (rms_distance_score < winScore);
 				}
 
 				//test if we should move the molecules with quick ray casts
@@ -1163,7 +1184,8 @@ public class BioBlox : MonoBehaviour
 					PopOut (sites [1]);
 				}
 
-				lockButton.gameObject.SetActive(false);
+				//lockButton.gameObject.SetActive(false);
+				lockButton.interactable = false;
 					
 				Debug.Log ("Docked");
 
@@ -1253,6 +1275,11 @@ public class BioBlox : MonoBehaviour
 			}
 
 			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+			
+			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
+
+			heuristicScore.localScale = num_invalid != 0 ? new Vector3(0,0,0) : new Vector3(ScoreScaleSize,ScoreScaleSize,ScoreScaleSize);
+
 		}
 
 		invalidDockText.enabled = num_invalid != 0;
