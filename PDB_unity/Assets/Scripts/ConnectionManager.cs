@@ -28,7 +28,7 @@ public class ConnectionManager : MonoBehaviour {
 	public void Reset()
 	{
 		connections.Clear ();
-		connectionMinDistances = null;
+		connectionMinDistances = new float[]{};
 	}
 
 	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,

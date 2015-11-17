@@ -700,6 +700,7 @@ public class BioBlox : MonoBehaviour
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
 		if (simpleGame) {
+			Debug.Log ("simple game");
 			//here we update the selected label list
 			//and align the molecule so that the labeled atom is facing the other molecule
 			Vector3 sumAtomPos = Vector3.zero;
@@ -843,6 +844,11 @@ public class BioBlox : MonoBehaviour
 		selectedLabel [1] = null;
 
 		game_state = GameState.Picking;
+
+		//Clear score
+		GameScore.localScale = Vector3.zero;
+		heuristicScore.localScale = Vector3.zero;
+		GameScoreValue.text = "0";
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -1099,7 +1105,7 @@ public class BioBlox : MonoBehaviour
 					}
 					else
 					{
-						GameScore.localScale = new Vector3(0,0,0);
+						GameScore.localScale = Vector3.zero;
 						GameScoreValue.text = "0";
 					}
 				}
