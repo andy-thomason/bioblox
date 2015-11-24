@@ -75,9 +75,9 @@ public class BioBlox : MonoBehaviour
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
-	public RectTransform heuristicScore;
+	public Image heuristicScore;
 	public Text GameScoreValue;
-	public RectTransform GameScore;
+	public Image GameScore;
 	public Slider overrideSlider;
 	public Slider cutawaySlider;
 	public Text invalidDockText;
@@ -102,6 +102,8 @@ public class BioBlox : MonoBehaviour
 	public int num_touching_1 = 0;
 	public int num_invalid = 0;
 	public int num_connections = 0;
+
+	public Camera MainCamera;
 
 	public enum GameState {
 		Setup,
@@ -358,6 +360,25 @@ public class BioBlox : MonoBehaviour
 					Vector4 plane = new Vector4(0, 0, 1, -cutawaySlider.value);
 					r.material.SetVector ("_CutawayPlane", plane);
 				}
+			}
+		}
+
+		//camera zoom roll mouse
+		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
+		{
+			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 90)
+			{
+				MainCamera.fieldOfView += Input.GetAxis ("Mouse ScrollWheel") * 5;
+			}
+
+			if(MainCamera.fieldOfView < 20)
+			{
+				MainCamera.fieldOfView = 20;
+			}
+
+			if(MainCamera.fieldOfView > 90)
+			{
+				MainCamera.fieldOfView = 90;
 			}
 		}
 	}
@@ -846,9 +867,10 @@ public class BioBlox : MonoBehaviour
 		game_state = GameState.Picking;
 
 		//Clear score
-		GameScore.localScale = Vector3.zero;
-		heuristicScore.localScale = Vector3.zero;
+		GameScore.fillAmount = 0;
+		heuristicScore.fillAmount = 0;
 		GameScoreValue.text = "0";
+		MainCamera.fieldOfView = 60;
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -1100,12 +1122,12 @@ public class BioBlox : MonoBehaviour
 					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
 					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
 					{
-						GameScore.localScale = new Vector3(scaleGameScore,scaleGameScore,scaleGameScore);						
+						GameScore.fillAmount = scaleGameScore;						
 						GameScoreValue.text = ((int)(scaleGameScore * 1250)).ToString();
 					}
 					else
 					{
-						GameScore.localScale = Vector3.zero;
+						GameScore.fillAmount = 0;
 						GameScoreValue.text = "0";
 					}
 				}
@@ -1288,7 +1310,7 @@ public class BioBlox : MonoBehaviour
 			
 			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
 
-			heuristicScore.localScale = num_invalid != 0 ? new Vector3(0,0,0) : new Vector3(ScoreScaleSize,ScoreScaleSize,ScoreScaleSize);
+			heuristicScore.fillAmount = num_invalid != 0 ? 0 : ScoreScaleSize;
 
 		}
 
