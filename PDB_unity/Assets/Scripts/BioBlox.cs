@@ -80,13 +80,15 @@ public class BioBlox : MonoBehaviour
 	public Image GameScore;
 	public Slider overrideSlider;
 	public Slider cutawaySlider;
-	public Text invalidDockText;
+	public GameObject invalidDockText;
+	public GameObject InvalidDockScore;
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 	//Animator of the tools menu
 	public Animator ToolMenuAnimator;
 	public GameObject OpenToolImage;
 	public GameObject CloseToolImage;
+	public GameObject EndLevelMenu;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
@@ -156,6 +158,7 @@ public class BioBlox : MonoBehaviour
 		eventSystem = EventSystem.current;
 
 		StartCoroutine (game_loop ());
+		GetComponent<AminoButtonController> ().init ();
 	}
 
 	public string GetCurrentLevelName ()
@@ -826,9 +829,7 @@ public class BioBlox : MonoBehaviour
 	// The lock button establishes the Locked state.
 	public void Lock()
 	{
-		Debug.Log ("Lock: " + game_state);
 		if (game_state == GameState.Docking) {
-			Debug.Log("ok");
 			game_state = GameState.Locked;
 		}
 	}
@@ -1251,6 +1252,7 @@ public class BioBlox : MonoBehaviour
 				Reset ();
 				molecules = null;
 				activeLabels.Clear();
+				//EndLevelMenu.SetActive(true);
 			}
 		}
 	}
@@ -1314,7 +1316,8 @@ public class BioBlox : MonoBehaviour
 
 		}
 
-		invalidDockText.enabled = num_invalid != 0;
+		invalidDockText.SetActive(num_invalid != 0);
+		InvalidDockScore.SetActive(num_invalid != 0);
 
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
