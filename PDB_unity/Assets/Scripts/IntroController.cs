@@ -3,18 +3,11 @@ using System.Collections;
 
 public class IntroController : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+	public Animator MainCamera;
 
-	public void ChangeScene()
+	public void CameraStart()
 	{
-		Application.LoadLevel (0);
+		MainCamera.SetBool ("Start", true);
+		Debug.Log ("caca");
 	}
 }
