@@ -1251,7 +1251,8 @@ public class BioBlox : MonoBehaviour
 				conMan.Reset();
 				Reset ();
 				molecules = null;
-				activeLabels.Clear();
+				activeLabels.Clear();				
+				GetComponent<AminoButtonController> ().EmptyAminoSliders ();
 				//EndLevelMenu.SetActive(true);
 			}
 		}

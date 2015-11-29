@@ -4,10 +4,22 @@ using System.Collections;
 public class IntroController : MonoBehaviour {
 
 	public Animator MainCamera;
+	public GameObject FadeCanvas;
 
 	public void CameraStart()
 	{
 		MainCamera.SetBool ("Start", true);
-		Debug.Log ("caca");
 	}
+
+	public void ChangeScene()
+	{
+		Application.LoadLevel ("main");
+	}
+
+	public void StartFadeCanvas()
+	{
+		FadeCanvas.SetActive (true);
+	}
+
+
 }

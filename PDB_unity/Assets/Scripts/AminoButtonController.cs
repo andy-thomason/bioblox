@@ -59,4 +59,10 @@ public class AminoButtonController : MonoBehaviour {
 		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
 		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","");;
 	}
+
+	public void EmptyAminoSliders()
+	{
+		foreach (Transform childTransform in SliderMol1.transform) Destroy(childTransform.gameObject);
+		foreach (Transform childTransform in SliderMol2.transform) Destroy(childTransform.gameObject);
+	}
 }
