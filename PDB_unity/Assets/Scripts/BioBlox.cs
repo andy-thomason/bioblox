@@ -354,15 +354,29 @@ public class BioBlox : MonoBehaviour
 		}
 
 		GameObject cam = GameObject.Find ("Main Camera");
+		Camera camcam = cam.GetComponent<Camera>() as Camera;
 		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
 		foreach (GameObject mol in molecules) {
 			MeshRenderer[] meshes = mol.GetComponentsInChildren<MeshRenderer> ();
+			PDB_mesh pm = mol.GetComponent<PDB_mesh>() as PDB_mesh;
 			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_LightPos", light_pos);
 				if (cutawaySlider) {
 					Vector4 plane = new Vector4(0, 0, 1, -cutawaySlider.value);
 					r.material.SetVector ("_CutawayPlane", plane);
 				}
+				Vector4[] uniforms = pm.GetSelectedAtomUniforms(camcam);
+				int len = uniforms.Length;
+				r.material.SetVector ("_Atom0", uniforms[0]);
+				r.material.SetVector ("_Atom1", uniforms[1]);
+				r.material.SetVector ("_Atom2", uniforms[2]);
+				r.material.SetVector ("_Atom3", uniforms[3]);
+				r.material.SetVector ("_Atom4", uniforms[4]);
+				r.material.SetVector ("_Atom5", uniforms[5]);
+				r.material.SetVector ("_Atom6", uniforms[6]);
+				r.material.SetVector ("_Atom7", uniforms[7]);
+				r.material.SetVector ("_Atom8", uniforms[8]);
+				r.material.SetVector ("_Atom9", uniforms[9]);
 			}
 		}
 
@@ -766,12 +780,13 @@ public class BioBlox : MonoBehaviour
 			//set the sector we clicked to glow, this is done in the shader to stop us having to rebuild the mesh with new colours
 			MeshRenderer[] meshes = molecules [molNum].GetComponentsInChildren<MeshRenderer> ();
 			foreach (MeshRenderer r in meshes) {
-				r.material.SetVector ("_GlowPoint1", atomPos1);
-				r.material.SetFloat ("_GlowRadius1", 5.0f);
-				r.material.SetVector ("_GlowPoint2", atomPos2);
-				r.material.SetFloat ("_GlowRadius2", 5.0f);
-				r.material.SetVector ("_GlowPoint3", atomPos3);
-				r.material.SetFloat ("_GlowRadius3", 5.0f);
+				Material m = r.material;
+				m.SetVector ("_GlowPoint1", atomPos1);
+				m.SetFloat ("_GlowRadius1", 5.0f);
+				m.SetVector ("_GlowPoint2", atomPos2);
+				m.SetFloat ("_GlowRadius2", 5.0f);
+				m.SetVector ("_GlowPoint3", atomPos3);
+				m.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
 			if (selectedLabel [0] != null && selectedLabel [1] != null) {

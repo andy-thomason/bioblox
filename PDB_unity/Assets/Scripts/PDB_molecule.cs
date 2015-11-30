@@ -155,7 +155,7 @@ public class PDB_molecule
 
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
-		const float grid_spacing = 0.5f;
+		const float grid_spacing = 0.5f; // set this to 0.5f for final game and 2.0f for rough builds.
 		const float rgs = 1.0f / grid_spacing;
 
 		// Create a 3D array for each molecule
