@@ -21,6 +21,8 @@ public class AminoButtonController : MonoBehaviour {
 
 
 	public void init () {
+
+		EmptyAminoSliders ();
 		BioBlox BioBloxReference = GameObject.Find ("BioBlox").GetComponent<BioBlox> ();
 		aminoAcidsNames1 = BioBloxReference.molecules [0].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;
 		aminoAcidsNames2 = BioBloxReference.molecules [1].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;

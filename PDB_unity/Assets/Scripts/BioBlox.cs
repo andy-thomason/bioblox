@@ -872,6 +872,8 @@ public class BioBlox : MonoBehaviour
 		heuristicScore.fillAmount = 0;
 		GameScoreValue.text = "0";
 		MainCamera.fieldOfView = 60;
+		
+		GetComponent<AminoButtonController> ().init ();
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -1252,7 +1254,7 @@ public class BioBlox : MonoBehaviour
 				Reset ();
 				molecules = null;
 				activeLabels.Clear();				
-				GetComponent<AminoButtonController> ().EmptyAminoSliders ();
+				//GetComponent<AminoButtonController> ().EmptyAminoSliders ();
 				//EndLevelMenu.SetActive(true);
 			}
 		}
@@ -1319,6 +1321,7 @@ public class BioBlox : MonoBehaviour
 
 		invalidDockText.SetActive(num_invalid != 0);
 		InvalidDockScore.SetActive(num_invalid != 0);
+
 
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
