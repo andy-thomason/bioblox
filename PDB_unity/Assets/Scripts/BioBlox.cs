@@ -158,7 +158,7 @@ public class BioBlox : MonoBehaviour
 		eventSystem = EventSystem.current;
 
 		StartCoroutine (game_loop ());
-		GetComponent<AminoButtonController> ().init ();
+		GetComponent<AminoSliderController> ().init ();
 	}
 
 	public string GetCurrentLevelName ()
@@ -888,7 +888,7 @@ public class BioBlox : MonoBehaviour
 		GameScoreValue.text = "0";
 		MainCamera.fieldOfView = 60;
 		
-		GetComponent<AminoButtonController> ().init ();
+		GetComponent<AminoSliderController> ().init ();
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several

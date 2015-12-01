@@ -269,7 +269,7 @@ public class PDB_mesh : MonoBehaviour {
 		int len = selected_atoms.Length;
 		Vector4[] result = new Vector4[10]; // see PDB.shader _Atom0..9
 		int imax = Mathf.Min (len, result.Length);
-		for (int i = 0; i != len; ++i) {
+		for (int i = 0; i != imax; ++i) {
 			int sel = selected_atoms[i];
 			Vector3 atom_pos = transform.TransformPoint(mol.atom_centres[sel]);
 			Vector3 screen_pos = camera.WorldToViewportPoint(atom_pos);
@@ -283,12 +283,12 @@ public class PDB_mesh : MonoBehaviour {
 	}
 
 	// call this to select an amino acid
-	void SelectAminoAcid(int acid_number) {
+	public void SelectAminoAcid(int acid_number) {
 		selected_atoms = mol.aminoAcidsAtomIds[acid_number];
 	}
 
 	// call this to deselect amino acids
-	void DeselectAminoAcid() {
+	public void DeselectAminoAcid() {
 		selected_atoms = new int[0];
 	}
 }
