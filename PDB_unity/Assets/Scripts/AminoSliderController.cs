@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using AssemblyCSharp;
 
 public class AminoSliderController : MonoBehaviour {
 
@@ -22,14 +23,13 @@ public class AminoSliderController : MonoBehaviour {
 	//pair of buttons
 	GameObject ButtonPickedA1;
 	GameObject ButtonPickedA2;
-	//list of all bounds
-	List<GameObject> AminoLinks = new List<GameObject>();
 	//panel for the links of amino
 	public GameObject AminoLinkPanel;
 	public GameObject AminoLinkPanelParent;
-	float[] button_displace = {16f,-5.3f};
+	float[] button_displace = {18.5f,-7f};
 	BioBlox BioBloxReference;
-
+	public List<AtomConnection> connections = new List<AtomConnection> ();
+	public GameObject AddConnection;
 
 	public void init () {
 
@@ -62,7 +62,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.transform.SetParent (SliderMol1.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
 		//Debug.Log (AminoColor [currentAmino]);
-		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","");
+		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+index;
 		//set the button id
 		AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
 	}
@@ -72,7 +72,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
 		AminoButtonReference.transform.SetParent (SliderMol2.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
-		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","");;
+		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+index;
 		//set the button id
 		AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
 	}
@@ -96,53 +96,58 @@ public class AminoSliderController : MonoBehaviour {
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null)
 		{
-			Debug.Log ("pickeado");
-			AminoLinks.Add(ButtonPickedA1);			
-			AminoLinks.Add(ButtonPickedA2);
-			ButtonPickedA1.GetComponent<Button>().interactable = false;
-			ButtonPickedA2.GetComponent<Button>().interactable = false;
-
-			//create the connection
-			BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(),ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID,BioBloxReference.molecules[1].GetComponent<PDB_mesh>(),ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID);
-			
-			ButtonPickedA1 = ButtonPickedA2 = null;
-			AminoAcidsLinkPanel();
+			AddConnection.GetComponent<Animator>().enabled = true;
+			BioBloxReference.EnableSlider();
 		}
 	}
 
-	public void AminoAcidsLinkPanel()
+	public void AddConnectionButton()
+	{		
+		ButtonPickedA1.GetComponent<Button>().interactable = false;
+		ButtonPickedA2.GetComponent<Button>().interactable = false;
+		AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(),ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID,BioBloxReference.molecules[1].GetComponent<PDB_mesh>(),ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID),ButtonPickedA1,ButtonPickedA2);
+		
+		ButtonPickedA1 = ButtonPickedA2 = null;
+		AddConnection.GetComponent<Animator>().enabled = false;
+		AddConnection.GetComponent<Button> ().enabled = false;
+		Color c = AddConnection.GetComponent<Image>().color;
+		c.a = 0.3f;
+		AddConnection.GetComponent<Image> ().color = c;
+		Debug.Log (c);
+	}
+
+	public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
 	{
-		//Clean
-		foreach (Transform childTransform in AminoLinkPanelParent.transform) Destroy(childTransform.gameObject);
-		int i = 0;
-		int panel_displace = 0;
 		GameObject AminoLinkPanelReference;
-		AminoLinkPanelReference = AminoLinkPanel;
-		foreach(GameObject AminoButton in AminoLinks)
-		{
-			//insitaite the panel holder 
-			if(i % 2 == 0)
-			{				
-				AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
-				AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
-				AminoLinkPanelReference.transform.localPosition += new Vector3((33.0f * panel_displace),0,0);
-				panel_displace++;
-			}
-			AminoButton.GetComponent<LayoutElement>().enabled = false;
-			GameObject AminoButtonReference = Instantiate<GameObject>(AminoButton);
-			AminoButtonReference.transform.SetParent(AminoLinkPanelReference.transform,false);
-			RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
-			AminoButtonRect.anchorMin = new Vector2(0.5f,0.5f);
-			AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
-			AminoButtonRect.pivot = new Vector2(0.5f,0.5f);
-			AminoButtonRect.sizeDelta = new Vector2(25, 20);
-			AminoButtonRect.localPosition += new Vector3(0,button_displace[i%2],0);
-			i++;
-		}
+		AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
+		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
+		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().connection = connection;
+		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
+		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID;
+
+		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0);
+		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1);
 	}
 
-	public void DeleteAminoLink()
+	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i)
 	{
-		//AminoLinks.re
+		GameObject AminoButtonReference = Instantiate<GameObject>(AminoButton);
+		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
+		AminoButtonReference.GetComponent<Button> ().interactable = true;
+		AminoButtonReference.GetComponent<Button> ().enabled = false;
+
+		AminoButtonReference.transform.SetParent(AminoLinkPanelReference.transform,false);
+		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
+		AminoButtonRect.anchorMin = new Vector2(0.5f,0.5f);
+		AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
+		AminoButtonRect.pivot = new Vector2(0.5f,0.5f);
+		AminoButtonRect.sizeDelta = new Vector2(25, 25);
+		AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
+	}
+
+	public void RestoreDeletedAminoButtons(int B1, int B2)
+	{
+		SliderMol1.transform.GetChild (B1).GetComponent<Button> ().interactable = true;
+		SliderMol2.transform.GetChild (B2).GetComponent<Button> ().interactable = true;
 	}
 }

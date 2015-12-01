@@ -84,7 +84,6 @@ public class ConnectionManager : MonoBehaviour {
 	}
 
 	public AtomConnection CreateAminoAcidLink(PDB_mesh mol1, int amino_acid_index1, PDB_mesh mol2, int amino_acid_index2) {
-		Debug.Log ("amino_acid_index1: " + amino_acid_index1 + " amino_acid_index2: " + amino_acid_index2);
 		int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
 		int index1 = atoms1 [atoms1.Length - 1];
 		int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];

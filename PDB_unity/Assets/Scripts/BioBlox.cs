@@ -383,7 +383,7 @@ public class BioBlox : MonoBehaviour
 		//camera zoom roll mouse
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
 		{
-			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 90)
+			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 60)
 			{
 				MainCamera.fieldOfView += Input.GetAxis ("Mouse ScrollWheel") * 5;
 			}
@@ -393,9 +393,9 @@ public class BioBlox : MonoBehaviour
 				MainCamera.fieldOfView = 20;
 			}
 
-			if(MainCamera.fieldOfView > 90)
+			if(MainCamera.fieldOfView > 60)
 			{
-				MainCamera.fieldOfView = 90;
+				MainCamera.fieldOfView = 60;
 			}
 		}
 	}
@@ -789,7 +789,7 @@ public class BioBlox : MonoBehaviour
 				m.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
-			if (selectedLabel [0] != null && selectedLabel [1] != null) {
+			/*if (selectedLabel [0] != null && selectedLabel [1] != null) {
 				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
 				                   selectedLabel [0].atomIds.ToArray (),
 				                   molecules [1].GetComponent<PDB_mesh> (),
@@ -798,11 +798,11 @@ public class BioBlox : MonoBehaviour
 				{
 					dockSliders[i].gameObject.SetActive(true);
 					overrideSlider.gameObject.SetActive(true);
-				}*/				
+				}			
 				overrideSlider.interactable = true;
 
 				uiScrollSpeed =900;
-			}
+			}*/
 		}
 	}
 
@@ -1371,6 +1371,13 @@ public class BioBlox : MonoBehaviour
 	public void ScrollDownAmino2()
 	{
 		ScrollbarAmino2.value -= 0.01f;	
+	}
+
+	public void EnableSlider()
+	{
+		overrideSlider.interactable = true;
+
+		uiScrollSpeed =900;
 	}
 
 }
