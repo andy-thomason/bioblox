@@ -26,6 +26,7 @@ public class AminoSliderController : MonoBehaviour {
 	//panel for the links of amino
 	public GameObject AminoLinkPanel;
 	public GameObject AminoLinkPanelParent;
+	public RectTransform AminoLinkBackground;
 	float[] button_displace = {18.5f,-7f};
 	BioBlox BioBloxReference;
 	public List<AtomConnection> connections = new List<AtomConnection> ();
@@ -113,7 +114,6 @@ public class AminoSliderController : MonoBehaviour {
 		Color c = AddConnection.GetComponent<Image>().color;
 		c.a = 0.3f;
 		AddConnection.GetComponent<Image> ().color = c;
-		Debug.Log (c);
 	}
 
 	public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
@@ -125,8 +125,20 @@ public class AminoSliderController : MonoBehaviour {
 		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
 		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID;
 
+		UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount);
+
 		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0);
 		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1);
+	}
+
+	void UpdateBackGroundSize(int hijos)
+	{
+		Vector2 temp = AminoLinkBackground.offsetMax;
+		temp.x = -235.0f + (35.0f * hijos);
+		AminoLinkBackground.offsetMax = temp;
+		if (hijos == 0) {
+			AminoLinkBackground.offsetMax = new Vector2 (-244.0f, temp.y);
+		}
 	}
 
 	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i)
@@ -147,6 +159,7 @@ public class AminoSliderController : MonoBehaviour {
 
 	public void RestoreDeletedAminoButtons(int B1, int B2)
 	{
+		UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount-1);
 		SliderMol1.transform.GetChild (B1).GetComponent<Button> ().interactable = true;
 		SliderMol2.transform.GetChild (B2).GetComponent<Button> ().interactable = true;
 	}
