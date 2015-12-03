@@ -10,3 +10,6 @@
 *.idb
 *.ilk
 *.opensdf
+
+*.iobj
+PDB_cpp/x64/Release/PDB_cpp.ipdb
