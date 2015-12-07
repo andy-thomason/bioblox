@@ -15,6 +15,9 @@ public class PDB_mesh : MonoBehaviour {
 	public bool shouldCollide = false;
 	float t=0;
 
+	// add atom indices to here to display them selected
+	public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
 	//public bool hasCollided=false;
 
 	// Use this for initialization
@@ -260,5 +263,32 @@ public class PDB_mesh : MonoBehaviour {
 				}
 			}*/
 		}
+	}
+
+	public Vector4[] GetSelectedAtomUniforms(Camera camera) {
+		int len = selected_atoms.Length;
+		Vector4[] result = new Vector4[10]; // see PDB.shader _Atom0..9
+		int imax = Mathf.Min (len, result.Length);
+		for (int i = 0; i != imax; ++i) {
+			int sel = selected_atoms[i];
+			Vector3 atom_pos = transform.TransformPoint(mol.atom_centres[sel]);
+			Vector3 screen_pos = camera.WorldToViewportPoint(atom_pos);
+			float size = screen_pos.z / mol.atom_radii[sel];
+			result[i] = new Vector4(screen_pos.x, screen_pos.y, size * camera.aspect, size);
+		}
+		for (int i = len; i < result.Length; ++i) {
+			result[i] = new Vector4(0, 0, 1e37f, 1e37f);
+		}
+		return result;
+	}
+
+	// call this to select an amino acid
+	public void SelectAminoAcid(int acid_number) {
+		selected_atoms = mol.aminoAcidsAtomIds[acid_number];
+	}
+
+	// call this to deselect amino acids
+	public void DeselectAminoAcid() {
+		selected_atoms = new int[0];
 	}
 }

@@ -70,14 +70,25 @@ public class BioBlox : MonoBehaviour
 	public float seperationForce = 10000.0f;
 	//  force applied by string
 	public float stringForce = 20000.0f;
+	private float ScoreScaleSize;
+	private float ScoreScaleValue;
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
+	public Image heuristicScore;
+	public Text GameScoreValue;
+	public Image GameScore;
 	public Slider overrideSlider;
 	public Slider cutawaySlider;
-	public Text invalidDockText;
+	public GameObject invalidDockText;
+	public GameObject InvalidDockScore;
 	public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
+	//Animator of the tools menu
+	public Animator ToolMenuAnimator;
+	public GameObject OpenToolImage;
+	public GameObject CloseToolImage;
+	public GameObject EndLevelMenu;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
@@ -94,6 +105,8 @@ public class BioBlox : MonoBehaviour
 	public int num_invalid = 0;
 	public int num_connections = 0;
 
+	public Camera MainCamera;
+
 	public enum GameState {
 		Setup,
 		Waiting,
@@ -109,7 +122,7 @@ public class BioBlox : MonoBehaviour
 	{
 		//winSplash.SetActive (false);
 		//looseSplash.SetActive (false);
-		goSplash.SetActive (false);
+		//goSplash.SetActive (false);
 
 		game_state = GameState.Setup;
 
@@ -145,6 +158,7 @@ public class BioBlox : MonoBehaviour
 		eventSystem = EventSystem.current;
 
 		StartCoroutine (game_loop ());
+		GetComponent<AminoSliderController> ().init ();
 	}
 
 	public string GetCurrentLevelName ()
@@ -340,15 +354,48 @@ public class BioBlox : MonoBehaviour
 		}
 
 		GameObject cam = GameObject.Find ("Main Camera");
+		Camera camcam = cam.GetComponent<Camera>() as Camera;
 		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
 		foreach (GameObject mol in molecules) {
 			MeshRenderer[] meshes = mol.GetComponentsInChildren<MeshRenderer> ();
+			PDB_mesh pm = mol.GetComponent<PDB_mesh>() as PDB_mesh;
 			foreach (MeshRenderer r in meshes) {
 				r.material.SetVector ("_LightPos", light_pos);
 				if (cutawaySlider) {
 					Vector4 plane = new Vector4(0, 0, 1, -cutawaySlider.value);
 					r.material.SetVector ("_CutawayPlane", plane);
 				}
+				Vector4[] uniforms = pm.GetSelectedAtomUniforms(camcam);
+				int len = uniforms.Length;
+				r.material.SetVector ("_Atom0", uniforms[0]);
+				r.material.SetVector ("_Atom1", uniforms[1]);
+				r.material.SetVector ("_Atom2", uniforms[2]);
+				r.material.SetVector ("_Atom3", uniforms[3]);
+				r.material.SetVector ("_Atom4", uniforms[4]);
+				r.material.SetVector ("_Atom5", uniforms[5]);
+				r.material.SetVector ("_Atom6", uniforms[6]);
+				r.material.SetVector ("_Atom7", uniforms[7]);
+				r.material.SetVector ("_Atom8", uniforms[8]);
+				r.material.SetVector ("_Atom9", uniforms[9]);
+			}
+		}
+
+		//camera zoom roll mouse
+		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
+		{
+			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 60)
+			{
+				MainCamera.fieldOfView += Input.GetAxis ("Mouse ScrollWheel") * 5;
+			}
+
+			if(MainCamera.fieldOfView < 20)
+			{
+				MainCamera.fieldOfView = 20;
+			}
+
+			if(MainCamera.fieldOfView > 60)
+			{
+				MainCamera.fieldOfView = 60;
 			}
 		}
 	}
@@ -691,6 +738,7 @@ public class BioBlox : MonoBehaviour
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
 		if (simpleGame) {
+			Debug.Log ("simple game");
 			//here we update the selected label list
 			//and align the molecule so that the labeled atom is facing the other molecule
 			Vector3 sumAtomPos = Vector3.zero;
@@ -732,26 +780,29 @@ public class BioBlox : MonoBehaviour
 			//set the sector we clicked to glow, this is done in the shader to stop us having to rebuild the mesh with new colours
 			MeshRenderer[] meshes = molecules [molNum].GetComponentsInChildren<MeshRenderer> ();
 			foreach (MeshRenderer r in meshes) {
-				r.material.SetVector ("_GlowPoint1", atomPos1);
-				r.material.SetFloat ("_GlowRadius1", 5.0f);
-				r.material.SetVector ("_GlowPoint2", atomPos2);
-				r.material.SetFloat ("_GlowRadius2", 5.0f);
-				r.material.SetVector ("_GlowPoint3", atomPos3);
-				r.material.SetFloat ("_GlowRadius3", 5.0f);
+				Material m = r.material;
+				m.SetVector ("_GlowPoint1", atomPos1);
+				m.SetFloat ("_GlowRadius1", 5.0f);
+				m.SetVector ("_GlowPoint2", atomPos2);
+				m.SetFloat ("_GlowRadius2", 5.0f);
+				m.SetVector ("_GlowPoint3", atomPos3);
+				m.SetFloat ("_GlowRadius3", 5.0f);
 			}
 
-			if (selectedLabel [0] != null && selectedLabel [1] != null) {
+			/*if (selectedLabel [0] != null && selectedLabel [1] != null) {
 				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
 				                   selectedLabel [0].atomIds.ToArray (),
 				                   molecules [1].GetComponent<PDB_mesh> (),
 				                   selectedLabel [1].atomIds.ToArray ());
-				for(int i = 0; i < dockSliders.Count; ++i)
+				/*for(int i = 0; i < dockSliders.Count; ++i)
 				{
 					dockSliders[i].gameObject.SetActive(true);
 					overrideSlider.gameObject.SetActive(true);
-				}
+				}			
+				overrideSlider.interactable = true;
+
 				uiScrollSpeed =900;
-			}
+			}*/
 		}
 	}
 
@@ -793,9 +844,7 @@ public class BioBlox : MonoBehaviour
 	// The lock button establishes the Locked state.
 	public void Lock()
 	{
-		Debug.Log ("Lock: " + game_state);
 		if (game_state == GameState.Docking) {
-			Debug.Log("ok");
 			game_state = GameState.Locked;
 		}
 	}
@@ -832,6 +881,14 @@ public class BioBlox : MonoBehaviour
 		selectedLabel [1] = null;
 
 		game_state = GameState.Picking;
+
+		//Clear score
+		GameScore.fillAmount = 0;
+		heuristicScore.fillAmount = 0;
+		GameScoreValue.text = "0";
+		MainCamera.fieldOfView = 60;
+		
+		GetComponent<AminoSliderController> ().init ();
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -984,7 +1041,8 @@ public class BioBlox : MonoBehaviour
 			}
 
 			if (lockButton) {
-				lockButton.gameObject.SetActive(false);
+				//lockButton.gameObject.SetActive(false);
+				lockButton.interactable = false;
 			}
 
 			make_molecules (true, MeshTopology.Triangles);
@@ -1036,14 +1094,15 @@ public class BioBlox : MonoBehaviour
 				dockSliders[i].maxValue =  conMan.maxDistance;
 				dockSliders[i].minValue = conMan.minDistance;
 				dockSliders[i].value =conMan.maxDistance;
-				dockSliders[i].gameObject.SetActive(false);
+				//dockSliders[i].gameObject.SetActive(false);
 				//sliderConstarinedByOverride.Add(true);
 			}
 
 			overrideSlider.maxValue = conMan.maxDistance;
 			overrideSlider.minValue = conMan.minDistance;
 			overrideSlider.value = conMan.maxDistance;
-			overrideSlider.gameObject.SetActive (false);
+			
+			overrideSlider.interactable = false;
 
 			mol1.transform.localScale = new Vector3 (1, 1, 1);
 			mol2.transform.localScale = new Vector3 (1, 1, 1);
@@ -1060,9 +1119,9 @@ public class BioBlox : MonoBehaviour
 				yield return new WaitForEndOfFrame();
 			}
 
-			if (goSplash) {
+			/*if (goSplash) {
 				PopInWaitDisappear (goSplash, 1.0f);
-			}
+			}*/
 
 			playerClock.StartPlayerTimer ();
 
@@ -1080,10 +1139,22 @@ public class BioBlox : MonoBehaviour
 				float rms_distance_score = ScoreRMSD ();
 				if (rmsScoreSlider) {
 					rmsScoreSlider.value = rms_distance_score * 0.1f;
+					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
+					{
+						GameScore.fillAmount = scaleGameScore;						
+						GameScoreValue.text = ((int)(scaleGameScore * 1250)).ToString();
+					}
+					else
+					{
+						GameScore.fillAmount = 0;
+						GameScoreValue.text = "0";
+					}
 				}
 
 				if (lockButton) {
-					lockButton.gameObject.SetActive (rms_distance_score < winScore);
+					//lockButton.gameObject.SetActive (rms_distance_score < winScore);
+					lockButton.interactable = (rms_distance_score < winScore);
 				}
 
 				//test if we should move the molecules with quick ray casts
@@ -1165,7 +1236,8 @@ public class BioBlox : MonoBehaviour
 					PopOut (sites [1]);
 				}
 
-				lockButton.gameObject.SetActive(false);
+				//lockButton.gameObject.SetActive(false);
+				lockButton.interactable = false;
 					
 				Debug.Log ("Docked");
 
@@ -1198,7 +1270,9 @@ public class BioBlox : MonoBehaviour
 				conMan.Reset();
 				Reset ();
 				molecules = null;
-				activeLabels.Clear();
+				activeLabels.Clear();				
+				//GetComponent<AminoButtonController> ().EmptyAminoSliders ();
+				//EndLevelMenu.SetActive(true);
 			}
 		}
 	}
@@ -1255,13 +1329,58 @@ public class BioBlox : MonoBehaviour
 			}
 
 			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+			
+			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
+
+			heuristicScore.fillAmount = num_invalid != 0 ? 0 : ScoreScaleSize;
+
 		}
 
-		invalidDockText.enabled = num_invalid != 0;
+		invalidDockText.SetActive(num_invalid != 0);
+		InvalidDockScore.SetActive(num_invalid != 0);
+
 
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
 	}
+
+	public void ToogleToolMenu(bool Status)
+	{
+		ToolMenuAnimator.SetBool ("Open", Status);
+		OpenToolImage.SetActive (!Status);
+		CloseToolImage.SetActive (Status);
+	}
+
+	public Scrollbar ScrollbarAmino1;
+	public Scrollbar ScrollbarAmino2;
+
+	public void ScrollUpAmino1()
+	{
+		ScrollbarAmino1.value += 0.01f;
+	}
+
+	public void ScrollDownAmino1()
+	{
+		ScrollbarAmino1.value -= 0.01f;		
+	}
+
+	public void ScrollUpAmino2()
+	{
+		ScrollbarAmino2.value += 0.01f;	
+	}
+
+	public void ScrollDownAmino2()
+	{
+		ScrollbarAmino2.value -= 0.01f;	
+	}
+
+	public void EnableSlider()
+	{
+		overrideSlider.interactable = true;
+
+		uiScrollSpeed =900;
+	}
+
 }
 

@@ -19,6 +19,16 @@
     _DarkK("DarkK" , Float) = -0.01
     _CutawayPlane("CutawayPlane", Vector) = (0,0,1,0)
     _CutawayColor("CutawayColor", Color) = (1,1,1,1)
+    _Atom0 ("Atom0" , Vector) = (0,0,0,0)
+    _Atom1 ("Atom1" , Vector) = (0,0,0,0)
+    _Atom2 ("Atom2" , Vector) = (0,0,0,0)
+    _Atom3 ("Atom3" , Vector) = (0,0,0,0)
+    _Atom4 ("Atom4" , Vector) = (0,0,0,0)
+    _Atom5 ("Atom5" , Vector) = (0,0,0,0)
+    _Atom6 ("Atom6" , Vector) = (0,0,0,0)
+    _Atom7 ("Atom7" , Vector) = (0,0,0,0)
+    _Atom8 ("Atom8" , Vector) = (0,0,0,0)
+    _Atom9 ("Atom9" , Vector) = (0,0,0,0)
   }
   SubShader {
     Pass {
@@ -152,6 +162,16 @@
       uniform float4 _DarkPoint;
       uniform float _DarkK;
       
+      uniform float4 _Atom0;
+      uniform float4 _Atom1;
+      uniform float4 _Atom2;
+      uniform float4 _Atom3;
+      uniform float4 _Atom4;
+      uniform float4 _Atom5;
+      uniform float4 _Atom6;
+      uniform float4 _Atom7;
+      uniform float4 _Atom8;
+      uniform float4 _Atom9;
       uniform sampler2D _GlowTexture;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
@@ -218,13 +238,57 @@
   		glowVal *= _SinTime.w * _SinTime.w * 0.05;
 
       	float3 rpos = i.model_pos - _DarkPoint.xyz;
-      	float d2 = dot(rpos, rpos);
-      	float dark = 1.0 - exp(_DarkK * d2);
+      	float dp2 = dot(rpos, rpos);
+      	float dark = 1.0 - exp(_DarkK * dp2);
+      	
+      	float2 d0 = (screen_pos - _Atom0.xy) * _Atom0.zw;
+      	float dot0 = dot(d0, d0);
+      	float2 d1 = (screen_pos - _Atom1.xy) * _Atom1.zw;
+      	float dot1 = dot(d1, d1);
+      	float2 d2 = (screen_pos - _Atom2.xy) * _Atom2.zw;
+      	float dot2 = dot(d2, d2);
+      	float2 d3 = (screen_pos - _Atom3.xy) * _Atom3.zw;
+      	float dot3 = dot(d3, d3);
+      	float2 d4 = (screen_pos - _Atom4.xy) * _Atom4.zw;
+      	float dot4 = dot(d4, d4);
+      	float2 d5 = (screen_pos - _Atom5.xy) * _Atom5.zw;
+      	float dot5 = dot(d5, d5);
+      	float2 d6 = (screen_pos - _Atom6.xy) * _Atom6.zw;
+      	float dot6 = dot(d6, d6);
+      	float2 d7 = (screen_pos - _Atom7.xy) * _Atom7.zw;
+      	float dot7 = dot(d7, d7);
+      	float2 d8 = (screen_pos - _Atom8.xy) * _Atom8.zw;
+      	float dot8 = dot(d8, d8);
+      	float2 d9 = (screen_pos - _Atom9.xy) * _Atom9.zw;
+      	float dot9 = dot(d9, d9);
+      	
+      	float min01 = min(dot0, dot1);
+      	float min23 = min(dot2, dot3);
+      	float min45 = min(dot4, dot5);
+      	float min67 = min(dot6, dot7);
+      	float min89 = min(dot8, dot9);
+      	float min0123 = min(min01, min23);
+      	float min4567 = min(min45, min67);
+      	float dmin = min(min0123, min(min4567, min89));
+      	glowVal += dmin >= 0.7 && dmin <= 1 ? 1 : 0;
+      	
+      	/*glowVal +=
+      		(dot0 >= 0.7 && dot1 >= 0.7 && dot2 >= 0.7 && dot3 >= 0.7 && dot4 >= 0.7) && 
+      		(dot0 <= 1 || dot1 <= 1 || dot2 <= 1 || dot3 <= 1 || dot4 <= 1) ? 1 : 0
+      	;*/
+      	//glowVal += dot0 <= 1 || dot1 <= 1 || dot2 <= 1 || dot3 <= 1 || dot4 <= 1 ? 1 : 0;
+      	
+       	float3 colour = _Ambient.xyz * dark;
+      	colour += _Color.xyz * i.color.xyz * diffuse_factor * dark;
+      	colour += glowColor * glowVal;
+      	colour += _Specular.xyz * specular_factor * dark;
    
       	if (dot(float4(i.world_pos.xyz, 1), _CutawayPlane) < 0) {
       		clip(-1);
       	}
-      	return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal + _Specular.xyz * specular_factor * dark, _Color.w);
+
+      	return fixed4(colour, _Color.w);
+      	//return fixed4(_Ambient.xyz * dark + _Color.xyz * i.color.xyz * diffuse_factor * dark + glowColor * glowVal + _Specular.xyz * specular_factor * dark, _Color.w);
       }
 
       ENDCG
