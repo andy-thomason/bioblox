@@ -18,6 +18,8 @@ public class PDB_mesh : MonoBehaviour {
 	// add atom indices to here to display them selected
 	public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
+	public bool has_rotated = false;
+
 	//public bool hasCollided=false;
 
 	// Use this for initialization
@@ -192,76 +194,30 @@ public class PDB_mesh : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        if (other) {
-			if (Input.GetMouseButtonDown(1)) {
+		if (Input.GetMouseButtonUp (0)) {
+			// click without movement selects an atom/amino acid.
+			if (!has_rotated) {
 				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
 					GetComponent<Camera> ();
 				Ray r = c.ScreenPointToRay (Input.mousePosition);
-				
 				RaycastHit info = new RaycastHit();
-				Physics.Raycast(r, out info);
-				if (info.collider == null)
-				{
-					int hit = PDB_molecule.collide_ray (gameObject, mol,
-					                                    transform, r);
-					for(int i = 0; i < mol.serial_to_atom.Length; ++i)
-					{
-						if (mol.serial_to_atom[i] == hit)
-						{
-							Debug.Log (i);
-							break;
+				int atom = PDB_molecule.collide_ray (gameObject, mol, transform, r);
+				if (atom != -1) {
+					SelectAtom(atom);
+				}
+
+				/*if (allowInteraction) {
+					if (startRotation) {
+						t += Time.deltaTime;
+						transform.localRotation = Quaternion.Slerp (start, end, t);
+						if (t > 1) {
+							startRotation = false;
+							t = 0;
 						}
-
 					}
-				}
+				}*/
 			}
-			if (allowInteraction) {
-//				if (Input.GetKey ("w")) {
-//					rb.AddForce (new Vector3 (0, 10, 0));
-//				}
-//				if (Input.GetKey ("s")) {
-//					rb.AddForce (new Vector3 (0, -10, 0));
-//				}
-//				if (Input.GetKey ("a")) {
-//					rb.AddForce (new Vector3 (-10, 0, 0));
-//				}
-//				if (Input.GetKey ("d")) {
-//					rb.AddForce (new Vector3 (10, 0, 0));
-//				}
-				if(Input.GetKey("p"))
-				{
-					this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-					other.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-					AutoDockCheap();
-				}
-
-				if (startRotation) {
-					t += Time.deltaTime;
-					transform.localRotation = Quaternion.Slerp (start, end, t);
-					if (t > 1) {
-						startRotation = false;
-						t = 0;
-					}
-				}
-			}
-
-			/*if(shouldCollide)
-			{
-				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
-				BioBlox bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
-				
-				if(PDB_molecule.pysics_collide (
-					gameObject, mol, transform,
-					other, other_mesh.mol, other.transform,
-					seperationForce,
-					bb.water_dia,
-					out bb.num_touching_0,
-					out bb.num_touching_1
-				))
-				{
-					hasCollided=true;
-				}
-			}*/
+			has_rotated = false;
 		}
 	}
 
@@ -290,5 +246,17 @@ public class PDB_mesh : MonoBehaviour {
 	// call this to deselect amino acids
 	public void DeselectAminoAcid() {
 		selected_atoms = new int[0];
+	}
+
+	public void SelectAtom(int atom) {
+		for (int i = 0; i != mol.aminoAcidsAtomIds.Count; ++i) {
+			int[] ids = mol.aminoAcidsAtomIds[i];
+			for (int j = 0; j != ids.Length; ++j) {
+				if (ids[j] == atom) {
+					SelectAminoAcid(i);
+					return;
+				}
+			}
+		}
 	}
 }
