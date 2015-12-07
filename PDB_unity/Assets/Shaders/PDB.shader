@@ -29,6 +29,7 @@
     _Atom7 ("Atom7" , Vector) = (0,0,0,0)
     _Atom8 ("Atom8" , Vector) = (0,0,0,0)
     _Atom9 ("Atom9" , Vector) = (0,0,0,0)
+    _Atom10 ("Atom10" , Vector) = (0,0,0,0)
   }
   SubShader {
     Pass {
@@ -172,6 +173,7 @@
       uniform float4 _Atom7;
       uniform float4 _Atom8;
       uniform float4 _Atom9;
+      uniform float4 _Atom10;
       uniform sampler2D _GlowTexture;
 
       // note: _LightColor0, _WorldSpaceLightPos0 and _WorldSpaceCameraPos do not seem to work!
@@ -261,6 +263,8 @@
       	float dot8 = dot(d8, d8);
       	float2 d9 = (screen_pos - _Atom9.xy) * _Atom9.zw;
       	float dot9 = dot(d9, d9);
+      	float2 d10 = (screen_pos - _Atom10.xy) * _Atom10.zw;
+      	float dot10 = dot(d10, d10);
       	
       	float min01 = min(dot0, dot1);
       	float min23 = min(dot2, dot3);
@@ -269,8 +273,11 @@
       	float min89 = min(dot8, dot9);
       	float min0123 = min(min01, min23);
       	float min4567 = min(min45, min67);
-      	float dmin = min(min0123, min(min4567, min89));
-      	glowVal += dmin >= 0.7 && dmin <= 1 ? 1 : 0;
+      	float dmin = min(min(min0123, min4567), min(min89, dot10));
+      	float dmin_mid = 0.8f;
+      	float dmin_k = -10.0f;
+      	glowVal += exp((dmin - dmin_mid) * (dmin - dmin_mid) * dmin_k) * 0.5f;
+      	//glowVal += dmin >= 0.7 && dmin <= 1 ? 1 : 0;
       	
       	/*glowVal +=
       		(dot0 >= 0.7 && dot1 >= 0.7 && dot2 >= 0.7 && dot3 >= 0.7 && dot4 >= 0.7) && 

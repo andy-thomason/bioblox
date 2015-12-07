@@ -262,77 +262,6 @@ public class BioBlox : MonoBehaviour
 	}
     
 
-	//co-routine to manage player interaction with molecules
-	IEnumerator PlayerMoveMolecule (int molIndex)
-	{
-		GameObject mol = molecules [molIndex];
-		Rigidbody r = mol.GetComponent<Rigidbody> ();
-		PDB_mesh pdb_mesh = mol.GetComponent<PDB_mesh> ();
-		r.maxAngularVelocity = 4;
-		//player movement of the molecules times out after periods of no input
-		float timeout = 100.0f;
-		playerIsMoving [molIndex] = true;
-		Vector3 lastMousePos = Input.mousePosition;
-		RigidbodyConstraints old = RigidbodyConstraints.None;
-
-		for (float t=0.0f; t<timeout; t+=Time.deltaTime) {
-			if (playerIsMoving [molIndex] == false ||
-				eventSystem.IsActive () == false) {
-				//breakout if we the event system is deactivated or we are told to stop moving
-				r.constraints = old;
-				break;
-			}
-			if(Input.GetMouseButtonDown(0))
-			{
-				old = r.constraints;
-				r.constraints = RigidbodyConstraints.FreezePosition;
-			}
-			if(Input.GetMouseButtonUp(0))
-			{
-				r.constraints = old;
-			}
-
-			if (Input.GetMouseButton (0)) { //left mouse button
-				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-				Ray ray = c.ScreenPointToRay (Input.mousePosition);
-				//create a ray to the cursor and cast it, if it hits at all
-				int atomID = PDB_molecule.collide_ray (mol, mol.GetComponent<PDB_mesh> ().mol,
-				                                      mol.transform,
-				                                      ray);
-				if (atomID != -1) {
-					if (t > 0.3f) {
-						//if there is no recent input reset previous position
-						lastMousePos = Input.mousePosition;
-					}
-					t = 0.0f;
-					Vector3 mousePos = Input.mousePosition;
-					Vector3 mouseDelta = mousePos - lastMousePos;
-
-					if (mouseDelta.magnitude != 0) {
-						pdb_mesh.has_rotated = true;
-					}
-					//find the world position of the atom
-					//Vector3 atomPos = GetAtomWorldPos (atomID, molIndex);
-
-					//GameObject other = molecules[1-molIndex];
-
-					Vector3 dirRight = Vector3.right;
-					Vector3 dirUp = Vector3.up;
-					//add force at the postion of the atom picked by the cursor
-					//r.AddForceAtPosition(new Vector3 (mouseDelta.x, mouseDelta.y, 0) * uiScrollSpeed,
-					//                     atomPos);
-					r.transform.RotateAround(r.gameObject.transform.position,dirRight,mouseDelta.y);
-					r.transform.RotateAround(r.gameObject.transform.position,dirUp,-mouseDelta.x);                       
-
-					lastMousePos = mousePos;
-				}
-			}
-			yield return null;
-		}
-		playerIsMoving [molIndex] = false;
-		yield break;
-	}
-
 	// Update handles (badly) a few things that dont fit anywhere else.
 	void Update ()
 	{
@@ -355,33 +284,6 @@ public class BioBlox : MonoBehaviour
 					//Vector3 p1 = camera.transform.TransformPoint(new Vector3(  50, y, cutawaySlider.value));
 					line_renderer.add_line(new LineRenderer.Line(p0, p1));
 				}
-			}
-		}
-
-		GameObject cam = GameObject.Find ("Main Camera");
-		Camera camcam = cam.GetComponent<Camera>() as Camera;
-		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
-		foreach (GameObject mol in molecules) {
-			MeshRenderer[] meshes = mol.GetComponentsInChildren<MeshRenderer> ();
-			PDB_mesh pm = mol.GetComponent<PDB_mesh>() as PDB_mesh;
-			foreach (MeshRenderer r in meshes) {
-				r.material.SetVector ("_LightPos", light_pos);
-				if (cutawaySlider) {
-					Vector4 plane = new Vector4(0, 0, 1, -cutawaySlider.value);
-					r.material.SetVector ("_CutawayPlane", plane);
-				}
-				Vector4[] uniforms = pm.GetSelectedAtomUniforms(camcam);
-				int len = uniforms.Length;
-				r.material.SetVector ("_Atom0", uniforms[0]);
-				r.material.SetVector ("_Atom1", uniforms[1]);
-				r.material.SetVector ("_Atom2", uniforms[2]);
-				r.material.SetVector ("_Atom3", uniforms[3]);
-				r.material.SetVector ("_Atom4", uniforms[4]);
-				r.material.SetVector ("_Atom5", uniforms[5]);
-				r.material.SetVector ("_Atom6", uniforms[6]);
-				r.material.SetVector ("_Atom7", uniforms[7]);
-				r.material.SetVector ("_Atom8", uniforms[8]);
-				r.material.SetVector ("_Atom9", uniforms[9]);
 			}
 		}
 
@@ -527,51 +429,6 @@ public class BioBlox : MonoBehaviour
 	}
 
 
-	//changes variables in the shader to fade the molecules everywhere but two points
-	//this is to emphisie the docking site
-	/*IEnumerator FadeMolecules ()
-	{
-		//GameObject mol1 = molecules [0];
-		//GameObject mol2 = molecules [1];
-		MeshRenderer[] meshes1 = molecules [0].GetComponentsInChildren<MeshRenderer> ();
-		MeshRenderer[] meshes2 = molecules [1].GetComponentsInChildren<MeshRenderer> ();
-		//PDB_molecule molInfo1 = mol1.GetComponent<PDB_mesh> ().mol;
-		//PDB_molecule molInfo2 = mol2.GetComponent<PDB_mesh> ().mol;
-
-		//it is necessary to loop through the children as the mesh may be split into seveal sections
-		//due to vertex number limitations in unity
-		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1 [i].material.SetVector ("_CullPos", 
-			                               new Vector3 (0, 0, 0));
-		}
-		for (int i=0; i<meshes2.Length; ++i) {
-			meshes2 [i].material.SetVector ("_CullPos",
-			                               new Vector3 (0, 0, 0));
-		}
-		float targetKVal = shaderKVal;
-		float currentKVal = 0;
-		//lerp a current Kval to a target Kval for a smoother fade
-		for (float t=0; t<=1.0f; t+=Time.deltaTime) {
-			float k = currentKVal + targetKVal * t;
-			
-			for (int i=0; i<meshes1.Length; ++i) {
-				meshes1 [i].material.SetFloat ("_K", k);
-			}
-			for (int i=0; i<meshes2.Length; ++i) {
-				meshes2 [i].material.SetFloat ("_K", k);
-			}
-			yield return null;
-		}
-		//ensure that it reaches the target
-		for (int i=0; i<meshes1.Length; ++i) {
-			meshes1 [i].material.SetFloat ("_K", targetKVal);
-		}
-		for (int i=0; i<meshes2.Length; ++i) {
-			meshes2 [i].material.SetFloat ("_K", targetKVal);
-		}
-	}*/
-
-
 	public void ManageSliders()
 	{
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
@@ -636,57 +493,6 @@ public class BioBlox : MonoBehaviour
 				game_state = GameState.Docking;
 			}
 		}
-	}
-
-	public void SiteClicked (GameObject labelObj)
-	{
-		/*
-
-
-		//this is site picking code, it basically takes atoms local to the selected one
-		//and creates a new mesh with that subset
-		Debug.Log (labelObj.name + "'s site was selected");
-		LabelScript script = labelObj.GetComponent<LabelScript> ();
-		int molNum = -1;
-		int index = GetAtomIndexFromID (script.label.atomIndex,out molNum);
-
-		GameObject g;
-		Transform t = GameObject.Find ("SitePosition" + molNum).transform;
-		if (!sites [molNum]) {
-			Debug.Log("Created site");
-			GameObject primitive = GameObject.CreatePrimitive (PrimitiveType.Quad);
-			Material diffuse = primitive.GetComponent<MeshRenderer> ().sharedMaterial;
-			DestroyImmediate (primitive);
-
-			g = new GameObject ();
-			g.AddComponent<MeshFilter> ();
-			MeshRenderer r = g.AddComponent<MeshRenderer> ();
-			g.transform.position = t.position;
-			r.material = diffuse;
-			sites [molNum] = g;
-			g.transform.rotation = Quaternion.identity;
-		}
-
-		MeshFilter f = sites [molNum].GetComponent<MeshFilter> ();
-		sites [molNum].GetComponent<MeshRenderer> ();
-		PDB_mesh meshy = molecules [molNum].GetComponent<PDB_mesh> ();
-		PDB_molecule mol = meshy.mol;
-		Vector3 spherePos = meshy.mol.atom_centres [index];
-		float rad = 3.5f;
-
-		PDB_molecule.BvhSphereCollider sphere = 
-			new PDB_molecule.BvhSphereCollider (meshy.mol,
-			                                    spherePos,
-			                                    rad);
-
-		List<int> mol_index_vec = new List<int> ();
-		for(int i=0;i<sphere.results.Count;++i)
-		{
-			mol_index_vec.Add(sphere.results[i].index);
-		}
-		Mesh m = mol.build_section_mesh (mol_index_vec.ToArray());
-		f.mesh = m;*/
-	
 	}
 
 	//creates a err label. The label object contains a atom id and name used to name the instance
@@ -1132,7 +938,6 @@ public class BioBlox : MonoBehaviour
 
 			// Enter picking state
 			game_state = GameState.Picking;
-			bool prev_button = false;
 
 			// In this loop, the game state is either Picking or Docking.
 			while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
@@ -1161,64 +966,6 @@ public class BioBlox : MonoBehaviour
 					//lockButton.gameObject.SetActive (rms_distance_score < winScore);
 					lockButton.interactable = (rms_distance_score < winScore);
 				}
-
-				//test if we should move the molecules with quick ray casts
-				if (eventSystem.IsActive ()) {
-					ManageSliders ();
-					bool cur_button = Input.GetMouseButton (0);
-					if (cur_button && !prev_button) {
-						//Using this system we dont allow the player to move the two molecules at the same time
-						Camera c = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-						Ray r = c.ScreenPointToRay (Input.mousePosition);
-
-						// Starting cooroutines is grubby, we should avoid this.
-						if (PDB_molecule.collide_ray_quick (
-							molecules [0],
-							molecules [0].GetComponent<PDB_mesh> ().mol,
-							molecules [0].transform,
-							r)) {
-							//uncomment this line to stop players moving two molecules at once
-							//playerIsMoving[1]=false;#
-							if (!playerIsMoving [0]) {
-								playerIsMoving [0] = true;
-								StartCoroutine ("PlayerMoveMolecule", 0);
-							}
-						} else {
-							playerIsMoving [0] = false;
-						} 
-
-						if (PDB_molecule.collide_ray_quick (
-							molecules [1],
-							molecules [1].GetComponent<PDB_mesh> ().mol,
-							molecules [1].transform,
-							r)) {
-
-							//uncomment this line to stop players moving two molecules at once
-							//playerIsMoving[0]=false;
-							if (!playerIsMoving [1]) {
-								playerIsMoving [1] = true;
-								StartCoroutine ("PlayerMoveMolecule", 1);
-							}
-						} else {
-							playerIsMoving [1] = false;
-						}
-					}
-
-					if (sites [0]) {
-						sites [0].transform.rotation = molecules [0].transform.rotation;
-						if (simpleGame) {
-							sites [0].transform.Rotate (new Vector3 (0, 90, 0), Space.World);
-						}
-					}
-					if (sites [1]) {
-						sites [1].transform.rotation = molecules [1].transform.rotation;
-						if (simpleGame) {
-							sites [1].transform.Rotate (new Vector3 (0, -90, 0), Space.World);
-						}
-					}
-					prev_button = cur_button;
-				}
-
 			}
 
 			Debug.Log ("exited docking loop " + game_state);
