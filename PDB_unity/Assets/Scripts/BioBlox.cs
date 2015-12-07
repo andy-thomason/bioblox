@@ -267,6 +267,7 @@ public class BioBlox : MonoBehaviour
 	{
 		GameObject mol = molecules [molIndex];
 		Rigidbody r = mol.GetComponent<Rigidbody> ();
+		PDB_mesh pdb_mesh = mol.GetComponent<PDB_mesh> ();
 		r.maxAngularVelocity = 4;
 		//player movement of the molecules times out after periods of no input
 		float timeout = 100.0f;
@@ -306,6 +307,10 @@ public class BioBlox : MonoBehaviour
 					t = 0.0f;
 					Vector3 mousePos = Input.mousePosition;
 					Vector3 mouseDelta = mousePos - lastMousePos;
+
+					if (mouseDelta.magnitude != 0) {
+						pdb_mesh.has_rotated = true;
+					}
 					//find the world position of the atom
 					//Vector3 atomPos = GetAtomWorldPos (atomID, molIndex);
 
