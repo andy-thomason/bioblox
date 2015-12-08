@@ -151,8 +151,8 @@ public class BioBlox : MonoBehaviour
 
 		filenames.Add ("pdb2ptcWithTags");
 
-		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
-		scoreCard.gameObject.SetActive (false);
+//		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
+		//scoreCard.gameObject.SetActive (false);
 
 		//game_loop loads the file at filenames[current_level]
 		eventSystem = EventSystem.current;
@@ -736,7 +736,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 	// Creates the molecule objects including the PDB_mesh script.
-	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type)
+	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type, int index)
 	{
 		GameObject obj = GameObject.Find (name);
 		if (obj == null) {
@@ -754,6 +754,7 @@ public class BioBlox : MonoBehaviour
 
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
+		p.protein_id = index;
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
 		make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
@@ -823,8 +824,8 @@ public class BioBlox : MonoBehaviour
 		//Debug.Log ("make_molecules");
 		string file = filenames [current_level];
 		
-		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
-		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type);
+		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
+		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
 
 		if (init) {
 			molecules = new GameObject[2];

@@ -6,6 +6,7 @@ using AssemblyCSharp;
 public class PDB_mesh : MonoBehaviour {
     public PDB_molecule mol;
     public GameObject other;
+	public int protein_id;
 
 	bool allowInteraction=true;
 
@@ -14,6 +15,7 @@ public class PDB_mesh : MonoBehaviour {
 	bool startRotation=false;
 	public bool shouldCollide = false;
 	float t=0;
+	AminoSliderController aminoSliderController;
 
 	// add atom indices to here to display them selected
 	public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -24,6 +26,7 @@ public class PDB_mesh : MonoBehaviour {
 	void Start () {
 	  
         mol = PDB_parser.get_molecule(this.name);
+		aminoSliderController = FindObjectOfType<AminoSliderController> ();
 	}
 
 	public void AlignPointToVector(Vector3 point, Vector3 targetDir)
@@ -302,7 +305,8 @@ public class PDB_mesh : MonoBehaviour {
 			int[] ids = mol.aminoAcidsAtomIds[i];
 			for (int j = 0; j != ids.Length; ++j) {
 				if (ids[j] == atom) {
-					SelectAminoAcid(i);
+					SelectAminoAcid(i);					
+					aminoSliderController.HighLight3DMesh(i,protein_id);
 					return;
 				}
 			}
