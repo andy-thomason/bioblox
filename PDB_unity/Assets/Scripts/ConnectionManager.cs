@@ -97,6 +97,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)
 	{
+		Debug.Log ("clockl");
 		if (atomIndex != -1) {
 			if (numChainClicks == 0) {
 				connections.Add (new Grappel ());

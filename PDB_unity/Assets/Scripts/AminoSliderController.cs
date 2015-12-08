@@ -39,6 +39,124 @@ public class AminoSliderController : MonoBehaviour {
 	BioBlox BioBloxReference;
 	public List<AtomConnection> connections = new List<AtomConnection> ();
 	public GameObject AddConnection;
+	//slider buttons
+	bool ButtonA1LDown, ButtonA1RDown, ButtonA2LDown, ButtonA2RDown = false;	
+	public Scrollbar ScrollbarAmino1;
+	public Scrollbar ScrollbarAmino2;
+	List<Button> A1Buttons = new List<Button> ();
+	List<Button> A2Buttons = new List<Button> ();
+	//current button
+	public int CurrentButtonA1, CurrentButtonA2 = 0;
+	void Update()
+	{
+
+		if (ButtonA1LDown)
+		{
+			if(CurrentButtonA1>0)
+			{
+				A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+				CurrentButtonA1 --;
+				A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+				ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol1.transform.childCount-1);
+				Debug.Log (CurrentButtonA1);
+				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+			}
+		}
+		
+		if (ButtonA1RDown)
+		{
+			Debug.Log (SliderMol1.transform.childCount);
+			if(CurrentButtonA1<SliderMol1.transform.childCount-1)
+			{
+				A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+				CurrentButtonA1 ++;
+				A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+				ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol1.transform.childCount-1);
+				Debug.Log (CurrentButtonA1);
+				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+			}
+		}
+		
+		if (ButtonA2LDown)
+		{			
+			if(CurrentButtonA2>0)
+			{
+				A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+				CurrentButtonA2 --;
+				A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+				ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol2.transform.childCount-1);
+				Debug.Log (CurrentButtonA2);
+				A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+			}
+		}
+		
+		if (ButtonA2RDown)
+		{
+			if(CurrentButtonA2<SliderMol2.transform.childCount-1)
+			{
+				A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+				CurrentButtonA2 ++;
+				A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+				ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol2.transform.childCount-1);
+				Debug.Log (CurrentButtonA2);
+				A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+			}
+		}
+
+
+		/*if (ButtonA1LDown)
+		{
+			ScrollbarAmino1.value -= 0.01f;
+			CurrentButtonA1 = (int)(ScrollbarAmino1.value*SliderMol1.transform.childCount);
+			Debug.Log (CurrentButtonA1);
+			A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+			A1Buttons[CurrentButtonA1].Select();
+		}
+
+		if (ButtonA1RDown)
+		{
+			ScrollbarAmino1.value += 0.01f;
+			CurrentButtonA1 = (int)(ScrollbarAmino1.value*SliderMol1.transform.childCount)-1;
+			CurrentButtonA1 = (CurrentButtonA1<0) ? 0 : CurrentButtonA1;
+			A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+			A1Buttons[CurrentButtonA1].Select();
+		}
+
+		if (ButtonA2LDown)
+		{			
+			ScrollbarAmino2.value -= 0.01f;
+			CurrentButtonA2 = (int)(ScrollbarAmino2.value*SliderMol2.transform.childCount);
+			Debug.Log (CurrentButtonA2);
+			A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+			A2Buttons[CurrentButtonA2].Select();
+		}
+
+		if (ButtonA2RDown)
+		{
+			ScrollbarAmino2.value += 0.01f;
+			CurrentButtonA2 = (int)(ScrollbarAmino2.value*SliderMol2.transform.childCount)-1;
+			CurrentButtonA2 = (CurrentButtonA2<0) ? 0 : CurrentButtonA2;
+			A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+			A2Buttons[CurrentButtonA2].Select();
+		}*/
+	}
+
+	public void UpdateCurrentButtonA1(int index)
+	{
+		A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+		CurrentButtonA1 = index;
+		A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+
+	}
+
+	public void UpdateCurrentButtonA2(int index)
+	{
+		A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+		CurrentButtonA2 = index;
+		A2Buttons[CurrentButtonA2].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+	}
+
+
 
 	public void init () {
 
@@ -68,6 +186,7 @@ public class AminoSliderController : MonoBehaviour {
 	{		
 		//Debug.Log (currentAmino);
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
+		A1Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol1.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
 		//Debug.Log (AminoColor [currentAmino]);
@@ -79,6 +198,7 @@ public class AminoSliderController : MonoBehaviour {
 	public void GeneratesAminoButtons2(string currentAmino, int index)
 	{		
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
+		A2Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol2.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
 		AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+index;
@@ -116,6 +236,8 @@ public class AminoSliderController : MonoBehaviour {
 	{		
 		ButtonPickedA1.GetComponent<Button>().interactable = false;
 		ButtonPickedA2.GetComponent<Button>().interactable = false;
+		ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
+		ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
 		AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(),ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID,BioBloxReference.molecules[1].GetComponent<PDB_mesh>(),ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID),ButtonPickedA1,ButtonPickedA2);
 		
 		ButtonPickedA1 = ButtonPickedA2 = null;
@@ -172,5 +294,47 @@ public class AminoSliderController : MonoBehaviour {
 		UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount-1);
 		SliderMol1.transform.GetChild (B1).GetComponent<Button> ().interactable = true;
 		SliderMol2.transform.GetChild (B2).GetComponent<Button> ().interactable = true;
+	}
+
+	//SLIDER BUTTONS
+	
+	public void A1LDown()
+	{
+		ButtonA1LDown = true;
+	}
+
+	public void A1LUp()
+	{
+		ButtonA1LDown = false;
+	}
+
+	public void A1RDown()
+	{
+		ButtonA1RDown = true;
+	}
+	
+	public void A1RUp()
+	{
+		ButtonA1RDown = false;
+	}
+
+	public void A2LDown()
+	{
+		ButtonA2LDown = true;
+	}
+	
+	public void A2LUp()
+	{
+		ButtonA2LDown = false;
+	}
+
+	public void A2RDown()
+	{
+		ButtonA2RDown = true;
+	}
+	
+	public void A2RUp()
+	{
+		ButtonA2RDown = false;
 	}
 }

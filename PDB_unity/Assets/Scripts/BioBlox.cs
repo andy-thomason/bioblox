@@ -287,12 +287,15 @@ public class BioBlox : MonoBehaviour
 			}
 		}
 
+		/*
 		//camera zoom roll mouse
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
 		{
-			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 60)
+			if(MainCamera.transform.position.z >= -120 && MainCamera.transform.position.z <= 0)
 			{
-				MainCamera.fieldOfView += Input.GetAxis ("Mouse ScrollWheel") * 5;
+				Vector3 temp = MainCamera.transform.position;
+				temp.z += Input.GetAxis ("Mouse ScrollWheel") * 5;
+				MainCamera.transform.position = temp;
 			}
 
 			if(MainCamera.fieldOfView < 20)
@@ -304,7 +307,7 @@ public class BioBlox : MonoBehaviour
 			{
 				MainCamera.fieldOfView = 60;
 			}
-		}
+		}*/
 	}
 
 	void PopInSound (GameObject g)
@@ -1102,29 +1105,6 @@ public class BioBlox : MonoBehaviour
 		ToolMenuAnimator.SetBool ("Open", Status);
 		OpenToolImage.SetActive (!Status);
 		CloseToolImage.SetActive (Status);
-	}
-
-	public Scrollbar ScrollbarAmino1;
-	public Scrollbar ScrollbarAmino2;
-
-	public void ScrollUpAmino1()
-	{
-		ScrollbarAmino1.value += 0.01f;
-	}
-
-	public void ScrollDownAmino1()
-	{
-		ScrollbarAmino1.value -= 0.01f;		
-	}
-
-	public void ScrollUpAmino2()
-	{
-		ScrollbarAmino2.value += 0.01f;	
-	}
-
-	public void ScrollDownAmino2()
-	{
-		ScrollbarAmino2.value -= 0.01f;	
 	}
 
 	public void EnableSlider()
