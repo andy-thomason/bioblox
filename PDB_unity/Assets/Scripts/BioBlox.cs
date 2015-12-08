@@ -379,13 +379,15 @@ public class BioBlox : MonoBehaviour
 				r.material.SetVector ("_Atom9", uniforms[9]);
 			}
 		}
-
+		/*
 		//camera zoom roll mouse
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
 		{
-			if(MainCamera.fieldOfView >= 20 && MainCamera.fieldOfView <= 60)
+			if(MainCamera.transform.position.z >= -120 && MainCamera.transform.position.z <= 0)
 			{
-				MainCamera.fieldOfView += Input.GetAxis ("Mouse ScrollWheel") * 5;
+				Vector3 temp = MainCamera.transform.position;
+				temp.z += Input.GetAxis ("Mouse ScrollWheel") * 5;
+				MainCamera.transform.position = temp;
 			}
 
 			if(MainCamera.fieldOfView < 20)
@@ -397,7 +399,7 @@ public class BioBlox : MonoBehaviour
 			{
 				MainCamera.fieldOfView = 60;
 			}
-		}
+		}*/
 	}
 
 	void PopInSound (GameObject g)
