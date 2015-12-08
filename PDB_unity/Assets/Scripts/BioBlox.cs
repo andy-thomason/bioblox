@@ -1350,29 +1350,6 @@ public class BioBlox : MonoBehaviour
 		CloseToolImage.SetActive (Status);
 	}
 
-	public Scrollbar ScrollbarAmino1;
-	public Scrollbar ScrollbarAmino2;
-
-	public void ScrollUpAmino1()
-	{
-		ScrollbarAmino1.value += 0.01f;
-	}
-
-	public void ScrollDownAmino1()
-	{
-		ScrollbarAmino1.value -= 0.01f;		
-	}
-
-	public void ScrollUpAmino2()
-	{
-		ScrollbarAmino2.value += 0.01f;	
-	}
-
-	public void ScrollDownAmino2()
-	{
-		ScrollbarAmino2.value -= 0.01f;	
-	}
-
 	public void EnableSlider()
 	{
 		overrideSlider.interactable = true;
