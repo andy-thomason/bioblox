@@ -202,7 +202,7 @@ public class AminoSliderController : MonoBehaviour {
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
 			AddConnection.GetComponent<Animator> ().enabled = true;
-			BioBloxReference.EnableSlider ();
+			//BioBloxReference.EnableSlider ();
 		} else {
 			DeactivateAddConnectionButton ();
 		}
@@ -217,6 +217,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(),ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID,BioBloxReference.molecules[1].GetComponent<PDB_mesh>(),ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID),ButtonPickedA1,ButtonPickedA2);
 		
 		ButtonPickedA1 = ButtonPickedA2 = null;
+		FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
 		DeactivateAddConnectionButton ();
 	}
 

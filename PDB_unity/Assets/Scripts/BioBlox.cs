@@ -73,11 +73,11 @@ public class BioBlox : MonoBehaviour
 	public Image heuristicScore;
 	public Text GameScoreValue;
 	public Image GameScore;
-	public Slider overrideSlider;
+	//public Slider overrideSlider;
 	public Slider cutawaySlider;
 	public GameObject invalidDockText;
 	public GameObject InvalidDockScore;
-	public List<Slider> dockSliders = new List<Slider> ();
+	//public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 	//Animator of the tools menu
 	public Animator ToolMenuAnimator;
@@ -427,7 +427,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 
-	public void ManageSliders()
+	/*public void ManageSliders()
 	{
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
@@ -473,7 +473,7 @@ public class BioBlox : MonoBehaviour
 				}
 			}
 		}
-	}
+	}*/
 	/*
 	//creates a err label. The label object contains a atom id and name used to name the instance
 	void CreateLabel (PDB_molecule.Label argLabel, int molNum, string labelName, PDB_molecule mol)
@@ -513,7 +513,7 @@ public class BioBlox : MonoBehaviour
 	}*/
 
 	// The pick button resets the sliders to the right.
-	public void Pick()
+	/*public void Pick()
 	{
 		if (game_state == GameState.Picking || game_state == GameState.Docking) {
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
@@ -545,7 +545,7 @@ public class BioBlox : MonoBehaviour
 			}
 			ManageSliders ();
 		}
-	}
+	}*/
 	
 	// The lock button establishes the Locked state.
 	public void Lock()
@@ -779,7 +779,7 @@ public class BioBlox : MonoBehaviour
 
 			//this is the connection manager for the complex game, it handles grappling between the molecules
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-
+			/*
 			for (int i = 0; i < dockSliders.Count; ++i) {
 				dockSliders[i].maxValue =  conMan.maxDistance;
 				dockSliders[i].minValue = conMan.minDistance;
@@ -787,12 +787,11 @@ public class BioBlox : MonoBehaviour
 				//dockSliders[i].gameObject.SetActive(false);
 				//sliderConstarinedByOverride.Add(true);
 			}
-
 			overrideSlider.maxValue = conMan.maxDistance;
 			overrideSlider.minValue = conMan.minDistance;
 			overrideSlider.value = conMan.maxDistance;
 			
-			overrideSlider.interactable = false;
+			overrideSlider.interactable = false;*/
 
 			mol1.transform.localScale = new Vector3 (1, 1, 1);
 			mol2.transform.localScale = new Vector3 (1, 1, 1);
@@ -968,13 +967,6 @@ public class BioBlox : MonoBehaviour
 		ToolMenuAnimator.SetBool ("Open", Status);
 		OpenToolImage.SetActive (!Status);
 		CloseToolImage.SetActive (Status);
-	}
-
-	public void EnableSlider()
-	{
-		overrideSlider.interactable = true;
-
-		uiScrollSpeed =900;
 	}
 
 }

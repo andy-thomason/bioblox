@@ -15,6 +15,7 @@ public class ConnectionManager : MonoBehaviour {
 	public float minDistance = 0.0f;
 	public float maxDistance = 60.0f;
 	public float spring_constant = 10000.0f;
+	public Slider SliderStrings;
 
 	public float[] connectionMinDistances;
 
@@ -25,6 +26,23 @@ public class ConnectionManager : MonoBehaviour {
 
 	public List<AtomConnection> connections = new List<AtomConnection> ();
 	public int nc;
+
+	public void StringManager()
+	{
+		for (int i = 0; i<connectionMinDistances.Length; i++)
+		{
+			connectionMinDistances[i] = 60 * SliderStrings.value;
+		}
+	}
+
+	public void DisableSlider()
+	{
+		if (connections.Count == 0)
+		{
+			SliderStrings.value = 1;
+			SliderStrings.interactable = false;
+		}
+	}
 
 	public void Reset()
 	{
@@ -53,7 +71,7 @@ public class ConnectionManager : MonoBehaviour {
 
 		connectionMinDistances = new float[mol1AtomIndicies.Length];
 		for (int i = 0; i < connectionMinDistances.Length; ++i) {
-			connectionMinDistances[i] = maxDistance;
+			connectionMinDistances[i] = maxDistance * SliderStrings.value;
 		}
 
 		shouldContract = true;
@@ -75,7 +93,7 @@ public class ConnectionManager : MonoBehaviour {
 
 		connectionMinDistances = new float[connections.Count];
 		for (int i = 0; i < connectionMinDistances.Length; ++i) {
-			connectionMinDistances[i] = maxDistance;
+			connectionMinDistances[i] = maxDistance * SliderStrings.value;;
 		}
 		
 		shouldContract = true;

@@ -13,6 +13,7 @@ public class AminoConnectionHolder : MonoBehaviour {
 	{		
 		FindObjectOfType<ConnectionManager> ().DeleteAminoAcidLink (connection);
 		FindObjectOfType<AminoSliderController> ().RestoreDeletedAminoButtons (ID_button1, ID_button2);
+		FindObjectOfType<ConnectionManager> ().DisableSlider ();
 		Destroy (gameObject);
 	}
 }
