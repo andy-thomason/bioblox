@@ -902,8 +902,9 @@ public class BioBlox : MonoBehaviour
 		num_touching_1 = 0;
 		num_invalid = 0;
 		num_connections = 0;
+		//Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length);
 		
-		if (game_state == GameState.Docking && molecules.Length >= 2) {
+		if (molecules.Length >= 2) {
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
@@ -945,7 +946,7 @@ public class BioBlox : MonoBehaviour
 				
 			}
 
-			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+			//heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 			
 			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
 
