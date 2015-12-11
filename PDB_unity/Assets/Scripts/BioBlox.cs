@@ -586,9 +586,9 @@ public class BioBlox : MonoBehaviour
 
 		//Clear score
 		GameScore.fillAmount = 0;
-		heuristicScore.fillAmount = 0;
-		GameScoreValue.text = "0";
-		MainCamera.fieldOfView = 60;
+		//heuristicScore.fillAmount = 0;
+		//GameScoreValue.text = "0";
+		//MainCamera.fieldOfView = 60;
 		
 		GetComponent<AminoSliderController> ().init ();
 	}
@@ -819,7 +819,7 @@ public class BioBlox : MonoBehaviour
 				float rms_distance_score = ScoreRMSD ();
 				if (rmsScoreSlider) {
 					rmsScoreSlider.value = rms_distance_score * 0.1f;
-					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+					/*float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
 					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
 					{
 						GameScore.fillAmount = scaleGameScore;						
@@ -829,7 +829,7 @@ public class BioBlox : MonoBehaviour
 					{
 						GameScore.fillAmount = 0;
 						GameScoreValue.text = "0";
-					}
+					}*/
 				}
 
 				if (lockButton) {
