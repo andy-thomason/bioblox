@@ -17,6 +17,9 @@ namespace AssemblyCSharp
 		public PDB_mesh[] molecules;
 		public int[] atomIds;
 		public bool isActive;
+		public float distance;
+
+
 		public AtomConnection()
 		{
 			molecules = new PDB_mesh[2] ;
@@ -119,7 +122,7 @@ namespace AssemblyCSharp
 			Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
 			Vector3 dir = (worldAtomPos2 - worldAtomPos1).normalized;
-			float distance = (worldAtomPos2 - worldAtomPos1).magnitude;
+			distance = (worldAtomPos2 - worldAtomPos1).magnitude;
 			if (isActive) {
 				if (distance > string_length) {
 

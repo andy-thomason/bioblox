@@ -72,6 +72,7 @@ public class PDB_parser {
 		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
 		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
 		List<string> aminoAcidName = new List<string>();
+		List<string> aminoAcidTag = new List<string>();
 		List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
@@ -101,10 +102,16 @@ public class PDB_parser {
 					string id = line.Substring(13, 7);
 					string aminoAcid = id.Substring(3);
 					//int atom = int.Parse(line.Substring(6, 5));
+					string aatag = line.Substring (21, 5);
 
 					while(aminoAcidName.Count < chainNumber)
 					{
 						aminoAcidName.Add(null);
+					}
+
+					while(aminoAcidTag.Count < chainNumber)
+					{
+						aminoAcidTag.Add(null);
 					}
 
 					while(aminoAcidAtomIDs.Count < chainNumber)
@@ -113,6 +120,7 @@ public class PDB_parser {
 					}
 
 					aminoAcidName[chainNumber - 1] = aminoAcid;
+					aminoAcidTag[chainNumber - 1] = aatag;
 					aminoAcidAtomIDs[chainNumber - 1].Add(index++);
 
 					Color col = Color.white;
@@ -195,11 +203,13 @@ public class PDB_parser {
                     cofg += cur.pos;
 					cur.aminoAcidsNames = new List<string>();
 					cur.aminoAcidsAtomIds = new List<int[]>();
+					cur.aminoAcidsTags = new List<string>();
 					for(int i = 0; i < aminoAcidName.Count; ++i)
 					{
 						if(aminoAcidName[i] != null)
 						{
 							cur.aminoAcidsNames.Add(aminoAcidName[i]);
+							cur.aminoAcidsTags.Add(aminoAcidTag[i]);
 							cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
 							//Debug.Log ("aminoAcidName[i]: "+aminoAcidName[i]);
 						}
@@ -224,6 +234,7 @@ public class PDB_parser {
 					serial_to_atom.Clear();
 					aminoAcidName.Clear();
 					aminoAcidAtomIDs.Clear();
+					aminoAcidTag.Clear();
                 } 
             }
         }

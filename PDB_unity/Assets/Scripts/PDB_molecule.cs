@@ -20,6 +20,7 @@ public class PDB_molecule
     public int[] N_atoms;
     public Vector3 pos;
 	public List<string> aminoAcidsNames;
+	public List<string> aminoAcidsTags;
 	public List<int[]> aminoAcidsAtomIds;
 	public Mesh[] mesh;
 

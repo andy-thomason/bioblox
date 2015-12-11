@@ -950,7 +950,9 @@ public class BioBlox : MonoBehaviour
 			
 			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
 
-			heuristicScore.fillAmount = num_invalid != 0 ? 0 : ScoreScaleSize;
+			GameScore.fillAmount = num_invalid != 0 ? GameScore.fillAmount + 0.01f : GameScore.fillAmount - 0.01f;
+			//Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
+			//Debug.Log ("num_invalid: "+num_invalid);
 
 		}
 
