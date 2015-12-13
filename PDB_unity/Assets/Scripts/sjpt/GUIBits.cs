@@ -1,0 +1,364 @@
+﻿// various helper GUI bits to fit Stephen's experiments
+using UnityEngine;
+using UnityEngine.UI;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+using CSG;
+using CSGNonPlane;
+using CSGFIELD;
+using Random = UnityEngine.Random;
+
+namespace CSG {  // [ExecuteInEditMode]
+    public abstract class GUIBits : MonoBehaviour {
+        Material material;
+        GameObject child;
+
+
+        [Range(0, 4)] public int NBOX = 2;  // number of boxes to draw behind text to get enough opacity
+
+        //public Material[] materials = new Material[8];
+
+        // for reuse with different influence
+        public BigMesh savemesh;
+        // saved for processing
+        public BigMesh filtermesh;
+        public PDB_molecule mol;
+        // saved molecule
+        public float prepRadinf;
+        public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
+        public GameObject goTest, goLight0, goLight1, goFiltered;
+        public TransformData savedTransform;
+        public Vector3 lookat = Vector3.zero;
+        public Quaternion lightquat0 = new Quaternion(0.3f, 0.3f, 0, 1);
+        public Quaternion lightquat1 = new Quaternion(-0.3f, -0.3f, 0, 1);
+        protected CSGNode csg;
+
+        protected string toshow;
+        static int nexty = 0, yinc = 1;
+
+        Vector3 lastmouse = new Vector3(0, 0, 0);
+
+        class ButtonPrepare {
+            public int y;
+            public string name;
+
+            public ButtonPrepare(string name, int y) {
+                this.name = name;
+                this.y = y;
+            }
+
+        }
+
+        public static string text = "";
+
+        Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
+
+        protected bool testop(string s) {
+            if (!ops.ContainsKey(s)) {
+                nexty += yinc;
+                ops.Add(s, new ButtonPrepare(s, nexty));
+            }
+
+            return (s == toshow);
+        }
+
+        public abstract void Show(string ptoshow);
+
+
+        public static void Log(string s) {
+            text += s + "\n";
+        }
+
+        public static void Log2(string s) {
+            Debug.Log(s);
+            Log(s);
+        }
+
+        public static void Log(Exception e) {
+            Debug.Log(e);
+            Log("!!!!!!!!!!!!!!!!!!" + e.ToString());
+        }
+
+        protected void showcsg() {
+            string sss = csg.ToStringF("\n");
+            Log(sss);
+            CSGNode cc = csg.Bake();
+            sss = cc.ToStringF("\n");
+            Log2("baked=" + sss);
+        }
+
+        protected virtual void UpdateI() {
+
+        	// save these early, maybe more efficient, and difficult to find again after hiding otherwise
+           	if (!goTest)
+                goTest = GameObject.Find("Test");
+            if (!goLight0)
+                goLight0 = GameObject.Find("Light0");
+            if (!goLight1)
+                goLight1 = GameObject.Find("Light1");
+            if (!goFiltered)
+                goFiltered = GameObject.Find("Filtered");
+
+            var t = Camera.main.transform;
+            var p = t.position;
+            var a = Input.GetKey("left shift") ? 10 : 1;
+
+            float mrate = a * 0.01f;
+
+            if (Input.GetKey("w"))
+                p += t.forward * mrate;
+            if (Input.GetKey("s"))
+                p -= t.forward * mrate;
+            if (Input.GetKey("a"))
+                p -= t.right * mrate;
+            if (Input.GetKey("d"))
+                p += t.right * mrate;
+
+            if (Input.GetKey(KeyCode.LeftArrow))
+                p -= t.right * mrate;
+            if (Input.GetKey(KeyCode.RightArrow))
+                p += t.right * mrate;
+            if (Input.GetKey(KeyCode.UpArrow))
+                p += t.up * mrate;
+            if (Input.GetKey(KeyCode.DownArrow))
+                p -= t.up * mrate;
+
+            float srate = a * 0.1f;
+            p += t.forward * Input.mouseScrollDelta.x * srate;
+            p += t.forward * Input.mouseScrollDelta.y * srate;
+
+            t.position = p;
+
+            float rrate = a * 0.1f;
+            if (Input.GetKey("i"))
+                t.Rotate(-rrate, 0, 0);
+            if (Input.GetKey("k"))
+                t.Rotate(rrate, 0, 0);
+            if (Input.GetKey("j"))
+                t.Rotate(0, -rrate, 0);
+            if (Input.GetKey("l"))
+                t.Rotate(0, rrate, 0);
+
+            Vector3 mousedelta = Input.mousePosition - lastmouse;
+            lastmouse = Input.mousePosition;
+            float mmrate = 0.1f;
+            mousedelta *= a * mmrate;
+
+            if (Input.GetMouseButtonDown(0)) {
+                Vector3 hit = Hitpoint();
+                if (!float.IsNaN(hit.x))
+                    lookat = hit;
+            }
+
+            int k = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);
+            // mouse may go down in odd position on new click
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+                k = 0;
+            //lookat = Vector3.zero; // t.position + t.forward * 20;
+            switch (k) {
+                case 0:
+                    break;
+                case 1:
+                    t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
+                    break;
+                case 2:
+                    t.position -= 0.3f * (mousedelta.x * t.right + mousedelta.y * t.up);
+                    break;
+                case 3:
+                    t.RotateAround(lookat, t.forward, mousedelta.x);
+                    break;
+
+            }
+            if (Input.GetKey("home")) {
+                t.rotation = new Quaternion(0, 0, 0, 1);
+                t.position = new Vector3(0, 0, -30);
+            }
+
+
+            if (Input.GetKeyDown("m") || Input.GetKeyDown("n")) {  // set up CSG break and use it
+                Vector3 hit = Hitpoint();
+                if (float.IsNaN(hit.x)) {
+                    //Log ("no hit");
+                    text = ("no hit");
+                    CSGControl.BreakOff();
+                } else {
+                    Log("hit at " + hit);
+                    lookat = hit;
+                    if (Input.GetKeyDown("m")) {
+                        CSGControl.Break(hit);
+                        Show(toshow);
+                        CSGControl.BreakOff();
+                    } else {  // "n"
+                        float d = 0.01f;
+                        Volume v = new Volume(lookat.x - d, lookat.x + d, lookat.y - d, lookat.y + d, lookat.z - d, lookat.z + d);
+                        int unodes = 0;
+                        CSGNode csgs = csg.Bake().Simplify(v, simpguid--, ref unodes);
+                        text = csgs.ToStringF("\n"); 
+                    }
+                }
+            }
+
+            if (Input.GetKeyDown("z")) {
+                Camera.main.transform.RestoreData(savedTransform);
+            }
+
+            if (Input.GetKeyDown("x")) {
+                if (goTest != null)
+                    goTest.SetActive(!goTest.activeSelf);
+            }
+
+            goFiltered.transform.position = -Camera.main.transform.forward * 0.1f;
+
+            // MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
+            //Camera.main.transform
+
+            // ? no effect RenderSettings.ambientLight = Color.red;
+            Light l = (Light)(goLight0.GetComponent(typeof(Light)));
+            l.transform.localRotation = lightquat0;
+            l = (Light)(goLight1.GetComponent(typeof(Light)));
+            l.transform.localRotation = lightquat1;
+
+        }
+
+        static float lastxx;
+
+		// standard Unity OnGUI function, protecting from exceptions
+		void OnGUI() {
+			try {
+				OnGUII();
+			} catch (System.Exception e) {
+				Log(e.ToString());
+			}
+		}
+			
+		int slidery = 0;
+		protected virtual void OnGUII() {
+            if (ops.Count == 0)
+                Show("");  // get things initialized
+
+			// display buttons for all the options set up by Show()
+            int y = 0;
+            foreach (var kvp in ops) {    // and show buttons for tests
+                if (GUI.Button(new Rect(20, kvp.Value.y * 20, 80, 20), kvp.Key))
+                    Show(kvp.Key);
+                y = kvp.Value.y;
+            }
+            y += 2;
+			slidery = 20*y;
+        
+/***
+            MSlider("MaxLev", ref CSGControl.MaxLev, 0, 12 );
+            MSlider("MinLev", ref CSGControl.MinLev, 0, 12 );
+            MSlider("CylNum", ref Minster.CylNum, -1, 20 );
+            MSlider("GiveUpNodes", ref CSGControl.GiveUpNodes, 10, 2000 );
+            MSlider("Cull Sides", ref BasicMeshData.Sides, 0, 3 );
+
+            MSlider("NumSpheres", ref NumSpheres, 0, 2500 );
+            MSlider("radInfluence", ref CSGControl.radInfluence, 0f, 5f );
+            MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50 );
+            MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 50 );
+            MSlider("WindShow", ref BasicMeshData.WindShow, 0, 3 );
+***/
+
+
+            //float xx = GUI.HorizontalSlider(new Rect (20  * 30, 80, 20), lastxx, 0, 10);
+            //if (lastxx != xx) Log("xx=" + xx);
+            //lastxx = xx;
+            int w = Screen.width / 2;  // width of text
+            GUI.contentColor = Color.white;
+            GUI.color = Color.white;
+            GUI.backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1f);
+
+            Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(text), "label");
+            labelRect.x = Screen.width - labelRect.width;
+            for (int i = 0; i < NBOX; i++)
+                GUI.Box(labelRect, ""); 
+            GUI.contentColor = Color.white;
+            if (GUI.Button(labelRect, text, "label"))
+                text = ""; 
+        }     // OnGUII
+
+        int sliderWidth = 160, sliderHeight = 25;
+        /** make an int slider, y position w.i.p, return true if value changed */
+        protected bool MSlider(string sliderName, ref int v, int low, int high) {
+            int o = v;
+            v = (int)GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
+            //if (o != v) Log (name + v);
+            GUI.contentColor = Color.black;
+            GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
+			slidery += sliderHeight;
+			return o != v;
+        }
+
+		/** make an int slider, y position w.i.p, return true if value changed */
+		protected bool MSlider(string sliderName, ref float v, float low, float high) {
+            float o = v;
+			v = (int)GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
+            //if (o != v) Log (name + v);
+            GUI.contentColor = Color.black;
+			GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
+			slidery += sliderHeight;
+			return o != v;
+        }
+
+        // Update is called once per frame: call UpdateI with exception protection
+        void Update() {
+            try {
+                UpdateI();
+            } catch (System.Exception e) {
+                Log("Exception in update: " + e + "\n" + e.Source);
+            }
+        }
+
+        private static int simpguid = -1;
+
+#region Utility functions
+		// find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
+		protected Vector3 Hitpoint() {
+			return (savemesh == null) ? HitpointGO() : HitpointBM();
+		}
+
+		// find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
+		Vector3 HitpointBM() {
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh);
+		}
+
+		// find the hitpoint on the screen, using meshes in Test game object
+		Vector3 HitpointGO() {
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			float r = ray.intersectR(gameObject);
+			if (r == float.MaxValue)
+				return new Vector3(float.NaN, float.NaN, float.NaN);
+			else
+				return ray.origin + r * ray.direction;
+		}
+
+		// clear the CSGStephen game objects we have generated
+		protected static void Clear() {
+			var objects = FindObjectsOfType(typeof(GameObject)); 
+			foreach (GameObject o in objects) { 
+				if (o.name.StartsWith("CSGStephen"))
+					Destroy(o.gameObject); 
+			}
+		}
+
+		// delete all children of some game object
+		protected static void DeleteChildren(GameObject test) {
+			try {
+				Transform top = test.transform;
+				for (int i = top.childCount - 1; i >= 0; i--)
+					Destroy(top.GetChild(i).gameObject);
+
+				top.DetachChildren();
+			} catch (System.Exception e) {
+				Log("DeleteChildren failed: " + e);
+			}
+		}
+#endregion
+
+
+    }     // class GUIBits
+}   // namespace CSG
