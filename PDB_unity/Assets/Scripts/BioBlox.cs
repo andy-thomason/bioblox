@@ -80,9 +80,6 @@ public class BioBlox : MonoBehaviour
 	//public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 	//Animator of the tools menu
-	public Animator ToolMenuAnimator;
-	public GameObject OpenToolImage;
-	public GameObject CloseToolImage;
 	public GameObject EndLevelMenu;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
@@ -963,13 +960,6 @@ public class BioBlox : MonoBehaviour
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
-	}
-
-	public void ToogleToolMenu(bool Status)
-	{
-		ToolMenuAnimator.SetBool ("Open", Status);
-		OpenToolImage.SetActive (!Status);
-		CloseToolImage.SetActive (Status);
 	}
 
 }

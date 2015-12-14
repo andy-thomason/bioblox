@@ -49,6 +49,9 @@ public class AminoSliderController : MonoBehaviour {
 	List<Button> A2Buttons = new List<Button> ();
 	//current button
 	public int CurrentButtonA1, CurrentButtonA2 = 0;
+	//text to link when there is the free camera
+	public GameObject AddConnectionText;
+
 	void Update()
 	{
 
@@ -99,6 +102,11 @@ public class AminoSliderController : MonoBehaviour {
 				A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
 			}
 		}
+
+		if(Input.GetKeyDown (KeyCode.L) && AddConnectionText.activeSelf) {
+			AddConnectionButton();
+		}
+
 	}
 
 	public void UpdateCurrentButtonA1(int index)
@@ -219,8 +227,9 @@ public class AminoSliderController : MonoBehaviour {
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
 			AddConnection.GetComponent<Animator> ().enabled = true;
-			//BioBloxReference.EnableSlider ();
+			AddConnectionText.SetActive(!BioBloxReference.GetComponent<UIController>().ToggleFreeCameraStatus);
 		} else {
+			AddConnectionText.SetActive(false);
 			DeactivateAddConnectionButton ();
 		}
 	}
@@ -235,6 +244,7 @@ public class AminoSliderController : MonoBehaviour {
 		
 		ButtonPickedA1 = ButtonPickedA2 = null;
 		FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
+		AddConnectionText.SetActive(false);
 		DeactivateAddConnectionButton ();
 	}
 
