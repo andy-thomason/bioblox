@@ -136,6 +136,7 @@ using System.Diagnostics;
 
 //using Mutator2;  // just for Break
 using SystemHelpers;
+
 //using CommandNamespace;
 
 
@@ -382,7 +383,7 @@ namespace CSG {
         public Bounds Bounds() {
             return new Bounds(Centre(), Size());
         }
-        
+
         
         public Bounds BoundsExpand(float sc) {
             float s = sc * MaxSize();
@@ -396,24 +397,24 @@ namespace CSG {
         /// <returns></returns>
         public Volume SV(int i) {
             switch (i) {
-                case 0:
-                    return new Volume(lev + 1, x1, x, y1, y, z1, z);
-                case 1:
-                    return new Volume(lev + 1, x1, x, y1, y, z, z2);
-                case 2:
-                    return new Volume(lev + 1, x1, x, y, y2, z1, z);
-                case 3:
-                    return new Volume(lev + 1, x1, x, y, y2, z, z2);
-                case 4:
-                    return new Volume(lev + 1, x, x2, y1, y, z1, z);
-                case 5:
-                    return new Volume(lev + 1, x, x2, y1, y, z, z2);
-                case 6:
-                    return new Volume(lev + 1, x, x2, y, y2, z1, z);
-                case 7:
-                    return new Volume(lev + 1, x, x2, y, y2, z, z2);
-                default:
-                    throw new NotImplementedException();
+            case 0:
+                return new Volume(lev + 1, x1, x, y1, y, z1, z);
+            case 1:
+                return new Volume(lev + 1, x1, x, y1, y, z, z2);
+            case 2:
+                return new Volume(lev + 1, x1, x, y, y2, z1, z);
+            case 3:
+                return new Volume(lev + 1, x1, x, y, y2, z, z2);
+            case 4:
+                return new Volume(lev + 1, x, x2, y1, y, z1, z);
+            case 5:
+                return new Volume(lev + 1, x, x2, y1, y, z, z2);
+            case 6:
+                return new Volume(lev + 1, x, x2, y, y2, z1, z);
+            case 7:
+                return new Volume(lev + 1, x, x2, y, y2, z, z2);
+            default:
+                throw new NotImplementedException();
             }
         }
 
@@ -657,15 +658,16 @@ namespace CSG {
         #region implemented abstract members of CSGNode
 
         public override CSGNode Simplify(CSG.Volume vol, int simpguid, ref int nUnodes) {
-            throw new NotImplementedException();
+            throw new UnbakedException();
         }
 
         public override CSGNode SimplifyWithFix(CSGPrim node, CSGNode fix) {
-            throw new NotImplementedException();
+            throw new UnbakedException();
         }
 
         public override bool Involves(CSGPrim node) {
-            return s.Involves(node);
+            throw new UnbakedException();
+            //return s.Involves (node);
         }
 
         //        public override IColorable WithTextureI(string texture, bool force) {
@@ -673,7 +675,7 @@ namespace CSG {
         //        }
 
         public override float Dist(float x, float y, float z) {
-            throw new NotImplementedException();
+            throw new UnbakedException();
         }
 
         public override void Nodes(LinkedList<CSGPrim> nodelist) {
@@ -681,7 +683,7 @@ namespace CSG {
         }
 
         public override void UNodes(LinkedList<CSGPrim> nodelist, ref int num, int simpguid) {
-            throw new NotImplementedException();
+            throw new UnbakedException();
         }
 
         public override CSGNode Expand(float e) {
@@ -1293,10 +1295,15 @@ namespace CSG {
             return TNode(new Bakery("t_" + reason).Mat(m));
         }
 
+        static readonly Bakery negbakery = new Bakery("neg", neg: true);
+
         public CSGNode Neg() {
-            return TNode(new Bakery("neg", neg: true));
+            return TNode(negbakery);
         }
 
+        public CSGNode DynNeg() {
+            return Bake(negbakery);
+        }
 
         public abstract CSGNode Expand(float e);
 
@@ -1487,14 +1494,14 @@ namespace CSG {
             NOP2++;
             if (Op2AlwaysNew) { // TODO: TOCHECK if this was helpful || (ll.nodes + rr.nodes > 5)) {
                 switch (op) {
-                    case OP.Union:
-                        return new Union(ll, rr);
-                    case OP.Intersect:
-                        return new Intersect(ll, rr);
-                    case OP.Xor:
-                        return new Xor(ll, rr);
-                    default:
-                        throw new NotImplementedException();
+                case OP.Union:
+                    return new Union(ll, rr);
+                case OP.Intersect:
+                    return new Intersect(ll, rr);
+                case OP.Xor:
+                    return new Xor(ll, rr);
+                default:
+                    throw new NotImplementedException();
                 }
             }
 
@@ -1521,17 +1528,17 @@ namespace CSG {
                     return r;
             }
             switch (op) {
-                case OP.Union:
-                    r = new Union(ll, rr);
-                    break;
-                case OP.Intersect:
-                    r = new Intersect(ll, rr);
-                    break;
-                case OP.Xor:
-                    r = new Xor(ll, rr);
-                    break;
-                default:
-                    throw new NotImplementedException();
+            case OP.Union:
+                r = new Union(ll, rr);
+                break;
+            case OP.Intersect:
+                r = new Intersect(ll, rr);
+                break;
+            case OP.Xor:
+                r = new Xor(ll, rr);
+                break;
+            default:
+                throw new NotImplementedException();
             }
             shareda[pos] = r;
             r.mykey = key;
@@ -1776,12 +1783,12 @@ namespace CSG {
             CSGNode sl = l.OSimplify(vol, simpguid, ref nUnodes);
             CSGNode sr = r.OSimplify(vol, simpguid, ref nUnodes);
             if (sl == S.ALL)
-                return sr.provneg != null ? sr.provneg : sr.Neg();
+                return sr.provneg != null ? sr.provneg : sr.DynNeg();
             ;
             if (sl == S.NONE)
                 return sr;
             if (sr == S.ALL)
-                return sl.provneg != null ? sl.provneg : sl.Neg(); 
+                return sl.provneg != null ? sl.provneg : sl.DynNeg(); 
             if (sr == S.NONE)
                 return sl;
             if (sl.canon == sr.canon)
@@ -1800,13 +1807,13 @@ namespace CSG {
             CSGNode sl = l.SimplifyWithFix(node, fix);
             CSGNode sr = r.SimplifyWithFix(node, fix);
             if (sl == S.ALL) {
-                CSGNode rr = sr.provneg != null ? sr.provneg : sr.Neg();
+                CSGNode rr = sr.provneg != null ? sr.provneg : sr.DynNeg();
                 return rr;
             }
             if (sl == S.NONE)
                 return sr;
             if (sr == S.ALL) {
-                CSGNode rr = sl.provneg != null ? sl.provneg : sl.Neg();
+                CSGNode rr = sl.provneg != null ? sl.provneg : sl.DynNeg();
                 return rr;
             }
             if (sr == S.NONE)
@@ -3073,17 +3080,92 @@ namespace CSG {
             // , 8, 7, 9, 9, 11, 13, 21, 14, 21, 21_ , 999 => 0.0156
 
             // optimized against georgian 16 Sept 2009
-            dd = new int[] { 9, 10, 6, 6, 7, 12, 9, 11, 15, 15, 15, 15, 15, 999 };
+            dd = new int[] {
+                9,
+                10,
+                6,
+                6,
+                7,
+                12,
+                9,
+                11,
+                15,
+                15,
+                15,
+                15,
+                15,
+                999
+            };
             // optimized against georgian 25 Sept 2009
-            dd = new int[] { 10, 10, 6, 7, 8, 15, 8, 13, 17, 18, 15, 15, 15, 999 };
+            dd = new int[] {
+                10,
+                10,
+                6,
+                7,
+                8,
+                15,
+                8,
+                13,
+                17,
+                18,
+                15,
+                15,
+                15,
+                999
+            };
 
             // optimized with OptTest against twohouse with some fancy double profile, 10 Nov 2011
-            dd = new int[] { 11, 12, 4, 4, 10, 20, 18, 16, 999, 999, 999, 999, 999, 999 };
+            dd = new int[] {
+                11,
+                12,
+                4,
+                4,
+                10,
+                20,
+                18,
+                16,
+                999,
+                999,
+                999,
+                999,
+                999,
+                999
+            };
 
             // optimized with OptTest against twohouse with some fancy double profile, improved object merge, 13 Nov 2011
-            dd = new int[] { 12, 12, 4, 5, 8, 21, 29, 26, 17, 18, 999, 999, 999, 999 };
+            dd = new int[] {
+                12,
+                12,
+                4,
+                5,
+                8,
+                21,
+                29,
+                26,
+                17,
+                18,
+                999,
+                999,
+                999,
+                999
+            };
 
-            dd = new int[] { 12, 11, 4, 7, 8, 21, 30, 27, 17, 20, 999, 999, 999, 999 };
+            dd = new int[] {
+                12,
+                11,
+                4,
+                7,
+                8,
+                21,
+                30,
+                27,
+                17,
+                20,
+                999,
+                999,
+                999,
+                999
+            };
             // !!! DoDraw set here
             Subdivide.DoDraw = dd;
         }
@@ -3255,7 +3337,7 @@ namespace CSG {
 
         int Count { get; }
 
-        PolyDecPoint this [int n] { get; }
+        PolyDecPoint this[int n] { get; }
 
         void setLastOthercsg(CSGPrim csg);
 
@@ -3432,7 +3514,7 @@ namespace CSG {
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public PolyDecPoint this [int n] {
+        public PolyDecPoint this[int n] {
             get {
                 return points[n];
             }
@@ -3865,6 +3947,10 @@ namespace CSG {
             if (TraceLevel < minlev)
                 GUIBits.Log(msg);
         }
+    }
+
+    class UnbakedException : Exception {
+
     }
 
 }

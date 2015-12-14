@@ -89,6 +89,14 @@ namespace CSG {  // [ExecuteInEditMode]
             Log2("baked=" + sss);
         }
 
+        public float keyPanRate = 0.05f;
+        public float keyRotRate = 0.5f;
+        public float wheelScrollRate = 0.3f;
+
+        public float mousePanRate = 0.05f;
+        public float mouseRotRate = 0.1f;
+
+
         protected virtual void UpdateI() {
 
         	// save these early, maybe more efficient, and difficult to find again after hiding otherwise
@@ -103,9 +111,9 @@ namespace CSG {  // [ExecuteInEditMode]
 
             var t = Camera.main.transform;
             var p = t.position;
-            var a = Input.GetKey("left shift") ? 10 : 1;
+            var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
 
-            float mrate = a * 0.01f;
+            float mrate = a * keyPanRate;
 
             if (Input.GetKey("w"))
                 p += t.forward * mrate;
@@ -125,13 +133,13 @@ namespace CSG {  // [ExecuteInEditMode]
             if (Input.GetKey(KeyCode.DownArrow))
                 p -= t.up * mrate;
 
-            float srate = a * 0.1f;
+            float srate = a * wheelScrollRate;
             p += t.forward * Input.mouseScrollDelta.x * srate;
             p += t.forward * Input.mouseScrollDelta.y * srate;
 
             t.position = p;
 
-            float rrate = a * 0.1f;
+            float rrate = a * keyRotRate;
             if (Input.GetKey("i"))
                 t.Rotate(-rrate, 0, 0);
             if (Input.GetKey("k"))
@@ -143,8 +151,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
             Vector3 mousedelta = Input.mousePosition - lastmouse;
             lastmouse = Input.mousePosition;
-            float mmrate = 0.1f;
-            mousedelta *= a * mmrate;
+            mousedelta *= a;
 
             if (Input.GetMouseButtonDown(0)) {
                 Vector3 hit = Hitpoint();
@@ -161,12 +168,15 @@ namespace CSG {  // [ExecuteInEditMode]
                 case 0:
                     break;
                 case 1:
+                    mousedelta *= mouseRotRate;
                     t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
                     break;
                 case 2:
+                    mousedelta *= mousePanRate;
                     t.position -= 0.3f * (mousedelta.x * t.right + mousedelta.y * t.up);
                     break;
                 case 3:
+                    mousedelta *= mouseRotRate;
                     t.RotateAround(lookat, t.forward, mousedelta.x);
                     break;
 

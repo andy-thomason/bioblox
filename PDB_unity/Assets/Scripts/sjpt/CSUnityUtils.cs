@@ -255,7 +255,7 @@ namespace CSG {
 				int cnum = 7;
 				System.Int32.TryParse(kvp.Key.Split('_')[0], out cnum);
 				cnum = cnum % 10;
-				Color col = Color.white; // CSGXX.colors[cnum];
+				Color col = CSGXX.colors[cnum];
 				Material mat;
 				if (cnum == 999) {
 					GameObject pdb = GameObject.Find("ProtoMaterial");
@@ -444,10 +444,10 @@ namespace CSG {
 			
 			// experiment, won't usually apply
 			if (!hascolor) {
-				//int l = CSGXX.colors.Length;
+				int l = CSGXX.colors.Length;
 				n1colors = new Color[nnn];
 				for (int i = 0; i < nnn; i++) {
-					n1colors[i] = Color.white; // CSGXX.colors[i % l];
+					n1colors[i] = CSGXX.colors[i % l];
 				}			
 			}
 			
