@@ -85,6 +85,9 @@ namespace CSG {
 	/// <summary>
 	/// Mesh data. We collect into ILists since we don't know how much data to expect in advance.
 	/// Equivalent to XList in original.
+	/// 
+	/// This automatically breaks collected meshes into sections with 'limit' vertices.
+	/// Data is inserted with Add(Poly).
 	/// </summary>
 	public class BasicMeshData {
 		int limit;
