@@ -164,11 +164,6 @@ public class LabelScript : MonoBehaviour{
 		    !Input.GetKey(KeyCode.LeftShift)) {
 			owner.LabelClicked (this.gameObject);
 		}
-		//slight legacy, use for right click interaction
-		if (eventData.button == PointerEventData.InputButton.Left &&
-		    Input.GetKey(KeyCode.LeftShift)) {
-			owner.SiteClicked (this.gameObject);
-		}
 	}
 
 

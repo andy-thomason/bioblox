@@ -15,6 +15,9 @@ public class PDB_mesh : MonoBehaviour {
 	public bool shouldCollide = false;
 	float t=0;
 
+	// add atom indices to here to display them selected
+	public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
 	//public bool hasCollided=false;
 
 	// Use this for initialization
@@ -186,79 +189,123 @@ public class PDB_mesh : MonoBehaviour {
 		this.transform.rotation = Quaternion.identity;
 	}
 
+	Vector3 lastMousePos;
+	bool rotating = false;
+	bool has_rotated = false;
 
 	// Update is called once per frame
 	void Update () {
-        if (other) {
-			if (Input.GetMouseButtonDown(1)) {
-				Camera c = GameObject.FindGameObjectWithTag ("MainCamera").
-					GetComponent<Camera> ();
-				Ray r = c.ScreenPointToRay (Input.mousePosition);
-				
-				RaycastHit info = new RaycastHit();
-				Physics.Raycast(r, out info);
-				if (info.collider == null)
-				{
-					int hit = PDB_molecule.collide_ray (gameObject, mol,
-					                                    transform, r);
-					for(int i = 0; i < mol.serial_to_atom.Length; ++i)
-					{
-						if (mol.serial_to_atom[i] == hit)
-						{
-							Debug.Log (i);
-							break;
-						}
+		Camera cam = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
+		Ray ray = cam.ScreenPointToRay (Input.mousePosition);
+		//create a ray to the cursor and cast it, if it hits at all
+		int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
+		Vector3 mousePos = Input.mousePosition;
 
-					}
+		if (Input.GetMouseButtonDown (0)) {
+			if (atomID != -1) {
+				// "rotating" only gets set if we first click on an atom.
+				rotating = true;
+				has_rotated = false;
+			}
+		} else if (Input.GetMouseButton (0)) { //left mouse button
+			if (rotating) {
+				if (t > 0.3f) {
+					//if there is no recent input reset previous position
+					lastMousePos = Input.mousePosition;
+				}
+				t = 0.0f;
+				Vector3 mouseDelta = mousePos - lastMousePos;
+				
+				if (mouseDelta.magnitude != 0) {
+					has_rotated = true;
+				}
+				Vector3 dirRight = Vector3.right;
+				Vector3 dirUp = Vector3.up;
+
+				transform.RotateAround (transform.position, dirRight, mouseDelta.y);
+				transform.RotateAround (transform.position, dirUp, -mouseDelta.x);                       
+			}
+		} else if (Input.GetMouseButtonUp (0)) {
+			// click without movement selects an atom/amino acid.
+			if (rotating && !has_rotated) {
+				Ray r = cam.ScreenPointToRay (Input.mousePosition);
+				int atom = PDB_molecule.collide_ray (gameObject, mol, transform, r);
+				if (atom != -1) {
+					SelectAtom (atom);
 				}
 			}
-			if (allowInteraction) {
-//				if (Input.GetKey ("w")) {
-//					rb.AddForce (new Vector3 (0, 10, 0));
-//				}
-//				if (Input.GetKey ("s")) {
-//					rb.AddForce (new Vector3 (0, -10, 0));
-//				}
-//				if (Input.GetKey ("a")) {
-//					rb.AddForce (new Vector3 (-10, 0, 0));
-//				}
-//				if (Input.GetKey ("d")) {
-//					rb.AddForce (new Vector3 (10, 0, 0));
-//				}
-				if(Input.GetKey("p"))
-				{
-					this.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-					other.gameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
-					AutoDockCheap();
-				}
+			has_rotated = false;
+			rotating = false;
+		} else {
+			has_rotated = false;
+			rotating = false;
+		}
+		lastMousePos = mousePos;
 
-				if (startRotation) {
-					t += Time.deltaTime;
-					transform.localRotation = Quaternion.Slerp (start, end, t);
-					if (t > 1) {
-						startRotation = false;
-						t = 0;
-					}
+		BioBlox bb = (BioBlox)GameObject.FindObjectOfType (typeof(BioBlox));
+		MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer> ();
+		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
+		foreach (MeshRenderer r in meshes) {
+			r.material.SetVector ("_LightPos", light_pos);
+			if (bb.cutawaySlider) {
+				Vector4 plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
+				r.material.SetVector ("_CutawayPlane", plane);
+			}
+			Vector4[] uniforms = GetSelectedAtomUniforms(cam);
+			int len = uniforms.Length;
+			r.material.SetVector ("_Atom0", uniforms[0]);
+			r.material.SetVector ("_Atom1", uniforms[1]);
+			r.material.SetVector ("_Atom2", uniforms[2]);
+			r.material.SetVector ("_Atom3", uniforms[3]);
+			r.material.SetVector ("_Atom4", uniforms[4]);
+			r.material.SetVector ("_Atom5", uniforms[5]);
+			r.material.SetVector ("_Atom6", uniforms[6]);
+			r.material.SetVector ("_Atom7", uniforms[7]);
+			r.material.SetVector ("_Atom8", uniforms[8]);
+			r.material.SetVector ("_Atom9", uniforms[9]);
+			r.material.SetVector ("_Atom10", uniforms[10]);
+		}
+	}
+
+	public float select_fudge = 0.67f;
+
+	public Vector4[] GetSelectedAtomUniforms(Camera camera) {
+		int len = selected_atoms.Length;
+		Vector4[] result = new Vector4[11]; // see PDB.shader _Atom0..10
+		int imax = Mathf.Min (len, result.Length);
+		float scale = select_fudge * Mathf.Tan (camera.fieldOfView * (3.14159f/180));
+		for (int i = 0; i != imax; ++i) {
+			int sel = selected_atoms[i];
+			Vector3 atom_pos = transform.TransformPoint(mol.atom_centres[sel]);
+			Vector3 screen_pos = camera.WorldToViewportPoint(atom_pos);
+			float size = scale * screen_pos.z / mol.atom_radii[sel];
+			result[i] = new Vector4(screen_pos.x, screen_pos.y, size * camera.aspect, size);
+		}
+		for (int i = len; i < result.Length; ++i) {
+			result[i] = new Vector4(0, 0, 1e37f, 1e37f);
+		}
+		return result;
+	}
+
+	// call this to select an amino acid
+	public void SelectAminoAcid(int acid_number) {
+		selected_atoms = mol.aminoAcidsAtomIds[acid_number];
+	}
+
+	// call this to deselect amino acids
+	public void DeselectAminoAcid() {
+		selected_atoms = new int[0];
+	}
+
+	public void SelectAtom(int atom) {
+		for (int i = 0; i != mol.aminoAcidsAtomIds.Count; ++i) {
+			int[] ids = mol.aminoAcidsAtomIds[i];
+			for (int j = 0; j != ids.Length; ++j) {
+				if (ids[j] == atom) {
+					SelectAminoAcid(i);
+					return;
 				}
 			}
-
-			/*if(shouldCollide)
-			{
-				PDB_mesh other_mesh = other.GetComponent<PDB_mesh> ();
-				BioBlox bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
-				
-				if(PDB_molecule.pysics_collide (
-					gameObject, mol, transform,
-					other, other_mesh.mol, other.transform,
-					seperationForce,
-					bb.water_dia,
-					out bb.num_touching_0,
-					out bb.num_touching_1
-				))
-				{
-					hasCollided=true;
-				}
-			}*/
 		}
 	}
 }

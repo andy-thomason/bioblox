@@ -23,12 +23,13 @@ public class ConnectionManager : MonoBehaviour {
 
 	public float slideBackSpeed = 2.0f;
 
-	List<AtomConnection> connections = new List<AtomConnection> ();
+	public List<AtomConnection> connections = new List<AtomConnection> ();
+	public int nc;
 
 	public void Reset()
 	{
 		connections.Clear ();
-		connectionMinDistances = null;
+		connectionMinDistances = new float[]{};
 	}
 
 	public void CreateLinks(PDB_mesh mol1, int[] mol1AtomIndicies,
@@ -58,8 +59,45 @@ public class ConnectionManager : MonoBehaviour {
 		shouldContract = true;
 	}
 
+	public AtomConnection CreateLink(PDB_mesh mol1, int mol1AtomIndex, PDB_mesh mol2, int mol2AtomIndex) {
+		AtomConnection con = new Rope();
+		
+		con.molecules[0] = mol1;
+		con.molecules[1] = mol2;
+		
+		con.atomIds[0] = mol1AtomIndex;
+		con.atomIds[1] = mol2AtomIndex;
+		
+		con.isActive=true;
+		
+		connections.Add(con);
+		nc = connections.Count;
+
+		connectionMinDistances = new float[connections.Count];
+		for (int i = 0; i < connectionMinDistances.Length; ++i) {
+			connectionMinDistances[i] = maxDistance;
+		}
+		
+		shouldContract = true;
+
+		return con;
+	}
+
+	public AtomConnection CreateAminoAcidLink(PDB_mesh mol1, int amino_acid_index1, PDB_mesh mol2, int amino_acid_index2) {
+		int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
+		int index1 = atoms1 [atoms1.Length - 1];
+		int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];
+		int index2 = atoms2 [atoms2.Length - 1];
+		return CreateLink (mol1, index1, mol2, index2);
+	}
+
+	public void DeleteAminoAcidLink(AtomConnection con) {
+		connections.Remove (con);
+	}
+
 	public bool RegisterClick (PDB_mesh mol, int atomIndex)
 	{
+		Debug.Log ("clockl");
 		if (atomIndex != -1) {
 			if (numChainClicks == 0) {
 				connections.Add (new Grappel ());
