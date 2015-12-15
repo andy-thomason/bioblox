@@ -33,16 +33,4 @@ public class AminoButtonController : MonoBehaviour {
 		}
 		FindObjectOfType<AminoSliderController> ().AminoAcidsSelection (gameObject);
 	}
-
-	/*public void OnSelect (BaseEventData eventData) 
-	{
-		transform.localScale = new Vector3 (1.2f, 1.2f, 1.2f);
-	}
-
-	public void OnDeselect (BaseEventData eventData) 
-	{
-		transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
-	}*/
-
-
 }

@@ -25,8 +25,7 @@ public class BioBlox : MonoBehaviour
 	// a holder variable for the current event system
 	EventSystem eventSystem;
 
-	// prefab of the labels used to point to atoms on the molecules, must have label script attached
-	public GameObject prefabLabel;
+
 
 	// the win and loose spash images
 	//public GameObject winSplash;
@@ -38,11 +37,7 @@ public class BioBlox : MonoBehaviour
 	
 	// a bool that will exit the win splash if set to true
 	public bool exitWinSplash = false;
-
-	// all labels which are currently in the scene
-	public List<LabelScript> activeLabels = new List<LabelScript> ();
-	// a number of selected labels, at the moment limited to 2, one from each molecule
-	public LabelScript[] selectedLabel = new LabelScript[2];
+	
 	// a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 
@@ -78,16 +73,13 @@ public class BioBlox : MonoBehaviour
 	public Image heuristicScore;
 	public Text GameScoreValue;
 	public Image GameScore;
-	public Slider overrideSlider;
+	//public Slider overrideSlider;
 	public Slider cutawaySlider;
 	public GameObject invalidDockText;
 	public GameObject InvalidDockScore;
-	public List<Slider> dockSliders = new List<Slider> ();
+	//public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 	//Animator of the tools menu
-	public Animator ToolMenuAnimator;
-	public GameObject OpenToolImage;
-	public GameObject CloseToolImage;
 	public GameObject EndLevelMenu;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
@@ -151,8 +143,8 @@ public class BioBlox : MonoBehaviour
 
 		filenames.Add ("pdb2ptcWithTags");
 
-		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
-		scoreCard.gameObject.SetActive (false);
+//		scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
+		//scoreCard.gameObject.SetActive (false);
 
 		//game_loop loads the file at filenames[current_level]
 		eventSystem = EventSystem.current;
@@ -432,7 +424,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 
-	public void ManageSliders()
+	/*public void ManageSliders()
 	{
 		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
@@ -478,26 +470,8 @@ public class BioBlox : MonoBehaviour
 				}
 			}
 		}
-
-		if (game_state == GameState.Picking || game_state == GameState.Docking) {
-			if (allInPickZone) {
-				if (!activeLabels [0].gameObject.activeSelf) {
-					for (int i = 0; i < activeLabels.Count; ++i) {
-						activeLabels [i].gameObject.SetActive (true);
-					}
-				}
-				game_state = GameState.Picking;
-			} else {
-				if (activeLabels [0].gameObject.activeSelf) {
-					for (int i = 0; i < activeLabels.Count; ++i) {
-						activeLabels [i].gameObject.SetActive (false);
-					}
-				}
-				game_state = GameState.Docking;
-			}
-		}
-	}
-
+	}*/
+	/*
 	//creates a err label. The label object contains a atom id and name used to name the instance
 	void CreateLabel (PDB_molecule.Label argLabel, int molNum, string labelName, PDB_molecule mol)
 	{
@@ -533,95 +507,10 @@ public class BioBlox : MonoBehaviour
 		}
 
 		activeLabels [argLabel.uniqueLabelID] = laSc;
-	}
-
-	//manages a left click on a label
-	//has two different functions depending on the gametype eg( simple or complicated)
-	public void LabelClicked (GameObject labelObj)
-	{
-		//Debug.Log (labelObj.name + " was clicked");
-		LabelScript script = labelObj.GetComponent<LabelScript> ();
-		
-		int molNum = script.moleculeNumber;
-
-		if (script.atomIds.Count == 0) {
-			return;
-		}
-
-		PDB_mesh pdbMesh = molecules [molNum].GetComponent<PDB_mesh> ();
-		ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
-
-		if (simpleGame) {
-			Debug.Log ("simple game");
-			//here we update the selected label list
-			//and align the molecule so that the labeled atom is facing the other molecule
-			Vector3 sumAtomPos = Vector3.zero;
-			for (int i=0; i < script.atomIds.Count; ++i) {
-				sumAtomPos += GetAtomPos (script.atomIds [i], molNum);
-			}
-			sumAtomPos /= script.atomIds.Count;
-			int otherMolNum = 1 - molNum;
-			Vector3 alignDir = molecules [otherMolNum].transform.position -
-				molecules [molNum].transform.position;
-			pdbMesh.AlignPointToVector (sumAtomPos, alignDir);
-			//logic to select which labels should glow
-			if (selectedLabel [0]) {
-				selectedLabel [0].shouldGlow = false;
-			}
-			if (selectedLabel [1]) {
-				selectedLabel [1].shouldGlow = false;
-			}
-			selectedLabel [molNum] = script;
-			if (selectedLabel [0]) {
-				selectedLabel [0].shouldGlow = true;
-			}
-			if (selectedLabel [1]) {
-				selectedLabel [1].shouldGlow = true;
-			}
-			Vector3 atomPos1 = new Vector3 (0, 100000, 0);
-			Vector3 atomPos2 = atomPos1;
-			Vector3 atomPos3 = atomPos2;
-			if (script.atomIds.Count > 0) {
-				atomPos1 = pdbMesh.mol.atom_centres [script.atomIds [0]];
-			}
-			if (script.atomIds.Count > 1) {
-				atomPos2 = pdbMesh.mol.atom_centres [script.atomIds [1]];
-			}
-			if (script.atomIds.Count > 2) {
-				atomPos3 = pdbMesh.mol.atom_centres [script.atomIds [2]];
-			}
-
-			//set the sector we clicked to glow, this is done in the shader to stop us having to rebuild the mesh with new colours
-			MeshRenderer[] meshes = molecules [molNum].GetComponentsInChildren<MeshRenderer> ();
-			foreach (MeshRenderer r in meshes) {
-				Material m = r.material;
-				m.SetVector ("_GlowPoint1", atomPos1);
-				m.SetFloat ("_GlowRadius1", 5.0f);
-				m.SetVector ("_GlowPoint2", atomPos2);
-				m.SetFloat ("_GlowRadius2", 5.0f);
-				m.SetVector ("_GlowPoint3", atomPos3);
-				m.SetFloat ("_GlowRadius3", 5.0f);
-			}
-
-			/*if (selectedLabel [0] != null && selectedLabel [1] != null) {
-				conMan.CreateLinks (molecules [0].GetComponent<PDB_mesh> (),
-				                   selectedLabel [0].atomIds.ToArray (),
-				                   molecules [1].GetComponent<PDB_mesh> (),
-				                   selectedLabel [1].atomIds.ToArray ());
-				/*for(int i = 0; i < dockSliders.Count; ++i)
-				{
-					dockSliders[i].gameObject.SetActive(true);
-					overrideSlider.gameObject.SetActive(true);
-				}			
-				overrideSlider.interactable = true;
-
-				uiScrollSpeed =900;
-			}*/
-		}
-	}
+	}*/
 
 	// The pick button resets the sliders to the right.
-	public void Pick()
+	/*public void Pick()
 	{
 		if (game_state == GameState.Picking || game_state == GameState.Docking) {
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
@@ -653,7 +542,7 @@ public class BioBlox : MonoBehaviour
 			}
 			ManageSliders ();
 		}
-	}
+	}*/
 	
 	// The lock button establishes the Locked state.
 	public void Lock()
@@ -690,17 +579,13 @@ public class BioBlox : MonoBehaviour
 		//clear the old win condition
 		winCondition.Clear ();
 
-		//clears the selected index
-		selectedLabel [0] = null;
-		selectedLabel [1] = null;
-
 		game_state = GameState.Picking;
 
 		//Clear score
 		GameScore.fillAmount = 0;
-		heuristicScore.fillAmount = 0;
-		GameScoreValue.text = "0";
-		MainCamera.fieldOfView = 60;
+		//heuristicScore.fillAmount = 0;
+		//GameScoreValue.text = "0";
+		//MainCamera.fieldOfView = 60;
 		
 		GetComponent<AminoSliderController> ().init ();
 	}
@@ -736,7 +621,7 @@ public class BioBlox : MonoBehaviour
 	}
 
 	// Creates the molecule objects including the PDB_mesh script.
-	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type)
+	GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type, int index)
 	{
 		GameObject obj = GameObject.Find (name);
 		if (obj == null) {
@@ -754,6 +639,7 @@ public class BioBlox : MonoBehaviour
 
 		PDB_molecule mol = PDB_parser.get_molecule (name);
 		p.mol = mol;
+		p.protein_id = index;
 		GameObject pdb = GameObject.Find (proto);
 		MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
 		make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
@@ -785,13 +671,13 @@ public class BioBlox : MonoBehaviour
 		//obj.transform.rotation = Random.rotation;
 
 		//if this is the simple game load in labels from the file
-		if (simpleGame) {
+		/*if (simpleGame) {
 			for (int i=0; i<mol.labels.Length; ++i) {
 				if (mol.labels [i].atomIds.Count > 0) {
 					CreateLabel (p.mol.labels [i], molNum, "Label" + i + "mol" + name, mol);
 				}
 			}
-		}
+		}*/
 	}
 
 
@@ -823,8 +709,8 @@ public class BioBlox : MonoBehaviour
 		//Debug.Log ("make_molecules");
 		string file = filenames [current_level];
 		
-		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
-		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type);
+		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
+		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
 
 		if (init) {
 			molecules = new GameObject[2];
@@ -867,14 +753,6 @@ public class BioBlox : MonoBehaviour
 
 			originPosition [0] = mol1.transform.position;
 			originPosition [1] = mol2.transform.position;
-
-			for (int i = 0; i < activeLabels.Count; ++i) {
-				activeLabels [i].gameObject.SetActive (false);
-			}
-
-			ClockTimer playerClock = gameObject.GetComponent<ClockTimer> ();
-			playerClock.ResetTimer ();
-			playerClock.timeText.enabled = false;
 		
 			PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
 			PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
@@ -896,14 +774,9 @@ public class BioBlox : MonoBehaviour
 			yield return new WaitForSeconds (0.2f);
 			PopInSound (mol2.gameObject);
 
-			for (int i = 0; i < activeLabels.Count; ++i) {
-				yield return new WaitForSeconds (0.1f);
-				PopInSound (activeLabels [i].gameObject);
-			}
-
 			//this is the connection manager for the complex game, it handles grappling between the molecules
 			ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-
+			/*
 			for (int i = 0; i < dockSliders.Count; ++i) {
 				dockSliders[i].maxValue =  conMan.maxDistance;
 				dockSliders[i].minValue = conMan.minDistance;
@@ -911,12 +784,11 @@ public class BioBlox : MonoBehaviour
 				//dockSliders[i].gameObject.SetActive(false);
 				//sliderConstarinedByOverride.Add(true);
 			}
-
 			overrideSlider.maxValue = conMan.maxDistance;
 			overrideSlider.minValue = conMan.minDistance;
 			overrideSlider.value = conMan.maxDistance;
 			
-			overrideSlider.interactable = false;
+			overrideSlider.interactable = false;*/
 
 			mol1.transform.localScale = new Vector3 (1, 1, 1);
 			mol2.transform.localScale = new Vector3 (1, 1, 1);
@@ -927,17 +799,9 @@ public class BioBlox : MonoBehaviour
 			// Enter waiting state
 			game_state = GameState.Waiting;
 
-			//any input should start the timer
-			while (!Input.anyKey || !playerClock.clockStopped) {
-				// start the new frame
-				yield return new WaitForEndOfFrame();
-			}
-
 			/*if (goSplash) {
 				PopInWaitDisappear (goSplash, 1.0f);
 			}*/
-
-			playerClock.StartPlayerTimer ();
 
 			// Enter picking state
 			game_state = GameState.Picking;
@@ -952,7 +816,7 @@ public class BioBlox : MonoBehaviour
 				float rms_distance_score = ScoreRMSD ();
 				if (rmsScoreSlider) {
 					rmsScoreSlider.value = rms_distance_score * 0.1f;
-					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+					/*float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
 					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
 					{
 						GameScore.fillAmount = scaleGameScore;						
@@ -962,7 +826,7 @@ public class BioBlox : MonoBehaviour
 					{
 						GameScore.fillAmount = 0;
 						GameScoreValue.text = "0";
-					}
+					}*/
 				}
 
 				if (lockButton) {
@@ -975,10 +839,6 @@ public class BioBlox : MonoBehaviour
 
 			if (game_state == GameState.Locked) {
 				Debug.Log ("locking");
-
-				for (int i = 0; i < activeLabels.Count; ++i) {
-					PopOut (activeLabels [i].gameObject);
-				}
 
 				eventSystem.enabled = false;
 
@@ -1024,8 +884,7 @@ public class BioBlox : MonoBehaviour
 				}
 				conMan.Reset();
 				Reset ();
-				molecules = null;
-				activeLabels.Clear();				
+				molecules = null;			
 				//GetComponent<AminoButtonController> ().EmptyAminoSliders ();
 				//EndLevelMenu.SetActive(true);
 			}
@@ -1040,8 +899,9 @@ public class BioBlox : MonoBehaviour
 		num_touching_1 = 0;
 		num_invalid = 0;
 		num_connections = 0;
+		//Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length);
 		
-		if (game_state == GameState.Docking && molecules.Length >= 2) {
+		if (molecules.Length >= 2) {
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
@@ -1083,11 +943,13 @@ public class BioBlox : MonoBehaviour
 				
 			}
 
-			heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+			//heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 			
 			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
 
-			heuristicScore.fillAmount = num_invalid != 0 ? 0 : ScoreScaleSize;
+			GameScore.fillAmount = num_invalid != 0 ? GameScore.fillAmount + 0.01f : GameScore.fillAmount - 0.01f;
+			//Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
+			//Debug.Log ("num_invalid: "+num_invalid);
 
 		}
 
@@ -1098,20 +960,6 @@ public class BioBlox : MonoBehaviour
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
-	}
-
-	public void ToogleToolMenu(bool Status)
-	{
-		ToolMenuAnimator.SetBool ("Open", Status);
-		OpenToolImage.SetActive (!Status);
-		CloseToolImage.SetActive (Status);
-	}
-
-	public void EnableSlider()
-	{
-		overrideSlider.interactable = true;
-
-		uiScrollSpeed =900;
 	}
 
 }

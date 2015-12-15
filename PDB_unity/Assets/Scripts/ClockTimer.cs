@@ -116,12 +116,12 @@ public class ClockTimer : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		clockStopped = true;
-		playerTimeZone = GameObject.Find ("LevelTimesZone");
-		if (!playerTimeZone) {
+		//clockStopped = true;
+		//playerTimeZone = GameObject.Find ("LevelTimesZone");
+		/*if (!playerTimeZone) {
 			Debug.LogError("Cannot find layout zone for level times, disabling level time UI");
 			shouldAddLevelTimes=false;
-		}
+		}*/
 	}
 	
 	// Update is called once per frame
