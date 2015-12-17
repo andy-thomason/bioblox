@@ -52,6 +52,9 @@ public class AminoSliderController : MonoBehaviour {
 	//text to link when there is the free camera
 	public GameObject AddConnectionText;
 	public Animator ConnectionExistMessage;
+	//linked
+	public GameObject LinkedGameObject;
+	GameObject LinkedGameObjectReference;
 
 	void Update()
 	{
@@ -267,8 +270,13 @@ public class AminoSliderController : MonoBehaviour {
 	{
 		GameObject AminoLinkPanelReference;
 		//activate the linked image
-		ButtonPickedA1.transform.GetChild (2).gameObject.SetActive (true);
-		ButtonPickedA2.transform.GetChild (2).gameObject.SetActive (true);
+		LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);		
+		LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform,false);		
+		LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);		
+		LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform,false);
+
+		//ButtonPickedA1.transform.GetChild (2).gameObject.SetActive (true);
+		//ButtonPickedA2.transform.GetChild (2).gameObject.SetActive (true);
 		//ButtonPickedA2.GetComponent<AminoButtonController> ().activateLinkedImage ();
 		AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
 		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
@@ -301,7 +309,7 @@ public class AminoSliderController : MonoBehaviour {
 	void UpdateBackGroundSize(int hijos)
 	{
 		Vector2 temp = AminoLinkBackground.offsetMax;
-		temp.x = -229.0f + (45.0f * hijos);
+		temp.x = -231.0f + (47.0f * hijos);
 		AminoLinkBackground.offsetMax = temp;
 		if (hijos == 0) {
 			AminoLinkBackground.offsetMax = new Vector2 (-244.0f, temp.y);
@@ -315,7 +323,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.GetComponent<Button> ().interactable = true;
 		AminoButtonReference.GetComponent<Button> ().enabled = false;
 		//deactivate the linked image
-		AminoButtonReference.transform.GetChild (2).gameObject.SetActive (false);
+		Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
 
 		AminoButtonReference.transform.SetParent(AminoLinkPanelReference.transform,false);
 		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
@@ -329,8 +337,10 @@ public class AminoSliderController : MonoBehaviour {
 	public void RestoreDeletedAminoButtons(int B1, int B2)
 	{
 		UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount-1);
-		SliderMol1.transform.GetChild (B1).GetComponent<Button> ().interactable = true;
-		SliderMol2.transform.GetChild (B2).GetComponent<Button> ().interactable = true;
+		SliderMol1.transform.GetChild (B1).GetComponent<AminoButtonController> ().Linked = false;
+		SliderMol2.transform.GetChild (B2).GetComponent<AminoButtonController> ().Linked = false;
+		Destroy(SliderMol1.transform.GetChild (B1).transform.GetChild (2).transform.GetChild (0).gameObject);
+		Destroy(SliderMol2.transform.GetChild (B2).transform.GetChild (2).transform.GetChild (0).gameObject);
 	}
 
 	//SLIDER BUTTONS
