@@ -552,19 +552,19 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 	
-	public void SolidClicked()
+	public void SolidClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Triangles);
+		make_moleculesT (false, MeshTopology.Triangles, molecules[molecule_id].name,molecule_id);
 	}
 	
-	public void PointClicked()
+	public void PointClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Points);
+		make_moleculesT (false, MeshTopology.Points, molecules[molecule_id].name,molecule_id);
 	}
 	
-	public void WireClicked()
+	public void WireClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Lines);
+		make_moleculesT (false, MeshTopology.Lines, molecules[molecule_id].name,molecule_id);
 	}
 
 
@@ -725,6 +725,16 @@ public class BioBlox : MonoBehaviour
 				offset += 2;
 			}
 		}
+	}
+
+	// create both molecules
+	void make_moleculesT(bool init, MeshTopology mesh_type, string name, int index) {
+		//Debug.Log ("make_molecules");
+		//string file = filenames [current_level];
+		//Debug.Log (file);
+		
+		GameObject mol1 = make_molecule (name, "Proto1", 7, mesh_type,index);
+		//GameObject mol2 = make_molecule (name, "Proto2", 7, mesh_type,1);
 	}
 
 	//main meat of the initilisation logic and level completion logic

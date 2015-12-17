@@ -14,6 +14,9 @@ public class UIController : MonoBehaviour {
 	public GameObject AddConnectionText;
 	bool CameraFreeze = false;
 	public bool ToggleFreeCameraStatus = true;
+	//tool panel togle protein view
+	public GameObject Protein1;
+	public GameObject Protein2;
 
 	void Start()
 	{
@@ -54,6 +57,18 @@ public class UIController : MonoBehaviour {
 	{
 		MainCamera.transform.position = new Vector3 (0, 0, -75);
 		MainCamera.transform.rotation = Quaternion.identity;
+	}
+
+	public void ToggleProteinView1()
+	{
+		Protein1.SetActive (true);		
+		Protein2.SetActive (false);
+	}
+
+	public void ToggleProteinView2()
+	{
+		Protein1.SetActive (false);		
+		Protein2.SetActive (true);
 	}
 
 

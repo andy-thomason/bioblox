@@ -37,7 +37,7 @@ public class AminoSliderController : MonoBehaviour {
 	public GameObject AminoLinkPanel;
 	public GameObject AminoLinkPanelParent;
 	public RectTransform AminoLinkBackground;
-	float[] button_displace = {13.4f,-12.2f};
+	float[] button_displace = {22.7f,-3.7f};
 	BioBlox BioBloxReference;
 	public List<AtomConnection> connections = new List<AtomConnection> ();
 	public GameObject AddConnection;
@@ -275,7 +275,7 @@ public class AminoSliderController : MonoBehaviour {
 	void UpdateBackGroundSize(int hijos)
 	{
 		Vector2 temp = AminoLinkBackground.offsetMax;
-		temp.x = -234.0f + (63.0f * hijos);
+		temp.x = -229.0f + (45.0f * hijos);
 		AminoLinkBackground.offsetMax = temp;
 		if (hijos == 0) {
 			AminoLinkBackground.offsetMax = new Vector2 (-244.0f, temp.y);
@@ -295,7 +295,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
 		AminoButtonRect.pivot = new Vector2(0.5f,0.5f);
 		AminoButtonRect.sizeDelta = new Vector2(25, 25);
-		AminoButtonRect.localPosition += new Vector3(button_displace[i],13.8f,0);
+		AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
 	}
 
 	public void RestoreDeletedAminoButtons(int B1, int B2)
