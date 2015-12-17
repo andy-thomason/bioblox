@@ -1,9 +1,13 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2
 
-import urllib2
 import array
+import io
 from PIL import Image
 from PIL import PSDraw
+import urllib.request
+
+# our extensions
+import thumbnail
 
 """
  ATOM AND CONECT LINE FORMATS
@@ -38,9 +42,9 @@ COLUMNS       DATA TYPE       FIELD         DEFINITION
 
 # Reference: glMol / A. Bondi, J. Phys. Chem., 1964, 68, 441.
 radii = {
-  " H" :  1.2, "LI" :  1.82, "NA" :  2.27, " K" :  2.75, " C" :  1.7, " N" :  1.55, " O" :  1.52,
-  " F" :  1.47, " P" :  1.80, " S" :  1.80, "CL" :  1.75, "BR" :  1.85, "SE" :  1.90,
-  "ZN" :  1.39, "CU" :  1.4, "NI" :  1.63,
+  b" H" :  1.2, b"LI" :  1.82, b"NA" :  2.27, b" K" :  2.75, b" C" :  1.7, b" N" :  1.55, b" O" :  1.52,
+  b" F" :  1.47, b" P" :  1.80, b" S" :  1.80, b"CL" :  1.75, b"BR" :  1.85, b"SE" :  1.90,
+  b"ZN" :  1.39, b"CU" :  1.4, b"NI" :  1.63,
 };
 
 class PDB_molecule:
@@ -53,11 +57,18 @@ class PDB_molecule:
     self.res_seq = []
     self.ins = []
     self.pos = array.array('f')
+    self.radii = array.array('f')
     #self.occ = []
     #self.tf = []
     #self.seg_id = []
     #self.esym = []
     #self.charge = []
+
+  def make_thumbnail(self, image):
+    thumbnail.make_thumbnail(image, self.pos, self.radii)
+    #svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
+    #svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
+    #svg_file.write('</svg>\n')
 
 def parse_pdb(file):
   mol = PDB_molecule()
@@ -65,10 +76,10 @@ def parse_pdb(file):
   start = True
 
   for line in file:
-    if line[0:3] == 'TER':
+    if line[0:3] == b'TER':
       mol = PDB_molecule()
       
-    elif line[0:6] == 'ATOM  ':
+    elif line[0:6] == b'ATOM  ':
       if start:
         result.append(mol)
         start = False
@@ -82,7 +93,7 @@ def parse_pdb(file):
       mol.pos.append(float(line[30:38]) )
       mol.pos.append(float(line[38:46]) )
       mol.pos.append(float(line[46:54]) )
-      mol.pos.append(radii[line[76:78]])
+      mol.radii.append(radii[line[76:78]])
       #mol.occ.append(line[54:60])
       #mol.tf.append(line[60:66])
       #mol.seg_id.append(line[72:76])
@@ -93,16 +104,19 @@ def parse_pdb(file):
       #break
   return result
 
-  def draw(self, svg_file):
-    svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
-    svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
-    svg_file.write('</svg>\n')
-
-
 def main():
-  pdb_file = urllib2.urlopen('http://www.rcsb.org/pdb/files/4hhb.pdb')
-  mols = parse_pdb(pdb_file)
-  print(mols[0].chain)
+  req = urllib.request.Request('http://www.rcsb.org/pdb/files/4hhb.pdb')
+  print(req)
+  with urllib.request.urlopen(req) as req:
+    pdb_file = req.read()
+    
+    print(type(pdb_file))
+    mols = parse_pdb(io.BytesIO(pdb_file))
+  print(mols)
+  #image = Image.new('RGB', (512, 512), 0)
+  image = array.array('B')
+  for mol in mols:
+    mol.make_thumbnail(image)
   #mol.draw(open('1.svg', 'wb'))
   
 
