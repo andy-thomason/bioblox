@@ -1,6 +1,9 @@
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2
 
+import urllib2
 import array
-
+from PIL import Image
+from PIL import PSDraw
 
 """
  ATOM AND CONECT LINE FORMATS
@@ -41,7 +44,7 @@ radii = {
 };
 
 class PDB_molecule:
-  def __init__(self, filename):
+  def __init__(self):
     self.serial = array.array('I')
     self.name = []
     self.alt_loc = []
@@ -56,29 +59,53 @@ class PDB_molecule:
     #self.esym = []
     #self.charge = []
 
-    for line in open(filename):
-      if line[0:6] == 'ATOM  ':
-        #atom = line[0:6]
-        self.serial.append( int(line[6:11]) )
-        self.name.append(line[12:16])
-        self.alt_loc.append(line[16])
-        self.res.append(line[17:20])
-        self.chain.append(line[21])
-        self.res_seq.append(int(line[22:26]))
-        self.ins.append(line[26])
-        self.pos.append(float(line[30:38]) )
-        self.pos.append(float(line[38:46]) )
-        self.pos.append(float(line[46:54]) )
-        self.pos.append(radii[line[76:78]])
-        #self.occ.append(line[54:60])
-        #self.tf.append(line[60:66])
-        #self.seg_id.append(line[72:76])
-        #self.esym.append(line[76:78])
-        #self.charge.append(line[78:80])
+def parse_pdb(file):
+  mol = PDB_molecule()
+  result = []
+  start = True
 
-        #print("(%s) ) (%s) ) (%s) ) %f %f %f" % (serial, name, res, x, y, z))
-        #break
+  for line in file:
+    if line[0:3] == 'TER':
+      mol = PDB_molecule()
+      
+    elif line[0:6] == 'ATOM  ':
+      if start:
+        result.append(mol)
+        start = False
+      mol.serial.append( int(line[6:11]) )
+      mol.name.append(line[12:16])
+      mol.alt_loc.append(line[16])
+      mol.res.append(line[17:20])
+      mol.chain.append(line[21])
+      mol.res_seq.append(int(line[22:26]))
+      mol.ins.append(line[26])
+      mol.pos.append(float(line[30:38]) )
+      mol.pos.append(float(line[38:46]) )
+      mol.pos.append(float(line[46:54]) )
+      mol.pos.append(radii[line[76:78]])
+      #mol.occ.append(line[54:60])
+      #mol.tf.append(line[60:66])
+      #mol.seg_id.append(line[72:76])
+      #mol.esym.append(line[76:78])
+      #mol.charge.append(line[78:80])
+
+      #print("(%s) ) (%s) ) (%s) ) %f %f %f" % (serial, name, res, x, y, z))
+      #break
+  return result
+
+  def draw(self, svg_file):
+    svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
+    svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
+    svg_file.write('</svg>\n')
 
 
-mol = PDB_molecule(r'..\PDB_unity\Assets\Resources\1AHW_b.txt')
+def main():
+  pdb_file = urllib2.urlopen('http://www.rcsb.org/pdb/files/4hhb.pdb')
+  mols = parse_pdb(pdb_file)
+  print(mols[0].chain)
+  #mol.draw(open('1.svg', 'wb'))
+  
+
+if __name__ == "__main__":
+  main()
 
