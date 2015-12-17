@@ -51,6 +51,7 @@ public class AminoSliderController : MonoBehaviour {
 	public int CurrentButtonA1, CurrentButtonA2 = 0;
 	//text to link when there is the free camera
 	public GameObject AddConnectionText;
+	public Animator ConnectionExistMessage;
 
 	void Update()
 	{
@@ -236,16 +237,21 @@ public class AminoSliderController : MonoBehaviour {
 
 	public void AddConnectionButton()
 	{		
-		ButtonPickedA1.GetComponent<Button>().interactable = false;
-		ButtonPickedA2.GetComponent<Button>().interactable = false;
-		ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
-		ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
-		AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(),ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID,BioBloxReference.molecules[1].GetComponent<PDB_mesh>(),ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID),ButtonPickedA1,ButtonPickedA2);
-		
-		ButtonPickedA1 = ButtonPickedA2 = null;
-		FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
-		AddConnectionText.SetActive(false);
-		DeactivateAddConnectionButton ();
+		//ButtonPickedA1.GetComponent<Button>().interactable = false;
+		//ButtonPickedA2.GetComponent<Button>().interactable = false;
+		if (!CheckIfConnectionExist (ButtonPickedA1, ButtonPickedA2)) {
+			ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
+			ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
+			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
+			ButtonPickedA1 = ButtonPickedA2 = null;
+			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
+			AddConnectionText.SetActive (false);
+			DeactivateAddConnectionButton ();
+		}
+		else
+		{
+			ConnectionExistMessage.SetBool("Play",true);
+		}
 	}
 
 	void DeactivateAddConnectionButton()
@@ -260,6 +266,10 @@ public class AminoSliderController : MonoBehaviour {
 	public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
 	{
 		GameObject AminoLinkPanelReference;
+		//activate the linked image
+		ButtonPickedA1.transform.GetChild (2).gameObject.SetActive (true);
+		ButtonPickedA2.transform.GetChild (2).gameObject.SetActive (true);
+		//ButtonPickedA2.GetComponent<AminoButtonController> ().activateLinkedImage ();
 		AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
 		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
 		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().connection = connection;
@@ -270,6 +280,22 @@ public class AminoSliderController : MonoBehaviour {
 
 		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0);
 		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1);
+	}
+
+	bool CheckIfConnectionExist(GameObject A1, GameObject A2)
+	{
+		int A1ID = A1.GetComponent<AminoButtonController> ().AminoButtonID;
+		int A2ID = A2.GetComponent<AminoButtonController> ().AminoButtonID;
+		bool existe = false;
+
+		foreach (Transform childLinks in AminoLinkPanelParent.transform)
+		{
+			if(childLinks.GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
+			{
+				existe = true;
+			}
+		}
+		return existe;
 	}
 
 	void UpdateBackGroundSize(int hijos)
@@ -288,6 +314,8 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
 		AminoButtonReference.GetComponent<Button> ().interactable = true;
 		AminoButtonReference.GetComponent<Button> ().enabled = false;
+		//deactivate the linked image
+		AminoButtonReference.transform.GetChild (2).gameObject.SetActive (false);
 
 		AminoButtonReference.transform.SetParent(AminoLinkPanelReference.transform,false);
 		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();

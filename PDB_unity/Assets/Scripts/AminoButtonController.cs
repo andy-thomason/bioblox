@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class AminoButtonController : MonoBehaviour {
 
 	public int AminoButtonID;
+	public bool Linked = false;
 
 	public void HighLight()
 	{
