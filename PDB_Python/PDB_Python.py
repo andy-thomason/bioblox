@@ -2,9 +2,8 @@
 
 import array
 import io
-from PIL import Image
-from PIL import PSDraw
 import urllib.request
+from PIL import Image
 
 # our extensions
 import thumbnail
@@ -53,7 +52,7 @@ class PDB_molecule:
     self.name = []
     self.alt_loc = []
     self.res = []
-    self.chain = []
+    self.chain = array.array('B')
     self.res_seq = []
     self.ins = []
     self.pos = array.array('f')
@@ -64,8 +63,8 @@ class PDB_molecule:
     #self.esym = []
     #self.charge = []
 
-  def make_thumbnail(self, image):
-    thumbnail.make_thumbnail(image, self.pos, self.radii)
+  def make_thumbnail(self, image, width, height):
+    thumbnail.make_thumbnail(image, self.pos, self.radii, self.chain, width, height)
     #svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
     #svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
     #svg_file.write('</svg>\n')
@@ -78,6 +77,7 @@ def parse_pdb(file):
   for line in file:
     if line[0:3] == b'TER':
       mol = PDB_molecule()
+      start = True
       
     elif line[0:6] == b'ATOM  ':
       if start:
@@ -105,19 +105,24 @@ def parse_pdb(file):
   return result
 
 def main():
-  req = urllib.request.Request('http://www.rcsb.org/pdb/files/4hhb.pdb')
-  print(req)
+  pdb = '4hhb';
+  pdb = '5cdo';
+  pdb = '2ptc';
+  print(Image)
+  req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
   with urllib.request.urlopen(req) as req:
     pdb_file = req.read()
-    
-    print(type(pdb_file))
     mols = parse_pdb(io.BytesIO(pdb_file))
-  print(mols)
-  #image = Image.new('RGB', (512, 512), 0)
-  image = array.array('B')
+
+  width = 1024
+  height = 1024
+  i = 0
   for mol in mols:
-    mol.make_thumbnail(image)
-  #mol.draw(open('1.svg', 'wb'))
+    image = bytearray(width*height*3)
+    mol.make_thumbnail(image, width, height)
+    img = Image.frombytes('RGB', (width, height), bytes(image));
+    img.save('%s.%d.png' % (pdb, i))
+    i = i + 1
   
 
 if __name__ == "__main__":
