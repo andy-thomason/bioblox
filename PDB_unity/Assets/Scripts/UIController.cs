@@ -17,6 +17,11 @@ public class UIController : MonoBehaviour {
 	//tool panel togle protein view
 	public GameObject Protein1;
 	public GameObject Protein2;
+	//change the visualization od the slider
+	public GameObject SliderProtein1;
+	public GameObject SliderProtein2;
+	//change to charged message on screen
+	public GameObject ChargedInfo;
 
 	void Start()
 	{
@@ -69,6 +74,32 @@ public class UIController : MonoBehaviour {
 	{
 		Protein1.SetActive (false);		
 		Protein2.SetActive (true);
+	}
+
+	public void ChangeSliderViewToCharged()
+	{
+		foreach (Transform AminoButton in SliderProtein1.transform)
+		{
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().ChargedColor;
+		}
+		foreach (Transform AminoButton in SliderProtein2.transform)
+		{
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().ChargedColor;
+		}
+		ChargedInfo.SetActive (true);
+	}
+
+	public void ChangeSliderViewToNormal()
+	{
+		foreach (Transform AminoButton in SliderProtein1.transform)
+		{
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
+		}
+		foreach (Transform AminoButton in SliderProtein2.transform)
+		{
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
+		}
+		ChargedInfo.SetActive (false);
 	}
 
 

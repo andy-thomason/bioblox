@@ -6,20 +6,6 @@ using AssemblyCSharp;
 
 public class AminoSliderController : MonoBehaviour {
 
-	//static public Color32[] AminoButtonsColors = new Color32[22];
-
-	static private Dictionary<string, Color32> AminoColor = new Dictionary<string, Color32> {
-		{" ALA",  new Color32(255, 255, 255, 255)}, {" ARG",  new Color32(253, 125, 125, 255)}, {" ASN",  new Color32(248, 221, 173, 255)}, {" ASP",  new Color32(253, 198, 0, 255)}, {" CYS",  new Color32(220, 234, 153, 255)}, {" GLU",  new Color32(216, 244, 88, 255)}, {" GLY",  new Color32(159, 233, 148, 255)},
-		{" HIS",  new Color32(53, 218, 22, 255)}, {" ILE",  new Color32(140, 221, 194, 255)}, {" LEU",  new Color32(44, 219, 212, 255)}, {" LYS",  new Color32(44, 161, 219, 255)}, {" MET",  new Color32(0, 255, 160, 255)}, {" PHE",  new Color32(161, 164, 223, 255)},
-		{" PRO",  new Color32(194, 161, 223, 255)}, {" SER",  new Color32(223, 161, 223, 255)}, {" THR",  new Color32(223, 161, 221, 255)}, {" GLN",  new Color32(242, 105, 164, 255)}, {" TRP",  new Color32(176, 159, 167, 255)}, {" TYR",  new Color32(234, 162, 169, 255)}, {" VAL",  new Color32(249, 101, 116, 255)},
-	};
-
-	/*static private Dictionary<string, Color32> AminoColor = new Dictionary<string, Color32> {
-		{" ALA",  AminoButtonsColors[0]}, {" ARG",  AminoButtonsColors[1]}, {" ASN",  AminoButtonsColors[2]}, {" ASP",  AminoButtonsColors[3]}, {" CYS",  AminoButtonsColors[4]}, {" GLU",  AminoButtonsColors[5]}, {" GLY",  AminoButtonsColors[6]},
-		{" HIS",  AminoButtonsColors[7]}, {" ILE",  AminoButtonsColors[8]}, {" LEU",  AminoButtonsColors[9]}, {" LYS",  AminoButtonsColors[10]}, {" MET",  AminoButtonsColors[11]}, {" PHE",  AminoButtonsColors[12]},
-		{" PRO",  AminoButtonsColors[13]}, {" SER",  AminoButtonsColors[14]}, {" THR",  AminoButtonsColors[15]}, {" GLN", AminoButtonsColors[16]}, {" TRP",  AminoButtonsColors[17]}, {" TYR",  AminoButtonsColors[18]}, {" VAL",  AminoButtonsColors[19]},
-	};*/
-
 	public GameObject AminoButton;
 	GameObject AminoButtonReference;
 	public GameObject SliderMol1;
@@ -55,6 +41,12 @@ public class AminoSliderController : MonoBehaviour {
 	//linked
 	public GameObject LinkedGameObject;
 	GameObject LinkedGameObjectReference;
+	ButtonStructure buttonStructure;
+
+	void Awake()
+	{
+		buttonStructure = FindObjectOfType<ButtonStructure> ();
+	}
 
 	void Update()
 	{
@@ -182,7 +174,10 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
 		A1Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol1.transform,false);
-		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
+		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
+		//store the color in the button
+		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+		AminoButtonReference.GetComponent<AminoButtonController>().ChargedColor = buttonStructure.ChargedColor [currentAmino];
 		//Debug.Log (AminoColor [currentAmino]);
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
 		ButtonText [0].text = currentAmino.Replace (" ", "");
@@ -199,7 +194,10 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
 		A2Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol2.transform,false);
-		AminoButtonReference.GetComponent<Image>().color = AminoColor [currentAmino];
+		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
+		//store the color in the button
+		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+		AminoButtonReference.GetComponent<AminoButtonController>().ChargedColor = buttonStructure.ChargedColor [currentAmino];
 
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
 		ButtonText [0].text = currentAmino.Replace (" ", "");
