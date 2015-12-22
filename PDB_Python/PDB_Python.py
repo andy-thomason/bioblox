@@ -63,11 +63,26 @@ class PDB_molecule:
     #self.esym = []
     #self.charge = []
 
-  def make_thumbnail(self, image, width, height):
+  def make_thumbnail(self, filename, width, height):
+    image = bytearray(width*height*3)
     thumbnail.make_thumbnail(image, self.pos, self.radii, self.chain, width, height)
+    img = Image.frombytes('RGB', (width, height), bytes(image));
+    img.save(filename)
     #svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
     #svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
     #svg_file.write('</svg>\n')
+
+  def add(self, mol):
+    self.serial += mol.serial
+    self.name += mol.name
+    self.alt_loc += mol.alt_loc
+    self.res += mol.res
+    self.chain += mol.chain
+    self.res_seq += mol.res_seq
+    self.ins += mol.ins
+    self.pos += mol.pos
+    self.radii += mol.radii
+
 
 def parse_pdb(file):
   mol = PDB_molecule()
@@ -108,6 +123,7 @@ def main():
   pdb = '4hhb';
   pdb = '5cdo';
   pdb = '2ptc';
+  pdb = '1e79';
   print(Image)
   req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
   with urllib.request.urlopen(req) as req:
@@ -117,12 +133,14 @@ def main():
   width = 1024
   height = 1024
   i = 0
+  tot = PDB_molecule()
   for mol in mols:
-    image = bytearray(width*height*3)
-    mol.make_thumbnail(image, width, height)
-    img = Image.frombytes('RGB', (width, height), bytes(image));
-    img.save('%s.%d.png' % (pdb, i))
+    #mol.make_thumbnail('%s.%d.png' % (pdb, i), width, height)
     i = i + 1
+    tot.add(mol)
+
+  tot.make_thumbnail('%s.png' % (pdb), width, height)
+  
   
 
 if __name__ == "__main__":
