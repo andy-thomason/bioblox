@@ -20,12 +20,33 @@ public class UIController : MonoBehaviour {
 	//change the visualization od the slider
 	public GameObject SliderProtein1;
 	public GameObject SliderProtein2;
-	//change to charged message on screen
-	public GameObject ChargedInfo;
+	//slider info toggles
+	public GameObject FunctionInfoProtein1;
+	public GameObject FunctionInfoProtein2;
+	public Animator FunctionInfoPanel;
+	public GameObject FunctionInfoPanelOpenImage;
+	public GameObject FunctionInfoPanelCloseImage;
+	bool FunctionInfoPanelStatus = true;
+	public GameObject FunctionInfoObject;
+
+	AminoSliderController aminoSliderController;
+
+	//togls for the types 1
+	public Toggle A1P;
+	public Toggle A1N;
+	public Toggle A1Po;
+	public Toggle A1O;
+	public Toggle A1H;
+	//togls for the types 2
+	public Toggle A2P;
+	public Toggle A2N;
+	public Toggle A2Po;
+	public Toggle A2O;
+	public Toggle A2H;
 
 	void Start()
 	{
-
+		aminoSliderController = FindObjectOfType<AminoSliderController> ();
 	}
 
 	// Update is called once per frame
@@ -86,7 +107,7 @@ public class UIController : MonoBehaviour {
 		{
 			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().ChargedColor;
 		}
-		ChargedInfo.SetActive (true);
+		FunctionInfoObject.SetActive (true);
 	}
 
 	public void ChangeSliderViewToNormal()
@@ -99,8 +120,108 @@ public class UIController : MonoBehaviour {
 		{
 			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
 		}
-		ChargedInfo.SetActive (false);
+		FunctionInfoObject.SetActive (false);
 	}
 
+	public void SwitchFunctionInfoProtein2()
+	{
+		FunctionInfoProtein1.SetActive (false);
+		FunctionInfoProtein2.SetActive (true);
+	}
 
+	public void SwitchFunctionInfoProtein1()
+	{		
+		FunctionInfoProtein2.SetActive (false);
+		FunctionInfoProtein1.SetActive (true);
+	}
+
+	public void SwitchFunctionInfoPanel()
+	{
+		FunctionInfoPanelOpenImage.SetActive (FunctionInfoPanelStatus);
+		FunctionInfoPanelCloseImage.SetActive (!FunctionInfoPanelStatus);
+		FunctionInfoPanel.SetBool ("Status", FunctionInfoPanelStatus);
+		FunctionInfoPanelStatus = !FunctionInfoPanelStatus;
+	}
+
+	public void TogglePositiveA1()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A1Positive)
+		{
+			AminoButton.SetActive(A1P.isOn);
+		}
+	}
+
+	public void ToggleNegativeA1()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A1Negative)
+		{
+			AminoButton.SetActive(A1N.isOn);
+		}
+	}
+
+	public void TogglePolarA1()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A1Polar)
+		{
+			AminoButton.SetActive(A1Po.isOn);
+		}
+	}
+
+	public void ToggleOtherA1()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A1Other)
+		{
+			AminoButton.SetActive(A1O.isOn);
+		}
+	}
+
+	public void ToggleHydroA1()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A1Hydro)
+		{
+			AminoButton.SetActive(A1H.isOn);
+		}
+	}
+
+	//AMINO ACIDS 2
+
+	public void TogglePositiveA2()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A2Positive)
+		{
+			AminoButton.SetActive(A2P.isOn);
+		}
+	}
+	
+	public void ToggleNegativeA2()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A2Negative)
+		{
+			AminoButton.SetActive(A2N.isOn);
+		}
+	}
+	
+	public void TogglePolarA2()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A2Polar)
+		{
+			AminoButton.SetActive(A2Po.isOn);
+		}
+	}
+	
+	public void ToggleOtherA2()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A2Other)
+		{
+			AminoButton.SetActive(A2O.isOn);
+		}
+	}
+	
+	public void ToggleHydroA2()
+	{
+		foreach (GameObject AminoButton in aminoSliderController.A2Hydro)
+		{
+			AminoButton.SetActive(A2H.isOn);
+		}
+	}
 }
