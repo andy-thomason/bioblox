@@ -2,4 +2,8 @@
 *.png
 *.so
 build/
+data/
+thumbnails/
+mesh/
+
 

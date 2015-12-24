@@ -2,11 +2,17 @@
 
 import array
 import io
+import re
 import urllib.request
 from PIL import Image
 
 # our extensions
 import thumbnail
+import time
+import os
+import http.server
+import ssl
+
 
 """
  ATOM AND CONECT LINE FORMATS
@@ -119,12 +125,28 @@ def parse_pdb(file):
       #break
   return result
 
-def main():
-  pdb = '4hhb';
-  pdb = '5cdo';
-  pdb = '2ptc';
-  pdb = '1e79';
-  print(Image)
+names = []
+
+# the entries.txt file is a tab separated list of names and references of PDB entries.
+def download_entries():
+  try:
+    rfile = open('data/names.txt', 'rb')
+  except:
+    req = urllib.request.Request('ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx')
+    with urllib.request.urlopen(req) as req:
+      with open('data/names.txt', 'wb') as wfile:
+        for line in req:
+          splt = line.split(b'\t')
+          if len(splt) >= 2 and splt[1][0:7] == b'COMPLEX':
+            wfile.write(splt[0].lower() + b'\n')
+    rfile = open('data/names.txt', 'rb')
+  for line in rfile:
+    names.append(line[:-1])
+  print(names)
+
+
+
+def build_resources(pdb):
   req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
   with urllib.request.urlopen(req) as req:
     pdb_file = req.read()
@@ -139,9 +161,77 @@ def main():
     i = i + 1
     tot.add(mol)
 
-  tot.make_thumbnail('%s.png' % (pdb), width, height)
-  
-  
+  tot.make_thumbnail('thumbnails/%s.png' % (pdb), width, height)
+  # pdb = '4hhb';
+  # pdb = '5cdo';
+  # pdb = '2ptc';
+  # pdb = '1e79';
+
+thumbnails_png_re = re.compile('^/thumbnails/(\\w+)\.png$')
+mesh_txt_re = re.compile('^/mesh/(\\w+)\.txt$')
+
+class MyHandler(http.server.BaseHTTPRequestHandler):
+  def do_GET(s):
+    print(s.path)
+    if s.path == '/':
+      s.send_response(200)
+      s.send_header(b"Content-type", "text/html")
+      s.end_headers()
+      s.wfile.write(b"<html>\n<head>\n<title>Bioblox data server</title>\n</head>")
+      s.wfile.write(b"<body>\n")
+      s.wfile.write(b"<h1>Bioblox data server</h1>\n")
+      s.wfile.write(b"<h3>Example urls:</h3>\n")
+      s.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
+      s.wfile.write(b"<p><a href='/mesh/2ptc.txt'>/mesh/2ptc.txt</p>\n")
+      s.wfile.write(b"<p><a href='/mesh/2ptc.1.vertics'>/mesh/2ptc.1.vertics</p>\n")
+      s.wfile.write(b"<p><a href='/mesh/2ptc.1.colors'>/mesh/2ptc.1.colors</p>\n")
+      s.wfile.write(b"</body></html>\n")
+    elif s.path[0:12] == '/thumbnails/' or s.path[0:6] == '/mesh/' or s.path[0:6] == '/data/':
+      s.send_response(200)
+      if s.path[-4:] == '.png':
+        s.send_header(b"Content-type", "image/png")
+      else:
+        s.send_header(b"Content-type", "text/plain")
+      s.end_headers()
+      try:
+        with open(s.path[1:], 'rb') as rf:
+          s.wfile.write(rf.read())
+      except:
+        m = thumbnails_png_re.match(s.path)
+        if m:
+          build_resources(str(m.group(1)))
+        pass
+      with open(s.path[1:], 'rb') as rf:
+        s.wfile.write(rf.read())
+    else:
+      s.send_response(404)
+      s.end_headers()
+        
+
+def main():
+  # example of a python class
+  try:
+    os.mkdir('data')
+  except:
+    pass
+  try:
+    os.mkdir('thumbnails')
+  except:
+    pass
+  try:
+    os.mkdir('mesh')
+  except:
+    pass
+
+  download_entries()
+   
+  host = os.getenv('IP', '0.0.0.0')
+  port = int(os.getenv('PORT', '8080'))
+  print(host, port)
+  httpd = http.server.HTTPServer((host, port), MyHandler)
+  #httpd.socket = ssl.wrap_socket(httpd.socket)
+  print("serving")
+  httpd.serve_forever()
 
 if __name__ == "__main__":
   main()
