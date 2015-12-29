@@ -156,7 +156,6 @@ namespace CSG {
         public static readonly None NONE = new None();
         public static Bakery DefaultBakery = new Bakery("default", texweight: 0);
 
-        public static bool rendering = false;
         // debug flag
 
         static S() {
@@ -164,11 +163,6 @@ namespace CSG {
             NONE.canonneg = ALL;
         }
 
-        public static readonly object NOPROV = new None();
-        // flag that explicitly ignores provenance
-        public static T SetNoProvenance<T>(this T x) where T : IHasProvenance {
-            return (T)x.SetProvenance(S.NOPROV);
-        }
 
         private static CSGNode[] Append(this CSGNode[] others, CSGNode extra) {
             Array.Resize(ref others, others.Length + 1);
@@ -307,15 +301,15 @@ namespace CSG {
             Subdivide.SetVals();  // set the level control each cycle, so we can tinker with the levels
             Subdivide sd = new Subdivide(output);
 
-            ClearCache();
+            //ClearCache();
             CSGNode csgnp = csg;
             if (CSGControl.CheatProvenance) {
                 csgnp = csg.SingleProvenance(csg);
-                ClearCache();
+                //ClearCache();
             }
             Poly.fromnew = 0;
             Poly.frompool = 0;
-            CSGNode ncsg = csgnp.Bake();    // this should get a copy in the cache, with appropriate deduplication
+            CSGNode ncsg = csgnp.Bake();    // this should get a copy in the cache, with appropriate deduplication, and new cache
             sd.SD(vol, ncsg, 0);
         }
 
@@ -547,6 +541,10 @@ namespace CSG {
         // how far sphere influence extends, multiple of radius
         public static bool doBalance = true;
         public static float fieldThresh = 1;
+        /// <summary>
+        /// true to igore non-adjacent facets during split
+        /// </summary>
+        public static bool FacetOptimize = true;
 
 
         public static void Break(Vector3 b) {
@@ -564,6 +562,10 @@ namespace CSG {
         }
 
         public static bool Interrupt = false;
+
+        public static bool stats = false;
+
+        public static FilterString filterInput = null;
 
     }
 
@@ -585,15 +587,31 @@ namespace CSG {
             return this;
         }
 
+        private void clearProvenance() {
+            this.provenance = null;
+            this.provstring = null;
+            this.provweight = 0;
+            this.texture = null;
+            this.texweight = 0;
+        }
+
         public Bakery(string reason, object provenance = null, int provweight = -999, string texture = null, int texweight = -999, bool neg = false) {
             this.reason = reason;
-            this.provenance = provenance;
-            this.provstring = provenance == null ? null : provenance.ToString();
-            this.provweight = provweight >= 0 ? provweight : provenance != null ? 10 : 0;
-            this.texture = texture;
-            if (this.texture != null)
-                this.provstring += "!" + this.texture;
-            this.texweight = texweight >= 0 ? texweight : texture != null ? 10 : 0;
+            if (!CSGControl.CheatProvenance) {
+                this.provenance = provenance;
+                this.provstring = provenance == null ? null : provenance.ToString();
+                this.provweight = provweight >= 0 ? provweight : provenance != null ? 10 : 0;
+                this.texture = texture;
+                if (this.texture != null)
+                    this.provstring += "!" + this.texture;
+                this.texweight = texweight >= 0 ? texweight : texture != null ? 10 : 0;
+            } else {
+                this.provenance = null;  // can't call clearProvenance, C# struct initialization rules
+                this.provstring = null;
+                this.provweight = 0;
+                this.texture = null;
+                this.texweight = 0;
+            }
             this.m = Matrix.identity;
             this.invM = Matrix.identity;
             this.neg = neg;
@@ -607,15 +625,19 @@ namespace CSG {
             }
             Bakery n = bko;  // COPY of old bakery
             n.reason += bkn.reason;
-            //if (bkn.provenance != null)
-            if (bkn.provstring != null && bkn.provstring.StartsWith("/" + bkn.provstring)) {
-            }
-            if (bkn.provstring != null)
-                n.provstring += "/" + bkn.provstring;
-            n.provenance = n.provstring;   // <<< for now while fixing
-            if (bkn.texweight > bko.texweight) {
-                n.texweight = bkn.texweight;
-                n.texture = bkn.texture;
+            if (CSGControl.CheatProvenance) {
+                n.clearProvenance();
+            } else {
+                //if (bkn.provenance != null)
+                if (bkn.provstring != null && bkn.provstring.StartsWith("/" + bkn.provstring)) {
+                }
+                if (bkn.provstring != null)
+                    n.provstring += "/" + bkn.provstring;
+                n.provenance = n.provstring;   // <<< for now while fixing
+                if (bkn.texweight > bko.texweight) {
+                    n.texweight = bkn.texweight;
+                    n.texture = bkn.texture;
+                }
             }
             n.m = bko.m * bkn.m;
             n.invM = n.m.inverse;  // or bkn.mInv * bko.mInv;
@@ -631,7 +653,7 @@ namespace CSG {
         CSGNode s;
 
         public BNode(CSGNode s, Bakery bk) {
-            if (S.rendering)
+            if (csgmode == CSGMode.rendering)
                 throw new Exception("attempt to create BNode during rendering phase");
             this.s = s;
             this.bk = bk;
@@ -698,30 +720,73 @@ namespace CSG {
 
     }
 
+    public enum CSGMode { collecting, baking, rendering };
+
     /// <summary>
     /// Node class is any node of a CSG tree
     /// </summary>
     public abstract class CSGNode : CSGControl, IDist, IColorable, IHasProvenance {
-        [ThreadStatic] protected static int rid = 0;
+//?        [ThreadStatic]
+        protected static int rid = 0;
         public int Id = rid++;
         /// <summary>Count of give ups
         public static int GiveUpCount = 0;
         public static int MaxnodesForDraw = 0;
 
+        public static CSGMode csgmode = CSGMode.collecting;
 
+        private CSGNode baked = null;
+        /// <summary>
+        /// Top level call to bake the node so that it is ready for rendering etc
+        /// The result is cached.
+        /// </summary>
+        /// <returns></returns>
         public CSGNode Bake() {
-            return Bake(S.DefaultBakery);
+            if (baked != null) return baked;
+            try {
+                csgmode = CSGMode.baking;
+                S.ClearCache();
+                baked = Bake(S.DefaultBakery);
+            } finally {
+                csgmode = CSGMode.collecting;
+            }
+            return baked;
         }
 
+        /// <summary>
+        /// Bake the node so it is ready for rendering etc
+        /// This is a recursive process, and the bakery bk passed down gives the context of the node:
+        /// including transform, negative/positive status, and provenance.
+        /// At the root (primitive) nodes the transforms etc are applied to the objects for efficiency during render.
+        /// </summary>
+        /// <param name="bk"></param>
+        /// <returns></returns>
         public virtual CSGNode Bake(Bakery bk) {
             Bakery nbk = Bakery.Merge(this.bk, bk);
-            return BCopy(bk);
+            if (CSGControl.filterInput != null) {
+                if (this is CSGPrim && !CSGControl.filterInput.filter(bk.provstring))
+                    return S.NONE;
+            }
+            CSGNode rr = BCopy(bk);
+            if (csgmode == CSGMode.rendering && rr.bk.provstring != this.bk.provstring)
+                GUIBits.Log("prov error " + csgmode + " " + this + " " + rr + " prov " + this.Provenance + " <-> " + rr.Provenance);
+            return rr;
         }
 
+        /// <summary>
+        /// Make and return a copy of the node with the given bakery information applied.
+        /// </summary>
+        /// <param name="bk"></param>
+        /// <returns></returns>
         public abstract CSGNode BCopy(Bakery bk);
 
 
-        /** make a TNode parent */
+        /// <summary>
+        /// Make and return a TNode parent, with additional bakery information bk.
+        /// During baking the information from bk (and higher level TNodes) is accumulated and applied to (a copy of) the node.
+        /// </summary>
+        /// <param name="bk"></param>
+        /// <returns></returns>
         public CSGNode TNode(Bakery bk) {
             return new BNode(this, bk);
         }
@@ -824,7 +889,9 @@ namespace CSG {
 
         CSGNode lastSimp;
         internal int lastguid = 0;
+#if TTT
         internal ulong ttt;
+#endif
         // this is the truth table, valid only if lastguid == simpguid
 
         // internal Simplify with 'opimization' (?) for reuse of csg
@@ -886,11 +953,13 @@ namespace CSG {
             return node;
         }
 
+#if TTT
         internal const int TTNUM = 6;
         // max number of nodes for truth table
         static int MAXTTTEST = TTNUM;
         // max number of nodes to use truth tables for testing involvement
         //static int MAXTTUSE = TTNUM;  // min number of nodes to use truth tables for processing
+#endif
 
         /// <summary>
         /// draw the csg in the volume, accumulate result in pl
@@ -984,10 +1053,36 @@ namespace CSG {
             CSGPrim polynode = nodea[i];
             if (poly == null)
                 return;
-            if (nextcuti == i)
-                nextcuti++;
-            if (nextcuti < nodea.Length && (polynode.canon == nodea[nextcuti].canon || polynode.canon == nodea[nextcuti].canonneg))
-                nextcuti++;
+            //if (!Involves(nodea[i]))  // this never seems to happen so not worth checking, to check what ensures this.
+            //    return;
+
+            while (nextcuti < nodea.Length) {
+                if (nextcuti == i) {
+                    nextcuti++;
+                    continue;
+                }
+                if (nextcuti < nodea.Length && (polynode.canon == nodea[nextcuti].canon || polynode.canon == nodea[nextcuti].canonneg)) {
+                    nextcuti++;
+                    continue;
+                }
+                if (!Involves(nodea[nextcuti])) {
+                    nextcuti++;
+                    continue;
+                }
+
+                /* optimize facet intersection */
+                if (CSGControl.FacetOptimize && nodea[i].realCSG != null && nodea[i].realCSG == nodea[nextcuti].realCSG) {
+                    int d = nodea[i].realCSGid - nodea[nextcuti].realCSGid;
+                    if (Math.Abs(d) != 1 && Math.Abs(d) != nodea[i].realCSGnum - 1) {
+                        nextcuti++;
+                        continue;
+                    }
+                }
+                /**/
+                
+                break;
+            }
+
             if (nextcuti >= nodea.Length) { // we have finished all cutting levels, mark the poly and use it
                 if (this.canon != nodea[i].canon && this.canonneg != nodea[i].canon) {
                 }         // for debug
@@ -1014,7 +1109,7 @@ namespace CSG {
             }
 
             CSGPrim cutnode = nodea[nextcuti];
-
+#if TTT
             // prepare truth tables for the lower end of the recursion.
             // (This does not give as big a performance gain as I had hoped, and sometimes gets wrong answers.)
             int ttl; // truth table length that would be needed
@@ -1044,7 +1139,7 @@ namespace CSG {
             } else {
                 ttl = nodea.Length;
             }
-
+#endif
 
 
             CSGNode csgin, csgout;
@@ -1071,9 +1166,9 @@ namespace CSG {
             // make sure the simplified versions actually use the node of interest, polynode
             // use the truth table version if possible: cheaper and fewer(no) false positives
             // (TODO: fold tt code more into basic operations rather than here)
+#if TTT
             MAXTTTEST = TTNUM;
-            //MAXTTUSE = TTNUM;
-            if (ttl <= MAXTTTEST) {
+            if (CSGControl.Dyntt && ttl <= MAXTTTEST) {
                 int shift = 1 << i;
                 if (((csgin.ttt >> shift ^ csgin.ttt) & CSGTT.TTI[i]) == 0) {
                     //if (csgin.ttt != 0 && csgin.Involves(polynode)) { Console.WriteLine(csgin.ToString("\n")); Debugger.Break(); }
@@ -1089,7 +1184,12 @@ namespace CSG {
                 if (!csgout.Involves(polynode))
                     csgout = S.NONE;
             }
-
+#else
+                            if (!csgin.Involves(polynode))
+                    csgin = S.NONE;
+                if (!csgout.Involves(polynode))
+                    csgout = S.NONE;
+#endif
             if (csgin.nodes == 0 && csgout.nodes == 0)
                 return;  // both sides trivial, so nothing to be seen
 
@@ -1102,12 +1202,14 @@ namespace CSG {
             //    return;
             //}
 
+#if TTT
             // ttt is not currently reliable for > 6 nodes handled in the case above [never will be while it's ulong]
             // However, this cheat can give some approximation and an idea of cost savings we may get from truth tables
             if (CSGControl.CheatTruthTable && csgin.ttt == csgout.ttt) {
                 csgin.Split(poly, nodea, i, nextcuti + 1, pl);
                 return;
             }
+#endif
 
             // nothing easy, so do the cut and find both sides
             ICSGPoly outpoly, inpoly;
@@ -1136,10 +1238,13 @@ namespace CSG {
         /// Might (for example) point back to a particular wall of a particular building.
         /// This does NOT have a property set: setting provenance must create a new object
         /// </summary>
-        public virtual object Provenance { get { return bk.provenance; } }
+        public virtual object Provenance { get { return bk.provenance ?? "noprov"; } }
         // return this with provenance, needed because C# won't allow subtype overloading
         public CSGNode WithProvenance(object prov) { 
             return TNode(new Bakery("prov", provenance: prov)); 
+        }
+        public CSGNode WP(object prov) {
+            return TNode(new Bakery("prov", provenance: prov));
         }
 
         public virtual IHasProvenance SetProvenance(object prov) {
@@ -1209,6 +1314,19 @@ namespace CSG {
             Matrix tm = Matrix.TRS(new Vector3(), Quaternion.Euler(new Vector3(0, (float)rot)), new Vector3(1, 1, 1)); 
             CSGNode copy = T_Bake(tm, "rotateY");
             return copy;
+        }
+
+        public CSGNode RotateFromTo(Vector3 from, Vector3 to) {
+            to = to.Normal();
+            from = from.Normal();
+            Vector3 ax = to.cross(from);
+            float dot = to.dot(from);
+            float ang = Mathf.Asin(ax.magnitude) * Mathf.Rad2Deg;
+            if (ang == 0)
+                return dot > 0 ? this : RotateX(180);
+            else
+                return this.RotateAA(ax.Normal(), dot > 0 ? ang : 180 - ang);
+
         }
 
         /// <summary>
@@ -1298,11 +1416,14 @@ namespace CSG {
         static readonly Bakery negbakery = new Bakery("neg", neg: true);
 
         public CSGNode Neg() {
+//            if (csgmode == CSGMode.rendering) 
+//                return DynNeg();
             return TNode(negbakery);
         }
 
         public CSGNode DynNeg() {
-            return Bake(negbakery);
+            CSGNode rr = Bake(negbakery);
+            return rr;
         }
 
         public abstract CSGNode Expand(float e);
@@ -1337,10 +1458,12 @@ namespace CSG {
             return float.IsNaN(a) ? b : float.IsNaN(b) ? a : Mathf.Min(a, b);
         }
 
-        public bool showttt = false;
-
         public string tttstring() {
-            return showttt ? String.Format("{0,16:X}", ttt).Replace(" ", "0") + "  " : "";
+#if TTT
+            return String.Format("{0,16:X}", ttt).Replace(" ", "0") + "  ";
+#else
+            return "";
+#endif
         }
     }
     // end CSGNode
@@ -1391,7 +1514,9 @@ namespace CSG {
         }
 
         public All() {
+#if TTT
             ttt = 0xffffffffffffffff;
+#endif
         }
         //@@ public override ulong TT() { return ~((ulong)0); }
 
@@ -1403,7 +1528,9 @@ namespace CSG {
     /// </summary>
     public class None : CSGTrivial {
         public None() {
+#if TTT
             ttt = 0;
+#endif
         }
 
         public override CSGNode BCopy(Bakery bk) {
@@ -1463,7 +1590,7 @@ namespace CSG {
         // we only use one of these
         //protected static Dictionary<int, CSGOP2> sharedd;
         //protected static Hashtable sharedh;
-        [ThreadStatic]
+//?        [ThreadStatic]
         protected static CSGOP2[] _shareda;
 
         protected static CSGOP2[] shareda {
@@ -1474,7 +1601,7 @@ namespace CSG {
             }
         }
 
-        protected static int SIZE = 9967 * 17 * 7;
+        protected static int SIZE = 9967 * 17;
         // biggish primish: consider making more dynamic (eg smallish caches for parallel subtasks)
         long mykey;
         // my key
@@ -1505,7 +1632,7 @@ namespace CSG {
                 }
             }
 
-            if (ll.Id > rr.Id || ll.Provenance == S.NOPROV) {
+            if (ll.Id > rr.Id) { //##
                 CSGNode s = rr;
                 rr = ll;
                 ll = s;
@@ -1543,8 +1670,18 @@ namespace CSG {
             shareda[pos] = r;
             r.mykey = key;
             NUniqueOP2++;
-            if (NUniqueOP2 > SIZE * 0.8)
-                throw new Exception("OP2 Cache overfull " + NUniqueOP2 + " of " + SIZE);
+            if (NUniqueOP2 > SIZE * 0.8) {
+                GUIBits.Log("OP2 Cache overfull " + NUniqueOP2 + " of " + SIZE);
+                var old = shareda;
+                SIZE = SIZE * 2 - 1;
+                ClearCache();
+                for (int i=0; i<old.Length; i++) {
+                    var s = old[i];
+                    if (s != null)
+                        MakeShared(s.Op, s.l, s.r);
+                }
+                return MakeShared(op, ll, rr);
+            }
             //}
             return r;
         }
@@ -1652,7 +1789,9 @@ namespace CSG {
                 return S.ALL;  // todo: clean up the way we handle neg
             //if (sl == l && sr == r) return this;
             if (sl == l && sr == r) {
+#if TTT
                 ttt = sl.ttt | sr.ttt;
+#endif
                 return this;
             }  // << ??? remove canon, and in Xor, Int
 
@@ -1663,7 +1802,9 @@ namespace CSG {
             //if (sr is Intersect && (sr as Intersect).l == sl) return sl;
             //if (sr is Intersect && (sr as Intersect).r == sl) return sl;
             CSGNode ret = MakeShared(OP.Union, sl, sr);
+#if TTT
             ret.ttt = sl.ttt | sr.ttt;
+#endif
             return ret;
         }
 
@@ -1715,7 +1856,7 @@ namespace CSG {
             List<CSGNode> list = new List<CSGNode>();
             ulist(list);
             CSGNode[] arr = list.ToArray();
-            if (arr.Count() == 0)
+            if (arr.Any())
                 return S.NONE;
             return balance(arr, 0, arr.Length);
         }
@@ -1744,7 +1885,7 @@ namespace CSG {
         /// <returns></returns>
         public static CSGNode balance(IEnumerable<CSGNode> iii) {
             CSGNode[] arr = iii.ToArray();
-            if (arr.Count() == 0)
+            if (arr.Any())
                 return S.NONE;
             return balance(arr, 0, arr.Length);
         }
@@ -1774,8 +1915,14 @@ namespace CSG {
 
         public override CSGNode BCopy(Bakery bk) {
             Bakery bk2 = bk;
-            bk2.neg = !bk2.neg;
-            return Make(l.Bake(bk), r.Bake(bk2));
+            // For bk positive (bk.neg == false) there is no need to change either side, both wides will use bk positive.
+            // For bk negative we need to invert just one side ... it doesn't matter which one.
+            // Thus we will have bk negative and bk2 positive.
+            // So, in either case, bk2 is positive.
+            // ~(a ^ b) = ~a ^ b == a ^ ~b
+            bk2.neg = false;
+            CSGNode rr = Make(l.Bake(bk2), r.Bake(bk));
+            return rr;
         }
 
         public override CSGNode Simplify(Volume vol, int simpguid, ref int nUnodes) {
@@ -1783,12 +1930,11 @@ namespace CSG {
             CSGNode sl = l.OSimplify(vol, simpguid, ref nUnodes);
             CSGNode sr = r.OSimplify(vol, simpguid, ref nUnodes);
             if (sl == S.ALL)
-                return sr.provneg != null ? sr.provneg : sr.DynNeg();
-            ;
+                return sr.provneg ?? sr.DynNeg();
             if (sl == S.NONE)
                 return sr;
             if (sr == S.ALL)
-                return sl.provneg != null ? sl.provneg : sl.DynNeg(); 
+                return sl.provneg ?? sl.DynNeg(); 
             if (sr == S.NONE)
                 return sl;
             if (sl.canon == sr.canon)
@@ -1807,13 +1953,13 @@ namespace CSG {
             CSGNode sl = l.SimplifyWithFix(node, fix);
             CSGNode sr = r.SimplifyWithFix(node, fix);
             if (sl == S.ALL) {
-                CSGNode rr = sr.provneg != null ? sr.provneg : sr.DynNeg();
+                CSGNode rr = sr.provneg ?? sr.DynNeg();
                 return rr;
             }
             if (sl == S.NONE)
                 return sr;
             if (sr == S.ALL) {
-                CSGNode rr = sl.provneg != null ? sl.provneg : sl.DynNeg();
+                CSGNode rr = sl.provneg ?? sl.DynNeg();
                 return rr;
             }
             if (sr == S.NONE)
@@ -1828,7 +1974,9 @@ namespace CSG {
             //if (ttt == 0) return S.NONE;  // TODO 
             //if (ttt == -1) return S.ALL;
             if (sl == l && sr == r) {
+#if TTT
                 ttt = sl.ttt ^ sr.ttt;
+#endif
                 return this;
             }
 
@@ -1839,15 +1987,17 @@ namespace CSG {
             //if (sr.canon is Intersect && (sr.canon as Intersect).l.canon == sl.canon) return sl.canon;
             //if (sr.canon is Intersect && (sr.canon as Intersect).r.canon == sl.canon) return sl.canon;
             CSGNode ret = MakeShared(OP.Xor, sl, sr);
+#if TTT
             ret.ttt = sl.ttt ^ sr.ttt;
+#endif
             return ret;
         }
 
         public static CSGNode Make(CSGNode sl, CSGNode sr) {
             if (sl == S.ALL)
-                return sr.provneg != null ? sr.provneg : sr.Neg();
+                return sr.provneg ?? sr.Neg();
             if (sr == S.ALL)
-                return sl.provneg != null ? sl.provneg : sl.Neg();
+                return sl.provneg ?? sl.Neg();
             if (sl == S.NONE)
                 return sr;
             if (sr == S.NONE)
@@ -1940,7 +2090,9 @@ namespace CSG {
             if (sl == sr)
                 return sl;
             if (sl == l && sr == r) {
+#if TTT
                 ttt = sl.ttt & sr.ttt;
+#endif
                 return this;
             }
             if (sl.canonneg != null && sl.canonneg.canon == sr.canon)
@@ -1948,7 +2100,9 @@ namespace CSG {
             if (sr.canonneg != null && sr.canonneg.canon == sl.canon)
                 return S.NONE;
             CSGNode ret = MakeShared(OP.Intersect, sl, sr);
+#if TTT
             ret.ttt = sl.ttt & sr.ttt;
+#endif
             return ret;
         }
 
@@ -2036,6 +2190,10 @@ namespace CSG {
 
         public override abstract float Dist(float x, float y, float z);
 
+        public CSGPrim realCSG = null;  // may be overridden for faceted cylinders etc, used for normals
+        public int realCSGid;           // number within planes representing realCSG, for facet optimization
+        public int realCSGnum;          // total number of lanes representing realCSG
+
         public float Dist(Vector3 v) {
             return Dist(v.x, v.y, v.z);
         }
@@ -2059,8 +2217,10 @@ namespace CSG {
 
 
         public override CSGNode SimplifyWithFix(CSGPrim node, CSGNode fix) {
+#if TTT
             ttt = canon.ttt;
             System.Diagnostics.Debug.Assert(ttt != 0);  // debug :: PJT Unity, type ambiguity
+#endif
             if (canon == node)
                 return fix;
             if (canonneg == node) {
@@ -2117,22 +2277,28 @@ namespace CSG {
         /// <param name="simpguid"></param>
         public override void UNodes(LinkedList<CSGPrim> nodelist, ref int num, int simpguid) {
             if (canon.lastguid == simpguid) {   // already set for this simpguid, not new
+#if TTT
                 ttt = canon.ttt;                // bring my ttt up to date (may already be), don't bother with my lastguid, rely on canon.lastguid
                 System.Diagnostics.Debug.Assert(ttt != 0);         // check things ok
+#endif
                 return;                             
             }
 
             // have to generate new entry and assign new truth table value, record here and in canon
             nodelist.AddLast(canon as CSGPrim);
+#if TTT
             ttt = (num < CSGTT.TTI.Length) ? CSGTT.TTI[num] : CSGTT.TTIX >> num;  // first TTNUM good, remainder test or rubbish
             canon.ttt = ttt;
+#endif
             canon.lastguid = simpguid;
 
             //// use negative ttt for neg.
             if (canonneg != null) {
                 System.Diagnostics.Debug.Assert(canonneg.lastguid != simpguid);  // canon and canonneg should always be set together
                 canonneg.lastguid = simpguid;
+#if TTT
                 canonneg.ttt = ~canon.ttt;
+#endif
             }
             num++;  // keep track of depth so far (? cheaper than using nodelist.Count())
             System.Diagnostics.Debug.Assert(num == nodelist.Count());
@@ -2151,12 +2317,16 @@ namespace CSG {
                 return;
             lastguid = simpguid;
             nodelist.AddFirst(this);
+#if TTT
             ttt = (num < CSGTT.TTI.Length) ? CSGTT.TTI[num] : CSGTT.TTIX;
+#endif
 
             //// use negative ttt for neg.
             if (provneg != null) {
                 provneg.lastguid = simpguid;
+#if TTT
                 provneg.ttt = ~ttt;
+#endif
             }
             //arrayPos = num;  // nb, this will actually be backwards becuase of AddFirst, but is not used
             num++;
@@ -2191,7 +2361,7 @@ namespace CSG {
         public override CSGNode BCopy(Bakery bk) {
             Vector4 v1 = new Vector4(a, b, c, d);
             Vector4 v = bk.invM * v1;
-            return Make(v.x, v.y, v.z, v.w, bk);
+            return Make(v.x, v.y, v.z, v.w, Bakery.Merge(this.bk, bk));
         }
 
         public override string ToString() {
@@ -2304,8 +2474,11 @@ namespace CSG {
 
         public override Vector3 Normal(Vector3 pos) {
             // this provenance is only reliable if it has tracked all transforms: todo
-            //if (Provenance is CSGNonPlane.CSGXPrim)
-            //    return ((CSGNonPlane.CSGXPrim)Provenance).Normal (pos);
+            if (realCSG != null) {
+                Vector3 n = realCSG.Normal(pos);
+                if (n.sqrMagnitude > 0.001f)  // apex of cone can't get a real normal
+                    return n;
+            }
             return normal;
         }
 
@@ -2324,7 +2497,7 @@ namespace CSG {
         static int SHAREDSIZE = 1024;
         // must be power 2
         //static int FirstOfGroup;
-        [ThreadStatic]
+ //?       [ThreadStatic]
         static List<CSGPlane>[] _shared = new List<CSGPlane>[SHAREDSIZE];
 
         static List<CSGPlane>[] shared {
@@ -2378,10 +2551,7 @@ namespace CSG {
         /// <param name="provenance"></param>
         /// <returns></returns>
         public static CSGPlane Make(float aa, float bb, float cc, float dd, Bakery bk) {
-            //if (provenance is IColorable && ((IColorable)provenance).Texture[0] != '#') {
-            //}
             NPrims++;
-
 
             float a, b, c, d;
             float sc = (float)(1 / Math.Sqrt(aa * aa + bb * bb + cc * cc));
@@ -2419,15 +2589,6 @@ namespace CSG {
                         //if (bk.provenance == p.Provenance || (bk.provenance != null && bk.provenance.Equals(p.Provenance))) {
                         if (bk.provstring == p.bk.provstring) {
                             return p;  // « todo; remember geom equality for mixed provenance
-
-                        } else if (p.Provenance == S.NOPROV) {
-                            p.bk = bk;
-                            if (p.provneg != null) {
-                                ((CSGPlane)p.provneg).bk = bk;
-                            }
-                            return p;
-                            //} else if (provenance == S.NOPROV) {
-                            //    return p;
                         } else {  // close but different provenance
                             if (canon != null && canon != p.canon) {
                                 Console.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>> canon error" + p);
@@ -2484,9 +2645,6 @@ namespace CSG {
                         }
                         p.canonneg = r.canon;
                         r.canonneg = p.canon;
-                        if (p.Provenance == S.NOPROV) {
-                            p.bk = bk;
-                        }
                         //if (provenance == p.Provenance || (provenance != null && provenance.Equals(p.Provenance))) { // || CSGControl.UseTTCanon) {
                         if (p.bk.provstring == bk.provstring) {
                             p.provneg = r;
@@ -2926,16 +3084,18 @@ namespace CSG {
     /// Class Subdivide implements the main subdivision operation
     /// </summary>
     class Subdivide {
+        public static float done;
         public Subdivide(ICSGOutput output) {
+            done = 0;
             csgoutput = output;
         }
 
-        #if STATS
-        /// <summary>max number of prims at given level to keep stats for</summary>
-        private const int PrimLimit = 500;
-        int[] hits = new int[PrimLimit];  // number of hits for the given number of primitives
-        int[] uhits = new int[PrimLimit];  // number of unique primitives //note was 500; problem cases still overflow with 1024 so set back to 500 for now
-        #endif
+        //if (CSGControl.stats) { # if STATS
+            /// <summary>max number of prims at given level to keep stats for</summary>
+            private const int PrimLimit = 500;
+            int[] hits = new int[PrimLimit];  // number of hits for the given number of primitives
+            int[] uhits = new int[PrimLimit];  // number of unique primitives //note was 500; problem cases still overflow with 1024 so set back to 500 for now
+        //}
         private ICSGOutput csgoutput;
 
         // DoDraw gives the number of primitives to choose between subdivision and draw/split at each recursion level
@@ -2956,11 +3116,23 @@ namespace CSG {
         public void SD(Volume vol, CSGNode node, int lev) {
             // if (node.Color == CSGNode.DefaultColor) node.SetColor(Color.WhiteSmoke);
             //node.WithColTexture(CSGControl.DefaultTexture);
-            S.rendering = true;  // debug helper flag
+            CSGNode.csgmode = CSGMode.rendering;  // debug helper flag
             try {
-                SDivNoUnion(vol, node, lev);
+                if (CSGControl.MaxLev == 0) {
+                    CSGNode n2;
+                    //int unodes = 0;
+                    //n2 = node.Bake().Simplify(vol, -999, ref unodes);
+                    n2=node;
+                    //string sss = n2.ToStringF("\n");
+                    //GUIBits.Log(sss);
+
+
+                    n2.Draw(csgoutput, vol);
+                } else {
+                    SDivNoUnion(vol, node, lev);
+                    }
             } finally {
-                S.rendering = false;
+                CSGNode.csgmode = CSGMode.collecting;
             }
         }
 
@@ -3003,8 +3175,10 @@ namespace CSG {
             // snode.nodes does include duplicates, but that is less serious
             int nUnodes = 0;
             CSGNode snode = node.OSimplify(vol, S.Simpguid++, ref nUnodes);
-            if (snode.nodes == 0)
+            if (snode.nodes == 0) {
+                done += Mathf.Pow(0.125f, lev);
                 return;
+            }
             if (lev >= CSGControl.MinLev && (nUnodes <= DoDraw[lev] || lev >= CSGControl.MaxLev)) {  // TODO: TOCHECK was snode.nodes <=
                 //volList.Add(vol);
                 if (CSGControl.UseBreak) {
@@ -3012,11 +3186,12 @@ namespace CSG {
                     UnityEngine.Debug.Log("sss = " + sss);
                     GUIBits.Log("sss = " + sss);
                 }
+                done += Mathf.Pow(0.125f, lev);
                 int n = snode.Draw(csgoutput, vol);
-                #if STATS
-                if (node.nodes < hits.Length) hits[snode.nodes]++;
-                uhits[n]++;
-                #endif
+                if (CSGControl.stats) { // #if STATS
+                    if (node.nodes < hits.Length) hits[snode.nodes]++;
+                    uhits[n]++;
+                } //   #endif
                 return;
             }
 
@@ -3026,22 +3201,22 @@ namespace CSG {
         }
 
         public void PrintHits() {
-            #if STATS
-            if (CSGControl.TRLEV < TraceN.minlev) return;  // save a little
-            int k;
-            for (k = 25; k != 0 && hits[k] == 0; k--) { }  // don't show trailing 0
-            string msg = " hits:";
-            for (int i = 0; i <= k; i++) msg += string.Format("  {0}->{1}", i, hits[i]);
-            TraceN.trace(CSGControl.TRLEV, msg);
+            if (CSGControl.stats) { // #if STATS
+                if (CSGControl.TRLEV < TraceN.minlev) return;  // save a little
+                int k;
+                for (k = 25; k != 0 && hits[k] == 0; k--) { }  // don't show trailing 0
+                string msg = " hits:";
+                for (int i = 0; i <= k; i++) msg += string.Format("  {0}->{1}", i, hits[i]);
+                TraceN.trace(CSGControl.TRLEV, msg);
 
-            msg = ("uhits:");
-            for (k = 25; k != 0 && uhits[k] == 0; k--) { }  // don't show trailing 0
-            for (int i = 0; i <= k; i++) msg += string.Format("  {0}->{1}", i, uhits[i]);
-            TraceN.trace(CSGControl.TRLEV, msg);
-            #else
-            //TraceN.trace(CSGControl.TRLEV, "PrintHits() has no stats, recompile with STATS flag for stats"); //pjt Unity
-            GUIBits.Log("PrintHits() has no stats, recompile with STATS flag for stats");
-            #endif
+                msg = ("uhits:");
+                for (k = 25; k != 0 && uhits[k] == 0; k--) { }  // don't show trailing 0
+                for (int i = 0; i <= k; i++) msg += string.Format("  {0}->{1}", i, uhits[i]);
+                TraceN.trace(CSGControl.TRLEV, msg);
+            } else { // #else
+                //TraceN.trace(CSGControl.TRLEV, "PrintHits() has no stats, recompile with STATS flag for stats"); //pjt Unity
+                GUIBits.Log("PrintHits() has no stats, recompile with STATS flag for stats");
+            } // #endif
         }
 
 
@@ -3160,6 +3335,14 @@ namespace CSG {
                 30,
                 27,
                 17,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
+                20,
                 20,
                 999,
                 999,
@@ -3495,12 +3678,21 @@ namespace CSG {
             num++;
         }
 
+        public static int[] verttype = new int[3];  // stats on polygon vertex types
+
         public void AddTo(CSGPrim prov, ICSGOutput pl) {
             //debugpolypool.Remove(this);
             if (prov.Provenance == null) {
             }
             csg = prov;
             pl.Add(this);
+
+            if (CSGControl.stats) {
+                for (int i = 0; i < num; i++) {
+                    int n = (points[i].othercsg == null ? 0 : 1) + (points[i == 0 ? num - 1 : i - 1].othercsg == null ? 0 : 1);
+                    verttype[n]++;
+                }
+            }
         }
 
 
@@ -3563,7 +3755,8 @@ namespace CSG {
             //    return pool.Pop();
             //}
             Poly p;
-            lock (pool) {
+//?? TODO check why this caused deadlock even on single thread			
+//??            lock (pool) {
                 p = pool.Pop();
                 if (p == null) {
                     fromnew++;
@@ -3571,7 +3764,7 @@ namespace CSG {
                 } else {
                     frompool++;
                 }
-            }
+//??            }
             if (p == null)
                 p = new Poly();
             //debugpolypool.Add(p);
@@ -3586,7 +3779,7 @@ namespace CSG {
         private static Stack<Poly> pool = new Stack<Poly>();
 
         static Poly() {
-            lock (pool)
+//??            lock (pool)
                 pool.Push(null);
         }
         // needed if checking for null as empty pool
@@ -3604,7 +3797,7 @@ namespace CSG {
                     sp.ConditionalReleaseToPool();
             }
             num = 0;
-            lock (pool)
+//??            lock (pool)
                 pool.Push(this);
             //debugpolypool.Remove(this);
         }
@@ -3628,7 +3821,7 @@ namespace CSG {
         //    yield return this.First();
         //}
 
-
+        public static int splits = 0;  // for stats
         /// <summary>
         /// Split the poly at another csg
         /// This assumes convex, so just two parts
@@ -3647,10 +3840,11 @@ namespace CSG {
         /// <param name="inpoly">OUTPUT: The polygon for surface inside the split primitive.</param>
         /// <param name="outpoly">OUTPUT: The polygon for surface outside the split primitive.</param>
         public void Split(CSGPrim splitprim, out ICSGPoly inpoly, out ICSGPoly outpoly) {
+            splits++;
             inpoly = null;
             outpoly = null;
 
-            float delta = 0.00011f;
+            float delta = 0.0000011f;
             //##float maxd = float.MinValue, mind = float.MaxValue;
             float lastd = 0;
             Vector3 lastp = Vector3.zero;
@@ -3951,6 +4145,31 @@ namespace CSG {
 
     class UnbakedException : Exception {
 
+    }
+
+    public class FilterString {
+        string[][] ors;
+        char[] bsep = { ' ' };
+
+        public FilterString(string s) {
+            string[] orss = s.Split('|');
+            ors = new string[orss.Length][];
+            for (int i=0; i<orss.Length; i++) {
+                ors[i] = orss[i].Split(bsep, StringSplitOptions.RemoveEmptyEntries);
+            }
+        }
+
+        public bool filter(string f) {
+            if (f == null) return false;
+            foreach(var or in ors) {
+                foreach (var e in or) {
+                    if (!f.Contains(e)) goto NEXTORS;
+                }
+                return true;
+            NEXTORS:;
+            }
+        return false;
+        }
     }
 
 }

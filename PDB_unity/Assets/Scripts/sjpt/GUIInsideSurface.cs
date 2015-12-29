@@ -23,7 +23,7 @@ namespace CSG {
 
         public float outsideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go inside object 
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
-		public float smooth = 0.66f;		
+        public float smooth = 0.66f;        
 
         // following are class so they can get reused between frames
         CSGFMETA csgm;
@@ -94,7 +94,6 @@ namespace CSG {
                     savemesh = savemesh.RemapMesh();
 
                     DeleteChildren(goTest);
-                    int nverts = 0;
 
                     // Render outside and inside separately with different colours
                     // It would be more sensible to have a two-sided shader,
@@ -102,13 +101,13 @@ namespace CSG {
                     // and the extra cost doesn't seem to significant.
                     Material mat = new Material(shader);
                     mat.color = CSGXX.colors[0];            
-					mat.SetFloat("_Glossiness", smooth);
-                    BasicMeshData.ToGame(goTest, savemesh.ToMesh(), "CSGStephen_reduced", mat, ref nverts);
+                    mat.SetFloat("_Glossiness", smooth);
+                    CSGStats stats = BasicMeshData.ToGame(goTest, savemesh.ToMesh(), "CSGStephen_reduced", mat);
 
                     mat = new Material(shader);
                     mat.color = new Color(0.5f, 1, 0.5f);
-					mat.SetFloat("_Glossiness", smooth);
-                    BasicMeshData.ToGame(goTest, savemesh.ToMeshBack(), "CSGStephen_reduced_back", mat, ref nverts);
+                    mat.SetFloat("_Glossiness", smooth);
+                    BasicMeshData.ToGame(goTest, savemesh.ToMeshBack(), "CSGStephen_reduced_back", mat);
 
                     return; // 
                 }
@@ -122,19 +121,18 @@ namespace CSG {
                 float tf1 = Time.realtimeSinceStartup;
 
                 Log("mesh filter time=" + (tf1 - t0));
-                int nverts = 0;
                 DeleteChildren(goFiltered);
 
                 // double-sided filtered surface (again, silly way to do double-sided)
                 Material mat = new Material(shader);
                 mat.color = new Color(0.8f, 0.5f, 0.5f);
-				mat.SetFloat("_Glossiness", smooth);
-                BasicMeshData.ToGame(goFiltered, filtermesh.ToMesh(), "CSGStephen_special", mat, ref nverts);
+                mat.SetFloat("_Glossiness", smooth);
+                BasicMeshData.ToGame(goFiltered, filtermesh.ToMesh(), "CSGStephen_special", mat);
 
                 mat = new Material(shader);
                 mat.color = new Color(0.5f, 0.5f, 0.5f);
-				mat.SetFloat("_Glossiness", smooth);
-                BasicMeshData.ToGame(goFiltered, filtermesh.ToMeshBack(), "CSGStephen_special_back", mat, ref nverts);
+                mat.SetFloat("_Glossiness", smooth);
+                BasicMeshData.ToGame(goFiltered, filtermesh.ToMeshBack(), "CSGStephen_special_back", mat);
 
                 return;  // don't go through the standard csg display part appropriate to full display
             }
@@ -162,7 +160,7 @@ namespace CSG {
         }  // Show()
 
         protected override void UpdateI() {
-			if (!shader) shader = Shader.Find("Standard");    // Set shader
+            if (!shader) shader = Shader.Find("Standard");    // Set shader
 
             // custom update actions that apply only to this application
             if (Input.GetKeyDown(KeyCode.Semicolon)) {  // go to other side of surface and keep looking same way

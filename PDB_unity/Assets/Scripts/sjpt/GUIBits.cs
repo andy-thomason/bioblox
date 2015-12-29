@@ -15,8 +15,9 @@ namespace CSG {  // [ExecuteInEditMode]
         Material material;
         GameObject child;
 
-
         [Range(0, 4)] public int NBOX = 2;  // number of boxes to draw behind text to get enough opacity
+
+        public bool keepUpright = false;
 
         //public Material[] materials = new Material[8];
 
@@ -52,6 +53,7 @@ namespace CSG {  // [ExecuteInEditMode]
         }
 
         public static string text = "";
+        public static Dictionary<string, string> ktexts = new Dictionary<string, string>();
 
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
 
@@ -66,14 +68,20 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public abstract void Show(string ptoshow);
 
-
-        public static void Log(string s) {
-            text += s + "\n";
+        public static void Log(string s, params object[] xparms) {
+            string ss = String.Format(s, xparms);
+            if (text.Length < 5000) text += ss + "\n";
         }
 
-        public static void Log2(string s) {
-            Debug.Log(s);
-            Log(s);
+        public static void LogK(string k, string s, params object[] xparms) {
+            string ss = String.Format(s, xparms);
+            ktexts[k] = ss;
+        }
+
+        public static void Log2(string s, params object[] xparms) {
+            string ss = String.Format(s, xparms);
+            Debug.Log(ss);
+            Log(ss);
         }
 
         public static void Log(Exception e) {
@@ -99,15 +107,11 @@ namespace CSG {  // [ExecuteInEditMode]
 
         protected virtual void UpdateI() {
 
-        	// save these early, maybe more efficient, and difficult to find again after hiding otherwise
-           	if (!goTest)
-                goTest = GameObject.Find("Test");
-            if (!goLight0)
-                goLight0 = GameObject.Find("Light0");
-            if (!goLight1)
-                goLight1 = GameObject.Find("Light1");
-            if (!goFiltered)
-                goFiltered = GameObject.Find("Filtered");
+            // save these early, maybe more efficient, and difficult to find again after hiding otherwise
+            if (!goTest) goTest = GameObject.Find("Test");
+            if (!goLight0) goLight0 = GameObject.Find("Light0");
+            if (!goLight1) goLight1 = GameObject.Find("Light1");
+            if (!goFiltered) goFiltered = GameObject.Find("Filtered");
 
             var t = Camera.main.transform;
             var p = t.position;
@@ -124,6 +128,12 @@ namespace CSG {  // [ExecuteInEditMode]
             if (Input.GetKey("d"))
                 p += t.right * mrate;
 
+            if (Input.GetKey("r"))
+                p = p * (1 - mrate) + lookat * mrate;
+            if (Input.GetKey("f"))
+                p = p * (1 + mrate) - lookat * mrate;
+
+
             if (Input.GetKey(KeyCode.LeftArrow))
                 p -= t.right * mrate;
             if (Input.GetKey(KeyCode.RightArrow))
@@ -132,6 +142,9 @@ namespace CSG {  // [ExecuteInEditMode]
                 p += t.up * mrate;
             if (Input.GetKey(KeyCode.DownArrow))
                 p -= t.up * mrate;
+
+            if (Input.inputString.Contains("!"))
+                p = (p + lookat) / 2;
 
             float srate = a * wheelScrollRate;
             p += t.forward * Input.mouseScrollDelta.x * srate;
@@ -181,31 +194,46 @@ namespace CSG {  // [ExecuteInEditMode]
                     break;
 
             }
+
+            if (Input.GetKeyDown("u") && (Input.GetKey("left shift") || Input.GetKey("right shift")))
+                keepUpright = !keepUpright;
+
+            if (Input.GetKey("u") || keepUpright) {
+                // seems a little convoluted but gets desired effect
+                Vector3 f = t.forward;
+                Vector3 r = t.right;
+                r.y = 0;
+                t.up = -r.cross(t.forward);
+                t.forward = f;
+            }
+
             if (Input.GetKey("home")) {
                 t.rotation = new Quaternion(0, 0, 0, 1);
                 t.position = new Vector3(0, 0, -30);
             }
 
 
-            if (Input.GetKeyDown("m") || Input.GetKeyDown("n")) {  // set up CSG break and use it
+            if (Input.GetKeyDown("m") || Input.GetKey("n")) {  // use hitpoint for CSG feedback or simple feedback
                 Vector3 hit = Hitpoint();
                 if (float.IsNaN(hit.x)) {
                     //Log ("no hit");
                     text = ("no hit");
                     CSGControl.BreakOff();
                 } else {
-                    Log("hit at " + hit);
+                    text = "hit at " + hit;
                     lookat = hit;
                     if (Input.GetKeyDown("m")) {
                         CSGControl.Break(hit);
                         Show(toshow);
                         CSGControl.BreakOff();
                     } else {  // "n"
-                        float d = 0.01f;
+                        float d = 0.0001f;
                         Volume v = new Volume(lookat.x - d, lookat.x + d, lookat.y - d, lookat.y + d, lookat.z - d, lookat.z + d);
                         int unodes = 0;
                         CSGNode csgs = csg.Bake().Simplify(v, simpguid--, ref unodes);
-                        text = csgs.ToStringF("\n"); 
+                        Log(csgs.ToStringF("\n")); 
+                        if (csgs is CSGPrim && ((CSGPrim)csgs).realCSG != null)
+                            Log("from " + ((CSGPrim)csgs).realCSG.ToStringF("\n"));
                     }
                 }
             }
@@ -217,6 +245,10 @@ namespace CSG {  // [ExecuteInEditMode]
             if (Input.GetKeyDown("x")) {
                 if (goTest != null)
                     goTest.SetActive(!goTest.activeSelf);
+            }
+
+            if (Input.GetKeyDown("o")) {
+                CamScript.useWireframe = !CamScript.useWireframe;
             }
 
             goFiltered.transform.position = -Camera.main.transform.forward * 0.1f;
@@ -232,36 +264,34 @@ namespace CSG {  // [ExecuteInEditMode]
 
         }
 
-        static float lastxx;
-
-		// standard Unity OnGUI function, protecting from exceptions
-		void OnGUI() {
-			try {
-				OnGUII();
-			} catch (System.Exception e) {
-				Log(e.ToString());
-			}
-		}
-			
-		int slidery = 0;
-		protected virtual void OnGUII() {
+        // standard Unity OnGUI function, protecting from exceptions
+        void OnGUI() {
+            try {
+                OnGUII();
+            } catch (System.Exception e) {
+                Log(e.ToString());
+            }
+        }
+            
+        int slidery = 0;
+        protected virtual void OnGUII() {
             if (ops.Count == 0)
                 Show("");  // get things initialized
 
-			// display buttons for all the options set up by Show()
-            int y = 0;
+            // display buttons for all the options set up by Show()
+            int y = 0, yh = 18;
             foreach (var kvp in ops) {    // and show buttons for tests
-                if (GUI.Button(new Rect(20, kvp.Value.y * 20, 80, 20), kvp.Key))
+                if (GUI.Button(new Rect(20, kvp.Value.y * yh, 80, yh), kvp.Key))
                     Show(kvp.Key);
                 y = kvp.Value.y;
             }
             y += 2;
-			slidery = 20*y;
+            slidery = yh*y;
         
 /***
             MSlider("MaxLev", ref CSGControl.MaxLev, 0, 12 );
             MSlider("MinLev", ref CSGControl.MinLev, 0, 12 );
-            MSlider("CylNum", ref Minster.CylNum, -1, 20 );
+            MSlider("CylNum", ref CSGXprim.CylNum, -1, 20 );
             MSlider("GiveUpNodes", ref CSGControl.GiveUpNodes, 10, 2000 );
             MSlider("Cull Sides", ref BasicMeshData.Sides, 0, 3 );
 
@@ -280,13 +310,15 @@ namespace CSG {  // [ExecuteInEditMode]
             GUI.contentColor = Color.white;
             GUI.color = Color.white;
             GUI.backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1f);
+            string xtext = text;
+            foreach (var kvp in ktexts) xtext += kvp.Key + ": " + kvp.Value;
 
-            Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(text), "label");
+            Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
             labelRect.x = Screen.width - labelRect.width;
             for (int i = 0; i < NBOX; i++)
                 GUI.Box(labelRect, ""); 
             GUI.contentColor = Color.white;
-            if (GUI.Button(labelRect, text, "label"))
+            if (GUI.Button(labelRect, xtext, "label"))
                 text = ""; 
         }     // OnGUII
 
@@ -298,19 +330,19 @@ namespace CSG {  // [ExecuteInEditMode]
             //if (o != v) Log (name + v);
             GUI.contentColor = Color.black;
             GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
-			slidery += sliderHeight;
-			return o != v;
+            slidery += sliderHeight;
+            return o != v;
         }
 
-		/** make an int slider, y position w.i.p, return true if value changed */
-		protected bool MSlider(string sliderName, ref float v, float low, float high) {
+        /** make an int slider, y position w.i.p, return true if value changed */
+        protected bool MSlider(string sliderName, ref float v, float low, float high) {
             float o = v;
-			v = (int)GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
+            v = GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
             GUI.contentColor = Color.black;
-			GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
-			slidery += sliderHeight;
-			return o != v;
+            GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
+            slidery += sliderHeight;
+            return o != v;
         }
 
         // Update is called once per frame: call UpdateI with exception protection
@@ -325,48 +357,49 @@ namespace CSG {  // [ExecuteInEditMode]
         private static int simpguid = -1;
 
 #region Utility functions
-		// find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
-		protected Vector3 Hitpoint() {
-			return (savemesh == null) ? HitpointGO() : HitpointBM();
-		}
+        // find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
+        protected Vector3 Hitpoint() {
+            return (savemesh == null) ? HitpointGO() : HitpointBM();
+        }
 
-		// find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
-		Vector3 HitpointBM() {
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh);
-		}
+        // find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
+        Vector3 HitpointBM() {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh);
+        }
 
-		// find the hitpoint on the screen, using meshes in Test game object
-		Vector3 HitpointGO() {
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			float r = ray.intersectR(gameObject);
-			if (r == float.MaxValue)
-				return new Vector3(float.NaN, float.NaN, float.NaN);
-			else
-				return ray.origin + r * ray.direction;
-		}
+        // find the hitpoint on the screen, using meshes in Test game object
+        Vector3 HitpointGO() {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float r = ray.intersectR(gameObject);
+            if (r == float.MaxValue)
+                return new Vector3(float.NaN, float.NaN, float.NaN);
+            else
+                return ray.origin + r * ray.direction;
+        }
 
-		// clear the CSGStephen game objects we have generated
-		protected static void Clear() {
-			var objects = FindObjectsOfType(typeof(GameObject)); 
-			foreach (GameObject o in objects) { 
-				if (o.name.StartsWith("CSGStephen"))
-					Destroy(o.gameObject); 
-			}
-		}
+        // clear the CSGStephen game objects we have generated
+        protected void Clear() {
+            var objects = FindObjectsOfType(typeof(GameObject)); 
+            foreach (GameObject o in objects) { 
+                if (o.name.StartsWith("CSGStephen"))
+                    Destroy(o.gameObject); 
+            }
+            savemesh = null;
+        }
 
-		// delete all children of some game object
-		protected static void DeleteChildren(GameObject test) {
-			try {
-				Transform top = test.transform;
-				for (int i = top.childCount - 1; i >= 0; i--)
-					Destroy(top.GetChild(i).gameObject);
+        // delete all children of some game object
+        public static void DeleteChildren(GameObject test) {
+            try {
+                Transform top = test.transform;
+                for (int i = top.childCount - 1; i >= 0; i--)
+                    Destroy(top.GetChild(i).gameObject);
 
-				top.DetachChildren();
-			} catch (System.Exception e) {
-				Log("DeleteChildren failed: " + e);
-			}
-		}
+                top.DetachChildren();
+            } catch (System.Exception e) {
+                Log("DeleteChildren failed: " + e);
+            }
+        }
 #endregion
 
 
