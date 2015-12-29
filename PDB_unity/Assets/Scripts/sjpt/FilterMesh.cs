@@ -18,179 +18,179 @@ using System.Collections.Generic;
 
 
 namespace Filter {
-	public class FilterMesh {
-		public static int MaxNeighbourDistance = 10;
-		public static int MustIncludeDistance = 6;
+    public class FilterMesh {
+        public static int MaxNeighbourDistance = 10;
+        public static int MustIncludeDistance = 6;
 
-		public FilterMesh() {
-		}
+        public FilterMesh() {
+        }
 
-		/** core filter used to decide if ivert should be included */
-		static bool CoreFilter(Vector3 refvert, Vector3 refnorm, Vector3 ivert, Vector3 inorm, float idist) {
-			return ((Vector3.Dot((ivert - refvert).Normal(), refnorm) > 0.8
-			&& Vector3.Dot(inorm, refnorm) > 0
-			&& idist != int.MaxValue)
-			|| idist <= MustIncludeDistance);
-		}
+        /** core filter used to decide if ivert should be included */
+        static bool CoreFilter(Vector3 refvert, Vector3 refnorm, Vector3 ivert, Vector3 inorm, float idist) {
+            return ((Vector3.Dot((ivert - refvert).Normal(), refnorm) > 0.8
+            && Vector3.Dot(inorm, refnorm) > 0
+            && idist != int.MaxValue)
+            || idist <= MustIncludeDistance);
+        }
 
-		/** filter according to selected rule 
-		 * point is a sanple point that should be on or near the surface
-		 * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
-		 */
-		public static BigMesh Filter(
-			BigMesh mesh,
-			Vector3 point) {
+        /** filter according to selected rule 
+         * point is a sanple point that should be on or near the surface
+         * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
+         */
+        public static BigMesh Filter(
+            BigMesh mesh,
+            Vector3 point) {
 
-			// BigMesh nmesh = RemapMesh (mesh);  // precomuted (and checked)
-			BigMesh nmesh = mesh;
-			Vector3[] vertices = nmesh.vertices;
-			Vector3[] normals = nmesh.normals;
-			Vector2[] uv = nmesh.uv;
-			Color[] color = nmesh.colors;
-			int[] triangles = nmesh.triangles;
-			
-			int n = vertices.Length;
-
-
-			// find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
-			List<int>[] neigh = new List<int>[n];
-			for (int i = 0; i < n; i++) {
-				neigh[i] = new List<int>();
-			}
-			for (int t = 0; t < triangles.Length; t += 3) {
-				int t0 = triangles[t], t1 = triangles[t + 1], t2 = triangles[t + 2];
-				// only do in one direction, neighbour triangles wound the other way
-				// will do the others, and we don't want to double count
-				neigh[t0].Add(t1); 
-				neigh[t1].Add(t2);
-				neigh[t2].Add(t0);
-			}
-			// END find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~
+            // BigMesh nmesh = RemapMesh (mesh);  // precomuted (and checked)
+            BigMesh nmesh = mesh;
+            Vector3[] vertices = nmesh.vertices;
+            Vector3[] normals = nmesh.normals;
+            Vector2[] uv = nmesh.uv;
+            Color[] color = nmesh.colors;
+            int[] triangles = nmesh.triangles;
+            
+            int n = vertices.Length;
 
 
-			// find closest mesh point
-			float bestdist = float.MaxValue;
-			int bestind = 0;
-			for (int i = 0; i < n; i++) {
-				float d = Vector3.Distance(point, vertices[i]);
-				if (d < bestdist) {
-					bestdist = d;
-					bestind = i;
-				}
-			}
-			// fix point and its normal
-			Vector3 bestvert = vertices[bestind];
-			Vector3 bestnorm = normals[bestind];
-			// bestnorm = new Vector3(0,0,-1);  // temp debug
-
-			// find my neighours up to depth D
-			int D = MaxNeighbourDistance;
-			if (D < MustIncludeDistance) D = MustIncludeDistance;
-			int[] distFromMe = new int[n];
-			List<int>[] idsAtDist = new List<int>[D + 1];
-			for (int i = 0; i < n; i++)
-				distFromMe[i] = int.MaxValue;
-
-			// special case dist 0
-			idsAtDist[0] = new List<int>();
-			idsAtDist[0].Add(bestind);
-			distFromMe[bestind] = 0;
-
-			// special case dist 1
-			idsAtDist[1] = neigh[bestind];
-			foreach (int i in idsAtDist[1])
-				distFromMe[i] = 1;
-
-			// compute other distances incrementally
-			for (var dd = 2; dd <= D; dd++) {
-				idsAtDist[dd] = new List<int>();
-				foreach (int i in idsAtDist[dd-1]) {
-					foreach (int j in neigh[i]) {
-						if (distFromMe[j] == int.MaxValue) {
-							distFromMe[j] = dd;
-							idsAtDist[dd].Add(j);
-						}
-					}
-				}
-			}
-
-			string nums = "";
-			for (int i = 0; i <= D; i++)
-				nums += " " + idsAtDist[i].Count;
-			GUIBits.Log("neighbour numbers " + nums);
+            // find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
+            List<int>[] neigh = new List<int>[n];
+            for (int i = 0; i < n; i++) {
+                neigh[i] = new List<int>();
+            }
+            for (int t = 0; t < triangles.Length; t += 3) {
+                int t0 = triangles[t], t1 = triangles[t + 1], t2 = triangles[t + 2];
+                // only do in one direction, neighbour triangles wound the other way
+                // will do the others, and we don't want to double count
+                neigh[t0].Add(t1); 
+                neigh[t1].Add(t2);
+                neigh[t2].Add(t0);
+            }
+            // END find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~
 
 
-			//IList<int> newvertices = new List<int>();
-			int[] newnum = new int[n];  // map from old index to new
+            // find closest mesh point
+            float bestdist = float.MaxValue;
+            int bestind = 0;
+            for (int i = 0; i < n; i++) {
+                float d = Vector3.Distance(point, vertices[i]);
+                if (d < bestdist) {
+                    bestdist = d;
+                    bestind = i;
+                }
+            }
+            // fix point and its normal
+            Vector3 bestvert = vertices[bestind];
+            Vector3 bestnorm = normals[bestind];
+            // bestnorm = new Vector3(0,0,-1);  // temp debug
 
-			int nn = 0;  // new vert number
-			float DD = 2;  // offset to get local
-			Vector3 refvert = bestvert - bestnorm * DD;
-			// now filter out vertices we want
-			for (int i = 0; i < n; i++) {
-				// 	>>>>> core filter here
-				if (CoreFilter(refvert, bestnorm, vertices[i], normals[i], distFromMe[i])) {
-					//if ( (Vector3.Dot ((vertices[i] - refvert).Normal(), bestnorm) > 0.8
-					// /   && Vector3.Dot (normals[i], bestnorm) > 0
-					//	&& distFromMe[i] != int.MaxValue)
-					//    || distFromMe[i] <= 3) {
-					newnum[i] = nn++;
-				} else {
-					newnum[i] = -1;
-				}
-			}
+            // find my neighours up to depth D
+            int D = MaxNeighbourDistance;
+            if (D < MustIncludeDistance) D = MustIncludeDistance;
+            int[] distFromMe = new int[n];
+            List<int>[] idsAtDist = new List<int>[D + 1];
+            for (int i = 0; i < n; i++)
+                distFromMe[i] = int.MaxValue;
 
+            // special case dist 0
+            idsAtDist[0] = new List<int>();
+            idsAtDist[0].Add(bestind);
+            distFromMe[bestind] = 0;
 
-			// and generate new mesh
-			if (nn > 64000)
-				nn = 64000;  // save vertex mesh size complications for now
-			Vector3[] nvertices = new Vector3[nn];
-			Vector3[] nnormals = new Vector3[nn];
-			Vector2[] nuv = new Vector2[nn];
-			Color[] ncolor = new Color[nn];
-			List<int> ntris = new List<int>();
+            // special case dist 1
+            idsAtDist[1] = neigh[bestind];
+            foreach (int i in idsAtDist[1])
+                distFromMe[i] = 1;
 
-			for (int i = 0; i < n; i++) {
-				int ii = newnum[i];
-				if (0 <= ii && ii < 64000) {
-					nvertices[ii] = vertices[i];
-					nnormals[ii] = normals[i];
-					nuv[ii] = uv[i];
-					float dist = (Vector3.Distance(bestvert, vertices[i]) - bestdist) / 10;
-					ncolor[ii] = color[i];
-					//ncolor[ii] = new Color(1-dist, dist, 1);
-				}
-			}
+            // compute other distances incrementally
+            for (var dd = 2; dd <= D; dd++) {
+                idsAtDist[dd] = new List<int>();
+                foreach (int i in idsAtDist[dd-1]) {
+                    foreach (int j in neigh[i]) {
+                        if (distFromMe[j] == int.MaxValue) {
+                            distFromMe[j] = dd;
+                            idsAtDist[dd].Add(j);
+                        }
+                    }
+                }
+            }
 
-			for (int t = 0; t < triangles.Length; t += 3) {
-				if (newnum[triangles[t]] >= 0 && newnum[triangles[t + 1]] >= 0 && newnum[triangles[t + 2]] >= 0) {
-					if ((BasicMeshData.Sides & 1) != 0) {
-						ntris.Add(newnum[triangles[t]]);
-						ntris.Add(newnum[triangles[t + 1]]);
-						ntris.Add(newnum[triangles[t + 2]]);
-					}
-					if ((BasicMeshData.Sides & 2) != 0) {
-						ntris.Add(newnum[triangles[t]]);
-						ntris.Add(newnum[triangles[t + 2]]);
-						ntris.Add(newnum[triangles[t + 1]]);
-					}
-				}
-			}
-			BigMesh newmesh = new BigMesh();
-			newmesh.vertices = nvertices;
-			newmesh.normals = nnormals;
-			newmesh.uv = nuv;
-			newmesh.colors = ncolor;
-			newmesh.triangles = ntris.ToArray();
-
-			GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
-			" bestnorm" + bestnorm + " vertices=" + nn +
-			" cam forward= " + Camera.main.transform.forward);
-
-			return newmesh;
+            string nums = "";
+            for (int i = 0; i <= D; i++)
+                nums += " " + idsAtDist[i].Count;
+            GUIBits.Log("neighbour numbers " + nums);
 
 
-		}
-	}
+            //IList<int> newvertices = new List<int>();
+            int[] newnum = new int[n];  // map from old index to new
+
+            int nn = 0;  // new vert number
+            float DD = 2;  // offset to get local
+            Vector3 refvert = bestvert - bestnorm * DD;
+            // now filter out vertices we want
+            for (int i = 0; i < n; i++) {
+                //     >>>>> core filter here
+                if (CoreFilter(refvert, bestnorm, vertices[i], normals[i], distFromMe[i])) {
+                    //if ( (Vector3.Dot ((vertices[i] - refvert).Normal(), bestnorm) > 0.8
+                    // /   && Vector3.Dot (normals[i], bestnorm) > 0
+                    //    && distFromMe[i] != int.MaxValue)
+                    //    || distFromMe[i] <= 3) {
+                    newnum[i] = nn++;
+                } else {
+                    newnum[i] = -1;
+                }
+            }
+
+
+            // and generate new mesh
+            if (nn > 64000)
+                nn = 64000;  // save vertex mesh size complications for now
+            Vector3[] nvertices = new Vector3[nn];
+            Vector3[] nnormals = new Vector3[nn];
+            Vector2[] nuv = new Vector2[nn];
+            Color[] ncolor = new Color[nn];
+            List<int> ntris = new List<int>();
+
+            for (int i = 0; i < n; i++) {
+                int ii = newnum[i];
+                if (0 <= ii && ii < 64000) {
+                    nvertices[ii] = vertices[i];
+                    nnormals[ii] = normals[i];
+                    nuv[ii] = uv[i];
+                    float dist = (Vector3.Distance(bestvert, vertices[i]) - bestdist) / 10;
+                    ncolor[ii] = color[i];
+                    //ncolor[ii] = new Color(1-dist, dist, 1);
+                }
+            }
+
+            for (int t = 0; t < triangles.Length; t += 3) {
+                if (newnum[triangles[t]] >= 0 && newnum[triangles[t + 1]] >= 0 && newnum[triangles[t + 2]] >= 0) {
+                    if ((BasicMeshData.Sides & 1) != 0) {
+                        ntris.Add(newnum[triangles[t]]);
+                        ntris.Add(newnum[triangles[t + 1]]);
+                        ntris.Add(newnum[triangles[t + 2]]);
+                    }
+                    if ((BasicMeshData.Sides & 2) != 0) {
+                        ntris.Add(newnum[triangles[t]]);
+                        ntris.Add(newnum[triangles[t + 2]]);
+                        ntris.Add(newnum[triangles[t + 1]]);
+                    }
+                }
+            }
+            BigMesh newmesh = new BigMesh();
+            newmesh.vertices = nvertices;
+            newmesh.normals = nnormals;
+            newmesh.uv = nuv;
+            newmesh.colors = ncolor;
+            newmesh.triangles = ntris.ToArray();
+
+            GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
+            " bestnorm" + bestnorm + " vertices=" + nn +
+            " cam forward= " + Camera.main.transform.forward);
+
+            return newmesh;
+
+
+        }
+    }
 }
 
