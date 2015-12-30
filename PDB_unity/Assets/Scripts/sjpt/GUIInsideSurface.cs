@@ -29,6 +29,10 @@ namespace CSG {
         CSGFMETA csgm;
         Shader shader;
 
+        GameObject[] goMol;
+        MeshFilter[] mfMol;
+        MeshRenderer[] mrMol;
+
         // main function that will be called for display when something interesting has happened
         public override void Show(string ptoshow) {
             text = "";
@@ -99,15 +103,8 @@ namespace CSG {
                     // It would be more sensible to have a two-sided shader,
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
-                    Material mat = new Material(shader);
-                    mat.color = CSGXX.colors[0];            
-                    mat.SetFloat("_Glossiness", smooth);
-                    CSGStats stats = BasicMeshData.ToGame(goTest, savemesh.ToMesh(), "CSGStephen_reduced", mat);
-
-                    mat = new Material(shader);
-                    mat.color = new Color(0.5f, 1, 0.5f);
-                    mat.SetFloat("_Glossiness", smooth);
-                    BasicMeshData.ToGame(goTest, savemesh.ToMeshBack(), "CSGStephen_reduced_back", mat);
+                    mfMol[Mols.molA].mesh = savemesh.ToMesh();
+                    mfMol[Mols.molAback].mesh = savemesh.ToMeshBack();
 
                     return; // 
                 }
@@ -124,15 +121,8 @@ namespace CSG {
                 DeleteChildren(goFiltered);
 
                 // double-sided filtered surface (again, silly way to do double-sided)
-                Material mat = new Material(shader);
-                mat.color = new Color(0.8f, 0.5f, 0.5f);
-                mat.SetFloat("_Glossiness", smooth);
-                BasicMeshData.ToGame(goFiltered, filtermesh.ToMesh(), "CSGStephen_special", mat);
-
-                mat = new Material(shader);
-                mat.color = new Color(0.5f, 0.5f, 0.5f);
-                mat.SetFloat("_Glossiness", smooth);
-                BasicMeshData.ToGame(goFiltered, filtermesh.ToMeshBack(), "CSGStephen_special_back", mat);
+                mfMol[Mols.molAfilt].mesh = filtermesh.ToMesh();
+                mfMol[Mols.molAfiltback].mesh = filtermesh.ToMeshBack();
 
                 return;  // don't go through the standard csg display part appropriate to full display
             }
@@ -196,6 +186,7 @@ namespace CSG {
 
         // application specific parts of GUI code
         protected override void OnGUII() {
+            setobjs();
             //GUIBits.text = "";
 
             if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
@@ -208,9 +199,48 @@ namespace CSG {
             
             base.OnGUII();
         }
-            
+
+        private void setobjs() {
+            if (goMol != null) return;
+            int N = 8;
+            goMol = new GameObject[N];
+            mfMol = new MeshFilter[N];
+            mrMol = new MeshRenderer[N];
 
 
+            for (int i = 0; i < N; i++) {
+                goMol[i] = GameObject.Find(Mols.name[i]);
+                if (goMol[i] == null) {
+                    goMol[i] = new GameObject(Mols.name[i]);
+                    goMol[i].layer = i + 8;
+                    mfMol[i] = goMol[i].AddComponent<MeshFilter>();
+                    mrMol[i] = goMol[i].AddComponent<MeshRenderer>();
+                    Material mat = new Material(shader);
+                    mat.color = Mols.colors[i];
+                    mat.SetFloat("_Glossiness", smooth);
+                    mrMol[i].material = mat;
+                } else {
+                    mfMol[i] = goMol[i].GetComponent<MeshFilter>();
+                    mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
+                }
+            }
+        }
     } // class GUIInsideSurface
+
+
+    static class Mols {
+        public static int molA = 0, molAback = 1, molB = 2, molBback = 3, molAfilt = 4, molAfiltback = 5, molBfilt = 6, molBfiltback = 7;
+        public static string[] name = { "molA", "molAback", "molB", "molBback", "molAfilt", "molAfiltback", "molBfilt", "molBfiltback" };
+        public static Color[] colors = {
+            new Color(0.5f, 0.5f, 0.5f), // A
+            new Color(0.5f, 1,    0.5f), // Aback
+            new Color(0.5f, 0.5f, 0.5f), // B
+            new Color(0.5f, 0.5f, 0.5f), // Bback
+            new Color(0.8f, 0.5f, 0.5f), // Afilt
+            new Color(0.5f, 0.5f, 0.5f), // Afiltback
+            new Color(0.5f, 0.5f, 0.5f), // Bfilt
+            new Color(0.5f, 0.5f, 0.5f)  // Bfiltback
+        };
+    }
 
 } // namespace CSG
