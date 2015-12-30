@@ -107,6 +107,8 @@ namespace CSG {  // [ExecuteInEditMode]
 
         protected Camera curcam;
         protected Camera findcam() {
+            if (Cameras == null) Cameras = Camera.allCameras;
+
             curcam = null;
             foreach (Camera cam in Cameras) {
                 if (cam.pixelRect.Contains(Input.mousePosition)) {
@@ -124,9 +126,7 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!goLight0) goLight0 = GameObject.Find("Light0");
             if (!goLight1) goLight1 = GameObject.Find("Light1");
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
-            if (Cameras == null) Cameras = Camera.allCameras;
-            findcam();
-            if (curcam == null) return;
+            if (!findcam()) return;
 
 
             var t = curcam.transform;
