@@ -32,6 +32,8 @@ namespace CSG {
         GameObject[] goMol;
         MeshFilter[] mfMol;
         MeshRenderer[] mrMol;
+        protected PDB_molecule molA, molB;
+
 
         // main function that will be called for display when something interesting has happened
         public override void Show(string ptoshow) {
@@ -62,12 +64,17 @@ namespace CSG {
             } 
             Bounds bounds = new Bounds();
 
-            if (testop("pdb") || testop("pdb prep")) {
+            if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 if (CSGControl.MinLev < 5) 
                     CSGControl.MinLev = CSGControl.MinLev = 7;
                 CSGControl.MaxLev = CSGControl.MinLev;
+                bool useb = ptoshow == "pdb prepB";
+                PDB_molecule mol;
 
-                mol = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+                if (useb)
+                    mol = molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
+                else
+                    mol = molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
 
                 // prepare and populate the metaball object
                 csgm = new CSGFMETA();
@@ -83,35 +90,39 @@ namespace CSG {
 
                 // prepare the mesh in a way I can raycast it and filter it
                 // common up the common vertices, and if easily possible display
-                if (testop("pdb prep")) {
+                if (ptoshow.StartsWith("pdb prep")) {
                     var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999);
-                    savemesh = savemeshx["notexture"].GetBigMesh();
+                    var tsavemesh = savemeshx["notexture"].GetBigMesh();
 
                     float tf1 = Time.realtimeSinceStartup;
                     Log("pdb prep time=" + (tf1 - t0));
 
 
-                    Log("basic mesh saved, triangles=" + savemesh.triangles.Length);
+                    Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
                     prepRadinf = CSGControl.radInfluence;
 
                     // precompute the compacted version (common vertices)
-                    savemesh = savemesh.RemapMesh();
-
-                    DeleteChildren(goTest);
+                    tsavemesh = tsavemesh.RemapMesh();
 
                     // Render outside and inside separately with different colours
                     // It would be more sensible to have a two-sided shader,
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
-                    mfMol[Mols.molA].mesh = savemesh.ToMesh();
-                    mfMol[Mols.molAback].mesh = savemesh.ToMeshBack();
+                    if (!useb) {
+                        mfMol[Mols.molA].mesh = tsavemesh.ToMesh();
+                        mfMol[Mols.molAback].mesh = tsavemesh.ToMeshBack();
+                        savemesh = tsavemesh;
+                    } else {
+                        mfMol[Mols.molB].mesh = tsavemesh.ToMesh();
+                        mfMol[Mols.molBback].mesh = tsavemesh.ToMeshBack();
+                    }
 
                     return; // 
                 }
             }
 
             if (testop("filter")) {
-                if (mol == null || savemesh == null || prepRadinf != CSGControl.radInfluence)
+                if (molA == null || savemesh == null || prepRadinf != CSGControl.radInfluence)
                     Show("pdb prep");
 
                 filtermesh = Filter.FilterMesh.Filter(savemesh, hitpoint);
@@ -155,7 +166,7 @@ namespace CSG {
         /// <param name="c"></param>
         /// <param name="molid"></param>
         /// <returns></returns>
-        bool isShown(Camera c, int molid) {
+        protected bool isShown(Camera c, int molid) {
             return ( c.cullingMask & (1 << (molid + 8)) ) != 0;
         }
 
@@ -165,11 +176,22 @@ namespace CSG {
         /// <param name="c"></param>
         /// <param name="molid"></param>
         /// <param name="s"></param>
-        void show(Camera c, int molid, bool s) {
+        protected void show(Camera c, int molid, bool s) {
             if (s)
                 c.cullingMask |= (1 << (molid + 8));
             else
                 c.cullingMask &= ~ (1 << (molid + 8));
+        }
+
+        /// <summary>
+        /// show just the given modelule parts in the given camera view
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="molid"></param>
+        protected void show(Camera c, params int[] molids) {
+            c.cullingMask = 0;
+            foreach (var molid in molids)
+                show(c, molid, true);
         }
 
         protected override void UpdateI() {

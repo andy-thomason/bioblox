@@ -25,7 +25,6 @@ namespace CSG {  // [ExecuteInEditMode]
         protected BigMesh savemesh;
         // saved for processing
         protected BigMesh filtermesh;
-        protected PDB_molecule mol;
         // saved molecule
         protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
@@ -126,8 +125,8 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!goLight0) goLight0 = GameObject.Find("Light0");
             if (!goLight1) goLight1 = GameObject.Find("Light1");
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
-            if (!findcam()) return;
 
+            if (!findcam()) return;
 
             var t = curcam.transform;
             var p = t.position;
