@@ -51,7 +51,7 @@ namespace CSG {
             if (Cameras.Length == 1) {
                 Cameras = new Camera[4];
                 Cameras[0] = cam0;
-                for (int i = 0; i < 4; i++) {
+                for (int i = 1; i < 4; i++) {
                     GameObject goCam = new GameObject("cam" + i);
                     Camera cam = Cameras[i] = goCam.AddComponent<Camera>();
                     cam.transform.position = cam0.transform.position;
@@ -66,8 +66,13 @@ namespace CSG {
                 Cameras[2].rect = new Rect(0.5f, 0,     0.5f, 0.5f);
                 Cameras[3].rect = new Rect(0.5f, 0.5f,  0.5f, 0.5f);
 
-                Cameras[1].cullingMask = (1 << (Mols.molAfilt + 8)) | (1 << (Mols.molAfiltback + 8));
+                show(Cameras[0], Mols.molA, Mols.molAback, Mols.molAfilt, Mols.molAfiltback);
+                show(Cameras[1], Mols.molAfilt, Mols.molAfiltback);
+                show(Cameras[2], Mols.molB, Mols.molBback, Mols.molBfilt, Mols.molBfiltback);
+                show(Cameras[3], Mols.molBfilt, Mols.molBfiltback);
             }
+            cam0.rect = new Rect(0, 0, 0.5f, 0.5f);
+
         }
 
         void setonewin() {
