@@ -43,7 +43,6 @@ namespace CSG {
                     cam2.transform.Rotate(new Vector3(0, 180, 0));
                 }
             }
-
         }
 
 
@@ -62,6 +61,7 @@ namespace CSG {
             cam2.transform.localScale = cam1.transform.localScale;
             cam2.enabled = true;
             cam2.cullingMask = (1 << (Mols.molAfilt + 8)) | (1 << (Mols.molAfiltback + 8));
+            Cameras = Camera.allCameras;
         }
 
         void setonewin() {
@@ -72,6 +72,7 @@ namespace CSG {
             }
             cam1.rect = new Rect(0, 0, 1,1);
             cam2.enabled = false;
+            Cameras = Camera.allCameras;
         }
 
     }

@@ -149,7 +149,19 @@ namespace CSG {
             }
         }  // Show()
 
+        bool isShown(Camera c, int molid) {
+            return ( c.cullingMask & (1 << (molid + 8)) ) != 0;
+        }
+        void show(Camera c, int molid, bool s) {
+            if (s)
+                c.cullingMask |= (1 << (molid + 8));
+            else
+                c.cullingMask &= ~ (1 << (molid + 8));
+        }
+
         protected override void UpdateI() {
+            if (!findcam()) return;
+            
             if (!shader) shader = Shader.Find("Standard");    // Set shader
 
             // custom update actions that apply only to this application
@@ -165,6 +177,13 @@ namespace CSG {
                     lookat = Camera.main.transform.position = h + Camera.main.transform.forward * insideDist;
                     Camera.main.transform.Rotate(new Vector3(0, 180, 0));
                 }
+            }
+
+            if (Input.GetKeyDown("x")) {
+
+                bool act = ! isShown(curcam, Mols.molA);
+                show(curcam, Mols.molA, act);
+                show(curcam, Mols.molAback, act);
             }
 
             if (Input.GetKey("q")) {

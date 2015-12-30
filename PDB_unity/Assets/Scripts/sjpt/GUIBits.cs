@@ -22,19 +22,20 @@ namespace CSG {  // [ExecuteInEditMode]
         //public Material[] materials = new Material[8];
 
         // for reuse with different influence
-        public BigMesh savemesh;
+        protected BigMesh savemesh;
         // saved for processing
-        public BigMesh filtermesh;
-        public PDB_molecule mol;
+        protected BigMesh filtermesh;
+        protected PDB_molecule mol;
         // saved molecule
-        public float prepRadinf;
+        protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
-        public GameObject goTest, goLight0, goLight1, goFiltered;
-        public TransformData savedTransform;
+        protected GameObject goTest, goLight0, goLight1, goFiltered;
+        protected TransformData savedTransform;
         public Vector3 lookat = Vector3.zero;
         public Quaternion lightquat0 = new Quaternion(0.3f, 0.3f, 0, 1);
         public Quaternion lightquat1 = new Quaternion(-0.3f, -0.3f, 0, 1);
         protected CSGNode csg;
+        protected Camera[] Cameras;
 
         protected string toshow;
         static int nexty = 0, yinc = 1;
@@ -104,6 +105,17 @@ namespace CSG {  // [ExecuteInEditMode]
         public float mousePanRate = 0.05f;
         public float mouseRotRate = 0.1f;
 
+        protected Camera curcam;
+        protected Camera findcam() {
+            curcam = null;
+            foreach (Camera cam in Cameras) {
+                if (cam.pixelRect.Contains(Input.mousePosition)) {
+                    curcam = cam;
+                    break;
+                }
+            }
+            return curcam;
+        }
 
         protected virtual void UpdateI() {
 
@@ -112,8 +124,12 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!goLight0) goLight0 = GameObject.Find("Light0");
             if (!goLight1) goLight1 = GameObject.Find("Light1");
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
+            if (Cameras == null) Cameras = Camera.allCameras;
+            findcam();
+            if (curcam == null) return;
 
-            var t = Camera.main.transform;
+
+            var t = curcam.transform;
             var p = t.position;
             var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
 
@@ -239,22 +255,14 @@ namespace CSG {  // [ExecuteInEditMode]
             }
 
             if (Input.GetKeyDown("z")) {
-                Camera.main.transform.RestoreData(savedTransform);
-            }
-
-            if (Input.GetKeyDown("x")) {
-                if (goTest != null)
-                    goTest.SetActive(!goTest.activeSelf);
+                curcam.transform.RestoreData(savedTransform);
             }
 
             if (Input.GetKeyDown("o")) {
                 CamScript.useWireframe = !CamScript.useWireframe;
             }
 
-            goFiltered.transform.position = -Camera.main.transform.forward * 0.1f;
-
-            // MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
-            //Camera.main.transform
+            goFiltered.transform.position = -curcam.transform.forward * 0.1f;
 
             // ? no effect RenderSettings.ambientLight = Color.red;
             Light l = (Light)(goLight0.GetComponent(typeof(Light)));
@@ -364,13 +372,13 @@ namespace CSG {  // [ExecuteInEditMode]
 
         // find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
         Vector3 HitpointBM() {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
             return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh);
         }
 
         // find the hitpoint on the screen, using meshes in Test game object
         Vector3 HitpointGO() {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
             float r = ray.intersectR(gameObject);
             if (r == float.MaxValue)
                 return new Vector3(float.NaN, float.NaN, float.NaN);
