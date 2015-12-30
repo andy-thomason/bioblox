@@ -13,9 +13,7 @@ namespace CSG {
     /// </summary>
     class MultiView : GUIInsideSurface {
 
-        Camera cam1, cam2;
-        GameObject goCam2;
-
+ 
         // main function that will be called for display when something interesting has happened
         public override void Show(string ptoshow) {
             text = "";
@@ -34,45 +32,47 @@ namespace CSG {
         protected override void UpdateI() {
             base.UpdateI();
 
-            if (Input.GetKey("q")) {
+            if (Input.GetKey("q") && curcam == Cameras[0]) {
 
                 Vector3 h = Hitpoint();
                 if (!float.IsNaN(h.x)) {
-                    cam2.transform.position = h + Camera.main.transform.forward * insideDist;
-                    cam2.transform.rotation = cam1.transform.rotation;
-                    cam2.transform.Rotate(new Vector3(0, 180, 0));
+                    Camera cam = Cameras[1];
+                    cam.transform.position = h + Camera.main.transform.forward * insideDist;
+                    cam.transform.rotation = Camera.main.transform.rotation;
+                    cam.transform.Rotate(new Vector3(0, 180, 0));
                 }
             }
         }
 
 
         void setmwin() {
-            if (cam1 == null) cam1 = Camera.main;
-            if (goCam2 == null) {
-                goCam2 = new GameObject("cam2");
-                cam2 = goCam2.AddComponent<Camera>();
+            Camera cam0 = Camera.main;
+
+            if (Cameras.Length == 1) {
+                Cameras = new Camera[4];
+                Cameras[0] = cam0;
+                for (int i = 0; i < 4; i++) {
+                    GameObject goCam = new GameObject("cam" + i);
+                    Camera cam = Cameras[i] = goCam.AddComponent<Camera>();
+                    cam.transform.position = cam0.transform.position;
+                    cam.transform.rotation = cam0.transform.rotation;
+                    cam.transform.localScale = cam0.transform.localScale;
+                    cam.clearFlags = CameraClearFlags.Color;
+                    cam.backgroundColor = Color.green;
+                    cam.enabled = true;
+                }
+                cam0.rect =       new Rect(0,    0,     0.5f, 0.5f);
+                Cameras[1].rect = new Rect(0,    0.5f,  0.5f, 0.5f);
+                Cameras[2].rect = new Rect(0.5f, 0,     0.5f, 0.5f);
+                Cameras[3].rect = new Rect(0.5f, 0.5f,  0.5f, 0.5f);
+
+                Cameras[1].cullingMask = (1 << (Mols.molAfilt + 8)) | (1 << (Mols.molAfiltback + 8));
             }
-            cam1.rect = new Rect(0, 0, 0.5f, 0.5f);
-            cam2.rect = new Rect(0, 0.5f, 0.5f, 0.5f);
-            cam2.clearFlags = CameraClearFlags.Color;
-            cam2.backgroundColor = Color.green;
-            cam2.transform.position = cam1.transform.position;
-            cam2.transform.rotation = cam1.transform.rotation;
-            cam2.transform.localScale = cam1.transform.localScale;
-            cam2.enabled = true;
-            cam2.cullingMask = (1 << (Mols.molAfilt + 8)) | (1 << (Mols.molAfiltback + 8));
-            Cameras = Camera.allCameras;
         }
 
         void setonewin() {
-            if (cam1 == null) cam1 = Camera.main;
-            if (goCam2 == null) {
-                goCam2 = new GameObject("cam2");
-                cam2 = goCam2.AddComponent<Camera>();
-            }
-            cam1.rect = new Rect(0, 0, 1,1);
-            cam2.enabled = false;
-            Cameras = Camera.allCameras;
+            Camera.main.rect = new Rect(0, 0, 1,1);
+            for(int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = false;
         }
 
     }

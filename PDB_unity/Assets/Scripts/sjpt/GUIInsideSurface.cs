@@ -149,9 +149,22 @@ namespace CSG {
             }
         }  // Show()
 
+        /// <summary>
+        /// check if the given molecule part is shown in given camera view
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="molid"></param>
+        /// <returns></returns>
         bool isShown(Camera c, int molid) {
             return ( c.cullingMask & (1 << (molid + 8)) ) != 0;
         }
+
+        /// <summary>
+        /// set the visibility of the given molecule part for the given camera view
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="molid"></param>
+        /// <param name="s"></param>
         void show(Camera c, int molid, bool s) {
             if (s)
                 c.cullingMask |= (1 << (molid + 8));
@@ -180,7 +193,6 @@ namespace CSG {
             }
 
             if (Input.GetKeyDown("x")) {
-
                 bool act = ! isShown(curcam, Mols.molA);
                 show(curcam, Mols.molA, act);
                 show(curcam, Mols.molAback, act);
