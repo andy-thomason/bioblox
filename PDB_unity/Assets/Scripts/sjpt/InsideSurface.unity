@@ -23,8 +23,8 @@ RenderSettings:
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 0.1
-  m_AmbientMode: 0
+  m_AmbientIntensity: 0
+  m_AmbientMode: 3
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -456,21 +456,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 1182041623}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 308fa38d14daa434092da1f088c6b02c, type: 3}
+  m_Script: {fileID: 11500000, guid: 171db214fb950b34c9cf62aac708405d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   NBOX: 2
+  radInfluence: 2.5
   keepUpright: 0
+  parallel: 1
+  CSGStats: 0
+  MinLev: 1
+  CylNum: 6
+  GiveUpNodes: 50
+  CullSides: 1
+  WindShow: 3
+  CheckWind: 1
+  windDebug: 1
   hitpoint: {x: NaN, y: NaN, z: NaN}
+  goTest: {fileID: 0}
+  goFiltered: {fileID: 0}
   lookat: {x: 0, y: 0, z: 0}
-  lightquat0: {x: 0.3, y: 0.3, z: 0, w: 1}
-  lightquat1: {x: -0.3, y: -0.3, z: 0, w: 1}
   keyPanRate: 0.05
   keyRotRate: 0.5
   wheelScrollRate: 0.3
   mousePanRate: 0.05
   mouseRotRate: 0.1
-  radInfluence: 2.5
   outsideDist: 20
   insideDist: 20
   smooth: 0.66

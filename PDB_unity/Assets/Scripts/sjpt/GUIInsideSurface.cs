@@ -17,9 +17,6 @@ namespace CSG {
         //[Range(1, 8)]
         //public int MaxLev = 10;
 
-        [Range(0, 5)]
-        [SerializeField] float radInfluence = 2.5f;  // controls the blobiness of the metaballs,
-                            // a sphere of radius r has influence up to distance r*radInfluence
 
         public float outsideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go inside object 
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
@@ -36,33 +33,14 @@ namespace CSG {
 
 
         // main function that will be called for display when something interesting has happened
-        public override void Show(string ptoshow) {
-            text = "";
-            toshow = ptoshow;
+        public override bool Show(string ptoshow) {
+            if (base.Show(ptoshow)) return true;
 
-            // make sure some CSG metaball details correct for this experiment
-            BasicMeshData.Sides = 1;             // just show outside surface on main
-            BasicMeshData.CheckWind = true;        // check and correct winding
-            BasicMeshData.WindShow = 3;            //show all windings, correct = 1 + wrong = 2
-            Poly.windDebug = false;                // do not do further winding debug
-            BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
 
-            // update local control variables (so they show in Unity editor) 
-            // to be reflected in the 'real' places
-            CSGControl.radInfluence = radInfluence; MSPHERE.UpdateRadInfluence();
-
-            // In order to use sphere etc we must force subdivision to some level
-            // or objects are just 'lost'
-            float t0 = Time.realtimeSinceStartup;
-            
-            csg = S.NONE;
-
-            if (testop("clear")) {  // clear button
-                DeleteChildren(goTest);
-                DeleteChildren(goFiltered);
-                return;
-            } 
-            Bounds bounds = new Bounds();
+            if (testop("clearMol")) {
+                foreach (var mf in mfMol) mf.mesh = null;
+                return true;
+            }
 
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 if (CSGControl.MinLev < 5) 
@@ -92,7 +70,8 @@ namespace CSG {
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
                     var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999);
-                    var tsavemesh = savemeshx["notexture"].GetBigMesh();
+                    BigMesh tsavemesh = null;
+                    foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
 
                     float tf1 = Time.realtimeSinceStartup;
                     Log("pdb prep time=" + (tf1 - t0));
@@ -117,7 +96,7 @@ namespace CSG {
                         mfMol[Mols.molBback].mesh = tsavemesh.ToMeshBack();
                     }
 
-                    return; // 
+                    return true; // 
                 }
             }
 
@@ -135,29 +114,12 @@ namespace CSG {
                 mfMol[Mols.molAfilt].mesh = filtermesh.ToMesh();
                 mfMol[Mols.molAfiltback].mesh = filtermesh.ToMeshBack();
 
-                return;  // don't go through the standard csg display part appropriate to full display
+                return true;  // don't go through the standard csg display part appropriate to full display
             }
 
-            if (toshow == "") return;  // toshow = "" used to collect buttons, so nothing to display
+            if (opdone) showCSGParallel(bounds);
+            return opdone;
 
-            float t1 = Time.realtimeSinceStartup;
-            Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
-
-            // This is where the real rendering happens
-            var meshes = UnityCSGOutput.MeshesFromCsg(csg, bounds);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            float t2 = Time.realtimeSinceStartup;
-            Log2("mesh count " + meshes.Count + " maxlev=" + CSGControl.MaxLev + " time=" + (t2 - t1) +
-            ", giveUpCount=" + CSGNode.GiveUpCount);
-            if (BasicMeshData.CheckWind)
-                Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
-                + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
-                + " model=" + toshow);
-
-            if (toshow != "pdb prep") {  // already done for filter
-                GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
-                DeleteChildren(test1);
-                BasicMeshData.ToGame(test1, meshes, "CSGStephen");
-            }
         }  // Show()
 
         /// <summary>
