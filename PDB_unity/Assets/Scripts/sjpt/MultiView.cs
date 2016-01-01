@@ -15,18 +15,24 @@ namespace CSG {
 
  
         // main function that will be called for display when something interesting has happened
-        public override void Show(string ptoshow) {
+        public override bool Show(string ptoshow) {
+            if (base.Show(ptoshow)) return true;
+
             text = "";
             toshow = ptoshow;
             if (testop("mwin")) {
                 setmwin();
-                return;
+                return true;
             }
             if (testop("onewin")) {
                 setonewin();
-                return;
+                return true;
             }
-            base.Show(ptoshow);
+            if (testop("4lights")) {
+                setLights();
+                return true;
+            }
+            return false;
         }
 
         protected override void UpdateI() {
@@ -44,6 +50,26 @@ namespace CSG {
             }
         }
 
+        static Vector3[] lpos  = new Vector3[] { new Vector3(100, 100, 100),
+            new Vector3(100, -100, -100),
+            new Vector3(-100, 100, -100),
+            new Vector3(-100, -100, 100) };
+
+        void setLights() {
+            foreach (Light go in UnityEngine.Object.FindObjectsOfType(typeof(Light)))
+                Destroy(go.transform.gameObject);
+
+            for (int i = 0; i < 4; i++) {
+                GameObject go = new GameObject("light" + i);
+                Light l = go.AddComponent<Light>();
+                l.type = LightType.Point;
+                l.range = 1e20F;
+                l.color = Color.white;
+                l.intensity = 0.5f;
+                l.transform.position = lpos[i];
+            }
+
+        }
 
         void setmwin() {
             Camera cam0 = Camera.main;

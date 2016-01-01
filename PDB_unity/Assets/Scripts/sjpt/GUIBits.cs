@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 using CSG;
 using CSGNonPlane;
@@ -16,8 +17,36 @@ namespace CSG {  // [ExecuteInEditMode]
         GameObject child;
 
         [Range(0, 4)] public int NBOX = 2;  // number of boxes to draw behind text to get enough opacity
+        [Range(0, 5)]
+        public float radInfluence = 2.5f;  // controls the blobiness of the metaballs,
+                                           // a sphere of radius r has influence up to distance r*radInfluence
+
 
         public bool keepUpright = false;
+        public bool parallel = true;
+        public bool CSGStats = false;
+
+        [Range(1, 12)]
+        public int MinLev = 1;
+
+        //[Range(1, 12)]
+        //public int MaxLev = 10;
+
+        [Range(-1, 20)]
+        public float CylNum = 6;
+
+        [Range(10, 2000)]
+        public int GiveUpNodes = 50;
+
+
+        [Range(0, 3)]
+        public int CullSides = 1;
+
+        [Range(0, 3)]
+        public int WindShow = 3;
+        public bool CheckWind = true;
+        public bool windDebug = true;
+
 
         //public Material[] materials = new Material[8];
 
@@ -28,11 +57,9 @@ namespace CSG {  // [ExecuteInEditMode]
         // saved molecule
         protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
-        protected GameObject goTest, goLight0, goLight1, goFiltered;
-        protected TransformData savedTransform;
+        public GameObject goTest, goFiltered;
+        public TransformData savedTransform;
         public Vector3 lookat = Vector3.zero;
-        public Quaternion lightquat0 = new Quaternion(0.3f, 0.3f, 0, 1);
-        public Quaternion lightquat1 = new Quaternion(-0.3f, -0.3f, 0, 1);
         protected CSGNode csg;
         protected Camera[] Cameras;
 
@@ -56,17 +83,168 @@ namespace CSG {  // [ExecuteInEditMode]
         public static Dictionary<string, string> ktexts = new Dictionary<string, string>();
 
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
+        protected Bounds bounds;
 
+        protected bool opdone = false;
         protected bool testop(string s) {
             if (!ops.ContainsKey(s)) {
                 nexty += yinc;
                 ops.Add(s, new ButtonPrepare(s, nexty));
             }
 
-            return (s == toshow);
+            bool yes = (s == toshow);
+            opdone |= yes;
+            return yes;
         }
 
-        public abstract void Show(string ptoshow);
+        /// <summary>
+        /// find and perform operation, return true if operation complete
+        /// </summary>
+        /// <param name="ptoshow"></param>
+        /// <returns></returns>
+        public virtual bool Show(string ptoshow) {
+            opdone = false;
+            text = "";
+            toshow = ptoshow;
+
+            // make sure some CSG metaball details correct for this experiment
+            BasicMeshData.Sides = 1;             // just show outside surface on main
+            BasicMeshData.CheckWind = true;        // check and correct winding
+            BasicMeshData.WindShow = 3;            //show all windings, correct = 1 + wrong = 2
+            Poly.windDebug = false;                // do not do further winding debug
+            BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
+
+            // update local control variables (so they show in Unity editor) 
+            // to be reflected in the 'real' places
+            CSGControl.radInfluence = radInfluence; MSPHERE.UpdateRadInfluence();
+            gameObject.transform.position = new Vector3(0, 0, 0);
+            gameObject.transform.rotation = new Quaternion(0, 0, 0, 1);
+
+
+            if (testop("clear")) {  // clear button
+                DeleteChildren(goTest);
+                DeleteChildren(goFiltered);
+                csg = S.NONE;
+                return true;
+            }
+            if (testop("progress")) {
+                showProgress();
+                return true;
+            }
+            if (testop("interrupt")) {
+                interrupt();
+            }
+
+
+            bounds = new Bounds();
+
+            return false;
+        }  // Show()
+
+        protected float t0;
+        private float t1 = 0;
+
+        private IDictionary<string, BasicMeshData> parallelMeshes;
+        private string parallelPending = null;
+        private Thread parallelThread = null;
+        private float progressInterval;
+        private float lastProgressTime = 0;
+
+        private void interrupt() {
+            if (parallelThread != null) {
+                CSGControl.Interrupt = true;
+                Log("Interrupt requested by user");
+                float t2 = Time.realtimeSinceStartup;
+                parallelThread.Abort();
+                Log("INTERRUPTED: {0} interrupted at done={1}% time={2} est total time={3}", parallelPending, Subdivide.done * 100, (t2 - t1), (t2 - t1) / Subdivide.done);
+                parallelPending = null;
+                parallelThread = null;
+                if (CSGNode.csgmode != CSGMode.collecting) {
+                    Log("csgmode forced after interrupt from " + CSGNode.csgmode);
+                    CSGNode.csgmode = CSGMode.collecting;
+                }
+            } else {
+                // Log("interrupt: no parallel thread to kill");
+            }
+        } // interrupt
+
+        protected void showProgress() {
+            if (parallelThread == null) return;
+            try {
+                GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
+                BasicMeshData.showProgress(test1);
+            } catch (Exception e) {
+                Log("Error showing progress:" + e);
+            }
+            lastProgressTime = Time.realtimeSinceStartup;
+        }  // showProgress()
+
+        protected bool showCSGParallel(Bounds bounds) {
+            if (toshow == "")
+                return false;
+
+            t1 = Time.realtimeSinceStartup;
+            Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
+
+            if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
+            if (parallel) {
+                parallelPending = toshow;
+                Log("running in parallel:  " + parallelPending);
+                parallelThread = new Thread(() => {
+                    try {
+                        parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    } catch (Exception e) {
+                        Log("parallel thread failed: " + e);
+                        Log(e.StackTrace);
+}
+                });
+                parallelThread.Name = "CSGWorker";
+                parallelThread.Start();
+            } else {
+                parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            }
+            return true;
+
+        }  // showCSGparallel
+
+
+        private void finishParallel() {
+            if (parallelThread != null) {
+                float t2 = Time.realtimeSinceStartup;
+                LogK("done", "{0,3:0.0}%, time={1,5:0.00}, est remaining time={2,5:0.00}, splits={3}", Subdivide.done * 100, (t2 - t1), (t2 - t1) * (1 - Subdivide.done) / Subdivide.done, Poly.splits);
+
+
+                if (!parallelThread.IsAlive) {
+                    //showProgress();  // ???? <<< killer ???
+                    if (parallelMeshes == null) {
+                        Log("parallel thread finished but no meshes created, time=" + (t2 - t1));
+                        parallelPending = null;
+                        parallelThread = null;
+                        return;
+                    }
+                    LogK("done", "parallel complete: " + parallelPending + " time=" + (t2 - t1));
+                    parallelPending = null;
+                    parallelThread = null;
+
+                    var meshes = parallelMeshes;
+                    parallelMeshes = null;
+                    GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
+                    DeleteChildren(test1);
+                    CSGStats stats = BasicMeshData.ToGame(test1, meshes, "CSGStephen");
+
+                    Log2("mesh count " + meshes.Count + " maxlev=" + CSGControl.MaxLev + " time=" + (t2 - t1) +
+                    ", giveUpCount=" + CSGNode.GiveUpCount + "," + stats);
+                    if (BasicMeshData.CheckWind)
+                        Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
+                        + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
+                        + " model=" + toshow);
+                    if (CSGStats)
+                        Log2("verttypes {0:N0} {1:N0} {2:N0}", Poly.verttype[0], Poly.verttype[1], Poly.verttype[2]);
+                }
+
+                // nb, minster model from OpenSCAD 1/2 minster vertices=30,656, triangles=61,891
+            }
+        }  // finishParallel
 
         public static void Log(string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
@@ -89,7 +267,7 @@ namespace CSG {  // [ExecuteInEditMode]
             Log("!!!!!!!!!!!!!!!!!!" + e.ToString());
         }
 
-        protected void showcsg() {
+        protected void Logcsg() {
             string sss = csg.ToStringF("\n");
             Log(sss);
             CSGNode cc = csg.Bake();
@@ -122,11 +300,15 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // save these early, maybe more efficient, and difficult to find again after hiding otherwise
             if (!goTest) goTest = GameObject.Find("Test");
-            if (!goLight0) goLight0 = GameObject.Find("Light0");
-            if (!goLight1) goLight1 = GameObject.Find("Light1");
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
 
+            finishParallel();
+            if (Input.GetKeyDown("p")) showProgress();
+            if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
+                showProgress();
+
             if (!findcam()) return;
+
 
             var t = curcam.transform;
             var p = t.position;
@@ -257,17 +439,20 @@ namespace CSG {  // [ExecuteInEditMode]
                 curcam.transform.RestoreData(savedTransform);
             }
 
+            if (Input.GetKeyDown("x")) {
+                if (goTest != null)
+                    goTest.SetActive(!goTest.activeSelf);
+            }
+
             if (Input.GetKeyDown("o")) {
                 CamScript.useWireframe = !CamScript.useWireframe;
             }
 
             goFiltered.transform.position = -curcam.transform.forward * 0.1f;
 
-            // ? no effect RenderSettings.ambientLight = Color.red;
-            Light l = (Light)(goLight0.GetComponent(typeof(Light)));
-            l.transform.localRotation = lightquat0;
-            l = (Light)(goLight1.GetComponent(typeof(Light)));
-            l.transform.localRotation = lightquat1;
+            //RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            //RenderSettings.ambientLight = Color.white;
+            //RenderSettings.ambientIntensity = 0;
 
         }
 
@@ -282,6 +467,11 @@ namespace CSG {  // [ExecuteInEditMode]
             
         int slidery = 0;
         protected virtual void OnGUII() {
+            GUI.contentColor = Color.white;
+            GUI.color = Color.white;
+            GUI.backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1f);
+
+
             if (ops.Count == 0)
                 Show("");  // get things initialized
 
@@ -294,29 +484,10 @@ namespace CSG {  // [ExecuteInEditMode]
             }
             y += 2;
             slidery = yh*y;
-        
-/***
-            MSlider("MaxLev", ref CSGControl.MaxLev, 0, 12 );
-            MSlider("MinLev", ref CSGControl.MinLev, 0, 12 );
-            MSlider("CylNum", ref CSGXprim.CylNum, -1, 20 );
-            MSlider("GiveUpNodes", ref CSGControl.GiveUpNodes, 10, 2000 );
-            MSlider("Cull Sides", ref BasicMeshData.Sides, 0, 3 );
 
-            MSlider("NumSpheres", ref NumSpheres, 0, 2500 );
-            MSlider("radInfluence", ref CSGControl.radInfluence, 0f, 5f );
-            MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50 );
-            MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 50 );
-            MSlider("WindShow", ref BasicMeshData.WindShow, 0, 3 );
-***/
+            MSlider("progress rate", ref progressInterval, 0.0f, 10.0f);
 
-
-            //float xx = GUI.HorizontalSlider(new Rect (20  * 30, 80, 20), lastxx, 0, 10);
-            //if (lastxx != xx) Log("xx=" + xx);
-            //lastxx = xx;
             int w = Screen.width / 2;  // width of text
-            GUI.contentColor = Color.white;
-            GUI.color = Color.white;
-            GUI.backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1f);
             string xtext = text;
             foreach (var kvp in ktexts) xtext += kvp.Key + ": " + kvp.Value;
 
