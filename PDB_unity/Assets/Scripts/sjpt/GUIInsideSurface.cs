@@ -20,7 +20,8 @@ namespace CSG {
 
         public float outsideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go inside object 
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
-        public float smooth = 0.66f;        
+        public float smooth = 0.6f;
+        public float metallic = 0.8f;
 
         // following are class so they can get reused between frames
         CSGFMETA csgm;
@@ -240,6 +241,7 @@ namespace CSG {
                     Material mat = new Material(shader);
                     mat.color = Mols.colors[i];
                     mat.SetFloat("_Glossiness", smooth);
+                    mat.SetFloat("_Metallic", metallic);
                     mrMol[i].material = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();
@@ -254,7 +256,7 @@ namespace CSG {
         public static int molA = 0, molAback = 1, molB = 2, molBback = 3, molAfilt = 4, molAfiltback = 5, molBfilt = 6, molBfiltback = 7;
         public static string[] name = { "molA", "molAback", "molB", "molBback", "molAfilt", "molAfiltback", "molBfilt", "molBfiltback" };
         public static Color[] colors = {
-            new Color(0.5f, 0.5f, 0.5f), // A
+            new Color(0.7f, 0.7f, 0.7f), // A
             new Color(0.5f, 1,    0.5f), // Aback
             new Color(0.5f, 0.5f, 0.5f), // B
             new Color(0.5f, 0.5f, 0.5f), // Bback
