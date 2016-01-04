@@ -16,6 +16,7 @@ using CSGNonPlane;
 // Note: for updated metaballs see the Java code.
 
 namespace CSGFIELD {
+    using System.Runtime.CompilerServices;
     using Matrix = Matrix4x4;
 
     /// <summary>
@@ -25,6 +26,8 @@ namespace CSGFIELD {
         public abstract Interval ifield(Volume vol);  // not currently used
 
         public abstract float field(Vector3 point);
+        public abstract void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz);
+
 
         public abstract CSGFNODE simplify(Volume vol);
     }
@@ -38,6 +41,10 @@ namespace CSGFIELD {
 
         public override float field(Vector3 point) {
             return Single.MaxValue;
+        }
+
+        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+            dxx = dxy = dxz = dyy = dyz = dzz = 0;
         }
 
         public override CSGFNODE simplify(Volume vol) {
@@ -55,6 +62,10 @@ namespace CSGFIELD {
         public override float field(Vector3 point) {
             return Single.MaxValue;
         }
+        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+            dxx = dxy = dxz = dyy = dyz = dzz = 0;
+        }
+
 
         public override CSGFNODE simplify(Volume vol) {
             return this;
@@ -90,6 +101,20 @@ namespace CSGFIELD {
             return l.field(point) + r.field(point);
         }
 
+        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+            float ldxx, ldxy, ldxz, ldyy, ldyz, ldzz;
+            float rdxx, rdxy, rdxz, rdyy, rdyz, rdzz;
+            l.dd(p, out ldxx, out ldxy, out ldxz, out ldyy, out ldyz, out ldzz);
+            r.dd(p, out rdxx, out rdxy, out rdxz, out rdyy, out rdyz, out rdzz);
+            dxx = ldxx + rdxx;
+            dxy = ldxy + rdxy;
+            dxz = ldxz + rdxz;
+            dyy = ldyy + rdyy;
+            dyz = ldyz + rdyz;
+            dzz = ldzz + rdzz;
+        }
+
+
         public override CSGFNODE simplify(Volume vol) {
             CSGFNODE nl = l.simplify(vol);
             if (nl is CSGFBIG)
@@ -110,16 +135,16 @@ namespace CSGFIELD {
     /// metasphere class
     /// </summary>
     public class MSPHERE : CSGFNODE {
-        public float x, y, z, r, ri;
+        public float cx, cy, cz, r, ri;
         // centre, radius and radius inverse
         public Color color = Color.white;
 
-        public MSPHERE(float cx, float cy, float cz, float rr) {
-            x = cx;
-            y = cy;
-            z = cz;
-            r = rr;
-            ri = 1 / rr;
+        public MSPHERE(float px, float py, float pz, float pr) {
+            cx = px;
+            cy = py;
+            cz = pz;
+            r = pr;
+            ri = 1 / pr;
         }
 
         public MSPHERE(Vector3 c, float rr)
@@ -149,9 +174,9 @@ namespace CSGFIELD {
 
         public override Interval ifield(Volume vol) {
             //throw new Exception("not used");
-            Interval dx = (new Interval(vol.x1, vol.x2) - x) * ri;
-            Interval dy = (new Interval(vol.y1, vol.y2) - y) * ri;
-            Interval dz = (new Interval(vol.z1, vol.z2) - z) * ri;
+            Interval dx = (new Interval(vol.x1, vol.x2) - cx) * ri;
+            Interval dy = (new Interval(vol.y1, vol.y2) - cy) * ri;
+            Interval dz = (new Interval(vol.z1, vol.z2) - cz) * ri;
             Interval r2 = dx.sq() + dy.sq() + dz.sq();
             if (r2.hi < 1)
                 return Interval.MAX;
@@ -165,10 +190,10 @@ namespace CSGFIELD {
             return ret;
         }
 
-        public override float field(Vector3 point) {
-            float dx = (point.x - x);
-            float dy = (point.y - y);
-            float dz = (point.z - z);
+        public override float field(Vector3 p) {
+            float dx = (p.x - cx);
+            float dy = (p.y - cy);
+            float dz = (p.z - cz);
             float d2 = dx * dx + dy * dy + dz * dz;
             d2 *= ri * ri;  // scale r2 to operate as if radius is 1
             if (d2 > radInfluence2) return 0;
@@ -180,13 +205,63 @@ namespace CSGFIELD {
             }
         }
 
+        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+            float x = p.x, y = p.y, z = p.z;
+            float rin3 = radInfluenceNorm3;
+            float ri2 = radInfluence2;
+
+            dxx = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((x - cx).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
+            dxy = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (y - cy) * (x - cx) * rin3);
+            dxz = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (z - cz) * (x - cx) * rin3);
+            dyy = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((y - cy).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
+            dyz = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (z - cz) * (y - cy) * rin3);
+            dzz = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((z - cz).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
+
+        }
+
+        /** for http://www.tusanga.com/calc,
+            help at http://www.tusanga.com/help/examples.html#idp221376
+
+            dx := x - cx; 
+            dy := y - cy; 
+            dz := z - cz; 
+            d2a := dx*dx + dy*dy + dz*dz; 
+
+            d2 := (x-cx)^2 + (y-cy)^2 + (z-cz)^2;
+            ddd := ri2 - d2; 
+            f := ddd*ddd*ddd *rin3; 
+            dxx := diff(diff(f,x),x);
+            dxy := diff(diff(f,x),y);
+            dxz := diff(diff(f,x),z);
+            dyy := diff(diff(f,y),y);
+            dyz := diff(diff(f,y),z);
+            dzz := diff(diff(f,z),z);
+
+
+            dyx := diff(diff(f,y),x);
+            check := factor(dxy - dyx);
+            fdxx := factor(dxx);
+            fdxy := factor(dxy);
+            edxy := expand(dxy);
+>>
+dxx := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((x-cx)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
+dxy := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(y-cy)*(x-cx)*rin3)
+dxz := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(z-cz)*(x-cx)*rin3)
+dyy := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((y-cy)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
+dyz := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(z-cz)*(y-cy)*rin3)
+dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
+
+
+
+                        **/
+
         public override CSGFNODE simplify(Volume vol) {
             // new code using vol as sphere and simple test, much faster
             //bool unew = true;
             //if (unew) {
-            float dx = (vol.x - x);
-            float dy = (vol.y - y);
-            float dz = (vol.z - z);
+            float dx = (vol.x - cx);
+            float dy = (vol.y - cy);
+            float dz = (vol.z - cz);
             float r2 = dx * dx + dy * dy + dz * dz;
             float vr = vol.Radius(); // todo: check R correct
             if (r2 > (vr + radInfluence * r) * (vr + radInfluence * r))
@@ -203,14 +278,14 @@ namespace CSGFIELD {
         
         // normal at a point
         public Vector3 Normal(Vector3 p) {
-            Vector3 n = new Vector3(p.x - x, p.y - y, p.z - z);
+            Vector3 n = new Vector3(p.x - cx, p.y - cy, p.z - cz);
             return n.Normal();
         }
 
         public Vector3 grad(Vector3 pos) {
-            float dx = (pos.x - x);
-            float dy = (pos.y - y);
-            float dz = (pos.z - z);
+            float dx = (pos.x - cx);
+            float dy = (pos.y - cy);
+            float dz = (pos.z - cz);
             float d2 = dx * dx + dy * dy + dz * dz;
             d2 *= ri * ri;  // scale r2 to operate as if radius is 1
             float grads;    // grad strength / dist (dist will come back in with size of dd)
@@ -393,7 +468,7 @@ namespace CSGFIELD {
             for (int i = 0; i < levspheres[0]; i++) {
                 MSPHERE s = spheres[0][i];
                 float rr = s.r * radInfluence;
-                v = v.union(new Volume(s.x - rr, s.x + rr, s.y - rr, s.y + rr, s.z - rr, s.z + rr));
+                v = v.union(new Volume(s.cx - rr, s.cx + rr, s.cy - rr, s.cy + rr, s.cz - rr, s.cz + rr));
             }
             return v;
         }
@@ -483,6 +558,9 @@ namespace CSGFIELD {
             col.a = a;
             return col;
         }
+
+        // not supported at this level [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float sq(this float x) { return x * x; }
     }
     // end CSGFSOLID
 }
