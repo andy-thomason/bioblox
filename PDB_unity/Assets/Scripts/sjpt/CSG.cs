@@ -762,7 +762,7 @@ namespace CSG {
         /// <param name="bk"></param>
         /// <returns></returns>
         public virtual CSGNode Bake(Bakery bk) {
-            Bakery nbk = Bakery.Merge(this.bk, bk);
+            //Bakery nbk = Bakery.Merge(this.bk, bk);
             if (CSGControl.filterInput != null) {
                 if (this is CSGPrim && !CSGControl.filterInput.filter(bk.provstring))
                     return S.NONE;

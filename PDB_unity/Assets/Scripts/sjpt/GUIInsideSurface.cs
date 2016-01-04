@@ -44,7 +44,7 @@ namespace CSG {
 
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 if (CSGControl.MinLev < 5) 
-                    CSGControl.MinLev = CSGControl.MinLev = 7;
+                    CSGControl.MinLev = 7;
                 CSGControl.MaxLev = CSGControl.MinLev;
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
@@ -90,7 +90,7 @@ namespace CSG {
                     if (!useb) {
                         mfMol[Mols.molA].mesh = tsavemesh.ToMesh();
                         mfMol[Mols.molAback].mesh = tsavemesh.ToMeshBack();
-                        savemesh = tsavemesh;
+                        savemesh = tsavemesh.ToMesh();
                     } else {
                         mfMol[Mols.molB].mesh = tsavemesh.ToMesh();
                         mfMol[Mols.molBback].mesh = tsavemesh.ToMeshBack();
@@ -111,8 +111,8 @@ namespace CSG {
                 DeleteChildren(goFiltered);
 
                 // double-sided filtered surface (again, silly way to do double-sided)
-                mfMol[Mols.molAfilt].mesh = filtermesh.ToMesh();
-                mfMol[Mols.molAfiltback].mesh = filtermesh.ToMeshBack();
+                mfMol[Mols.molAfilt].mesh = filtermesh; // .ToMesh();
+                mfMol[Mols.molAfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
 
                 return true;  // don't go through the standard csg display part appropriate to full display
             }
@@ -177,9 +177,15 @@ namespace CSG {
             }
 
             if (Input.GetKeyDown("x")) {
-                bool act = ! isShown(curcam, Mols.molA);
-                show(curcam, Mols.molA, act);
-                show(curcam, Mols.molAback, act);
+                if (isShown(curcam, Mols.molAfilt)) {  // viewports showing A will always show the filtered, so use that as A/B test
+                    bool act = !isShown(curcam, Mols.molA);   //  switch visibility of non-filtered A (front and back)
+                    show(curcam, Mols.molA, act);
+                    show(curcam, Mols.molAback, act);
+                } else {
+                    bool act = !isShown(curcam, Mols.molB);   //  switch visibility of non-filtered B (front and back)
+                    show(curcam, Mols.molB, act);
+                    show(curcam, Mols.molBback, act);
+                }
             }
 
             if (Input.GetKey("q")) {
@@ -215,8 +221,9 @@ namespace CSG {
             base.OnGUII();
         }
 
-        private void setobjs() {
+        private void setobjs() { 
             if (goMol != null) return;
+            Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
             int N = 8;
             goMol = new GameObject[N];
             mfMol = new MeshFilter[N];

@@ -141,13 +141,13 @@ namespace CSG {
             int[] tri = mesh.triangles;
             Vector3[] vert = mesh.vertices;
             Vector3 point = new Point();
-            Vector3 bestpoint = new Point(float.NaN, float.NaN, float.NaN);
+            //Vector3 bestpoint = new Point(float.NaN, float.NaN, float.NaN);
             float r;
             for (int t = 0; t < tri.Length; t += 3) {
                 r = ray.intersect3D_RayTriangle(vert[tri[t]], vert[tri[t + 1]], vert[tri[t + 2]], out point);
                 if (r < bestr) {
                     bestr = r;
-                    bestpoint = point;
+                    //bestpoint = point;
                 }
             }
             return bestr;

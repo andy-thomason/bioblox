@@ -51,9 +51,9 @@ namespace CSG {  // [ExecuteInEditMode]
         //public Material[] materials = new Material[8];
 
         // for reuse with different influence
-        protected BigMesh savemesh;
+        protected Mesh savemesh;
         // saved for processing
-        protected BigMesh filtermesh;
+        protected Mesh filtermesh;
         // saved molecule
         protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
@@ -135,8 +135,8 @@ namespace CSG {  // [ExecuteInEditMode]
                 interrupt();
             }
 
-
             bounds = new Bounds();
+            t0 = Time.realtimeSinceStartup;
 
             return false;
         }  // Show()
@@ -232,8 +232,8 @@ namespace CSG {  // [ExecuteInEditMode]
                     DeleteChildren(test1);
                     CSGStats stats = BasicMeshData.ToGame(test1, meshes, "CSGStephen");
 
-                    Log2("mesh count " + meshes.Count + " maxlev=" + CSGControl.MaxLev + " time=" + (t2 - t1) +
-                    ", giveUpCount=" + CSGNode.GiveUpCount + "," + stats);
+                    Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", meshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
+                        CSGNode.GiveUpCount, stats);
                     if (BasicMeshData.CheckWind)
                         Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
                         + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
@@ -461,7 +461,7 @@ namespace CSG {  // [ExecuteInEditMode]
             try {
                 OnGUII();
             } catch (System.Exception e) {
-                Log(e.ToString());
+                Log(e.ToString() + e.StackTrace);
             }
         }
             
@@ -487,17 +487,21 @@ namespace CSG {  // [ExecuteInEditMode]
 
             MSlider("progress rate", ref progressInterval, 0.0f, 10.0f);
 
-            int w = Screen.width / 2;  // width of text
+            // int w = Screen.width / 2;  // width of text
             string xtext = text;
             foreach (var kvp in ktexts) xtext += kvp.Key + ": " + kvp.Value;
 
-            Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
-            labelRect.x = Screen.width - labelRect.width;
-            for (int i = 0; i < NBOX; i++)
-                GUI.Box(labelRect, ""); 
-            GUI.contentColor = Color.white;
-            if (GUI.Button(labelRect, xtext, "label"))
-                text = ""; 
+            try {
+                Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
+                labelRect.x = Screen.width - labelRect.width;
+                for (int i = 0; i < NBOX; i++)
+                    GUI.Box(labelRect, ""); 
+                    GUI.contentColor = Color.white;
+                    if (GUI.Button(labelRect, xtext, "label"))
+                        text = "";
+            } catch (Exception e) {
+                Log2("exception preparing labelRect {0}\n{1}", e, e.StackTrace);
+            }
         }     // OnGUII
 
         int sliderWidth = 160, sliderHeight = 25;
