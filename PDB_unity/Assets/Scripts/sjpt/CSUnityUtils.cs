@@ -255,7 +255,7 @@ namespace CSG {
                 lock (UnityCSGOutput.parallelOutput) { 
                     var meshes = UnityCSGOutput.MeshesSoFar();
                     GUIBits.DeleteChildren(go);
-                    CSGStats stats = BasicMeshData.ToGame(go, meshes, "CSGStephen");
+                    BasicMeshData.ToGame(go, meshes, "CSGStephen");
                 }
             } catch (System.Exception e) {
                 GUIBits.Log("Error showing progress:" + e);
@@ -280,7 +280,7 @@ namespace CSG {
         public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false) {
             CSGStats stats = new CSGStats(); 
             foreach (var kvp in meshes) {
-                BasicMeshData bmd = kvp.Value; // meshes[k];
+                //BasicMeshData bmd = kvp.Value; // meshes[k];
                 string name = basename + "_" + kvp.Key;
                 GameObject child = new GameObject(name);
                 child.transform.parent = gameObject.transform;
@@ -419,6 +419,22 @@ namespace CSG {
             mesh.triangles = triangles;
             return mesh;
         }
+
+        public static BigMesh ToBigMesh(Mesh mesh) {
+            BigMesh bigmesh = new BigMesh();
+            bigmesh.vertices = mesh.vertices;
+            bigmesh.normals = mesh.normals;
+            bigmesh.uv = mesh.uv;
+            bigmesh.colors = mesh.colors;
+            bigmesh.triangles = mesh.triangles;
+            return bigmesh;
+        }
+
+        /** make a mesh with reversed triangles and normals */
+        public static Mesh ToMeshBack(Mesh mesh) {
+            return ToBigMesh(mesh).ToMeshBack();
+        }
+
 
         /** make a mesh with reversed triangles and normals */
         public Mesh ToMeshBack() {

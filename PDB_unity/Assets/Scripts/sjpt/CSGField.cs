@@ -22,7 +22,7 @@ namespace CSGFIELD {
     /// field based node
     /// </summary>
     public abstract class CSGFNODE {
-        public abstract Interval field(Volume vol);
+        public abstract Interval ifield(Volume vol);  // not currently used
 
         public abstract float field(Vector3 point);
 
@@ -32,7 +32,7 @@ namespace CSGFIELD {
     public class CSGFBIG : CSGFNODE {
         public static CSGFBIG std = new CSGFBIG();
 
-        public override Interval field(Volume vol) {
+        public override Interval ifield(Volume vol) {
             return Interval.MAX;
         }
 
@@ -48,7 +48,7 @@ namespace CSGFIELD {
     public class CSGFZERO : CSGFNODE {
         public static CSGFZERO std = new CSGFZERO();
 
-        public override Interval field(Volume vol) {
+        public override Interval ifield(Volume vol) {
             return Interval.ZERO;
         }
 
@@ -62,7 +62,7 @@ namespace CSGFIELD {
     }
 
     public abstract class CSGFOP2 : CSGFNODE {
-        public override abstract Interval field(Volume vol);
+        public override abstract Interval ifield(Volume vol);
 
         public override abstract float field(Vector3 point);
 
@@ -82,8 +82,8 @@ namespace CSGFIELD {
             : base(ll, rr) {
         }
 
-        public override Interval field(Volume vol) {
-            return l.field(vol) + r.field(vol);
+        public override Interval ifield(Volume vol) {
+            return l.ifield(vol) + r.ifield(vol);
         }
 
         public override float field(Vector3 point) {
@@ -112,6 +112,8 @@ namespace CSGFIELD {
     public class MSPHERE : CSGFNODE {
         public float x, y, z, r, ri;
         // centre, radius and radius inverse
+        public Color color = Color.white;
+
         public MSPHERE(float cx, float cy, float cz, float rr) {
             x = cx;
             y = cy;
@@ -124,14 +126,14 @@ namespace CSGFIELD {
             : this(c.x, c.y, c.z, rr) {
         }
 
+        public float strength = 1;
         public float sqrt2 = (float)Math.Sqrt(2);
         
-        public static float radInfluence = CSGControl.radInfluence;
-        // rad influence
-        public static float radInfluence2 = radInfluence * radInfluence;
-        // sqr of rad influence
-        public static float radInfluenceNorm = 1 / ((1 - radInfluence2) * (1 - radInfluence2));
-        // compensate factor
+        public static float radInfluence = CSGControl.radInfluence;          // rad influence
+        public static float radInfluence2 = radInfluence * radInfluence;      // sqr of rad influence
+        public static float radInfluenceNorm2 = 1 / ((1 - radInfluence2) * (1 - radInfluence2));    // compensate factor
+        public static float radInfluenceNorm3;  	                        // compensate factor
+        public bool cubic = true;
         static MSPHERE() {
             UpdateRadInfluence();
         }
@@ -139,10 +141,13 @@ namespace CSGFIELD {
         public static void UpdateRadInfluence() {
             radInfluence = CSGControl.radInfluence;  // rad influence
             radInfluence2 = radInfluence * radInfluence;  // sqr of rad influence
-            radInfluenceNorm = 1 / ((1 - radInfluence2) * (1 - radInfluence2));  // compensate factor
+            float ddd = 1 / (radInfluence2 - 1);
+            radInfluenceNorm2 = ddd * ddd;  // compensate factor
+            radInfluenceNorm3 = ddd * ddd * ddd;  // compensate factor
+
         }
 
-        public override Interval field(Volume vol) {
+        public override Interval ifield(Volume vol) {
             //throw new Exception("not used");
             Interval dx = (new Interval(vol.x1, vol.x2) - x) * ri;
             Interval dy = (new Interval(vol.y1, vol.y2) - y) * ri;
@@ -156,18 +161,23 @@ namespace CSGFIELD {
                 r2.lo = 0;  // todo, ?? not needed
             if (r2.hi > 2)
                 r2.hi = radInfluence2;
-            Interval ret = (r2 - radInfluence2).sq() * radInfluenceNorm;
+            Interval ret = (r2 - radInfluence2).sq() * radInfluenceNorm2; //<< TODO update to cubic if we use Interval
             return ret;
         }
 
         public override float field(Vector3 point) {
-            float dx = (point.x - x) * ri;
-            float dy = (point.y - y) * ri;
-            float dz = (point.z - z) * ri;
-            float r2 = dx * dx + dy * dy + dz * dz;
-            if (r2 > radInfluence2)
-                return 0;
-            return ((r2 - radInfluence2) * (r2 - radInfluence2)) * radInfluenceNorm;
+            float dx = (point.x - x);
+            float dy = (point.y - y);
+            float dz = (point.z - z);
+            float d2 = dx * dx + dy * dy + dz * dz;
+            d2 *= ri * ri;  // scale r2 to operate as if radius is 1
+            if (d2 > radInfluence2) return 0;
+            float ddd = radInfluence2 - d2;
+            if (cubic) {
+                return ddd * ddd * ddd * radInfluenceNorm3 * strength;
+            } else {
+                return ddd * ddd * radInfluenceNorm2 * strength;
+            }
         }
 
         public override CSGFNODE simplify(Volume vol) {
@@ -196,12 +206,36 @@ namespace CSGFIELD {
             Vector3 n = new Vector3(p.x - x, p.y - y, p.z - z);
             return n.Normal();
         }
+
+        public Vector3 grad(Vector3 pos) {
+            float dx = (pos.x - x);
+            float dy = (pos.y - y);
+            float dz = (pos.z - z);
+            float d2 = dx * dx + dy * dy + dz * dz;
+            d2 *= ri * ri;  // scale r2 to operate as if radius is 1
+            float grads;    // grad strength / dist (dist will come back in with size of dd)
+            if (d2 > radInfluence2)
+                return new Vector3(0, 0, 0);
+            else {
+                float ddd = radInfluence2 - d2;
+                if (cubic) {
+                    grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
+                } else {
+                    grads = ddd * 4 * radInfluenceNorm2 * strength * ri * ri;
+                }
+            }
+
+            return new Vector3(dx * grads, dy * grads, dz * grads);
+        }
+
     }
 
     /// <summary>
     /// tuned class to turn metaballs into a solid
     /// </summary>
     public class CSGFMETA : CSGXPrim {
+        public bool grayscale = false;
+
         int MAXD = 15;
         // max depth, just for allocation
         int MAXN = 2500;
@@ -246,6 +280,8 @@ namespace CSGFIELD {
             // the fields are +ve inside region of influence, but the dist is measured as +ve outside
             return CSGControl.fieldThresh - field;
         }
+
+
         /**** generic CSGXPrim Normal is only slightly more expensive, and looks better * /
         public override Vector3 Normal(Vector3 p) {
             int inlev = CSGControl.MinLev + 1; // todo mlevspheres[vol.lev];
@@ -262,6 +298,66 @@ namespace CSGFIELD {
             return n.Normal();
         }
         /***********/
+/* temporary tilll we do colour properly */
+        public override Vector3 Normal(Vector3 p) {
+            Vector3 normal;
+            Color color;
+            normalColor(p, out normal, out color);
+            return normal;
+        }
+/**/
+
+        //        public @GUIVal(description = "colour threshold for special colour (eg docking difference), -999 means off", level= GUIVal.ADVANCED) float colThresh = -999;
+        //        public @GUIVal(description = "field threshold, usually 1", level= GUIVal.ADVANCED) float fieldThresh = 1;  // probably fixed, algorithm is incorrect with other values
+        public static float colThresh = -999;
+
+        public void normalColor(Vector3 p, out Vector3 normal, out Color col) {
+            int subdivideLevel = CSGControl.MaxLev; //??
+            int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+            //float field = 0;
+            // Vector3 n = new Vector3();
+            //Vector3 p = new Vector3(x, y, z);
+            normal = new Vector3();
+            col = new Color();
+            if (inn == 0) {  // unexpected
+                normal.x = 1;
+                col.r = 0; col.g = 1; col.b = 1; col.a = 1; 
+            } else if (inn == 1 && colThresh == -999) {  // partly for efficiency, partly for tight radInfluence
+                normal = inspheres[0].Normal(p);
+                col.set(inspheres[0].color);
+            } else {
+                //normal.set(0, 0, 0);
+                //col.set(0, 0, 0, 0);
+                float ftot = 0;
+                float ftotpos = 0; // sum of positive contributions
+                for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
+                    float myfield = inspheres[ini].field(p);
+                    Vector3 vv = inspheres[ini].grad(p);
+                    normal += vv;
+
+                    col += inspheres[ini].color * myfield;
+                    ftot += myfield;
+                    if (myfield > 0) ftotpos += ftot;
+                }
+                if (colThresh != -999) {
+                    normal.Normalize();
+                    float x = ftotpos / colThresh;
+                    Color cc = inspheres[0].color;
+                    if (!grayscale) {
+                        col.set(x * cc.r, 0.1f * cc.g, (1 - x) * cc.b, (x > 0.9f ? 1 : x / 0.9f) * cc.a); //pjt TODO: allow other colour palettes
+                    } else col.set(x * cc.r, x * cc.g, x * cc.b, (x > 0.3f ? 1 : x / 0.3f) * cc.a);
+                } else if (ftot < 0.001f) {  // can happen with very tight radInfluence
+                    normal = inspheres[0].Normal(p);
+                    col.set(inspheres[0].color);
+                } else {
+                    normal.Normalize();
+                    col /= ftot;
+                }
+            }
+        }
+
 
         public override CSGNode Expand(float e) {
             throw new NotImplementedException();
@@ -371,6 +467,22 @@ namespace CSGFIELD {
             return UnknownVolume();
         }
 
+    }
+
+    public static class CSGFieldExtras {
+        public static Color set(this Color col, Color c) {
+            return col = c;
+        }
+        public static Color set(this Color col, float r, float g, float b) {
+            return col.set(r, g, b, 1);
+        }
+        public static Color set(this Color col, float r, float g, float b, float a) {
+            col.r = r;
+            col.g = g;
+            col.b = b;
+            col.a = a;
+            return col;
+        }
     }
     // end CSGFSOLID
 }

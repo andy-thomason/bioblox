@@ -358,7 +358,7 @@ namespace CSGNonPlane {
         }
 
         static CSGNode basecyl;
-        private static int lastcnum = -999;
+        //private static int lastcnum = -999;
 
         /** Make a Faceted Cylinder.
         * If CylNum > 0 use 4*CylNum facets
@@ -375,7 +375,7 @@ namespace CSGNonPlane {
                                                 //prov = null;
                 CSGNode c;
                 //if (basecyl == null || cnum != lastcnum) {  // caching cylinders does make a huge difference
-                    lastcnum = cnum;
+                    //lastcnum = cnum;
                     CSGNode p1 = S.Plane(1, 0, 0, -1, prov);
                     c = S.ALL;
                     int n = 4 * cnum;
@@ -437,7 +437,7 @@ namespace CSGNonPlane {
             nodes = 50;  // temp to force subdivision
             apex = (ra * b - rb * a) / (ra - rb);
             angle = Mathf.Atan2( ra - rb, len);
-            float dangle = Mathf.Rad2Deg * angle;
+            //float dangle = Mathf.Rad2Deg * angle;
             infinite = inf;
         }
 

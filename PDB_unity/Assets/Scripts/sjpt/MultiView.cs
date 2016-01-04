@@ -50,10 +50,11 @@ namespace CSG {
             }
         }
 
-        static Vector3[] lpos  = new Vector3[] { new Vector3(100, 100, 100),
-            new Vector3(100, -100, -100),
-            new Vector3(-100, 100, -100),
-            new Vector3(-100, -100, 100) };
+        static float ddd = 1000;
+        static Vector3[] lpos  = new Vector3[] { new Vector3(ddd, 0, 0),
+            new Vector3(-ddd, 0, 0),
+            new Vector3(0, ddd, 0),
+            new Vector3(0, -ddd, 0) };
 
         void setLights() {
             foreach (Light go in UnityEngine.Object.FindObjectsOfType(typeof(Light)))
@@ -65,7 +66,7 @@ namespace CSG {
                 l.type = LightType.Point;
                 l.range = 1e20F;
                 l.color = Color.white;
-                l.intensity = 0.5f;
+                l.intensity = 0.7f;
                 l.transform.position = lpos[i];
             }
 

@@ -20,7 +20,7 @@ using System.Collections.Generic;
 namespace Filter {
     public class FilterMesh {
         public static int MaxNeighbourDistance = 10;
-        public static int MustIncludeDistance = 6;
+        public static int MustIncludeDistance = 20;
 
         public FilterMesh() {
         }
@@ -37,12 +37,12 @@ namespace Filter {
          * point is a sanple point that should be on or near the surface
          * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
          */
-        public static BigMesh Filter(
-            BigMesh mesh,
+        public static Mesh Filter(
+            Mesh mesh,
             Vector3 point) {
 
             // BigMesh nmesh = RemapMesh (mesh);  // precomuted (and checked)
-            BigMesh nmesh = mesh;
+            Mesh nmesh = mesh;
             Vector3[] vertices = nmesh.vertices;
             Vector3[] normals = nmesh.normals;
             Vector2[] uv = nmesh.uv;
@@ -156,7 +156,7 @@ namespace Filter {
                     nvertices[ii] = vertices[i];
                     nnormals[ii] = normals[i];
                     nuv[ii] = uv[i];
-                    float dist = (Vector3.Distance(bestvert, vertices[i]) - bestdist) / 10;
+                    //float dist = (Vector3.Distance(bestvert, vertices[i]) - bestdist) / 10;
                     ncolor[ii] = color[i];
                     //ncolor[ii] = new Color(1-dist, dist, 1);
                 }
@@ -176,7 +176,7 @@ namespace Filter {
                     }
                 }
             }
-            BigMesh newmesh = new BigMesh();
+            Mesh newmesh = new Mesh();
             newmesh.vertices = nvertices;
             newmesh.normals = nnormals;
             newmesh.uv = nuv;
