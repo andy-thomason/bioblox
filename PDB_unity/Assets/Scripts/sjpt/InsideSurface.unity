@@ -482,7 +482,8 @@ MonoBehaviour:
   mouseRotRate: 0.1
   outsideDist: 20
   insideDist: 20
-  smooth: 0.66
+  smooth: 0.6
+  metallic: 0.8
 --- !u!4 &1182041625
 Transform:
   m_ObjectHideFlags: 0
