@@ -159,8 +159,6 @@ namespace CSG {
         protected override void UpdateI() {
             if (!findcam()) return;
             
-            if (!shader) shader = Shader.Find("Standard");    // Set shader
-
             // custom update actions that apply only to this application
             if (Input.GetKeyDown(KeyCode.Semicolon)) {  // go to other side of surface and keep looking same way
                 Vector3 h = Hitpoint();
@@ -223,6 +221,8 @@ namespace CSG {
 
         private void setobjs() { 
             if (goMol != null) return;
+            if (!shader) shader = Shader.Find("Standard");    // Set shader
+
             Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
             int N = 8;
             goMol = new GameObject[N];
