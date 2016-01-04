@@ -96,20 +96,21 @@ namespace CSG {
         }
 
 
-        public static Vector3 intersect(this Ray ray, Mesh mesh) {
-            return ray.intersect(new BigMesh(mesh));
+        public static Vector3 intersect(this Ray ray, Mesh mesh, out int triangleNumber) {
+            return ray.intersect(new BigMesh(mesh), out triangleNumber);
         }
 
-        public static float intersectR(this Ray ray, Mesh mesh) {
-            return ray.intersectR(new BigMesh(mesh));
+        public static float intersectR(this Ray ray, Mesh mesh, out int triangleNumber) {
+            return ray.intersectR(new BigMesh(mesh), out triangleNumber);
         }
 
-        public static float intersectR(this Ray ray, GameObject gameObject) {
+        public static float intersectR(this Ray ray, GameObject gameObject, out int triangleNumber) {
+            triangleNumber = -1;
             float bestr = float.MaxValue;
             MeshFilter[] mfs = gameObject.GetComponentsInChildren<MeshFilter>();
             for (int i = 0; i < mfs.Length; i++) {
                 Mesh mesh = mfs[i].mesh;
-                float r = ray.intersectR(mesh);
+                float r = ray.intersectR(mesh, out triangleNumber);
                 if (r < bestr)
                     bestr = r;
             }
@@ -129,24 +130,26 @@ namespace CSG {
             return bestr;
         }
 
-        public static Vector3 intersect(this Ray ray, BigMesh mesh) {
-            float r = ray.intersectR(mesh);
+        public static Vector3 intersect(this Ray ray, BigMesh mesh, out int triangleNumber) {
+            float r = ray.intersectR(mesh, out triangleNumber);
             if (r == float.MaxValue)
                 return new Vector3(float.NaN, float.NaN, float.NaN);
             return ray.origin + r * ray.direction;
         }
 
-        public static float intersectR(this Ray ray, BigMesh mesh) {
+        public static float intersectR(this Ray ray, BigMesh mesh, out int triangleNumber) {
             float bestr = float.MaxValue;
             int[] tri = mesh.triangles;
             Vector3[] vert = mesh.vertices;
             Vector3 point = new Point();
             //Vector3 bestpoint = new Point(float.NaN, float.NaN, float.NaN);
             float r;
+            triangleNumber = -1;
             for (int t = 0; t < tri.Length; t += 3) {
                 r = ray.intersect3D_RayTriangle(vert[tri[t]], vert[tri[t + 1]], vert[tri[t + 2]], out point);
                 if (r < bestr) {
                     bestr = r;
+                    triangleNumber = t;
                     //bestpoint = point;
                 }
             }

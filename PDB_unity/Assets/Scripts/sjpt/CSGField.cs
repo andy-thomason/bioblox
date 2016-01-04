@@ -26,7 +26,7 @@ namespace CSGFIELD {
         public abstract Interval ifield(Volume vol);  // not currently used
 
         public abstract float field(Vector3 point);
-        public abstract void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz);
+        // public abstract void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz);
 
 
         public abstract CSGFNODE simplify(Volume vol);
@@ -43,9 +43,9 @@ namespace CSGFIELD {
             return Single.MaxValue;
         }
 
-        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
-            dxx = dxy = dxz = dyy = dyz = dzz = 0;
-        }
+        //public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+        //    dxx = dxy = dxz = dyy = dyz = dzz = 0;
+        //}
 
         public override CSGFNODE simplify(Volume vol) {
             return this;
@@ -62,9 +62,9 @@ namespace CSGFIELD {
         public override float field(Vector3 point) {
             return Single.MaxValue;
         }
-        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
-            dxx = dxy = dxz = dyy = dyz = dzz = 0;
-        }
+        //public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+        //    dxx = dxy = dxz = dyy = dyz = dzz = 0;
+        //}
 
 
         public override CSGFNODE simplify(Volume vol) {
@@ -101,7 +101,8 @@ namespace CSGFIELD {
             return l.field(point) + r.field(point);
         }
 
-        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+        /***
+        public void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
             float ldxx, ldxy, ldxz, ldyy, ldyz, ldzz;
             float rdxx, rdxy, rdxz, rdyy, rdyz, rdzz;
             l.dd(p, out ldxx, out ldxy, out ldxz, out ldyy, out ldyz, out ldzz);
@@ -113,6 +114,7 @@ namespace CSGFIELD {
             dyz = ldyz + rdyz;
             dzz = ldzz + rdzz;
         }
+        ***/
 
 
         public override CSGFNODE simplify(Volume vol) {
@@ -195,9 +197,9 @@ namespace CSGFIELD {
             float dy = (p.y - cy);
             float dz = (p.z - cz);
             float d2 = dx * dx + dy * dy + dz * dz;
-            d2 *= ri * ri;  // scale r2 to operate as if radius is 1
-            if (d2 > radInfluence2) return 0;
-            float ddd = radInfluence2 - d2;
+            float dri2 = d2 * ri * ri;  // scale r2 to operate as if radius is 1
+            if (dri2 > radInfluence2) return 0;
+            float ddd = radInfluence2 - dri2;
             if (cubic) {
                 return ddd * ddd * ddd * radInfluenceNorm3 * strength;
             } else {
@@ -205,37 +207,57 @@ namespace CSGFIELD {
             }
         }
 
-        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz) {
+        public void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz, out Vector3 grad) {
+
+            float dx1 = (p.x - cx);
+            float dy1 = (p.y - cy);
+            float dz1 = (p.z - cz);
+            float d2 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1;
+            float dri2 = d2 * ri * ri;  // scale r2 to operate as if radius is 1
+            float ridiff = radInfluence2 - dri2;
+            if (ridiff < 0) {
+                dxx = dxy = dxz = dyy = dyz = dzz = 0;
+                grad = new Vector3();
+                return;
+            }
+
+
             float x = p.x, y = p.y, z = p.z;
             float rin3 = radInfluenceNorm3;
-            float ri2 = radInfluence2;
+            float ri2 = ri * ri;
+            float ri4 = ri2 * ri2;
 
-            dxx = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((x - cx).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
-            dxy = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (y - cy) * (x - cx) * rin3);
-            dxz = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (z - cz) * (x - cx) * rin3);
-            dyy = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((y - cy).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
-            dyz = (24 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * (z - cz) * (y - cy) * rin3);
-            dzz = (-6 * ((-4 * (ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())) * ((z - cz).sq()) * rin3) + (((ri2 - ((x - cx).sq()) - ((y - cy).sq()) - ((z - cz).sq())).sq()) * rin3)));
+            float dx, dy, dz;
+            dxx = (-6 * ((-4 * ridiff * (ri4) * ((x - cx).sq()) * radInfluenceNorm3 * strength) + (((ridiff * ri).sq()) * radInfluenceNorm3 * strength)));
+            dxy = (24 * ridiff * (ri4) * (y - cy) * (x - cx) * radInfluenceNorm3 * strength);
+            dxz = (24 * ridiff * (ri4) * (z - cz) * (x - cx) * radInfluenceNorm3 * strength);
+            dyy = (-6 * ((-4 * ridiff * (ri4) * ((y - cy).sq()) * radInfluenceNorm3 * strength) + (((ridiff * ri).sq()) * radInfluenceNorm3 * strength)));
+            dyz = (24 * ridiff * (ri4) * (z - cz) * (y - cy) * radInfluenceNorm3 * strength);
+            dzz = (-6 * ((-4 * ridiff * (ri4) * ((z - cz).sq()) * radInfluenceNorm3 * strength) + (((ridiff * ri).sq()) * radInfluenceNorm3 * strength)));
+            dx = (-6 * ((ridiff * ri).sq()) * (x - cx) * radInfluenceNorm3 * strength);
+            dy = (-6 * ((ridiff * ri).sq()) * (y - cy) * radInfluenceNorm3 * strength);
+            dz = (-6 * ((ridiff * ri).sq()) * (z - cz) * radInfluenceNorm3 * strength);
 
+            grad = new Vector3(dx, dy, dz);
         }
 
         /** for http://www.tusanga.com/calc,
             help at http://www.tusanga.com/help/examples.html#idp221376
 
-            dx := x - cx; 
-            dy := y - cy; 
-            dz := z - cz; 
-            d2a := dx*dx + dy*dy + dz*dz; 
-
             d2 := (x-cx)^2 + (y-cy)^2 + (z-cz)^2;
-            ddd := ri2 - d2; 
-            f := ddd*ddd*ddd *rin3; 
+            dri2 = d2 * ri * ri;
+            ddd := radInfluence2 - dri2; 
+            f := ddd*ddd*ddd * radInfluenceNorm3 * strength; 
             dxx := diff(diff(f,x),x);
             dxy := diff(diff(f,x),y);
             dxz := diff(diff(f,x),z);
             dyy := diff(diff(f,y),y);
             dyz := diff(diff(f,y),z);
             dzz := diff(diff(f,z),z);
+
+            dx = diff(f,x);
+            dy = diff(f,y);
+            dz = diff(f,z);
 
 
             dyx := diff(diff(f,y),x);
@@ -244,14 +266,17 @@ namespace CSGFIELD {
             fdxy := factor(dxy);
             edxy := expand(dxy);
 >>
-dxx := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((x-cx)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
-dxy := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(y-cy)*(x-cx)*rin3)
-dxz := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(z-cz)*(x-cx)*rin3)
-dyy := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((y-cy)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
-dyz := (24*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*(z-cz)*(y-cy)*rin3)
-dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))^2)*rin3)))
+dxx := (-6*((-4*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*((x-cx)^2)*radInfluenceNorm3*strength)+((((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*radInfluenceNorm3*strength)))
+dxy := (24*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*(y-cy)*(x-cx)*radInfluenceNorm3*strength)
+dxz := (24*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*(z-cz)*(x-cx)*radInfluenceNorm3*strength)
+dyy := (-6*((-4*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*((y-cy)^2)*radInfluenceNorm3*strength)+((((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*radInfluenceNorm3*strength)))
+dyz := (24*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*(z-cz)*(y-cy)*radInfluenceNorm3*strength)
+dzz := (-6*((-4*(radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*(ri^4)*((z-cz)^2)*radInfluenceNorm3*strength)+((((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*radInfluenceNorm3*strength)))
+dx := (-6*(((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*(x-cx)*radInfluenceNorm3*strength)
+dy := (-6*(((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*(y-cy)*radInfluenceNorm3*strength)
+dz := (-6*(((radInfluence2-((((x-cx)^2)+((y-cy)^2)+((z-cz)^2))*(ri^2)))*ri)^2)*(z-cz)*radInfluenceNorm3*strength)
 
-
+grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
 
                         **/
 
@@ -287,12 +312,12 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
             float dy = (pos.y - cy);
             float dz = (pos.z - cz);
             float d2 = dx * dx + dy * dy + dz * dz;
-            d2 *= ri * ri;  // scale r2 to operate as if radius is 1
+            float dri2 = d2 * ri * ri;  // scale r2 to operate as if radius is 1
             float grads;    // grad strength / dist (dist will come back in with size of dd)
-            if (d2 > radInfluence2)
+            if (dri2 > radInfluence2)
                 return new Vector3(0, 0, 0);
             else {
-                float ddd = radInfluence2 - d2;
+                float ddd = radInfluence2 - dri2;
                 if (cubic) {
                     grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                 } else {
@@ -310,6 +335,7 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
     /// </summary>
     public class CSGFMETA : CSGXPrim {
         public bool grayscale = false;
+        public static bool computeCurvature = false;
 
         int MAXD = 15;
         // max depth, just for allocation
@@ -377,16 +403,37 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
         public override Vector3 Normal(Vector3 p) {
             Vector3 normal;
             Color color;
-            normalColor(p, out normal, out color);
+            normalColor(p, out normal, out color);                   
             return normal;
         }
-/**/
+        /**/
+
+        public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz, out Vector3 grad) {
+            dxx = dxy = dxz = dyy = dyz = dzz = 0;
+            grad = new Vector3();
+            int subdivideLevel = CSGControl.MaxLev; //??
+            int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+            for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
+                float ldxx, ldxy, ldxz, ldyy, ldyz, ldzz;
+                Vector3 lgrad;
+                inspheres[ini].dd(p, out ldxx, out ldxy, out ldxz, out ldyy, out ldyz, out ldzz, out lgrad);
+                dxx += ldxx;
+                dxy += ldxy;
+                dxz += ldxz;
+                dyy += ldyy;
+                dyz += ldyz;
+                dzz += ldzz;
+                grad += lgrad;
+            }
+        }
 
         //        public @GUIVal(description = "colour threshold for special colour (eg docking difference), -999 means off", level= GUIVal.ADVANCED) float colThresh = -999;
         //        public @GUIVal(description = "field threshold, usually 1", level= GUIVal.ADVANCED) float fieldThresh = 1;  // probably fixed, algorithm is incorrect with other values
         public static float colThresh = -999;
 
-        public void normalColor(Vector3 p, out Vector3 normal, out Color col) {
+        public override void normalColor(Vector3 p, out Vector3 normal, out Color col) {
             int subdivideLevel = CSGControl.MaxLev; //??
             int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
@@ -394,10 +441,10 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
             //float field = 0;
             // Vector3 n = new Vector3();
             //Vector3 p = new Vector3(x, y, z);
-            normal = new Vector3();
+            Vector3 grad = new Vector3();
             col = new Color();
             if (inn == 0) {  // unexpected
-                normal.x = 1;
+                normal = new Vector3(0, 0, 1);
                 col.r = 0; col.g = 1; col.b = 1; col.a = 1; 
             } else if (inn == 1 && colThresh == -999) {  // partly for efficiency, partly for tight radInfluence
                 normal = inspheres[0].Normal(p);
@@ -409,15 +456,14 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
                 float ftotpos = 0; // sum of positive contributions
                 for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
                     float myfield = inspheres[ini].field(p);
-                    Vector3 vv = inspheres[ini].grad(p);
-                    normal += vv;
+                    grad += inspheres[ini].grad(p);
 
                     col += inspheres[ini].color * myfield;
                     ftot += myfield;
                     if (myfield > 0) ftotpos += ftot;
                 }
+                normal = grad.Normal();
                 if (colThresh != -999) {
-                    normal.Normalize();
                     float x = ftotpos / colThresh;
                     Color cc = inspheres[0].color;
                     if (!grayscale) {
@@ -425,13 +471,26 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
                     } else col.set(x * cc.r, x * cc.g, x * cc.b, (x > 0.3f ? 1 : x / 0.3f) * cc.a);
                 } else if (ftot < 0.001f) {  // can happen with very tight radInfluence
                     normal = inspheres[0].Normal(p);
+                    // grad = ???
                     col.set(inspheres[0].color);
                 } else {
-                    normal.Normalize();
                     col /= ftot;
                 }
             }
+
+            if (computeCurvature) {
+                float dxx, dxy, dxz, dyy, dyz, dzz;
+                Vector3 grad2;
+                dd(p, out dxx, out dxy, out dxz, out dyy, out dyz, out dzz, out grad2);
+                Vector3 gradd = grad + grad2;
+                float ddd = gradd.magnitude;
+                if (ddd > 0.001)
+                    GUIBits.LogK("graderr", graderr++ + "");
+                col = Curvature.ctest(dxx, dxy, dxz, dyy, dyz, dzz, grad2);
+            }
+
         }
+        static int graderr = 0;
 
 
         public override CSGNode Expand(float e) {
@@ -561,6 +620,7 @@ dzz := (-6*((-4*(ri2-((x-cx)^2)-((y-cy)^2)-((z-cz)^2))*((z-cz)^2)*rin3)+(((ri2-(
 
         // not supported at this level [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float sq(this float x) { return x * x; }
+        public static double sq(this double x) { return x * x; }
     }
     // end CSGFSOLID
 }

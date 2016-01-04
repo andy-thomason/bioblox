@@ -22,6 +22,7 @@ namespace CSG {
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
         public float smooth = 0.6f;
         public float metallic = 0.8f;
+        public bool computeCurvature = CSGFMETA.computeCurvature;
 
         // following are class so they can get reused between frames
         CSGFMETA csgm;
@@ -36,7 +37,7 @@ namespace CSG {
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
             if (base.Show(ptoshow)) return true;
-
+            CSGFMETA.computeCurvature = computeCurvature;
 
             if (testop("clearMol")) {
                 foreach (var mf in mfMol) mf.mesh = null;
@@ -196,8 +197,20 @@ namespace CSG {
                     Show("filter");
                     lookat = hitpoint;
                 }
+
                 savedTransform = Camera.main.transform.SaveData();
             }
+
+            if (Input.GetKey("c")) {
+                int triangleNumber;
+                hitpoint = Hitpoint(out triangleNumber);
+                if (triangleNumber == -1) { LogK("curvhit", "miss"); return; }
+                Mesh mesh = goTest.activeSelf ? savemesh : filtermesh;  // to replace
+                int vertid = mesh.triangles[triangleNumber];  // take one vertex for now
+                LogK("curvhit", mesh.colors[vertid] + "");
+
+            }
+
 
             // perform standard update options
             base.UpdateI();

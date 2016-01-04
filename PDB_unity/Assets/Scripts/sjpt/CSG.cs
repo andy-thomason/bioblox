@@ -2260,6 +2260,17 @@ namespace CSG {
                 return this;
             return null;
         }
+
+        public virtual void normalColor(Vector3 p, out Vector3 normal, out Color color) {
+            normal = Normal(p);
+            color = Color;
+        }
+
+        /** work out values prior to curvature */
+        public virtual void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz, out Vector3 grad) {
+            throw new NotImplementedException ("dd not implemented for ...");
+        }
+
     }
 
 

@@ -362,6 +362,7 @@ namespace CSG {  // [ExecuteInEditMode]
             Vector3 mousedelta = Input.mousePosition - lastmouse;
             lastmouse = Input.mousePosition;
             mousedelta *= a;
+            // int triangleNumber = -1;
 
             if (Input.GetMouseButtonDown(0)) {
                 Vector3 hit = Hitpoint();
@@ -489,7 +490,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // int w = Screen.width / 2;  // width of text
             string xtext = text;
-            foreach (var kvp in ktexts) xtext += kvp.Key + ": " + kvp.Value;
+            foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
 
             try {
                 Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
@@ -540,20 +541,25 @@ namespace CSG {  // [ExecuteInEditMode]
 
 #region Utility functions
         // find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
+        protected Vector3 Hitpoint(out int triangleNumber) {
+            triangleNumber = -1;
+            return (savemesh == null) ? HitpointGO(out triangleNumber) : HitpointBM(out triangleNumber);
+        }
         protected Vector3 Hitpoint() {
-            return (savemesh == null) ? HitpointGO() : HitpointBM();
+            int triangleNumber;
+            return Hitpoint(out triangleNumber);
         }
 
         // find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
-        Vector3 HitpointBM() {
+        Vector3 HitpointBM(out int triangleNumber) {
             Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
-            return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh);
+            return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh, out triangleNumber);
         }
 
         // find the hitpoint on the screen, using meshes in Test game object
-        Vector3 HitpointGO() {
+        Vector3 HitpointGO(out int triangleNumber) {
             Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
-            float r = ray.intersectR(gameObject);
+            float r = ray.intersectR(gameObject, out triangleNumber);
             if (r == float.MaxValue)
                 return new Vector3(float.NaN, float.NaN, float.NaN);
             else

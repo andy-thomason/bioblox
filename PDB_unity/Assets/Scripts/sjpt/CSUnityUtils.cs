@@ -176,9 +176,10 @@ namespace CSG {
 			public Color color;
 			public CsgOutVert(Poly poly, int i) {
 				Vector3 p = position = poly[i].point;
-				normal = poly.Csg.Normal(p);
+                poly.Csg.normalColor(p, out normal, out color);
+				//normal = poly.Csg.Normal(p);
 				uv = poly.Csg.TextureCoordinate(p);
-				color = poly.Csg.Color;// Color.white;
+				//color = poly.Csg.Color;// Color.white;
 			}
 		}
 
