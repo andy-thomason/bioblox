@@ -65,11 +65,14 @@
 		  //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
 		  // 0.4 typical for purish sphere, 0 for flat
 		  // saved in IN.color
-		  float r = (IN.color.r - _LowR * _Range) / ((_HighR - _LowR) * _Range);
-		  float g = (IN.color.g - _LowG * _Range) / ((_HighG - _LowG) * _Range);
-		  float b = 0.5;
+		  float3 rgb = float3(
+			(IN.color.r - _LowR * _Range) / ((_HighR - _LowR) * _Range),
+			(IN.color.g - _LowG * _Range) / ((_HighG - _LowG) * _Range),
+			0.5);
+		  rgb = clamp(rgb, 0, 1);
+		  rgb *= rgb;		// perceptual range
 
-          o.Albedo = float3(r*r, g*g, b*b) * _Albedo.xyz;
+          o.Albedo = rgb * _Albedo.xyz;
           //o.Specular = _Specular;
           o.Smoothness = _Glossiness;
 		  o.Metallic = _Metallic;
