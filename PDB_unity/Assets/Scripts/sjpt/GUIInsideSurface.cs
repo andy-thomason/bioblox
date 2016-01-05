@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 using CSG;
 using CSGNonPlane;
@@ -97,6 +98,11 @@ namespace CSG {
                         mfMol[Mols.molB].mesh = tsavemesh.ToMesh();
                         mfMol[Mols.molBback].mesh = tsavemesh.ToMeshBack();
                     }
+                    Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
+                    Color cmin = tsavemesh.colors.Aggregate(new Color(999, 999, 999, 999), (Color c1, Color c2) => c1.Min(c2));
+                    LogK("curv range", "min {0} max {1}", cmin, cmax);
+                    Log2("curv range min {0} max {1}", cmin, cmax);
+                    //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
 
                     return true; // 
                 }
@@ -196,6 +202,9 @@ namespace CSG {
                 if (!float.IsNaN(hitpoint.x)) {
                     Show("filter");
                     lookat = hitpoint;
+                } else {
+                    mfMol[Mols.molAfilt].mesh = null;
+                    mfMol[Mols.molAfiltback].mesh = null;
                 }
 
                 savedTransform = Camera.main.transform.SaveData();
@@ -235,7 +244,7 @@ namespace CSG {
 
         private void setobjs() { 
             if (goMol != null) return;
-            if (!shader) shader = Shader.Find("Standard");    // Set shader
+            if (!shader) shader = Shader.Find("Custom/Color");    // Set shader
 
             Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
             int N = 8;
@@ -253,6 +262,7 @@ namespace CSG {
                     mrMol[i] = goMol[i].AddComponent<MeshRenderer>();
                     Material mat = new Material(shader);
                     mat.color = Mols.colors[i];
+                    mat.SetColor("_Albedo", Mols.colors[i]);
                     mat.SetFloat("_Glossiness", smooth);
                     mat.SetFloat("_Metallic", metallic);
                     mrMol[i].material = mat;

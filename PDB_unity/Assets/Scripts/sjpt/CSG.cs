@@ -4184,6 +4184,45 @@ namespace CSG {
     }
 
 }
+
+public static class CSGExtras {
+    public static Color set(this Color col, Color c) {
+        return col = c;
+    }
+    public static Color set(this Color col, float r, float g, float b) {
+        return col.set(r, g, b, 1);
+    }
+    public static Color set(this Color col, float r, float g, float b, float a) {
+        col.r = r;
+        col.g = g;
+        col.b = b;
+        col.a = a;
+        return col;
+    }
+
+    // not supported at this level [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float sq(this float x) { return x * x; }
+    public static double sq(this double x) { return x * x; }
+    public static Color Max(this Color c1, Color c2) {
+        Color cr = new Color();
+        cr.r = Mathf.Max(c1.r, c2.r);
+        cr.g = Mathf.Max(c1.g, c2.g);
+        cr.b = Mathf.Max(c1.b, c2.b);
+        cr.a = Mathf.Max(c1.a, c2.a);
+        return cr;
+    }
+    public static Color Min(this Color c1, Color c2) {
+        Color cr = new Color();
+        cr.r = Mathf.Min(c1.r, c2.r);
+        cr.g = Mathf.Min(c1.g, c2.g);
+        cr.b = Mathf.Min(c1.b, c2.b);
+        cr.a = Mathf.Min(c1.a, c2.a);
+        return cr;
+    }
+
+
+}
+
 #region // experiments in keeping lists of edges
 /***
 

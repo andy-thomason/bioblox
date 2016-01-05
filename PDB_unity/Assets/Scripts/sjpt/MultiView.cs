@@ -41,7 +41,7 @@ namespace CSG {
             if (Input.GetKey("q") && curcam == Cameras[0]) {
 
                 Vector3 h = Hitpoint();
-                if (!float.IsNaN(h.x)) {
+                if (!float.IsNaN(h.x) && Cameras.Length > 1) {
                     Camera cam = Cameras[1];
                     cam.transform.position = h + Camera.main.transform.forward * insideDist;
                     cam.transform.rotation = Camera.main.transform.rotation;

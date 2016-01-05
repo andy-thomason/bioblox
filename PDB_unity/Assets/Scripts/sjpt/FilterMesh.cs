@@ -177,6 +177,12 @@ namespace Filter {
                 }
             }
             Mesh newmesh = new Mesh();
+            // places to stash information ....
+            // newmesh.bindposes Matrix4
+            // newmesh.boneWeights // BoneWeight  (4 int and 4 float)
+            // newmesh.colors32 // Color32  (32 bits as 4 bytes)
+            // newmesh.tangents // Vector4
+            // newmesh.uv, uv2, uv3, uv4 // Vector2
             newmesh.vertices = nvertices;
             newmesh.normals = nnormals;
             newmesh.uv = nuv;

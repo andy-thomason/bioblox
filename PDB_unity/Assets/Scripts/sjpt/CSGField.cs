@@ -601,28 +601,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             return UnknownVolume();
         }
 
-    }
-
-    public static class CSGFieldExtras {
-        public static Color set(this Color col, Color c) {
-            return col = c;
-        }
-        public static Color set(this Color col, float r, float g, float b) {
-            return col.set(r, g, b, 1);
-        }
-        public static Color set(this Color col, float r, float g, float b, float a) {
-            col.r = r;
-            col.g = g;
-            col.b = b;
-            col.a = a;
-            return col;
-        }
-
-        // not supported at this level [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float sq(this float x) { return x * x; }
-        public static double sq(this double x) { return x * x; }
-    }
-    // end CSGFSOLID
+    }     // end CSGFSOLID
 }
 
 
