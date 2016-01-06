@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
@@ -28,25 +29,17 @@ public class UIController : MonoBehaviour {
 	public GameObject FunctionInfoPanelCloseImage;
 	bool FunctionInfoPanelStatus = true;
 	public GameObject FunctionInfoObject;
+	//father of the gameobjects of the connections
+	public GameObject AminoLinkPanel;
 
 	AminoSliderController aminoSliderController;
 
-	//togls for the types 1
-	public Toggle A1P;
-	public Toggle A1N;
-	public Toggle A1Po;
-	public Toggle A1O;
-	public Toggle A1H;
-	//togls for the types 2
-	public Toggle A2P;
-	public Toggle A2N;
-	public Toggle A2Po;
-	public Toggle A2O;
-	public Toggle A2H;
+	public Toggle[] ToggleButtonFunctionsView;
 
-	void Start()
+	void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
+
 	}
 
 	// Update is called once per frame
@@ -97,17 +90,19 @@ public class UIController : MonoBehaviour {
 		Protein2.SetActive (true);
 	}
 
-	public void ChangeSliderViewToCharged()
+	public void ChangeSliderViewToFunction()
 	{
 		foreach (Transform AminoButton in SliderProtein1.transform)
 		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().ChargedColor;
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().FunctionColor;
 		}
 		foreach (Transform AminoButton in SliderProtein2.transform)
 		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().ChargedColor;
+			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().FunctionColor;
 		}
 		FunctionInfoObject.SetActive (true);
+		//Change the coor of the buttons connections to function
+		ChangeAminoLinkPanelButtonColorToFunction ();
 	}
 
 	public void ChangeSliderViewToNormal()
@@ -121,6 +116,47 @@ public class UIController : MonoBehaviour {
 			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
 		}
 		FunctionInfoObject.SetActive (false);
+		//set all the buttons ON when return to normal view
+		//protein 1
+		ToggleAllButtonsSliderOn (aminoSliderController.A1Hydro);
+		ToggleAllButtonsSliderOn (aminoSliderController.A1Negative);
+		ToggleAllButtonsSliderOn (aminoSliderController.A1Polar);
+		ToggleAllButtonsSliderOn (aminoSliderController.A1Positive);
+		ToggleAllButtonsSliderOn (aminoSliderController.A1Other);
+		//protein 2
+		ToggleAllButtonsSliderOn (aminoSliderController.A2Hydro);
+		ToggleAllButtonsSliderOn (aminoSliderController.A2Polar);
+		ToggleAllButtonsSliderOn (aminoSliderController.A2Positive);
+		ToggleAllButtonsSliderOn (aminoSliderController.A2Negative);
+		ToggleAllButtonsSliderOn (aminoSliderController.A2Other);
+		//set all the togles ON
+		for (int i = 0; i<10; i++)
+		{
+			ToggleButtonFunctionsView[i].isOn = true;
+		}
+		//set the color of the buttons of the connections tonormal
+		ChangeAminoLinkPanelButtonColorToNormal ();
+			 
+	}
+
+	void ChangeAminoLinkPanelButtonColorToNormal()
+	{
+		foreach(Transform AminoLinkChild in AminoLinkPanel.transform)
+		{
+			Debug.Log (AminoLinkChild.name);
+			Debug.Log (AminoLinkChild.GetChild(3).name);
+			AminoLinkChild.GetChild(3).GetComponent<Image>().color = AminoLinkChild.GetChild(3).GetComponent<AminoButtonController>().NormalColor;			
+			AminoLinkChild.GetChild(4).GetComponent<Image>().color = AminoLinkChild.GetChild(4).GetComponent<AminoButtonController>().NormalColor;
+		}
+	}
+
+	void ChangeAminoLinkPanelButtonColorToFunction()
+	{
+		foreach(Transform AminoLinkChild in AminoLinkPanel.transform)
+		{
+			AminoLinkChild.GetChild(3).GetComponent<Image>().color = AminoLinkChild.GetChild(3).GetComponent<AminoButtonController>().FunctionColor;
+			AminoLinkChild.GetChild(4).GetComponent<Image>().color = AminoLinkChild.GetChild(4).GetComponent<AminoButtonController>().FunctionColor;
+		}
 	}
 
 	public void SwitchFunctionInfoProtein2()
@@ -147,7 +183,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A1Positive)
 		{
-			AminoButton.SetActive(A1P.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[0].isOn);
 		}
 	}
 
@@ -155,7 +191,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A1Negative)
 		{
-			AminoButton.SetActive(A1N.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
 		}
 	}
 
@@ -163,7 +199,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A1Polar)
 		{
-			AminoButton.SetActive(A1Po.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[3].isOn);
 		}
 	}
 
@@ -171,7 +207,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A1Other)
 		{
-			AminoButton.SetActive(A1O.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[4].isOn);
 		}
 	}
 
@@ -179,7 +215,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A1Hydro)
 		{
-			AminoButton.SetActive(A1H.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[2].isOn);
 		}
 	}
 
@@ -189,7 +225,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A2Positive)
 		{
-			AminoButton.SetActive(A2P.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
 		}
 	}
 	
@@ -197,7 +233,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A2Negative)
 		{
-			AminoButton.SetActive(A2N.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
 		}
 	}
 	
@@ -205,7 +241,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A2Polar)
 		{
-			AminoButton.SetActive(A2Po.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[8].isOn);
 		}
 	}
 	
@@ -213,7 +249,7 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A2Other)
 		{
-			AminoButton.SetActive(A2O.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[9].isOn);
 		}
 	}
 	
@@ -221,7 +257,15 @@ public class UIController : MonoBehaviour {
 	{
 		foreach (GameObject AminoButton in aminoSliderController.A2Hydro)
 		{
-			AminoButton.SetActive(A2H.isOn);
+			AminoButton.SetActive(ToggleButtonFunctionsView[7].isOn);
+		}
+	}
+
+	void ToggleAllButtonsSliderOn(List<GameObject> CurrentList)
+	{
+		foreach (GameObject AminoButton in CurrentList)
+		{
+			AminoButton.SetActive(true);
 		}
 	}
 }

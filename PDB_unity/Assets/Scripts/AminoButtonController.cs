@@ -7,7 +7,7 @@ public class AminoButtonController : MonoBehaviour {
 	public int AminoButtonID;
 	public bool Linked = false;
 	public Color32 NormalColor;
-	public Color32 ChargedColor;
+	public Color32 FunctionColor;
 
 	public void HighLight()
 	{

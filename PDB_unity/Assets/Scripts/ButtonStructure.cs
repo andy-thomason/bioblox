@@ -15,7 +15,7 @@ public class ButtonStructure : MonoBehaviour {
 	POLARColor = new Color32(234, 162, 169, 255), SPECIALColor = new Color32(234, 162, 169, 255);
 
 	public Dictionary<string, Color32> NormalColor;
-	public Dictionary<string, Color32> ChargedColor;
+	public Dictionary<string, Color32> FunctionColor;
 
 	// Use this for initialization
 	void Awake () {
@@ -27,7 +27,7 @@ public class ButtonStructure : MonoBehaviour {
 			{" TYR",  TYRColor}, {" VAL",  VALColor},
 		};
 
-		ChargedColor = new Dictionary<string, Color32>{
+		FunctionColor = new Dictionary<string, Color32>{
 			{" ALA",  HYDROColor}, {" ARG",  POSITIVEColor}, {" ASN",  POLARColor}, {" ASP",  NEGATIVEColor}, {" CYS",  SPECIALColor}, {" GLU",  NEGATIVEColor},
 			{" GLY",  SPECIALColor}, {" HIS",  POSITIVEColor}, {" ILE",  HYDROColor}, {" LEU",  HYDROColor}, {" LYS",  POSITIVEColor}, {" MET",  HYDROColor},
 			{" PHE",  HYDROColor},	{" PRO",  SPECIALColor}, {" SER",  POLARColor}, {" THR",  POLARColor}, {" GLN", POLARColor}, {" TRP",  HYDROColor},

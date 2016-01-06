@@ -42,6 +42,8 @@ public class AminoSliderController : MonoBehaviour {
 	public GameObject LinkedGameObject;
 	GameObject LinkedGameObjectReference;
 	ButtonStructure buttonStructure;
+	
+	Text[] ButtonText;
 
 	//dictionary for the function types of aunoacids
 	//protein 1
@@ -184,8 +186,6 @@ public class AminoSliderController : MonoBehaviour {
 			}
 		}
 	}
-
-	Text[] ButtonText;
 	
 	public void GeneratesAminoButtons1(string currentAmino, string tag, int index)
 	{		
@@ -197,7 +197,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
 		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		AminoButtonReference.GetComponent<AminoButtonController>().ChargedColor = buttonStructure.ChargedColor [currentAmino];
+		AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
 		InsertButtonToListOfAminoAcidsFuntionA1 (AminoButtonReference, currentAmino);
 
@@ -220,7 +220,7 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
 		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		AminoButtonReference.GetComponent<AminoButtonController>().ChargedColor = buttonStructure.ChargedColor [currentAmino];
+		AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
 		InsertButtonToListOfAminoAcidsFuntionA2 (AminoButtonReference, currentAmino);
 
@@ -372,6 +372,8 @@ public class AminoSliderController : MonoBehaviour {
 	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i)
 	{
 		GameObject AminoButtonReference = Instantiate<GameObject>(AminoButton);
+		AminoButtonReference.SetActive (true);
+		AminoButtonReference.transform.position = Vector3.zero;
 		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
 		AminoButtonReference.GetComponent<Button> ().interactable = true;
 		AminoButtonReference.GetComponent<Button> ().enabled = false;
