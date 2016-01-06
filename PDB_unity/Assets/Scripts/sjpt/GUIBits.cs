@@ -523,7 +523,7 @@ namespace CSG {  // [ExecuteInEditMode]
             v = GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
             GUI.contentColor = Color.black;
-            GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
+            GUI.Label(new Rect(10, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v));
             slidery += sliderHeight;
             return o != v;
         }

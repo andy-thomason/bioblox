@@ -4,7 +4,7 @@
 	  _Metallic("Metallic", Range(0,1)) = 0.8
 	  _Glossiness("Glossiness", Range(0,1)) = 0.6
       _VertexColors("Vertex Coloring", Range(0,1)) = 1
-      _Brightness("Overall brightness", Range(0,4)) = 1
+      _Brightness("Overall brightness", Range(0,10)) = 1
 
 		//curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
 		// but the extreme values are very rare (I still need to find them)
@@ -76,9 +76,9 @@
 			(IN.color.g - _LowG * _Range) / ((_HighG - _LowG) * _Range),
 			(IN.color.b - _LowB * _Range) / ((_HighB - _LowB) * _Range));
 		  rgb = clamp(rgb, 0, 1);
-		  rgb *= rgb;		// perceptual range
-		  rgb = rgb * _VertexColors + 1. - _VertexColors;
+		  rgb = rgb * _VertexColors + 0.5 * (1. - _VertexColors);
 		  rgb *= _Brightness;
+		  rgb *= rgb;		// perceptual range
 
           o.Albedo = rgb * _Albedo.xyz;
           //o.Specular = _Specular;

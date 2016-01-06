@@ -106,6 +106,7 @@ namespace CSG {
             this.limit = limit;
         }
 
+
         public BasicMeshData() {
             this.limit = 64000;
         }
@@ -315,6 +316,14 @@ namespace CSG {
             return stats;
         }
 
+        public static void ToGame(GameObject gameObject, Mesh[] meshes, string basename, Material mat, bool makeColliders = false) {
+            IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
+            for (int i = 0; i < meshes.Length; i++) {
+                ToGame(gameObject, meshes[i], "mesh_" + i, mat);
+            }
+        }
+
+
         CSGStats ToGame(GameObject parent, string basename, Material mat, bool makeColliders = false) {
             CSGStats stats = new CSGStats();
             int nextId = 0;
@@ -333,6 +342,7 @@ namespace CSG {
                 cchild.transform.Rotate(new Vector3(0, 0, 0));
                 cchild.transform.position = (parent.transform.position);
                 cchild.transform.rotation = (parent.transform.rotation);
+                cchild.layer = parent.layer;
 
                 cchild.AddComponent<MeshRenderer>().material = mat;
 
@@ -398,8 +408,18 @@ namespace CSG {
         public Color[] colors;
         public int[] triangles;
 
+        public Mesh[] meshes;   // cach after real meshes generated
+
         public BigMesh() {
         }
+        public BigMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uv, Color[] colors, int[] triangles) {
+            this.vertices = vertices;
+            this.normals = normals;
+            this.uv = uv;
+            this.colors = colors;
+            this.triangles = triangles;
+        }
+
 
         public BigMesh(Mesh mesh) {
             vertices = mesh.vertices;
@@ -409,16 +429,29 @@ namespace CSG {
             triangles = mesh.triangles;
         }
 
-        public Mesh ToMesh() {
-            if (vertices.Length > 65000)
-                throw new System.Exception("BigMesh too big to convert");
+        public Mesh[] ToMeshes() {
+            if (meshes != null) return meshes;
+            if (vertices.Length > 65000) {
+                PDB_molecule pdbmol = new PDB_molecule();
+                pdbmol.construct_unity_meshes(vertices, normals, uv, colors, triangles);
+                meshes = pdbmol.mesh;
+                return meshes;
+            }
             Mesh mesh = new Mesh();
             mesh.vertices = vertices;
             mesh.normals = normals;
             mesh.uv = uv;
             mesh.colors = colors;
             mesh.triangles = triangles;
-            return mesh;
+            meshes = new Mesh[] { mesh };
+            return meshes;
+        }
+
+        public Mesh ToMesh() {
+            ToMeshes();
+            if (meshes.Length > 1) GUIBits.Log("Skipping some of molecule making single mesh, tot meshes={0}", meshes.Length);
+            return meshes[0];
+
         }
 
         public static BigMesh ToBigMesh(Mesh mesh) {
@@ -431,28 +464,38 @@ namespace CSG {
             return bigmesh;
         }
 
-        /** make a mesh with reversed triangles and normals */
-        public static Mesh ToMeshBack(Mesh mesh) {
-            return ToBigMesh(mesh).ToMeshBack();
-        }
-
 
         /** make a mesh with reversed triangles and normals */
         public Mesh ToMeshBack() {
-            if (vertices.Length > 64000)
-                throw new System.Exception("BigMesh too big to convert");
+            return ToMeshBack(ToMesh());
+        }
+
+        /** make a mesh with reversed triangles and normals */
+        public Mesh[] ToMeshesBack() {
+            ToMeshes();
+            Mesh[] r = new Mesh[meshes.Length];
+            for (int i=0; i<meshes.Length; i++) {
+                r[i] = ToMeshBack(meshes[i]);
+            }
+            return r;
+        }
+
+        /** make a mesh with reversed triangles and normals */
+        public static Mesh ToMeshBack(Mesh imesh) {
             Mesh mesh = new Mesh();
-            mesh.vertices = vertices;
-            mesh.uv = uv;
-            mesh.colors = colors;
+            mesh.vertices = imesh.vertices;
+            mesh.uv = imesh.uv;
+            mesh.colors = imesh.colors;
 
             // coding question, for some reason not naming the intermediates
             // meant that the assignments to them didn't work
+            var normals = imesh.normals;
             Vector3[] nnormals = new Vector3[normals.Length];
             for (int i = 0; i < normals.Length; i++)
                 nnormals[i] = -normals[i];
             mesh.normals = nnormals;
 
+            var triangles = imesh.triangles;
             int[] ntri = new int[triangles.Length];
             for (int t = 0; t < triangles.Length; t += 3) {
                 ntri[t] = triangles[t];

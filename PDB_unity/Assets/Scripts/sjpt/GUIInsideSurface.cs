@@ -42,7 +42,12 @@ namespace CSG {
             CSGFMETA.computeCurvature = computeCurvature;
 
             if (testop("clearMol")) {
-                foreach (var mf in mfMol) mf.mesh = null;
+                foreach (var mf in mfMol)
+                    mf.mesh = null;
+                
+                foreach ( var go in goMol)
+                    DeleteChildren(go);
+
                 return true;
             }
 
@@ -92,12 +97,12 @@ namespace CSG {
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
                     if (!useb) {
-                        mfMol[Mols.molA].mesh = tsavemesh.ToMesh();
-                        mfMol[Mols.molAback].mesh = tsavemesh.ToMeshBack();
+                        BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
+                        BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
                         savemesh = tsavemesh.ToMesh();
                     } else {
-                        mfMol[Mols.molB].mesh = tsavemesh.ToMesh();
-                        mfMol[Mols.molBback].mesh = tsavemesh.ToMeshBack();
+                        BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
+                        BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
                     Color cmin = tsavemesh.colors.Aggregate(new Color(999, 999, 999, 999), (Color c1, Color c2) => c1.Min(c2));
@@ -238,7 +243,7 @@ namespace CSG {
                 Show("filter");          
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 7))
                 Show("pdb prep");
-            if (MSlider("Curv Map range", ref CurveMapRange, -10, 10))
+            if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))
                 CurveMap();
 
             base.OnGUII();
@@ -246,7 +251,7 @@ namespace CSG {
 
         private void CurveMap() {
             for (int i = 0; i < N; i++) {
-                mrMol[i].material.SetFloat("_Range", 1 / CurveMapRange);
+                mrMol[i].material.SetFloat("_Range", CurveMapRange);
             }
         }
 

@@ -347,13 +347,13 @@ public class PDB_molecule
 		return meshy;
 	}
 	
-	void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
+	public void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
 	{
-		int numMesh = 1;
+		//int numMesh = 1;
 
-		while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
-			numMesh += 1;
-		}
+		//while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
+		//	numMesh += 1;
+		//}
 
 		List<Mesh> meshes = new List<Mesh> ();
 
