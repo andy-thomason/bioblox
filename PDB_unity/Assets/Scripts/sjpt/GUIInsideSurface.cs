@@ -23,6 +23,7 @@ namespace CSG {
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
         public float smooth = 0.6f;
         public float metallic = 0.8f;
+        public float CurveMapRange = 0.4f;  // range of curvature to map to colours
         public bool computeCurvature = CSGFMETA.computeCurvature;
 
         // following are class so they can get reused between frames
@@ -234,20 +235,27 @@ namespace CSG {
             if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
                 Show("filter");
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 50))
-                Show("filter");
-            
+                Show("filter");          
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 7))
                 Show("pdb prep");
-            
+            if (MSlider("Curv Map range", ref CurveMapRange, -10, 10))
+                CurveMap();
+
             base.OnGUII();
         }
 
+        private void CurveMap() {
+            for (int i = 0; i < N; i++) {
+                mrMol[i].material.SetFloat("_Range", 1 / CurveMapRange);
+            }
+        }
+
+        int N = 8;
         private void setobjs() { 
             if (goMol != null) return;
             if (!shader) shader = Shader.Find("Custom/Color");    // Set shader
 
             Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
-            int N = 8;
             goMol = new GameObject[N];
             mfMol = new MeshFilter[N];
             mrMol = new MeshRenderer[N];
@@ -265,6 +273,12 @@ namespace CSG {
                     mat.SetColor("_Albedo", Mols.colors[i]);
                     mat.SetFloat("_Glossiness", smooth);
                     mat.SetFloat("_Metallic", metallic);
+                    mat.SetFloat("_LowR", -1);
+                    mat.SetFloat("_HighR", 1);
+                    mat.SetFloat("_LowG", -1);
+                    mat.SetFloat("_HighG", 1);
+                    mat.SetFloat("_LowB", -1000);
+                    mat.SetFloat("_HighB", 1000);
                     mrMol[i].material = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();

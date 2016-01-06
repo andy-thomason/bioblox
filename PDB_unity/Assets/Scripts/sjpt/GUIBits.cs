@@ -253,7 +253,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public static void LogK(string k, string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
-            ktexts[k] = ss;
+            lock(ktexts) ktexts[k] = ss;
         }
 
         public static void Log2(string s, params object[] xparms) {
@@ -490,16 +490,16 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // int w = Screen.width / 2;  // width of text
             string xtext = text;
-            foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
+            lock(ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
 
             try {
                 Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
                 labelRect.x = Screen.width - labelRect.width;
-                for (int i = 0; i < NBOX; i++)
+                for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
                     GUI.Box(labelRect, ""); 
-                    GUI.contentColor = Color.white;
-                    if (GUI.Button(labelRect, xtext, "label"))
-                        text = "";
+                GUI.contentColor = Color.white;
+                if (GUI.Button(labelRect, xtext, "label"))
+                    text = "";
             } catch (Exception e) {
                 Log2("exception preparing labelRect {0}\n{1}", e, e.StackTrace);
             }
