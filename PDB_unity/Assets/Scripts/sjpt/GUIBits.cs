@@ -47,16 +47,16 @@ namespace CSG {  // [ExecuteInEditMode]
         public bool CheckWind = true;
         public bool windDebug = true;
 
-
-        //public Material[] materials = new Material[8];
-
-        // for reuse with different influence
-        protected Mesh savemesh;
+        protected BigMesh savemeshA, savemeshB;
         // saved for processing
-        protected Mesh filtermesh;
+        //protected Mesh filtermesh;
         // saved molecule
         protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
+        // for refreshing filter
+        protected Vector3 hitpointA = new Vector3(float.NaN, float.NaN, float.NaN);
+        protected Vector3 hitpointB = new Vector3(float.NaN, float.NaN, float.NaN);
+
         public GameObject goTest, goFiltered;
         public TransformData savedTransform;
         public Vector3 lookat = Vector3.zero;
@@ -541,25 +541,58 @@ namespace CSG {  // [ExecuteInEditMode]
 
 #region Utility functions
         // find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
-        protected Vector3 Hitpoint(out int triangleNumber) {
+        protected Vector3 Hitpoint(out int triangleNumber, out MeshFilter bestmf) {
             triangleNumber = -1;
-            return (savemesh == null) ? HitpointGO(out triangleNumber) : HitpointBM(out triangleNumber);
+            float bestr = float.MaxValue;
+            Vector3 bestpoint = new Vector3(float.NaN, float.NaN, float.NaN);
+            bestmf = null;
+
+            Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
+            var mfs = GameObject.FindObjectsOfType<MeshFilter>();
+            foreach (MeshFilter mf in mfs) {
+                // LogK("mfs" + mf.name, "layer {0} {1} {2}", mf.gameObject.layer, curcam.cullingMask, (curcam.cullingMask & (1 << mf.gameObject.layer)) != 0);
+                if ((curcam.cullingMask & (1 << mf.gameObject.layer)) != 0 && ! mf.name.Contains("back")) {
+                    float r; int t;
+                    Vector3 hp = XRay.intersect(ray, mf.mesh, out t, out r);
+                    if (r < bestr) {
+                        bestr = r;
+                        bestpoint = hp;
+                        bestmf = mf;
+                        triangleNumber = t;
+                    }
+                }
+            }
+            if (bestmf != null) {
+                LogK("lasthit", "p={0} mf={1}", bestpoint, bestmf.name);
+                if (bestmf.name.StartsWith("molA")) hitpointA = bestpoint;
+                else if (bestmf.name.StartsWith("molB")) hitpointB = bestpoint;
+            }
+            hitpoint = bestpoint;
+
+            return bestpoint;
+
+            //triangleNumber = -1;
+            //mesh = savemesh;
+            //return (savemesh == null) ? HitpointGO(out triangleNumber, out mesh) : HitpointBM(out triangleNumber);
         }
         protected Vector3 Hitpoint() {
-            int triangleNumber;
-            return Hitpoint(out triangleNumber);
+            int triangleNumber; MeshFilter mf;
+            return Hitpoint(out triangleNumber, out mf);
         }
 
-        // find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
+        /** / find the hitpoint on the screen, using savemesh (if dispayed), or filtermesh
         Vector3 HitpointBM(out int triangleNumber) {
+
             Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
-            return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh, out triangleNumber);
+            float r;
+            return XRay.intersect(ray, goTest.activeSelf ? savemesh : filtermesh, out triangleNumber, out r);
         }
+        /**/
 
         // find the hitpoint on the screen, using meshes in Test game object
-        Vector3 HitpointGO(out int triangleNumber) {
+        Vector3 HitpointGO(out int triangleNumber, out Mesh mesh) {
             Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
-            float r = ray.intersectR(gameObject, out triangleNumber);
+            float r = ray.intersectR(gameObject, out triangleNumber, out mesh);
             if (r == float.MaxValue)
                 return new Vector3(float.NaN, float.NaN, float.NaN);
             else
@@ -573,7 +606,8 @@ namespace CSG {  // [ExecuteInEditMode]
                 if (o.name.StartsWith("CSGStephen"))
                     Destroy(o.gameObject); 
             }
-            savemesh = null;
+            savemeshA = savemeshB = null;
+            lock (ktexts) ktexts.Clear();
         }
 
         // delete all children of some game object

@@ -36,6 +36,7 @@ namespace CSG {
         protected PDB_molecule molA, molB;
 
 
+
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
             if (base.Show(ptoshow)) return true;
@@ -50,6 +51,15 @@ namespace CSG {
 
                 return true;
             }
+
+            /** for debugging two faced shaders ** /
+            if (testop("flipfrontback")) {
+                bool a = goMol[Mols.molA].activeSelf;
+                goMol[Mols.molA].SetActive(!a);
+                goMol[Mols.molAback].SetActive(a);
+                return true;
+            }
+            /**/
 
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 if (CSGControl.MinLev < 5) 
@@ -99,10 +109,11 @@ namespace CSG {
                     if (!useb) {
                         BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
                         BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
-                        savemesh = tsavemesh.ToMesh();
+                        savemeshA = tsavemesh;
                     } else {
                         BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
                         BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
+                        savemeshB = tsavemesh;
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
                     Color cmin = tsavemesh.colors.Aggregate(new Color(999, 999, 999, 999), (Color c1, Color c2) => c1.Min(c2));
@@ -114,27 +125,42 @@ namespace CSG {
                 }
             }
 
-            if (testop("filter")) {
-                if (molA == null || savemesh == null || prepRadinf != CSGControl.radInfluence)
-                    Show("pdb prep");
-
-                filtermesh = Filter.FilterMesh.Filter(savemesh, hitpoint);
-                float tf1 = Time.realtimeSinceStartup;
-
-                Log("mesh filter time=" + (tf1 - t0));
-                DeleteChildren(goFiltered);
-
-                // double-sided filtered surface (again, silly way to do double-sided)
-                mfMol[Mols.molAfilt].mesh = filtermesh; // .ToMesh();
-                mfMol[Mols.molAfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
-
-                return true;  // don't go through the standard csg display part appropriate to full display
-            }
-
             if (opdone) showCSGParallel(bounds);
             return opdone;
 
         }  // Show()
+
+        void filter() {
+            filterA();
+            filterB();
+        }
+
+        void filterA() {
+            if (molA == null || savemeshA == null || prepRadinf != CSGControl.radInfluence)
+                Show("pdb prep");
+
+            //float tf0 = Time.realtimeSinceStartup;
+            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshA, hitpointA);
+            //float tf1 = Time.realtimeSinceStartup;
+            //Log("mesh filter time=" + (tf1 - tf0));
+
+            // double-sided filtered surface (again, silly way to do double-sided)
+            mfMol[Mols.molAfilt].mesh = filtermesh; // .ToMesh();
+            mfMol[Mols.molAfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
+        }
+
+        void filterB() {
+            if (molB == null || savemeshB == null || prepRadinf != CSGControl.radInfluence)
+                Show("pdb prepB");
+
+            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshB, hitpointB);
+
+            // double-sided filtered surface (again, silly way to do double-sided)
+            mfMol[Mols.molBfilt].mesh = filtermesh; // .ToMesh();
+            mfMol[Mols.molBfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
+
+        }
+
 
         /// <summary>
         /// check if the given molecule part is shown in given camera view
@@ -201,13 +227,20 @@ namespace CSG {
             }
 
             if (Input.GetKey("q")) {
-                if (savemesh == null)
+                if (savemeshA == null)
                     Show("pdb prep");
-                hitpoint = Hitpoint();
+                int t; MeshFilter mf;
+                Hitpoint(out t, out mf);  // sets hitpoint as side effect
                 //Log ("hitp" + hitpoint);
                 if (!float.IsNaN(hitpoint.x)) {
-                    Show("filter");
                     lookat = hitpoint;
+                    if (mf.name.StartsWith("molA"))
+                        filterA();
+                    else if (mf.name.StartsWith("molB"))
+                        filterB();
+                    else
+                        Log("unexpected object hit for key 'q' {0}", mf.name);
+
                 } else {
                     mfMol[Mols.molAfilt].mesh = null;
                     mfMol[Mols.molAfiltback].mesh = null;
@@ -218,9 +251,10 @@ namespace CSG {
 
             if (Input.GetKey("c")) {
                 int triangleNumber;
-                hitpoint = Hitpoint(out triangleNumber);
+                MeshFilter mf;
+                hitpoint = Hitpoint(out triangleNumber, out mf);  //   // sets hitpoint as side effect
                 if (triangleNumber == -1) { LogK("curvhit", "miss"); return; }
-                Mesh mesh = goTest.activeSelf ? savemesh : filtermesh;  // to replace
+                Mesh mesh = mf.mesh;
                 int vertid = mesh.triangles[triangleNumber];  // take one vertex for now
                 LogK("curvhit", mesh.colors[vertid] + "");
 
@@ -238,9 +272,9 @@ namespace CSG {
             //GUIBits.text = "";
 
             if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
-                Show("filter");
+                filter();
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 50))
-                Show("filter");          
+                filter();          
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 7))
                 Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))
@@ -284,6 +318,7 @@ namespace CSG {
                     mat.SetFloat("_HighG", 1);
                     mat.SetFloat("_LowB", -1000);
                     mat.SetFloat("_HighB", 1000);
+                    mat.SetFloat("_Brightness", 2.5f);
                     mrMol[i].material = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();

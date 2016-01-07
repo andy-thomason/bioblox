@@ -96,23 +96,26 @@ namespace CSG {
         }
 
 
-        public static Vector3 intersect(this Ray ray, Mesh mesh, out int triangleNumber) {
-            return ray.intersect(new BigMesh(mesh), out triangleNumber);
+        public static Vector3 intersect(this Ray ray, Mesh mesh, out int triangleNumber, out float r) {
+            return ray.intersect(new BigMesh(mesh), out triangleNumber, out r);
         }
 
         public static float intersectR(this Ray ray, Mesh mesh, out int triangleNumber) {
             return ray.intersectR(new BigMesh(mesh), out triangleNumber);
         }
 
-        public static float intersectR(this Ray ray, GameObject gameObject, out int triangleNumber) {
+        public static float intersectR(this Ray ray, GameObject gameObject, out int triangleNumber, out Mesh omesh) {
             triangleNumber = -1;
             float bestr = float.MaxValue;
+            omesh = null;
             MeshFilter[] mfs = gameObject.GetComponentsInChildren<MeshFilter>();
             for (int i = 0; i < mfs.Length; i++) {
                 Mesh mesh = mfs[i].mesh;
                 float r = ray.intersectR(mesh, out triangleNumber);
-                if (r < bestr)
+                if (r < bestr) {
+                    omesh = mesh;
                     bestr = r;
+                }
             }
 
 /**
@@ -130,8 +133,8 @@ namespace CSG {
             return bestr;
         }
 
-        public static Vector3 intersect(this Ray ray, BigMesh mesh, out int triangleNumber) {
-            float r = ray.intersectR(mesh, out triangleNumber);
+        public static Vector3 intersect(this Ray ray, BigMesh mesh, out int triangleNumber, out float r) {
+            r = ray.intersectR(mesh, out triangleNumber);
             if (r == float.MaxValue)
                 return new Vector3(float.NaN, float.NaN, float.NaN);
             return ray.origin + r * ray.direction;

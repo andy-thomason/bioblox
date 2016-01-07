@@ -37,17 +37,14 @@ namespace Filter {
          * point is a sanple point that should be on or near the surface
          * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
          */
-        public static Mesh Filter(
-            Mesh mesh,
-            Vector3 point) {
+        public static Mesh Filter(BigMesh mesh, Vector3 point) {
 
-            // BigMesh nmesh = RemapMesh (mesh);  // precomuted (and checked)
-            Mesh nmesh = mesh;
-            Vector3[] vertices = nmesh.vertices;
-            Vector3[] normals = nmesh.normals;
-            Vector2[] uv = nmesh.uv;
-            Color[] color = nmesh.colors;
-            int[] triangles = nmesh.triangles;
+            //Mesh nmesh = mesh;
+            Vector3[] vertices = mesh.vertices;
+            Vector3[] normals = mesh.normals;
+            Vector2[] uv = mesh.uv;
+            Color[] color = mesh.colors;
+            int[] triangles = mesh.triangles;
             
             int n = vertices.Length;
 
@@ -117,7 +114,7 @@ namespace Filter {
             string nums = "";
             for (int i = 0; i <= D; i++)
                 nums += " " + idsAtDist[i].Count;
-            GUIBits.Log("neighbour numbers " + nums);
+            //GUIBits.Log("neighbour numbers " + nums);
 
 
             //IList<int> newvertices = new List<int>();
@@ -189,9 +186,9 @@ namespace Filter {
             newmesh.colors = ncolor;
             newmesh.triangles = ntris.ToArray();
 
-            GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
-            " bestnorm" + bestnorm + " vertices=" + nn +
-            " cam forward= " + Camera.main.transform.forward);
+            //GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
+            //" bestnorm" + bestnorm + " vertices=" + nn +
+            //" cam forward= " + Camera.main.transform.forward);
 
             return newmesh;
 

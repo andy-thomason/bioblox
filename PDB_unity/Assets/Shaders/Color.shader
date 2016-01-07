@@ -22,6 +22,7 @@
 
    SubShader {
       Tags { "RenderType" = "Opaque" }
+	  // Cull Off
       CGPROGRAM
       #pragma surface surf Standard
       struct Input {
@@ -79,12 +80,27 @@
 		  rgb = rgb * _VertexColors + 0.5 * (1. - _VertexColors);
 		  rgb *= _Brightness;
 		  rgb *= rgb;		// perceptual range
+		  /** /
+		  if (abs(IN.color.r) < 0.02) o.Emission += float3(1, 0, 0);
+		  if (abs(IN.color.g) < 0.01) o.Emission += float3(0, 1, 0);
+		  if (abs(IN.color.b) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b - 0.2) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.1) < 0.005) o.Emission += float3(1, 1, 1);
+		  if (abs(IN.color.b + 0.15) < 0.005) o.Emission += float3(1, 1, 0);
+		  if (abs(IN.color.b + 0.2) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.3) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.4) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.5) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.6) < 0.01) o.Emission += float3(0, 0, 1);
+		  if (abs(IN.color.b + 0.7) < 0.01) o.Emission += float3(0, 0, 1);
+		  / **/
 
           o.Albedo = rgb * _Albedo.xyz;
           //o.Specular = _Specular;
           o.Smoothness = _Glossiness;
 		  o.Metallic = _Metallic;
-      }
+
+	  }
       ENDCG
      }  // subshader
 
