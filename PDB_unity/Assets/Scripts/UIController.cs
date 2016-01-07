@@ -31,16 +31,23 @@ public class UIController : MonoBehaviour {
 	public GameObject FunctionInfoObject;
 	//father of the gameobjects of the connections
 	public GameObject AminoLinkPanel;
+    //dropdowns
+    public Dropdown DropDownProtein1;
+    public Dropdown DropDownProtein2;
+    public Dropdown DropDownSlider;
 
-	AminoSliderController aminoSliderController;
+    public GameObject CameraSlider;
+
+    AminoSliderController aminoSliderController;
+    BioBlox BioBloxReference;
 
 	public Toggle[] ToggleButtonFunctionsView;
 
 	void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
-
-	}
+        BioBloxReference = FindObjectOfType<BioBlox>();
+    }
 
 	// Update is called once per frame
 	void Update () {
@@ -57,8 +64,10 @@ public class UIController : MonoBehaviour {
 	public void ToggleFreeCamera()
 	{
 		MainCamera.GetComponent<CameraMovement> ().enabled = ToggleFreeCameraStatus;
-		FreeCameraKeysFreeze.SetActive (ToggleFreeCameraStatus); 
-		FreeCameraKeysUnfreeze.SetActive (false);
+		FreeCameraKeysFreeze.SetActive (ToggleFreeCameraStatus);
+        CameraSlider.SetActive(!ToggleFreeCameraStatus);
+
+        FreeCameraKeysUnfreeze.SetActive (false);
 		ToogleToolMenu (false);
 		AddConnectionText.SetActive (false);
 		ToggleFreeCameraStatus = !ToggleFreeCameraStatus;
@@ -90,7 +99,7 @@ public class UIController : MonoBehaviour {
 		Protein2.SetActive (true);
 	}
 
-	public void ChangeSliderViewToFunction()
+	void ChangeSliderViewToFunction()
 	{
 		foreach (Transform AminoButton in SliderProtein1.transform)
 		{
@@ -103,9 +112,13 @@ public class UIController : MonoBehaviour {
 		FunctionInfoObject.SetActive (true);
 		//Change the coor of the buttons connections to function
 		ChangeAminoLinkPanelButtonColorToFunction ();
-	}
+        //default states of the filter bar
+        FunctionInfoPanelOpenImage.SetActive(false);
+        FunctionInfoPanelCloseImage.SetActive(true);
+        FunctionInfoPanel.SetBool("Status", false);
+    }
 
-	public void ChangeSliderViewToNormal()
+	void ChangeSliderViewToNormal()
 	{
 		foreach (Transform AminoButton in SliderProtein1.transform)
 		{
@@ -268,4 +281,57 @@ public class UIController : MonoBehaviour {
 			AminoButton.SetActive(true);
 		}
 	}
+
+   public void DropDownProteinView(int molecule)
+    {
+        if(molecule == 0)
+        {
+            switch(DropDownProtein1.value)
+            {
+                case 0:
+                    BioBloxReference.SolidClicked(0);
+                    break;
+                case 1:
+                    BioBloxReference.PointClicked(0);
+                    break;
+                case 2:
+                    BioBloxReference.WireClicked(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            switch (DropDownProtein2.value)
+            {
+                case 0:
+                    BioBloxReference.SolidClicked(1);
+                    break;
+                case 1:
+                    BioBloxReference.PointClicked(1);
+                    break;
+                case 2:
+                    BioBloxReference.WireClicked(1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void DropDownSliderView()
+    {
+        switch (DropDownSlider.value)
+        {
+            case 0:
+                ChangeSliderViewToNormal();
+                break;
+            case 1:
+                ChangeSliderViewToFunction();
+                break;
+            default:
+                break;
+        }
+    }
 }
