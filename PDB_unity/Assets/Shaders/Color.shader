@@ -15,6 +15,22 @@
 		_HighG("High G", Range(-2,2)) = 1
 		_LowB("Low B", Range(-1000,1000)) = 0
 		_HighB("High B", Range(-1000,1000)) = 1
+
+		_P1Color("P1 colour", Color) = (1,0,0,0)  // colour for first principal curvature
+		_P1Step("P1 step", Range(0,1)) = 0.5 // step for p1 contours
+		_P1Width("P1 width", Range(0,0.1)) = 0 // width of P1
+
+		_P2Color("P2 colour", Color) = (0,1,0,0)  // colour for second principal curvature
+		_P2Step("P2 step", Range(0,1)) = 0.5 // step for p1 contours
+		_P2Width("P2 width", Range(0,0.1)) = 0 // width of P1
+
+		_PGColor("PGauss colour", Color) = (1,1,0,0)  // colour for gaussian curvature
+		_PGStep("PGauss step", Range(0,1)) = 0.5 // step for p1 contours
+		_PGWidth("PGauss width", Range(0,0.1)) = 0 // width of P1
+
+		_PMColor("PMean colour", Color) = (0,0,1,0)  // colour for mean curvature
+		_PMStep("PMean step", Range(0,1)) = 0.5 // step for p1 contours
+		_PMWidth("PMean width", Range(0,0.1)) = 0 // width of P1
 	}
 
 
@@ -35,6 +51,11 @@
 	  float _VertexColors;
 	  float _Brightness;
 	  float _Range, _LowR, _HighR, _LowG, _HighG, _LowB, _HighB;
+	  float4 _P1Color; float _P1Step, _P1Width;
+	  float4 _P2Color; float _P2Step, _P2Width;
+	  float4 _PGColor; float _PGStep, _PGWidth;
+	  float4 _PMColor; float _PMStep, _PMWidth;
+
 
 	  /**
 	  struct SurfaceOutput   {
@@ -80,20 +101,19 @@
 		  rgb = rgb * _VertexColors + 0.5 * (1. - _VertexColors);
 		  rgb *= _Brightness;
 		  rgb *= rgb;		// perceptual range
-		  /** /
-		  if (abs(IN.color.r) < 0.02) o.Emission += float3(1, 0, 0);
-		  if (abs(IN.color.g) < 0.01) o.Emission += float3(0, 1, 0);
-		  if (abs(IN.color.b) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b - 0.2) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.1) < 0.005) o.Emission += float3(1, 1, 1);
-		  if (abs(IN.color.b + 0.15) < 0.005) o.Emission += float3(1, 1, 0);
-		  if (abs(IN.color.b + 0.2) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.3) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.4) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.5) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.6) < 0.01) o.Emission += float3(0, 0, 1);
-		  if (abs(IN.color.b + 0.7) < 0.01) o.Emission += float3(0, 0, 1);
-		  / **/
+
+#define contour(q, id) \
+		  if (_P##id##Width != 0) { \
+		  float ps = IN.color.q / _P##id##Step; \
+		  float p = frac(ps); \
+		  if (p < _P##id##Width * ( floor(p) == 0 ? 2 : 1)) o.Emission += _P##id##Color; \
+		  }
+
+		  contour(r, 1)
+		  contour(g, 2)
+		  contour(b, G)
+		  contour(a, M)
+
 
           o.Albedo = rgb * _Albedo.xyz;
           //o.Specular = _Specular;
