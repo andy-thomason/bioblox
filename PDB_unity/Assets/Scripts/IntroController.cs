@@ -4,7 +4,8 @@ using System.Collections;
 public class IntroController : MonoBehaviour {
 
 	public Animator MainCamera;
-	public GameObject FadeCanvas;
+	public Animator FadeCanvas;
+    public GameObject MicroscopeView;
 
 	public void CameraStart()
 	{
@@ -18,8 +19,14 @@ public class IntroController : MonoBehaviour {
 
 	public void StartFadeCanvas()
 	{
-		FadeCanvas.SetActive (true);
+        FadeCanvas.SetBool("Fade", true);
 	}
+
+    public void MainToMicroscopeCamera()
+    {
+        gameObject.GetComponent<Camera>().enabled = false;
+        MicroscopeView.SetActive(true);
+    }
 
 
 }

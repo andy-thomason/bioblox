@@ -115,7 +115,7 @@ public class UIController : MonoBehaviour {
         //default states of the filter bar
         FunctionInfoPanelOpenImage.SetActive(false);
         FunctionInfoPanelCloseImage.SetActive(true);
-        FunctionInfoPanel.SetBool("Status", false);
+        FunctionInfoPanelStatus = true;
     }
 
 	void ChangeSliderViewToNormal()
