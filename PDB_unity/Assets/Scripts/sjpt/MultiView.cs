@@ -98,6 +98,7 @@ namespace CSG {
                 show(Cameras[2], Mols.molB, Mols.molBback, Mols.molBfilt, Mols.molBfiltback);
                 show(Cameras[3], Mols.molBfilt, Mols.molBfiltback);
             }
+            for (int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = true;
             cam0.rect = new Rect(0, 0, 0.5f, 0.5f);
 
         }
@@ -105,6 +106,7 @@ namespace CSG {
         void setonewin() {
             Camera.main.rect = new Rect(0, 0, 1,1);
             for(int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = false;
+            Cameras[0].cullingMask = -1;
         }
 
     }

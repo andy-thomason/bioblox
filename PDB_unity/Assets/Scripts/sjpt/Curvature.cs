@@ -51,7 +51,7 @@ namespace CSG {
             double K1 = KM + Math.Sqrt(KM * KM - KG);       // (4.3)
             double K2 = KM - Math.Sqrt(KM * KM - KG);
             if (KG < 0)
-                GUIBits.LogK("kgnegs", kgnegs++ + "");
+                kgnegs++; //  GUIBits.LogK("kgnegs", kgnegs++ + "");
 
             //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
             // 0.4 typical for purish sphere, 0 for flat

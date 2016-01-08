@@ -7,10 +7,10 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: CustomColorHolder
-  m_Shader: {fileID: 4800000, guid: ed43f1930ad4b1f4d925868df85050fb, type: 3}
+  m_Shader: {fileID: 4800000, guid: b3c23a49ac0961f4cab3d149caf51610, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2000
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -44,8 +44,72 @@ Material:
         first:
           name: _HighG
         second: 1
+      data:
+        first:
+          name: _VertexColors
+        second: 1
+      data:
+        first:
+          name: _Brightness
+        second: 1
+      data:
+        first:
+          name: _LowB
+        second: 0
+      data:
+        first:
+          name: _HighB
+        second: 1
+      data:
+        first:
+          name: _P1Step
+        second: 0.5
+      data:
+        first:
+          name: _P1Width
+        second: 0
+      data:
+        first:
+          name: _P2Step
+        second: 0.5
+      data:
+        first:
+          name: _P2Width
+        second: 0
+      data:
+        first:
+          name: _PGStep
+        second: 0.5
+      data:
+        first:
+          name: _PGWidth
+        second: 0
+      data:
+        first:
+          name: _PMStep
+        second: 0.5
+      data:
+        first:
+          name: _PMWidth
+        second: 0
     m_Colors:
       data:
         first:
           name: _Albedo
         second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _P1Color
+        second: {r: 1, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _P2Color
+        second: {r: 0, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _PGColor
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _PMColor
+        second: {r: 0, g: 0, b: 1, a: 0}

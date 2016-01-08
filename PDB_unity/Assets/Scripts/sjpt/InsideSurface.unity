@@ -472,9 +472,9 @@ MonoBehaviour:
   CheckWind: 1
   windDebug: 1
   hitpoint: {x: NaN, y: NaN, z: NaN}
+  lookat: {x: 0, y: 0, z: 0}
   goTest: {fileID: 0}
   goFiltered: {fileID: 0}
-  lookat: {x: 0, y: 0, z: 0}
   keyPanRate: 0.05
   keyRotRate: 0.5
   wheelScrollRate: 0.3
@@ -484,6 +484,7 @@ MonoBehaviour:
   insideDist: 20
   smooth: 0.6
   metallic: 0.8
+  CurveMapRange: 0.4
   computeCurvature: 1
 --- !u!4 &1182041625
 Transform:

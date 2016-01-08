@@ -397,6 +397,7 @@ namespace CSG {
         }
 
         public static float dot(this Vector3 a, Vector3 b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+        public static float Distance(this Vector3 a, Vector3 b) { return Vector3.Distance(a, b); }
         public static Vector3 cross(this Vector3 a, Vector3 b) { return Vector3.Cross(a, b); }
     }
 

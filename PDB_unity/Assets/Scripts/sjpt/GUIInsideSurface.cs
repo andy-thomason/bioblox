@@ -30,11 +30,19 @@ namespace CSG {
         CSGFMETA csgm;
         Shader shader;
 
+        GameObject goMolA, goMolB;
         GameObject[] goMol;
         MeshFilter[] mfMol;
         MeshRenderer[] mrMol;
         protected PDB_molecule molA, molB;
+        protected Vector3 filterpointA = new Vector3(float.NaN, float.NaN, float.NaN);
+        protected Vector3 filterpointB = new Vector3(float.NaN, float.NaN, float.NaN);
 
+
+        public GUIInsideSurface() {
+            molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
+            molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+        }
 
 
         // main function that will be called for display when something interesting has happened
@@ -52,7 +60,7 @@ namespace CSG {
                 return true;
             }
 
-            /** for debugging two faced shaders ** /
+            /** for debugging two faced shaders **/
             if (testop("flipfrontback")) {
                 bool a = goMol[Mols.molA].activeSelf;
                 goMol[Mols.molA].SetActive(!a);
@@ -60,7 +68,7 @@ namespace CSG {
                 return true;
             }
             /**/
-
+            Bounds bounds = new Bounds(Vector3.zero, new Vector3(70, 70, 70));  // same bounds for both molecules
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 if (CSGControl.MinLev < 5) 
                     CSGControl.MinLev = 7;
@@ -68,10 +76,7 @@ namespace CSG {
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
-                if (useb)
-                    mol = molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
-                else
-                    mol = molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+                mol = (useb) ? molB : molA;
 
                 // prepare and populate the metaball object
                 csgm = new CSGFMETA();
@@ -82,7 +87,8 @@ namespace CSG {
                 }
                 csg = csgm;                         // and save csg in 'standard' named variable
                 Volume molvol = csg.Volume();       // find bounding volume   
-                bounds = molvol.BoundsExpand(1.1f); // and get a little leway
+                // bounds = molvol.BoundsExpand(1.1f); // and get a little leway
+                // bounds = new Bounds(Vector3.zero, new Vector3(70,70,70));  // same bounds for both molecules
 
 
                 // prepare the mesh in a way I can raycast it and filter it
@@ -93,7 +99,7 @@ namespace CSG {
                     foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
 
                     float tf1 = Time.realtimeSinceStartup;
-                    Log("pdb prep time=" + (tf1 - t0));
+                    Log("pdb prep time={0}, vol used {1}", (tf1 - t0), molvol);
 
 
                     Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
@@ -107,22 +113,45 @@ namespace CSG {
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
                     if (!useb) {
+                        DeleteChildren(goMol[Mols.molA]);
+                        DeleteChildren(goMol[Mols.molAback]);
                         BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
                         BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
                         savemeshA = tsavemesh;
                     } else {
+                        DeleteChildren(goMol[Mols.molB]);
+                        DeleteChildren(goMol[Mols.molBback]);
                         BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
                         BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
                         savemeshB = tsavemesh;
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
                     Color cmin = tsavemesh.colors.Aggregate(new Color(999, 999, 999, 999), (Color c1, Color c2) => c1.Min(c2));
-                    LogK("curv range", "min {0} max {1}", cmin, cmax);
+                    // LogK("curv range", "min {0} max {1}", cmin, cmax);
                     Log2("curv range min {0} max {1}", cmin, cmax);
                     //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
 
                     return true; // 
                 }
+            }
+
+            if  (testop("dock")) {
+                Log("positions: A {0} B {1}", molA.pos, molB.pos);
+                goMolB.transform.position = molB.pos - molA.pos;
+
+                int ba = -999, bb = -999; float bd = 999999; float d;
+                for (int a = 0; a < molA.atom_centres.Length; a++) {
+                    for (int b = 0; b < molB.atom_centres.Length; b++) {
+                        if ((d = molA.atom_centres[a].Distance(molA.atom_centres[b])) < bd) {
+                            ba = a; bb = b;
+                            bd = d;
+                        }
+                    }
+                }
+                filterpointA = (molA.atom_centres[ba] + molB.atom_centres[bb]) / 2;
+                filterpointB = filterpointA + molA.pos - molB.pos;
+                filter();
+                return true;
             }
 
             if (opdone) showCSGParallel(bounds);
@@ -140,7 +169,7 @@ namespace CSG {
                 Show("pdb prep");
 
             //float tf0 = Time.realtimeSinceStartup;
-            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshA, hitpointA);
+            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshA, filterpointA);
             //float tf1 = Time.realtimeSinceStartup;
             //Log("mesh filter time=" + (tf1 - tf0));
 
@@ -153,7 +182,7 @@ namespace CSG {
             if (molB == null || savemeshB == null || prepRadinf != CSGControl.radInfluence)
                 Show("pdb prepB");
 
-            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshB, hitpointB);
+            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);
 
             // double-sided filtered surface (again, silly way to do double-sided)
             mfMol[Mols.molBfilt].mesh = filtermesh; // .ToMesh();
@@ -219,7 +248,8 @@ namespace CSG {
                     bool act = !isShown(curcam, Mols.molA);   //  switch visibility of non-filtered A (front and back)
                     show(curcam, Mols.molA, act);
                     show(curcam, Mols.molAback, act);
-                } else {
+                }
+                if (isShown(curcam, Mols.molBfilt)) {  // viewports showing A will always show the filtered, so use that as A/B test
                     bool act = !isShown(curcam, Mols.molB);   //  switch visibility of non-filtered B (front and back)
                     show(curcam, Mols.molB, act);
                     show(curcam, Mols.molBback, act);
@@ -299,11 +329,17 @@ namespace CSG {
             mfMol = new MeshFilter[N];
             mrMol = new MeshRenderer[N];
 
+            goMolA = GameObject.Find("MolAH");
+            if (goMolA == null) goMolA = new GameObject("MolAH");
+            goMolB = GameObject.Find("MolBH");
+            if (goMolB == null) goMolB = new GameObject("MolBH");
+
 
             for (int i = 0; i < N; i++) {
                 goMol[i] = GameObject.Find(Mols.name[i]);
                 if (goMol[i] == null) {
                     goMol[i] = new GameObject(Mols.name[i]);
+                    goMol[i].transform.parent = Mols.name[i].Contains("molA") ? goMolA.transform : goMolB.transform;
                     goMol[i].layer = i + 8;
                     mfMol[i] = goMol[i].AddComponent<MeshFilter>();
                     mrMol[i] = goMol[i].AddComponent<MeshRenderer>();
@@ -337,10 +373,11 @@ namespace CSG {
             new Color(0.5f, 1,    0.5f), // Aback
             new Color(0.5f, 0.5f, 0.5f), // B
             new Color(0.5f, 0.5f, 0.5f), // Bback
+
             new Color(0.8f, 0.5f, 0.5f), // Afilt
-            new Color(0.5f, 0.5f, 0.5f), // Afiltback
-            new Color(0.5f, 0.5f, 0.5f), // Bfilt
-            new Color(0.5f, 0.5f, 0.5f)  // Bfiltback
+            new Color(0.5f, 0.5f, 0.5f), // Afiltback  <<<
+            new Color(0.5f, 0.5f, 0.5f), // Bfilt      <<<
+            new Color(0.8f, 0.5f, 0.5f)  // Bfiltback
         };
     }
 

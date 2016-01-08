@@ -53,13 +53,13 @@ namespace CSG {  // [ExecuteInEditMode]
         // saved molecule
         protected float prepRadinf;
         public Vector3 hitpoint = new Vector3(float.NaN, float.NaN, float.NaN);
+        public Vector3 lookat = Vector3.zero;
         // for refreshing filter
         protected Vector3 hitpointA = new Vector3(float.NaN, float.NaN, float.NaN);
         protected Vector3 hitpointB = new Vector3(float.NaN, float.NaN, float.NaN);
 
         public GameObject goTest, goFiltered;
         public TransformData savedTransform;
-        public Vector3 lookat = Vector3.zero;
         protected CSGNode csg;
         protected Camera[] Cameras;
 
@@ -83,7 +83,7 @@ namespace CSG {  // [ExecuteInEditMode]
         public static Dictionary<string, string> ktexts = new Dictionary<string, string>();
 
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
-        protected Bounds bounds;
+        // protected Bounds bounds;
 
         protected bool opdone = false;
         protected bool testop(string s) {
@@ -135,7 +135,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 interrupt();
             }
 
-            bounds = new Bounds();
+            // bounds = new Bounds();
             t0 = Time.realtimeSinceStartup;
 
             return false;
@@ -303,6 +303,24 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
 
             finishParallel();
+
+            var t = curcam.transform;
+            var p = t.position;
+            var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
+
+            if (Input.GetKey("left alt")) {
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                    t.RotateAround(Vector3.zero, t.up, 90);
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                    t.RotateAround(Vector3.zero, t.up, -90);
+                if (Input.GetKeyDown(KeyCode.UpArrow))
+                    t.RotateAround(Vector3.zero, t.right, -90);
+                if (Input.GetKeyDown(KeyCode.DownArrow))
+                    t.RotateAround(Vector3.zero, t.right, 90);
+
+                return;
+            }
+
             if (Input.GetKeyDown("p")) showProgress();
             if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
                 showProgress();
@@ -310,9 +328,6 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!findcam()) return;
 
 
-            var t = curcam.transform;
-            var p = t.position;
-            var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
 
             float mrate = a * keyPanRate;
 
@@ -368,6 +383,8 @@ namespace CSG {  // [ExecuteInEditMode]
                 Vector3 hit = Hitpoint();
                 if (!float.IsNaN(hit.x))
                     lookat = hit;
+                else
+                    lookat = Vector3.zero;
             }
 
             int k = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);
@@ -548,12 +565,15 @@ namespace CSG {  // [ExecuteInEditMode]
             bestmf = null;
 
             Ray ray = curcam.ScreenPointToRay(Input.mousePosition);
+            
             var mfs = GameObject.FindObjectsOfType<MeshFilter>();
             foreach (MeshFilter mf in mfs) {
                 // LogK("mfs" + mf.name, "layer {0} {1} {2}", mf.gameObject.layer, curcam.cullingMask, (curcam.cullingMask & (1 << mf.gameObject.layer)) != 0);
                 if ((curcam.cullingMask & (1 << mf.gameObject.layer)) != 0 && ! mf.name.Contains("back")) {
                     float r; int t;
-                    Vector3 hp = XRay.intersect(ray, mf.mesh, out t, out r);
+                    Matrix4x4 tm = mf.transform.worldToLocalMatrix;
+                    Ray lray = new Ray(tm.MultiplyPoint3x4(ray.origin), tm.MultiplyVector(ray.direction));
+                    Vector3 hp = XRay.intersect(lray, mf.mesh, out t, out r);
                     if (r < bestr) {
                         bestr = r;
                         bestpoint = hp;
