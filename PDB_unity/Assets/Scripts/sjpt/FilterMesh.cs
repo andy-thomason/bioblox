@@ -139,8 +139,8 @@ namespace Filter {
 
 
             // and generate new mesh
-            if (nn > 64000)
-                nn = 64000;  // save vertex mesh size complications for now
+            //if (nn > 64000)
+            //    nn = 64000;  // save vertex mesh size complications for now
             Vector3[] nvertices = new Vector3[nn];
             Vector3[] nnormals = new Vector3[nn];
             Vector2[] nuv = new Vector2[nn];

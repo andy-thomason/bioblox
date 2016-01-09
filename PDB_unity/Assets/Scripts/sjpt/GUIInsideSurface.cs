@@ -299,7 +299,7 @@ namespace CSG {
 
             if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
-            if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 50))
+            if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
                 filter();          
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 7))
                 Show("pdb prep");

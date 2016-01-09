@@ -1,10 +1,18 @@
-﻿Shader "Custom/Color" {
+﻿/**** //~ 
+note on transparency:
+transparency experiment 9 Jan 2016.  commented out with //~
+There were lots of steps needed to get transparency to work, so I left the code commented out in case we want it back.
+Problem was that even with alpha=1 (or alpha large) there was still some transparency left;  to revisit some time.
+***/
+
+Shader "Custom/Color" {
     Properties{
       _Albedo("Albedo", Color) = (1,1,1,1)
       _Metallic("Metallic", Range(0,1)) = 0.8
       _Glossiness("Glossiness", Range(0,1)) = 0.6
       _VertexColors("Vertex Coloring", Range(0,1)) = 1
       _Brightness("Overall brightness", Range(0,10)) = 1
+ //~     _Alpha("Alpha", Range(0,1)) = 1
 
         //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
         // but the extreme values are very rare (I still need to find them)
@@ -37,10 +45,15 @@
 
 
    SubShader {
-      Tags { "RenderType" = "Opaque" }
-      // Cull Off
+      //~ Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
+      Tags{ "RenderType" = "Opaque" }
+      //~  Blend SrcAlpha OneMinusSrcAlpha
+        // Cull Off
+        // AlphaToMask On
+      //  ColorMask RGBA
+      //~ ZWrite On
       CGPROGRAM
-      #pragma surface surf Standard
+      #pragma surface surf Standard //~ alpha:fade
       struct Input {
           float4 color : COLOR;
       };
@@ -50,6 +63,7 @@
       float _Metallic;
       float _VertexColors;
       float _Brightness;
+      //~ float _Alpha;
       float _Range, _LowR, _HighR, _LowG, _HighG, _LowB, _HighB;
       float4 _P1Color; float _P1Step, _P1Width;
       float4 _P2Color; float _P2Step, _P2Width;
@@ -102,6 +116,7 @@
           o.Albedo = rgb * _Albedo.xyz;
           o.Smoothness = _Glossiness;
           o.Metallic = _Metallic;
+          //~ o.Alpha = _Alpha;
       }
       ENDCG
      }  // subshader
