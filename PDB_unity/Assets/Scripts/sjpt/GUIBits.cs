@@ -544,7 +544,19 @@ namespace CSG {  // [ExecuteInEditMode]
             GUI.contentColor = Color.black;
             GUI.Label(new Rect(10, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v));
             slidery += sliderHeight;
-            return o != v;
+            bool changed = o != v;
+            if (changed) lastmouse = Input.mousePosition;
+            return changed;
+        }
+
+        /** return IF CHANGED */
+        protected bool Mcheck(string checkName, ref bool v) {
+            bool o = v;
+            v = GUI.Toggle(new Rect(20, slidery, sliderWidth, 20), v, checkName);
+            slidery += sliderHeight;
+            bool changed = o != v;
+            if (changed) lastmouse = Input.mousePosition;
+            return changed;
         }
 
         // Update is called once per frame: call UpdateI with exception protection

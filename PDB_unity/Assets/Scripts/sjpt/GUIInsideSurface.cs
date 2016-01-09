@@ -40,6 +40,7 @@ namespace CSG {
 
 
         public GUIInsideSurface() {
+            PDB_parser.automesh = false;
             molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
             molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
         }
@@ -306,7 +307,26 @@ namespace CSG {
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))
                 CurveMap();
 
+            for (int i = 0; i < N/2; i++)
+                if (Mcheck(Mols.name[2*i], ref shown[0,i]))
+                    setshow();
+
             base.OnGUII();
+        }
+        private bool[,] shown = new bool[4,4];
+
+        private void setshow() {
+            for (int cam=0; cam < Cameras.Length; cam++) {
+                int c = 0;
+                for (int i = 0; i < N/2; i++) {
+                    if (shown[cam, i]) {
+                        c |= 3 << (i * 2 + 8);
+                    }
+                }
+                Cameras[cam].cullingMask = c;
+            }
+
+
         }
 
         private void CurveMap() {

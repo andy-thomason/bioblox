@@ -241,12 +241,13 @@ public class PDB_parser {
 				m.labels=labels[i].ToArray();
 			}
             m.name = asset_name + "." + (i+1);
-            m.build_mesh();
+            if (automesh) m.build_mesh();
             m.pos -= cofg;
             //Debug.Log(m.pos);
         }
         return result;
     }
+    public static bool automesh = true;
 
     static public Dictionary<string, PDB_molecule> mols = new Dictionary<string, PDB_molecule>();
 
