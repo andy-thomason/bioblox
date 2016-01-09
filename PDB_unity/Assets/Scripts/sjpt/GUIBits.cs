@@ -68,6 +68,10 @@ namespace CSG {  // [ExecuteInEditMode]
 
         Vector3 lastmouse = new Vector3(0, 0, 0);
 
+        public GUIBits() {
+            //home(Camera.main.transform);
+        }
+
         class ButtonPrepare {
             public int y;
             public string name;
@@ -282,14 +286,15 @@ namespace CSG {  // [ExecuteInEditMode]
         public float mousePanRate = 0.05f;
         public float mouseRotRate = 0.1f;
 
-        protected Camera curcam;
+        protected Camera curcam { get { if (Cameras == null) Cameras = Camera.allCameras;   return curcamnum < 0 ? null : Cameras[curcamnum]; } }
+        protected int curcamnum = 0;
         protected Camera findcam() {
             if (Cameras == null) Cameras = Camera.allCameras;
 
-            curcam = null;
-            foreach (Camera cam in Cameras) {
-                if (cam.pixelRect.Contains(Input.mousePosition)) {
-                    curcam = cam;
+            curcamnum = -1;
+            for (int cam= 0; cam < Cameras.Length; cam++ ) {
+                if (Cameras[cam].pixelRect.Contains(Input.mousePosition)) {
+                    curcamnum = cam;
                     break;
                 }
             }
@@ -303,6 +308,20 @@ namespace CSG {  // [ExecuteInEditMode]
             if (!goFiltered) goFiltered = GameObject.Find("Filtered");
 
             finishParallel();
+
+            // keys that can operate regardless of curcam
+            if (Input.GetKeyDown("p")) showProgress();
+            if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
+                showProgress();
+
+
+            int mousebuts = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);
+            // mouse may go down in odd position on new click
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)) {
+                mousebuts = 0;
+                findcam();
+            }
+            if (curcamnum < 0) return;
 
             var t = curcam.transform;
             var p = t.position;
@@ -320,13 +339,6 @@ namespace CSG {  // [ExecuteInEditMode]
 
                 return;
             }
-
-            if (Input.GetKeyDown("p")) showProgress();
-            if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
-                showProgress();
-
-            if (!findcam()) return;
-
 
 
             float mrate = a * keyPanRate;
@@ -387,12 +399,8 @@ namespace CSG {  // [ExecuteInEditMode]
                     lookat = Vector3.zero;
             }
 
-            int k = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);
-            // mouse may go down in odd position on new click
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
-                k = 0;
             //lookat = Vector3.zero; // t.position + t.forward * 20;
-            switch (k) {
+            switch (mousebuts) {
                 case 0:
                     break;
                 case 1:
@@ -422,10 +430,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 t.forward = f;
             }
 
-            if (Input.GetKey("home")) {
-                t.rotation = new Quaternion(0, 0, 0, 1);
-                t.position = new Vector3(0, 0, -30);
-            }
+            if (Input.GetKey("home")) home(t);            
 
 
             if (Input.GetKeyDown("m") || Input.GetKey("n")) {  // use hitpoint for CSG feedback or simple feedback
@@ -525,6 +530,10 @@ namespace CSG {  // [ExecuteInEditMode]
         int sliderWidth = 160, sliderHeight = 25;
         /** make an int slider, y position w.i.p, return true if value changed */
         protected bool MSlider(string sliderName, ref int v, int low, int high) {
+            GUI.contentColor = Color.white;
+            GUI.color = Color.white;
+            GUI.backgroundColor = Color.white;
+
             int o = v;
             v = (int)GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
@@ -538,6 +547,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
         /** make an int slider, y position w.i.p, return true if value changed */
         protected bool MSlider(string sliderName, ref float v, float low, float high) {
+            GUI.contentColor = Color.white;
             float o = v;
             v = GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
@@ -551,9 +561,22 @@ namespace CSG {  // [ExecuteInEditMode]
 
         /** return IF CHANGED */
         protected bool Mcheck(string checkName, ref bool v) {
+            GUI.contentColor = Color.white;
+//            GUI.color = Color.white;
             bool o = v;
             v = GUI.Toggle(new Rect(20, slidery, sliderWidth, 20), v, checkName);
             slidery += sliderHeight;
+            bool changed = o != v;
+            if (changed) lastmouse = Input.mousePosition;
+            return changed;
+        }
+
+        /** return IF CHANGED */
+        protected bool Mcheck(string checkName, ref bool v, Rect rect) {
+            GUI.contentColor = Color.white;
+//            GUI.color = Color.white;
+            bool o = v;
+            v = GUI.Toggle(rect, v, checkName);
             bool changed = o != v;
             if (changed) lastmouse = Input.mousePosition;
             return changed;
@@ -656,7 +679,13 @@ namespace CSG {  // [ExecuteInEditMode]
                 Log("DeleteChildren failed: " + e);
             }
         }
-#endregion
+
+        public virtual void home(Transform t) {
+            t.rotation = new Quaternion(0, 0, 0, 1);
+            t.position = new Vector3(0, 0, -30);
+        }
+
+        #endregion
 
 
     }     // class GUIBits

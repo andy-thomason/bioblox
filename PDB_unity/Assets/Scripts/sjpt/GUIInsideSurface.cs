@@ -49,7 +49,23 @@ namespace CSG {
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
             if (base.Show(ptoshow)) return true;
+
             CSGFMETA.computeCurvature = computeCurvature;
+
+            text = "";
+            toshow = ptoshow;
+            if (testop("mwin")) {
+                setmwin();
+                return true;
+            }
+            if (testop("onewin")) {
+                setonewin();
+                return true;
+            }
+            if (testop("4lights")) {
+                setLights();
+                return true;
+            }
 
             if (testop("clearMol")) {
                 foreach (var mf in mfMol)
@@ -223,8 +239,20 @@ namespace CSG {
         }
 
         protected override void UpdateI() {
-            if (!findcam()) return;
-            
+            if (curcamnum < 0) return;
+
+            if (Input.GetKey("q") && curcam == Cameras[0]) {
+
+                Vector3 h = Hitpoint();
+                if (!float.IsNaN(h.x) && Cameras.Length > 1) {
+                    Camera cam = Cameras[1];
+                    cam.transform.position = h + Camera.main.transform.forward * insideDist;
+                    cam.transform.rotation = Camera.main.transform.rotation;
+                    cam.transform.Rotate(new Vector3(0, 180, 0));
+                }
+            }
+
+
             // custom update actions that apply only to this application
             if (Input.GetKeyDown(KeyCode.Semicolon)) {  // go to other side of surface and keep looking same way
                 Vector3 h = Hitpoint();
@@ -287,6 +315,10 @@ namespace CSG {
 
             }
 
+            if (Input.GetKeyDown("1")) { shown[curcamnum, 0] = !shown[curcamnum, 0]; setshow(); }
+            if (Input.GetKeyDown("2")) { shown[curcamnum, 1] = !shown[curcamnum, 1]; setshow(); }
+            if (Input.GetKeyDown("3")) { shown[curcamnum, 2] = !shown[curcamnum, 2]; setshow(); }
+            if (Input.GetKeyDown("4")) { shown[curcamnum, 3] = !shown[curcamnum, 3]; setshow(); }
 
             // perform standard update options
             base.UpdateI();
@@ -295,6 +327,8 @@ namespace CSG {
 
         // application specific parts of GUI code
         protected override void OnGUII() {
+            base.OnGUII();
+
             setobjs();
             //GUIBits.text = "";
 
@@ -302,7 +336,7 @@ namespace CSG {
                 filter();
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
                 filter();          
-            if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 7))
+            if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8))
                 Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))
                 CurveMap();
@@ -311,11 +345,10 @@ namespace CSG {
                 if (Mcheck(Mols.name[2*i], ref shown[0,i]))
                     setshow();
 
-            base.OnGUII();
         }
-        private bool[,] shown = new bool[4,4];
+        public bool[,] shown = new bool[4,4];
 
-        private void setshow() {
+        protected void setshow() {
             for (int cam=0; cam < Cameras.Length; cam++) {
                 int c = 0;
                 for (int i = 0; i < N/2; i++) {
@@ -325,8 +358,6 @@ namespace CSG {
                 }
                 Cameras[cam].cullingMask = c;
             }
-
-
         }
 
         private void CurveMap() {
@@ -378,6 +409,82 @@ namespace CSG {
                 }
             }
         }
+
+        static float ddd = 1000;
+        static Vector3[] lpos = new Vector3[] { new Vector3(ddd, 0, 0),
+            new Vector3(-ddd, 0, 0),
+            new Vector3(0, ddd, 0),
+            new Vector3(0, -ddd, 0) };
+
+        void setLights() {
+            foreach (Light go in UnityEngine.Object.FindObjectsOfType(typeof(Light)))
+                Destroy(go.transform.gameObject);
+
+            for (int i = 0; i < 4; i++) {
+                GameObject go = new GameObject("light" + i);
+                Light l = go.AddComponent<Light>();
+                l.type = LightType.Point;
+                l.range = 1e20F;
+                l.color = Color.white;
+                l.intensity = 0.7f;
+                l.transform.position = lpos[i];
+            }
+
+        }
+
+        void setmwin() {
+            Camera cam0 = Camera.main;
+
+            if (Cameras.Length == 1) {
+                Cameras = new Camera[4];
+                Cameras[0] = cam0;
+                for (int i = 1; i < 4; i++) {
+                    GameObject goCam = new GameObject("cam" + i);
+                    Camera cam = Cameras[i] = goCam.AddComponent<Camera>();
+                    cam.transform.position = cam0.transform.position;
+                    cam.transform.rotation = cam0.transform.rotation;
+                    cam.transform.localScale = cam0.transform.localScale;
+                    cam.clearFlags = CameraClearFlags.Color;
+                    cam.backgroundColor = Color.green;
+                    cam.enabled = true;
+                }
+                cam0.rect = new Rect(0, 0, 0.5f, 0.5f);
+                Cameras[1].rect = new Rect(0, 0.5f, 0.5f, 0.5f);
+                Cameras[2].rect = new Rect(0.5f, 0, 0.5f, 0.5f);
+                Cameras[3].rect = new Rect(0.5f, 0.5f, 0.5f, 0.5f);
+
+            }
+            shown = new bool[,] {
+                    { true, false, true, false},
+                    { false, false, true, false},
+                    { false, true, false, true},
+                    { false, false, false, true}
+                };
+            setshow();
+            /**
+            show(Cameras[0], Mols.molA, Mols.molAback, Mols.molAfilt, Mols.molAfiltback);
+            show(Cameras[1], Mols.molAfilt, Mols.molAfiltback);
+            show(Cameras[2], Mols.molB, Mols.molBback, Mols.molBfilt, Mols.molBfiltback);
+            show(Cameras[3], Mols.molBfilt, Mols.molBfiltback);
+            **/
+            for (int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = true;
+            cam0.rect = new Rect(0, 0, 0.5f, 0.5f);
+
+        }
+
+        void setonewin() {
+            Camera.main.rect = new Rect(0, 0, 1, 1);
+            for (int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = false;
+            for (int i = 0; i < 4; i++) shown[0, i] = true;
+            setshow();
+        }
+
+        public override void home(Transform t) {
+            t.rotation = new Quaternion(0, 0, 0, 1);
+            t.position = new Vector3(0, 0, -80);
+        }
+
+
     } // class GUIInsideSurface
 
 
