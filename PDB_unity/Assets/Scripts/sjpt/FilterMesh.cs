@@ -37,7 +37,7 @@ namespace Filter {
          * point is a sanple point that should be on or near the surface
          * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
          */
-        public static Mesh Filter(BigMesh mesh, Vector3 point) {
+        public static BigMesh Filter(BigMesh mesh, Vector3 point) {
 
             //Mesh nmesh = mesh;
             Vector3[] vertices = mesh.vertices;
@@ -173,7 +173,7 @@ namespace Filter {
                     }
                 }
             }
-            Mesh newmesh = new Mesh();
+            BigMesh newmesh = new BigMesh();
             // places to stash information ....
             // newmesh.bindposes Matrix4
             // newmesh.boneWeights // BoneWeight  (4 int and 4 float)

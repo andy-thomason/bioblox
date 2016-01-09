@@ -531,7 +531,9 @@ namespace CSG {  // [ExecuteInEditMode]
             GUI.contentColor = Color.black;
             GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
             slidery += sliderHeight;
-            return o != v;
+            bool changed = o != v;
+            if (changed) lastmouse = Input.mousePosition;
+            return changed;
         }
 
         /** make an int slider, y position w.i.p, return true if value changed */

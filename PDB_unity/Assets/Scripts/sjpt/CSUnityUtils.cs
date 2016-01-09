@@ -317,6 +317,7 @@ namespace CSG {
         }
 
         public static void ToGame(GameObject gameObject, Mesh[] meshes, string basename, Material mat, bool makeColliders = false) {
+            GUIBits.DeleteChildren(gameObject);
             IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
             for (int i = 0; i < meshes.Length; i++) {
                 ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat);

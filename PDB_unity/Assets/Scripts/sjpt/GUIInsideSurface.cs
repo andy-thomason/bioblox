@@ -113,14 +113,10 @@ namespace CSG {
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
                     if (!useb) {
-                        DeleteChildren(goMol[Mols.molA]);
-                        DeleteChildren(goMol[Mols.molAback]);
                         BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
                         BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
                         savemeshA = tsavemesh;
                     } else {
-                        DeleteChildren(goMol[Mols.molB]);
-                        DeleteChildren(goMol[Mols.molBback]);
                         BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
                         BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
                         savemeshB = tsavemesh;
@@ -169,24 +165,24 @@ namespace CSG {
                 Show("pdb prep");
 
             //float tf0 = Time.realtimeSinceStartup;
-            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshA, filterpointA);
+            BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshA, filterpointA);
             //float tf1 = Time.realtimeSinceStartup;
             //Log("mesh filter time=" + (tf1 - tf0));
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            mfMol[Mols.molAfilt].mesh = filtermesh; // .ToMesh();
-            mfMol[Mols.molAfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
+            BasicMeshData.ToGame(goMol[Mols.molAfilt], filtermesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfiltback], filtermesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
         }
 
         void filterB() {
             if (molB == null || savemeshB == null || prepRadinf != CSGControl.radInfluence)
                 Show("pdb prepB");
 
-            Mesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);
+            BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            mfMol[Mols.molBfilt].mesh = filtermesh; // .ToMesh();
-            mfMol[Mols.molBfiltback].mesh = BigMesh.ToBigMesh(filtermesh).ToMeshBack();
+            BasicMeshData.ToGame(goMol[Mols.molBfilt], filtermesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfiltback], filtermesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
 
         }
 
