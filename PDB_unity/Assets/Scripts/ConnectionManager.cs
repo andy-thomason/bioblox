@@ -8,7 +8,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	int numChainClicks = 0;
 
-	int contractionKVal;
+//??	int contractionKVal;
 
 	public float dampingFactor = 1.0f;
 	//public float force = 10.0f;

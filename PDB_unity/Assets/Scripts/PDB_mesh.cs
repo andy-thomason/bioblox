@@ -22,7 +22,7 @@ public class PDB_mesh : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	  
+if (allowInteraction || startRotation || true)  //?? added to remove warnings
         mol = PDB_parser.get_molecule(this.name);
 	}
 

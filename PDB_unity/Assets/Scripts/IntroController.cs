@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class IntroController : MonoBehaviour {
 
@@ -13,7 +14,8 @@ public class IntroController : MonoBehaviour {
 
 	public void ChangeScene()
 	{
-		Application.LoadLevel ("main");
+		// obsolete Application.LoadLevel ("main");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("main");
 	}
 
 	public void StartFadeCanvas()

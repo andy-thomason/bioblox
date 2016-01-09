@@ -71,7 +71,7 @@ public class BioBlox : MonoBehaviour
 	//  force applied by string
 	public float stringForce = 20000.0f;
 	private float ScoreScaleSize;
-	private float ScoreScaleValue;
+//??	private float ScoreScaleValue;
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;

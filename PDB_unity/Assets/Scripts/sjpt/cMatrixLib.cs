@@ -56,7 +56,7 @@ namespace MatrixLibrary
 	/// '+','-','*' operators are overloaded to work with the objects
 	/// derived from the matrix class.
 	/// </summary>
-	public class Matrix
+	public class MatrixX
 	{
 		private double[,] in_Mat;
         
@@ -67,7 +67,7 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="noRows"> no. of rows in this matrix </param>
 		/// <param name="noCols"> no. of columns in this matrix</param>
-		public Matrix(int noRows, int noCols)
+		public MatrixX(int noRows, int noCols)
 		{
 			this.in_Mat = new double[noRows, noCols];
 		}
@@ -77,7 +77,7 @@ namespace MatrixLibrary
 		/// already defined array object.
 		/// </summary>
 		/// <param name="Mat">the array the matrix will contain</param>
-		public Matrix(double [,] Mat)
+		public MatrixX(double [,] Mat)
 		{
 			this.in_Mat = (double[,])Mat.Clone();
 		}
@@ -256,8 +256,8 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First matrix in the summation</param>
 		/// <param name="Mat2">Second matrix in the summation</param>
 		/// <returns>Sum of Mat1 and Mat2 as a Matrix object</returns>
-		public static Matrix Add(Matrix Mat1, Matrix Mat2)
-		{return new Matrix(Add(Mat1.in_Mat,Mat2.in_Mat));}
+		public static MatrixX Add(MatrixX Mat1, MatrixX Mat2)
+		{return new MatrixX(Add(Mat1.in_Mat,Mat2.in_Mat));}
 
 		/// <summary>
 		/// Returns the summation of two matrices with compatible 
@@ -267,8 +267,8 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First Matrix object in the summation</param>
 		/// <param name="Mat2">Second Matrix object in the summation</param>
 		/// <returns>Sum of Mat1 and Mat2 as a Matrix object</returns>
-		public static Matrix operator+(Matrix Mat1, Matrix Mat2)
-		{return new Matrix(Add(Mat1.in_Mat,Mat2.in_Mat));}
+		public static MatrixX operator+(MatrixX Mat1, MatrixX Mat2)
+		{return new MatrixX(Add(Mat1.in_Mat,Mat2.in_Mat));}
         #endregion
 
 		#region "Subtract Matrices"
@@ -320,8 +320,8 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First matrix in the subtraction</param>
 		/// <param name="Mat2">Second matrix in the subtraction</param>
 		/// <returns>Difference of Mat1 and Mat2 as a Matrix object</returns>
-		public static Matrix Subtract(Matrix Mat1, Matrix Mat2)
-		{return new Matrix(Subtract(Mat1.in_Mat,Mat2.in_Mat));}
+		public static MatrixX Subtract(MatrixX Mat1, MatrixX Mat2)
+		{return new MatrixX(Subtract(Mat1.in_Mat,Mat2.in_Mat));}
 
 		/// <summary>
 		/// Returns the difference of two matrices with compatible 
@@ -331,8 +331,8 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First Matrix object in the subtraction</param>
 		/// <param name="Mat2">Second Matrix object in the subtraction</param>
 		/// <returns>Difference of Mat1 and Mat2 as a Matrix object</returns>
-		public static Matrix operator-(Matrix Mat1, Matrix Mat2)
-		{return new Matrix(Subtract(Mat1.in_Mat,Mat2.in_Mat));}
+		public static MatrixX operator-(MatrixX Mat1, MatrixX Mat2)
+		{return new MatrixX(Subtract(Mat1.in_Mat,Mat2.in_Mat));}
         #endregion
 
 	    #region "Multiply Matrices"
@@ -392,13 +392,13 @@ namespace MatrixLibrary
 		/// multiplication
 		/// </param>
 		/// <returns>Mat1 multiplied by Mat2 as a Matrix object</returns>
-		public static Matrix Multiply(Matrix Mat1, Matrix Mat2)
+		public static MatrixX Multiply(MatrixX Mat1, MatrixX Mat2)
 		{
 			if ((Mat1.NoRows==3) && (Mat2.NoRows==3) &&
 				(Mat1.NoCols==1) && (Mat1.NoCols==1)) 
-			{return new Matrix(CrossProduct(Mat1.in_Mat,Mat2.in_Mat));}
+			{return new MatrixX(CrossProduct(Mat1.in_Mat,Mat2.in_Mat));}
 			else
-			{return new Matrix(Multiply(Mat1.in_Mat,Mat2.in_Mat));}
+			{return new MatrixX(Multiply(Mat1.in_Mat,Mat2.in_Mat));}
 		}
 
 		/// <summary>
@@ -415,16 +415,16 @@ namespace MatrixLibrary
 		/// multiplication
 		/// </param>
 		/// <returns>Mat1 multiplied by Mat2 as a Matrix object</returns>
-		public static Matrix operator*(Matrix Mat1, Matrix Mat2)
+		public static MatrixX operator*(MatrixX Mat1, MatrixX Mat2)
 		{
 			if ((Mat1.NoRows==3) && (Mat2.NoRows==3) &&
 				(Mat1.NoCols==1) && (Mat1.NoCols==1)) 
 			{
-				return new Matrix(CrossProduct(Mat1.in_Mat,Mat2.in_Mat));
+				return new MatrixX(CrossProduct(Mat1.in_Mat,Mat2.in_Mat));
 			}
 			else
 			{
-				return new Matrix(Multiply(Mat1.in_Mat,Mat2.in_Mat));
+				return new MatrixX(Multiply(Mat1.in_Mat,Mat2.in_Mat));
 			}
 		}
 	    #endregion
@@ -498,7 +498,7 @@ namespace MatrixLibrary
 		/// Matrix object with [n,n] dimension whose determinant is to be found
 		/// </param>
 		/// <returns>Determinant of the Matrix object</returns>
-		public static double Det(Matrix Mat)
+		public static double Det(MatrixX Mat)
 		{return Det(Mat.in_Mat);}
 		#endregion
 
@@ -587,8 +587,8 @@ namespace MatrixLibrary
 		/// Matrix object with [n,n] dimension whose inverse is to be found
 		/// </param>
 		/// <returns>Inverse of the matrix as a Matrix object</returns>
-		public static Matrix Inverse(Matrix Mat)
-		{return new Matrix(Inverse(Mat.in_Mat));}
+		public static MatrixX Inverse(MatrixX Mat)
+		{return new MatrixX(Inverse(Mat.in_Mat));}
 		#endregion
 
 		#region "Transpose of a Matrix"		
@@ -620,8 +620,8 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="Mat">Matrix object whose transpose is to be found</param>
 		/// <returns>Transpose of the Matrix object as a Matrix object</returns>
-		public static Matrix Transpose(Matrix Mat)
-		{return new Matrix(Transpose(Mat.in_Mat));}																			
+		public static MatrixX Transpose(MatrixX Mat)
+		{return new MatrixX(Transpose(Mat.in_Mat));}																			
 		#endregion
 		
 		#region "Singula Value Decomposition of a Matrix"
@@ -958,13 +958,13 @@ namespace MatrixLibrary
 		/// <param name="S">A Matrix object where the S matrix is returned</param>
 		/// <param name="U">A Matrix object where the U matrix is returned</param>
 		/// <param name="V">A Matrix object where the V matrix is returned</param>
-		public static void SVD(Matrix Mat, out Matrix S, out Matrix U, out Matrix V)
+		public static void SVD(MatrixX Mat, out MatrixX S, out MatrixX U, out MatrixX V)
 		{
 			double [,] s, u, v;
 			SVD(Mat.in_Mat, out s, out u, out v);
-			S = new Matrix(s);
-			U = new Matrix(u);
-			V = new Matrix(v);
+			S = new MatrixX(s);
+			U = new MatrixX(u);
+			V = new MatrixX(v);
 		}
 		#endregion
 		
@@ -1121,13 +1121,13 @@ namespace MatrixLibrary
 		/// <param name="L">A Matrix object where the lower traingular matrix is returned</param>
 		/// <param name="U">A Matrix object where the upper traingular matrix is returned</param>
 		/// <param name="P">A Matrix object where the permutation matrix is returned</param>
-		public static void LU(Matrix Mat , out Matrix L, out Matrix U, out Matrix P)
+		public static void LU(MatrixX Mat , out MatrixX L, out MatrixX U, out MatrixX P)
 		{
 			double [,] l, u, p;
 			LU(Mat.in_Mat, out l, out u, out p);
-			L = new Matrix(l);
-			U = new Matrix(u);
-			P = new Matrix(p);
+			L = new MatrixX(l);
+			U = new MatrixX(u);
+			P = new MatrixX(p);
 		}
 		#endregion
 
@@ -1276,8 +1276,8 @@ namespace MatrixLibrary
 		/// <param name="MatA">Matrix object 'A' on the left side of the equations A.X = B</param>
 		/// <param name="MatB">Matrix object 'B' on the right side of the equations A.X = B</param>
 		/// <returns>Matrix object 'X' in the system of equations A.X = B</returns>
-		public static Matrix SolveLinear(Matrix MatA , Matrix MatB)
-		{return new Matrix(Matrix.SolveLinear(MatA.in_Mat, MatB.in_Mat));}
+		public static MatrixX SolveLinear(MatrixX MatA , MatrixX MatB)
+		{return new MatrixX(MatrixX.SolveLinear(MatA.in_Mat, MatB.in_Mat));}
 		#endregion
 
 		#region "Rank of a matrix"
@@ -1312,7 +1312,7 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="Mat">a Matrix object whose rank is to be found</param>
 		/// <returns>The rank of the Matrix object</returns>
-		public static int Rank(Matrix Mat)
+		public static int Rank(MatrixX Mat)
 		{return Rank(Mat.in_Mat);}
 		#endregion
 
@@ -1399,8 +1399,8 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="Mat">a Matrix object whose pseudoinverse is to be found</param>
 		/// <returns>The pseudoinverse of the Matrix object as a Matrix Object</returns>
-		public static Matrix PINV(Matrix Mat)
-		{return new Matrix(PINV(Mat.in_Mat));}
+		public static MatrixX PINV(MatrixX Mat)
+		{return new MatrixX(PINV(Mat.in_Mat));}
 		#endregion
 
 		#region "Eigen Values and Vactors of Symmetric Matrix"
@@ -1550,12 +1550,12 @@ namespace MatrixLibrary
 		/// </param>
 		/// <param name="d">A Matrix object where the eigenvalues are returned</param>
 		/// <param name="v">A Matrix object where the eigenvectors are returned</param>
-		public static void Eigen(Matrix Mat, out Matrix d,out Matrix v)
+		public static void Eigen(MatrixX Mat, out MatrixX d,out MatrixX v)
 		{
 			double [,] D, V;
 			Eigen(Mat.in_Mat, out D, out V);
-			d = new Matrix(D);
-			v = new Matrix(V);
+			d = new MatrixX(D);
+			v = new MatrixX(V);
 		}
 		#endregion
 
@@ -1592,8 +1592,8 @@ namespace MatrixLibrary
 		/// <param name="Value">The scalar value to multiply the array</param>
 		/// <param name="Mat">Matrix which is to be multiplied by a scalar</param>
 		/// <returns>The multiplication of the scalar and the array as an array</returns>
-		public static Matrix ScalarMultiply(double Value, Matrix Mat)
-		{return new Matrix(ScalarMultiply(Value,Mat.in_Mat));}
+		public static MatrixX ScalarMultiply(double Value, MatrixX Mat)
+		{return new MatrixX(ScalarMultiply(Value,Mat.in_Mat));}
 
 		/// <summary>
 		/// Returns the multiplication of a matrix or a vector (i.e 
@@ -1606,8 +1606,8 @@ namespace MatrixLibrary
 		/// The multiplication of the scalar and the Matrix object as a 
 		/// Matrix object
 		/// </returns>
-		public static Matrix operator*(Matrix Mat, double Value)
-		{return new Matrix(ScalarMultiply(Value,Mat.in_Mat));}
+		public static MatrixX operator*(MatrixX Mat, double Value)
+		{return new MatrixX(ScalarMultiply(Value,Mat.in_Mat));}
 		
 		/// <summary>
 		/// Returns the multiplication of a matrix or a vector (i.e 
@@ -1620,8 +1620,8 @@ namespace MatrixLibrary
 		/// The multiplication of the scalar and the Matrix object as a 
 		/// Matrix object
 		/// </returns>
-		public static Matrix operator*(double Value,Matrix Mat)
-		{return new Matrix(ScalarMultiply(Value,Mat.in_Mat));}
+		public static MatrixX operator*(double Value,MatrixX Mat)
+		{return new MatrixX(ScalarMultiply(Value,Mat.in_Mat));}
 		#endregion
 
 		#region "Divide a matrix or a vector with a scalar quantity"
@@ -1658,8 +1658,8 @@ namespace MatrixLibrary
 		/// <param name="Value">The scalar value to divide the array with</param>
 		/// <param name="Mat">Matrix which is to be divided by a scalar</param>
 		/// <returns>The division of the array and the scalar as an array</returns>
-		public static Matrix ScalarDivide(double Value, Matrix Mat)
-		{return new Matrix(ScalarDivide(Value,Mat.in_Mat));}
+		public static MatrixX ScalarDivide(double Value, MatrixX Mat)
+		{return new MatrixX(ScalarDivide(Value,Mat.in_Mat));}
 
 		/// <summary>
 		/// Returns the division of a matrix or a vector (i.e 
@@ -1671,8 +1671,8 @@ namespace MatrixLibrary
 		/// <returns>
 		/// The division of the Matrix object and the scalar as a Matrix object
 		/// </returns>
-		public static Matrix operator/(Matrix Mat,double Value)
-		{return new Matrix(ScalarDivide(Value,Mat.in_Mat));}
+		public static MatrixX operator/(MatrixX Mat,double Value)
+		{return new MatrixX(ScalarDivide(Value,Mat.in_Mat));}
 		#endregion
 
 		#region "Vectors Cross Product"
@@ -1754,8 +1754,8 @@ namespace MatrixLibrary
 		/// <param name="V1">First Matrix (dimensions [3,1]) in the cross product</param>
 		/// <param name="V2">Second Matrix (dimensions [3,1]) in the cross product</param>
 		/// <returns>Cross product of V1 and V2 as a matrix (dimension [3,1])</returns>
-		public static Matrix CrossProduct(Matrix V1, Matrix V2)
-		{return (new Matrix((CrossProduct(V1.in_Mat,V2.in_Mat))));}
+		public static MatrixX CrossProduct(MatrixX V1, MatrixX V2)
+		{return (new MatrixX((CrossProduct(V1.in_Mat,V2.in_Mat))));}
 		#endregion
 
 		#region "Vectors Dot Product"
@@ -1821,7 +1821,7 @@ namespace MatrixLibrary
 		/// <param name="V1">First Matrix object (dimension [3,1]) in the dot product</param>
 		/// <param name="V2">Second Matrix object (dimension [3,1]) in the dot product</param>
 		/// <returns>Dot product of V1 and V2</returns>
-		public static double DotProduct(Matrix V1, Matrix V2)
+		public static double DotProduct(MatrixX V1, MatrixX V2)
 		{return (DotProduct(V1.in_Mat, V2.in_Mat));}
 		#endregion
 
@@ -1868,7 +1868,7 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="V">Matrix object (dimension [3,1]) whose magnitude is to be found</param>
 		/// <returns>The magnitude of the Matrix object</returns>
-		public static double VectorMagnitude(Matrix V)
+		public static double VectorMagnitude(MatrixX V)
 		{return (VectorMagnitude(V.in_Mat));}					
 		#endregion
 
@@ -1908,6 +1908,7 @@ namespace MatrixLibrary
 			return true;
 		}
 
+        /**?? removed to avoid no GetHashCode() warning
 		/// <summary>
 		/// Checks if two matrices of equal dimensions are equal or not.
 		/// In case of an error the error is raised as an exception.
@@ -1915,7 +1916,7 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First Matrix in equality check</param>
 		/// <param name="Mat2">Second Matrix in equality check</param>
 		/// <returns>If two matrices are equal or not</returns>
-		public static bool IsEqual (Matrix Mat1, Matrix Mat2)
+		public static bool IsEqual (MatrixX Mat1, MatrixX Mat2)
 		{return IsEqual(Mat1.in_Mat, Mat2.in_Mat);}
 
 		/// <summary>
@@ -1925,7 +1926,7 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First Matrix object in equality check</param>
 		/// <param name="Mat2">Second Matrix object in equality check</param>
 		/// <returns>If two matrices are equal or not</returns>
-		public static bool operator ==(Matrix Mat1, Matrix Mat2)
+		public static bool operator ==(MatrixX Mat1, MatrixX Mat2)
 		{return IsEqual(Mat1.in_Mat, Mat2.in_Mat);}
 
 		/// <summary>
@@ -1935,7 +1936,7 @@ namespace MatrixLibrary
 		/// <param name="Mat1">First Matrix object in equality check</param>
 		/// <param name="Mat2">Second Matrix object in equality check</param>
 		/// <returns>If two matrices are not equal</returns>
-		public static bool operator !=(Matrix Mat1, Matrix Mat2)
+		public static bool operator !=(MatrixX Mat1, MatrixX Mat2)
 		{return (! IsEqual(Mat1.in_Mat, Mat2.in_Mat));}
 
 		/// <summary>
@@ -1946,20 +1947,21 @@ namespace MatrixLibrary
 		/// <returns>This method returns true if obj is the specified Matrix object identical to this Matrix object; otherwise, false.</returns>
 		public override bool Equals(Object obj) 
 		{
-			try {return (bool) (this == (Matrix) obj);}
+			try {return (bool) (this == (MatrixX) obj);}
 			catch {return false;}
 		}
-		#endregion
+    **/
+        #endregion
 
-		#region "Print Matrix"
-		/// <summary>
-		/// Returns a matrix as a string, so it can be viewed
-		/// in a multi-text textbox or in a richtextBox (preferred).
-		/// In case of an error the error is raised as an exception.
-		/// </summary>
-		/// <param name="Mat">The array to be viewed</param>
-		/// <returns>The string view of the array</returns>
-		public static string PrintMat(double[,] Mat)
+        #region "Print Matrix"
+        /// <summary>
+        /// Returns a matrix as a string, so it can be viewed
+        /// in a multi-text textbox or in a richtextBox (preferred).
+        /// In case of an error the error is raised as an exception.
+        /// </summary>
+        /// <param name="Mat">The array to be viewed</param>
+        /// <returns>The string view of the array</returns>
+        public static string PrintMat(double[,] Mat)
 		{
 			int N_Rows, N_Columns, k, i, j, m;
 			string StrElem;
@@ -2039,7 +2041,7 @@ namespace MatrixLibrary
 		/// </summary>
 		/// <param name="Mat">The Matrix object to be viewed</param>
 		/// <returns>The string view of the Matrix object</returns>
-		public static string PrintMat(Matrix Mat)
+		public static string PrintMat(MatrixX Mat)
 		{return (PrintMat(Mat.in_Mat));}
 
 		/// <summary>

@@ -41,13 +41,13 @@ namespace CSG {
             };
 
             double[,] G = new double[,] { { grad.x, grad.y, grad.z } };   // delta F
-            double[,] GT = Matrix.Transpose(G);
-            double[,] KGA = Matrix.Multiply(G, Matrix.Multiply(HX, GT));
+            double[,] GT = MatrixX.Transpose(G);
+            double[,] KGA = MatrixX.Multiply(G, MatrixX.Multiply(HX, GT));
             double KGX = KGA[0, 0];
 
             double gradl = grad.magnitude;                  // | delta F |
             double KG = KGX / (gradl.sq().sq());            // (4.1)
-            double KM = (Matrix.Multiply(G, Matrix.Multiply(H, GT))[0,0] - gradl.sq() * (dxx + dyy + dzz)) / (2 * gradl.sq() * gradl);      // (4.2)
+            double KM = (MatrixX.Multiply(G, MatrixX.Multiply(H, GT))[0,0] - gradl.sq() * (dxx + dyy + dzz)) / (2 * gradl.sq() * gradl);      // (4.2)
             double K1 = KM + Math.Sqrt(KM * KM - KG);       // (4.3)
             double K2 = KM - Math.Sqrt(KM * KM - KG);
             if (KG < 0)
