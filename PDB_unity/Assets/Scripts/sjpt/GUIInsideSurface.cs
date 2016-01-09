@@ -481,8 +481,11 @@ namespace CSG {
 
         public override void home(Transform t) {
             t.rotation = new Quaternion(0, 0, 0, 1);
-            t.position = new Vector3(0, 0, -80);
+            t.position = new Vector3(0, 11, -70);
         }
+
+        protected override GameObject getSubObject() { return goMolB; }
+
 
 
     } // class GUIInsideSurface

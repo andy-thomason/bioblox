@@ -327,20 +327,6 @@ namespace CSG {  // [ExecuteInEditMode]
             var p = t.position;
             var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
 
-            if (Input.GetKey("left alt")) {
-                if (Input.GetKeyDown(KeyCode.LeftArrow))
-                    t.RotateAround(Vector3.zero, t.up, 90);
-                if (Input.GetKeyDown(KeyCode.RightArrow))
-                    t.RotateAround(Vector3.zero, t.up, -90);
-                if (Input.GetKeyDown(KeyCode.UpArrow))
-                    t.RotateAround(Vector3.zero, t.right, -90);
-                if (Input.GetKeyDown(KeyCode.DownArrow))
-                    t.RotateAround(Vector3.zero, t.right, 90);
-
-                return;
-            }
-
-
             float mrate = a * keyPanRate;
 
             if (Input.GetKey("w"))
@@ -358,14 +344,25 @@ namespace CSG {  // [ExecuteInEditMode]
                 p = p * (1 + mrate) - lookat * mrate;
 
 
-            if (Input.GetKey(KeyCode.LeftArrow))
-                p -= t.right * mrate;
-            if (Input.GetKey(KeyCode.RightArrow))
-                p += t.right * mrate;
-            if (Input.GetKey(KeyCode.UpArrow))
-                p += t.up * mrate;
-            if (Input.GetKey(KeyCode.DownArrow))
-                p -= t.up * mrate;
+            if (Input.GetKey("left alt")) {
+                if (Input.GetKeyDown(KeyCode.LeftArrow))
+                    t.RotateAround(Vector3.zero, t.up, 90);
+                if (Input.GetKeyDown(KeyCode.RightArrow))
+                    t.RotateAround(Vector3.zero, t.up, -90);
+                if (Input.GetKeyDown(KeyCode.UpArrow))
+                    t.RotateAround(Vector3.zero, t.right, -90);
+                if (Input.GetKeyDown(KeyCode.DownArrow))
+                    t.RotateAround(Vector3.zero, t.right, 90);
+            } else {
+                if (Input.GetKey(KeyCode.LeftArrow))
+                    p -= t.right * mrate;
+                if (Input.GetKey(KeyCode.RightArrow))
+                    p += t.right * mrate;
+                if (Input.GetKey(KeyCode.UpArrow))
+                    p += t.up * mrate;
+                if (Input.GetKey(KeyCode.DownArrow))
+                    p -= t.up * mrate;
+            }
 
             if (Input.inputString.Contains("!"))
                 p = (p + lookat) / 2;
@@ -400,23 +397,41 @@ namespace CSG {  // [ExecuteInEditMode]
             }
 
             //lookat = Vector3.zero; // t.position + t.forward * 20;
-            switch (mousebuts) {
-                case 0:
-                    break;
-                case 1:
-                    mousedelta *= mouseRotRate;
-                    t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
-                    break;
-                case 2:
-                    mousedelta *= mousePanRate;
-                    t.position -= 0.3f * (mousedelta.x * t.right + mousedelta.y * t.up);
-                    break;
-                case 3:
-                    mousedelta *= mouseRotRate;
-                    t.RotateAround(lookat, t.forward, mousedelta.x);
-                    break;
+            if (!Input.GetKey("left alt")) {
+                switch (mousebuts) {
+                    case 0:
+                        break;
+                    case 1:
+                        mousedelta *= mouseRotRate;
+                        t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
+                        break;
+                    case 2:
+                        mousedelta *= mousePanRate;
+                        t.position -= (mousedelta.x * t.right + mousedelta.y * t.up);
+                        break;
+                    case 3:
+                        mousedelta *= mouseRotRate;
+                        t.RotateAround(lookat, t.forward, mousedelta.x);
+                        break;
+                }
+            } else {
+                GameObject so = getSubObject();
+                if (so != null)
+                switch (mousebuts) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        mousedelta *= mousePanRate;
+                        so.transform.localPosition += (mousedelta.x * t.right + mousedelta.y * t.up);
+                        break;
+                    case 3:
+                        break;
 
+                }
             }
+
 
             if (Input.GetKeyDown("u") && (Input.GetKey("left shift") || Input.GetKey("right shift")))
                 keepUpright = !keepUpright;
@@ -478,6 +493,8 @@ namespace CSG {  // [ExecuteInEditMode]
             //RenderSettings.ambientIntensity = 0;
 
         }
+
+        protected virtual GameObject getSubObject() { return null; }
 
         // standard Unity OnGUI function, protecting from exceptions
         void OnGUI() {
