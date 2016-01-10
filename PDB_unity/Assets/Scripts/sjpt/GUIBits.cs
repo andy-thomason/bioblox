@@ -120,7 +120,6 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // update local control variables (so they show in Unity editor) 
             // to be reflected in the 'real' places
-            CSGControl.radInfluence = radInfluence; MSPHERE.UpdateRadInfluence();
             gameObject.transform.position = new Vector3(0, 0, 0);
             gameObject.transform.rotation = new Quaternion(0, 0, 0, 1);
 

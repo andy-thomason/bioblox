@@ -537,8 +537,7 @@ namespace CSG {
 
         public static int nspheres = 20;
         public static int sphereRadx = 25;
-        public static float radInfluence = 1.4f;
-        // how far sphere influence extends, multiple of radius
+        public static float radInfluence = 1.4f;  // how far sphere influence extends, multiple of radius (default value)
         public static bool doBalance = true;
         public static float fieldThresh = 1;
         /// <summary>
@@ -646,6 +645,8 @@ namespace CSG {
             return n;
         }
 
+        public float scale() { return Mathf.Pow(m.determinant, 1f / 3);  }
+
     }
 
     /** class used to record pending actions such as transform */
@@ -735,7 +736,7 @@ namespace CSG {
 
         public static CSGMode csgmode = CSGMode.collecting;
 
-        private CSGNode baked = null;
+        protected CSGNode baked = null;
         /// <summary>
         /// Top level call to bake the node so that it is ready for rendering etc
         /// The result is cached.

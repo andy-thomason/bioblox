@@ -27,7 +27,6 @@ namespace CSG {
         public bool computeCurvature = CSGFMETA.computeCurvature;
 
         // following are class so they can get reused between frames
-        CSGFMETA csgm;
         Shader shader;
 
         GameObject goMolA, goMolB;
@@ -51,6 +50,10 @@ namespace CSG {
             if (base.Show(ptoshow)) return true;
 
             CSGFMETA.computeCurvature = computeCurvature;
+            if (CSGControl.MinLev < 5)
+                CSGControl.MinLev = 7;
+            CSGControl.MaxLev = CSGControl.MinLev;
+
 
             text = "";
             toshow = ptoshow;
@@ -87,22 +90,13 @@ namespace CSG {
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(70, 70, 70));  // same bounds for both molecules
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
-                if (CSGControl.MinLev < 5) 
-                    CSGControl.MinLev = 7;
-                CSGControl.MaxLev = CSGControl.MinLev;
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
                 mol = (useb) ? molB : molA;
 
                 // prepare and populate the metaball object
-                csgm = new CSGFMETA();
-                Vector3[] v = mol.atom_centres;
-                float[] r = mol.atom_radii;
-                for (int i = 0; i < v.Length; i++) {
-                    csgm.Add(new MSPHERE(v[i], r[i]));
-                }
-                csg = csgm;                         // and save csg in 'standard' named variable
+                csg = meta(mol, radInfluence);
                 Volume molvol = csg.Volume();       // find bounding volume   
                 // bounds = molvol.BoundsExpand(1.1f); // and get a little leway
                 // bounds = new Bounds(Vector3.zero, new Vector3(70,70,70));  // same bounds for both molecules
@@ -120,7 +114,7 @@ namespace CSG {
 
 
                     Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
-                    prepRadinf = CSGControl.radInfluence;
+                    prepRadinf = radInfluence;
 
                     // precompute the compacted version (common vertices)
                     tsavemesh = tsavemesh.RemapMesh();
@@ -167,18 +161,41 @@ namespace CSG {
                 return true;
             }
 
+            if (testop("intersect")) {
+                csg = meta(molA, radInfluence).WithProvenance("molA") * meta(molB, radInfluence).WithProvenance("molB");
+                //csg = meta(molA, radInfluence).WithProvenance("molA") * new Sphere(0,0,0, 20);
+            }
+
             if (opdone) showCSGParallel(bounds);
             return opdone;
 
         }  // Show()
 
-        void filter() {
+        /// <summary>
+        /// prepare metaball for molecule
+        /// </summary>
+        /// <param name="mol"></param>
+        /// <param name="radInfluence"></param>
+        /// <returns></returns>
+        CSGFMETA meta(PDB_molecule mol, float radInfluence) {
+            // prepare and populate the metaball object
+            CSGFMETA csgm = new CSGFMETA();
+            Vector3[] v = mol.atom_centres;
+            float[] r = mol.atom_radii;
+            for (int i = 0; i < v.Length; i++) {
+                csgm.Add(new MSPHERE(v[i], r[i], radInfluence));
+            }
+            return csgm;
+        }
+
+
+    void filter() {
             filterA();
             filterB();
         }
 
         void filterA() {
-            if (molA == null || savemeshA == null || prepRadinf != CSGControl.radInfluence)
+            if (molA == null || savemeshA == null || prepRadinf != radInfluence)
                 Show("pdb prep");
 
             //float tf0 = Time.realtimeSinceStartup;
@@ -192,7 +209,7 @@ namespace CSG {
         }
 
         void filterB() {
-            if (molB == null || savemeshB == null || prepRadinf != CSGControl.radInfluence)
+            if (molB == null || savemeshB == null || prepRadinf != radInfluence)
                 Show("pdb prepB");
 
             BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);

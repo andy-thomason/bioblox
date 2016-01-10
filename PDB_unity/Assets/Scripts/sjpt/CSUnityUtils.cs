@@ -368,6 +368,7 @@ namespace CSG {
     //public class CSUnityException :
 
     public static class MathsExtensions {
+        /** not needed, determinant is provided
         public static float Determinant(this Matrix4x4 m) {
             //borrowed from java vecmath Matrix4f
             float f = m.m00
@@ -396,6 +397,7 @@ namespace CSG {
 
             return f;
         }
+        **/
 
         public static float dot(this Vector3 a, Vector3 b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
         public static float Distance(this Vector3 a, Vector3 b) { return Vector3.Distance(a, b); }

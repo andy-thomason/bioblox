@@ -137,36 +137,40 @@ namespace CSGFIELD {
     /// metasphere class
     /// </summary>
     public class MSPHERE : CSGFNODE {
-        public float cx, cy, cz, r, ri;
-        // centre, radius and radius inverse
+        public float cx, cy, cz, r, ri;  // centre, radius and radius inverse
         public Color color = Color.white;
+        public Vector3 c {  get { return new Vector3(cx, cy, cz); } }
 
-        public MSPHERE(float px, float py, float pz, float pr) {
+        public MSPHERE(float px, float py, float pz, float pr, float radInfluence) {
             cx = px;
             cy = py;
             cz = pz;
             r = pr;
             ri = 1 / pr;
+            UpdateRadInfluence(radInfluence);
         }
 
-        public MSPHERE(Vector3 c, float rr)
-            : this(c.x, c.y, c.z, rr) {
-        }
+        public MSPHERE(float px, float py, float pz, float pr) : this(px, py, pz, pr, CSGControl.radInfluence) { }
+        public MSPHERE(Vector3 c, float rr, float radInfluence) : this(c.x, c.y, c.z, rr, radInfluence) { }
+        public MSPHERE(Vector3 c, float rr) : this(c, rr, CSGControl.radInfluence) { }
 
         public float strength = 1;
         public float sqrt2 = (float)Math.Sqrt(2);
-        
-        public static float radInfluence = CSGControl.radInfluence;          // rad influence
-        public static float radInfluence2 = radInfluence * radInfluence;      // sqr of rad influence
-        public static float radInfluenceNorm2 = 1 / ((1 - radInfluence2) * (1 - radInfluence2));    // compensate factor
-        public static float radInfluenceNorm3;  	                        // compensate factor
+
+        public float radInfluence;// = CSGControl.radInfluence;          // rad influence
+        public float radInfluence2;// = radInfluence * radInfluence;      // sqr of rad influence
+        public float radInfluenceNorm2;// = 1 / ((1 - radInfluence2) * (1 - radInfluence2));    // compensate factor
+        public float radInfluenceNorm3;  	                        // compensate factor
         public bool cubic = true;
-        static MSPHERE() {
-            UpdateRadInfluence();
+
+        public MSPHERE BCopy(Bakery bk, float sc) {
+            Vector3 nc = bk.m.MultiplyPoint3x4(c);
+            MSPHERE nsp = new MSPHERE(nc, r*sc, radInfluence);
+            return nsp;
         }
 
-        public static void UpdateRadInfluence() {
-            radInfluence = CSGControl.radInfluence;  // rad influence
+        public void UpdateRadInfluence(float radInfluence) {
+            this.radInfluence = radInfluence;  // rad influence
             radInfluence2 = radInfluence * radInfluence;  // sqr of rad influence
             float ddd = 1 / (radInfluence2 - 1);
             radInfluenceNorm2 = ddd * ddd;  // compensate factor
@@ -337,14 +341,11 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public bool grayscale = false;
         public static bool computeCurvature = false;
 
-        int MAXD = 15;
-        // max depth, just for allocation
-        int MAXN = 2500;
-        // max num spheres, just for allocation
-        MSPHERE[][] spheres;
-        // list of spheres for each recursion level
-        int[] levspheres;
-        //number of used spheres at each level
+        int MAXD = 15;          // max depth, just for allocation
+        int MAXN = 2500;        // max num spheres, just for allocation
+        MSPHERE[][] spheres;    // list of spheres for each recursion level
+        int[] levspheres;       //number of used spheres at each level
+
         public CSGFMETA() {
             spheres = new MSPHERE[MAXD][];
             levspheres = new int[MAXD];
@@ -354,9 +355,19 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             }
         }
 
+        public void UpdateRadInfluence(float radInfluence) {
+            baked = null;
+            for (int s = 0; s < levspheres[0]; s++)
+                spheres[0][s].UpdateRadInfluence(radInfluence);
+        }
+
         public override CSGNode BCopy(Bakery bk) {
             this.bk = bk;
-            return this;  // todo not complete
+            CSGFMETA n = new CSGFMETA();
+            for (int s = 0; s < levspheres[0]; s++) {
+                n.Add(spheres[0][s].BCopy(bk, bk.scale()));
+            }
+            return n;  // todo not complete
         }
 
 
@@ -365,6 +376,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         /// </summary>
         /// <param name="ms"></param>
         public void Add(MSPHERE ms) {
+            baked = null;
             spheres[0][levspheres[0]] = ms;
             levspheres[0]++;
         }

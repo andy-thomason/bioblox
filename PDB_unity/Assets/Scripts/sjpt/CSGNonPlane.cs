@@ -174,7 +174,7 @@ namespace CSGNonPlane {
         public override CSGNode BCopy(Bakery bk) { 
             Vector4 ax = new Vector4(x, y, z, 1);
             Vector4 axx = bk.m.transpose * ax;
-            return new Sphere(axx.x, axx.y, axx.z, r * Mathf.Pow(bk.m.Determinant(), (1.0f / 3)), bk);
+            return new Sphere(axx.x, axx.y, axx.z, r * bk.scale(), bk);
         } 
 
         public override float Dist(float px, float py, float pz) {
@@ -230,7 +230,7 @@ namespace CSGNonPlane {
             Vector4 bx = new Vector4(b.x, b.y, b.z, 1);
             Vector4 axx = bk.m.transpose * ax;
             Vector4 bxx = bk.m.transpose * bx;
-            float rr = r * Mathf.Pow(bk.m.Determinant(), (1.0f / 3));
+            float rr = r * bk.scale();
 
             Cylinder realcyl = new Cylinder(axx.x, axx.y, axx.z, bxx.x, bxx.y, bxx.z, rr, infinite, bk);
             if (CylNum > 0) {
@@ -493,7 +493,7 @@ namespace CSGNonPlane {
             Vector4 axx = bk.m.transpose * ax;
             Vector4 bxx = bk.m.transpose * bx;
 
-            float sc = Mathf.Pow(bk.m.Determinant(), (1.0f / 3));
+            float sc = bk.scale();
             Cone realcone = new Cone(axx.x, axx.y, axx.z, bxx.x, bxx.y, bxx.z, ra * sc, rb * sc, infinite, bk);
             if (CylNum > 0) {
                 Vector4 d = bxx - axx;
