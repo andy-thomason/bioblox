@@ -1466,6 +1466,16 @@ namespace CSG {
             return "";
 #endif
         }
+
+        public CSGNode Colour(double Color) {
+            return WithTexture(Color + "_col");
+        }
+
+        public CSGNode WithTexture(string Texture) {
+            // compiles under MonoDevelop with provenance below, but not under Unity
+            return TNode(new Bakery("texture", texture: Texture /* , provenance: Texture */));
+        }
+
     }
     // end CSGNode
 
@@ -1857,8 +1867,8 @@ namespace CSG {
             List<CSGNode> list = new List<CSGNode>();
             ulist(list);
             CSGNode[] arr = list.ToArray();
-            if (arr.Any())
-                return S.NONE;
+            //if (arr.Any())
+            //    return S.NONE;
             return balance(arr, 0, arr.Length);
         }
 

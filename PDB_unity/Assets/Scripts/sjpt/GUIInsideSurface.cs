@@ -163,10 +163,15 @@ namespace CSG {
 
             if (testop("intersect")) {
                 Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
-                csg = meta(molA, radInfluence).WithProvenance("molA") 
-                    * meta(molB, radInfluence).At(molB.pos - molA.pos).WithProvenance("molB");
+                csg = meta(molA, radInfluence).Colour(7) 
+                    * meta(molB, 1.2f, 2.5f).At(molB.pos - molA.pos).Colour(2);
                 //csg = meta(molA, radInfluence).WithProvenance("molA") * new Sphere(0,0,0, 20);
             }
+
+            if (testop("spheres")) {
+                csg = spheres(molA);
+            }
+
 
             if (opdone) showCSGParallel(bounds);
             return opdone;
@@ -179,19 +184,32 @@ namespace CSG {
         /// <param name="mol"></param>
         /// <param name="radInfluence"></param>
         /// <returns></returns>
-        CSGFMETA meta(PDB_molecule mol, float radInfluence) {
+        CSGFMETA meta(PDB_molecule mol, float radInfluence, float radMult = 1) {
             // prepare and populate the metaball object
             CSGFMETA csgm = new CSGFMETA();
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm.Add(new MSPHERE(v[i], r[i], radInfluence));
+                csgm.Add(new MSPHERE(v[i], r[i] * radMult, radInfluence));
             }
             return csgm;
         }
 
+        CSGNode spheres(PDB_molecule mol, float radMult = 1) {
+            CSGNode csgm = S.NONE;
+            Vector3[] v = mol.atom_centres;
+            float[] r = mol.atom_radii;
+            for (int i = 0; i < v.Length; i++) {
+                csgm += new Sphere(v[i], r[i] * radMult);
+            }
+            csgm = ((Union)csgm).balance();
+            return csgm;
+        }
 
-    void filter() {
+
+
+
+        void filter() {
             filterA();
             filterB();
         }
@@ -354,10 +372,10 @@ namespace CSG {
             if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
-                filter();          
+                filter();
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8))
-                Show("pdb prep");
-            if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))
+                ; //  Show("pdb prep");
+            if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
 
             for (int i = 0; i < N/2; i++)

@@ -199,7 +199,7 @@ namespace CSG {  // [ExecuteInEditMode]
                     } catch (Exception e) {
                         Log("parallel thread failed: " + e);
                         Log(e.StackTrace);
-}
+                    }
                 });
                 parallelThread.Name = "CSGWorker";
                 parallelThread.Start();
@@ -259,7 +259,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public static void LogK(string k, string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
-            lock(ktexts) ktexts[k] = ss;
+            lock (ktexts) ktexts[k] = ss;
         }
 
         public static void Log2(string s, params object[] xparms) {
@@ -288,13 +288,13 @@ namespace CSG {  // [ExecuteInEditMode]
         public float mousePanRate = 0.05f;
         public float mouseRotRate = 0.1f;
 
-        protected Camera curcam { get { if (Cameras == null) Cameras = Camera.allCameras;   return curcamnum < 0 ? null : Cameras[curcamnum]; } }
+        protected Camera curcam { get { if (Cameras == null) Cameras = Camera.allCameras; return curcamnum < 0 ? null : Cameras[curcamnum]; } }
         protected int curcamnum = 0;
         protected Camera findcam() {
             if (Cameras == null) Cameras = Camera.allCameras;
 
             curcamnum = -1;
-            for (int cam= 0; cam < Cameras.Length; cam++ ) {
+            for (int cam = 0; cam < Cameras.Length; cam++) {
                 if (Cameras[cam].pixelRect.Contains(Input.mousePosition)) {
                     curcamnum = cam;
                     break;
@@ -328,6 +328,7 @@ namespace CSG {  // [ExecuteInEditMode]
             var t = curcam.transform;
             var p = t.position;
             var a = Input.GetKey("left ctrl") ? 0.1f : Input.GetKey("left shift") ? 10 : 1;
+            // LogK("control", GUI.GetNameOfFocusedControl());  // not helpful for sliders
 
             float mrate = a * keyPanRate;
 
@@ -399,40 +400,42 @@ namespace CSG {  // [ExecuteInEditMode]
             }
 
             //lookat = Vector3.zero; // t.position + t.forward * 20;
-            if (!Input.GetKey("left alt")) {
-                switch (mousebuts) {
-                    case 0:
-                        break;
-                    case 1:
-                        mousedelta *= mouseRotRate;
-                        t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
-                        break;
-                    case 2:
-                        mousedelta *= mousePanRate;
-                        t.position -= (mousedelta.x * t.right + mousedelta.y * t.up);
-                        break;
-                    case 3:
-                        mousedelta *= mouseRotRate;
-                        t.RotateAround(lookat, t.forward, mousedelta.x);
-                        break;
-                }
-            } else {
-                GameObject so = getSubObject();
-                if (so != null)
-                switch (mousebuts) {
-                    case 0:
-                        break;
-                    case 1:
-                        break;
-                    case 2:
-                        mousedelta *= mousePanRate;
-                        so.transform.localPosition += (mousedelta.x * t.right + mousedelta.y * t.up);
-                        break;
-                    case 3:
-                        break;
+            if (!showing) {     // only use mouse drag if ! showing
+                if (!Input.GetKey("left alt")) {// standard mouse drag
+                    switch (mousebuts) {
+                        case 0:
+                            break;
+                        case 1:
+                            mousedelta *= mouseRotRate;
+                            t.RotateAround(lookat, -mousedelta.y * t.right + mousedelta.x * t.up, mousedelta.magnitude);
+                            break;
+                        case 2:
+                            mousedelta *= mousePanRate;
+                            t.position -= (mousedelta.x * t.right + mousedelta.y * t.up);
+                            break;
+                        case 3:
+                            mousedelta *= mouseRotRate;
+                            t.RotateAround(lookat, t.forward, mousedelta.x);
+                            break;
+                    }
+                } else {  // end standard mouse drag, start alt mouse drag
+                    GameObject so = getSubObject();
+                    if (so != null)
+                        switch (mousebuts) {
+                            case 0:
+                                break;
+                            case 1:
+                                break;
+                            case 2:
+                                mousedelta *= mousePanRate;
+                                so.transform.localPosition += (mousedelta.x * t.right + mousedelta.y * t.up);
+                                break;
+                            case 3:
+                                break;
 
-                }
-            }
+                        }
+                }  // end alt mouse drag
+            }     // only use mouse drag if ! showing
 
 
             if (Input.GetKeyDown("u") && (Input.GetKey("left shift") || Input.GetKey("right shift")))
@@ -447,7 +450,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 t.forward = f;
             }
 
-            if (Input.GetKey("home")) home(t);            
+            if (Input.GetKey("home")) home(t);
 
 
             if (Input.GetKeyDown("m") || Input.GetKey("n")) {  // use hitpoint for CSG feedback or simple feedback
@@ -468,7 +471,7 @@ namespace CSG {  // [ExecuteInEditMode]
                         Volume v = new Volume(lookat.x - d, lookat.x + d, lookat.y - d, lookat.y + d, lookat.z - d, lookat.z + d);
                         int unodes = 0;
                         CSGNode csgs = csg.Bake().Simplify(v, simpguid--, ref unodes);
-                        Log(csgs.ToStringF("\n")); 
+                        Log(csgs.ToStringF("\n"));
                         if (csgs is CSGPrim && ((CSGPrim)csgs).realCSG != null)
                             Log("from " + ((CSGPrim)csgs).realCSG.ToStringF("\n"));
                     }
@@ -498,15 +501,25 @@ namespace CSG {  // [ExecuteInEditMode]
 
         protected virtual GameObject getSubObject() { return null; }
 
+        private bool showing = true;
         // standard Unity OnGUI function, protecting from exceptions
         void OnGUI() {
             try {
+                int ww = sliderWidth + 2 * slidermargin;
+                if (Input.mousePosition.x < 20) showing = true;
+                if (Input.mousePosition.x > ww) showing = false;
+                Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
+                GUI.BeginGroup(rect);
+                GUI.color = new Color(1.0f, 1.0f, 1.0f, 0.5f); //0.5 is half opacity 
+                GUI.Box(rect, "box");
                 OnGUII();
+                GUI.EndGroup();
+                showlog();
             } catch (System.Exception e) {
                 Log(e.ToString() + e.StackTrace);
             }
         }
-            
+
         int slidery = 0;
         protected virtual void OnGUII() {
             GUI.contentColor = Color.white;
@@ -525,28 +538,32 @@ namespace CSG {  // [ExecuteInEditMode]
                 y = kvp.Value.y;
             }
             y += 2;
-            slidery = yh*y;
+            slidery = yh * y;
 
             MSlider("progress rate", ref progressInterval, 0.0f, 10.0f);
 
+        }     // OnGUII
+
+        void showlog() {
             // int w = Screen.width / 2;  // width of text
             string xtext = text;
-            lock(ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
+            lock (ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
 
             try {
                 Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
                 labelRect.x = Screen.width - labelRect.width;
                 for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
-                    GUI.Box(labelRect, ""); 
+                    GUI.Box(labelRect, "");
                 GUI.contentColor = Color.white;
                 if (GUI.Button(labelRect, xtext, "label"))
                     text = "";
             } catch (Exception e) {
                 Log2("exception preparing labelRect {0}\n{1}", e, e.StackTrace);
             }
-        }     // OnGUII
+        }
 
-        int sliderWidth = 160, sliderHeight = 25;
+
+        int sliderWidth = 160, sliderHeight = 25, slidermargin = 20;
         /** make an int slider, y position w.i.p, return true if value changed */
         protected bool MSlider(string sliderName, ref int v, int low, int high) {
             GUI.contentColor = Color.white;
@@ -554,10 +571,11 @@ namespace CSG {  // [ExecuteInEditMode]
             GUI.backgroundColor = Color.white;
 
             int o = v;
-            v = (int)GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
+            GUI.SetNextControlName(sliderName);
+            v = (int)GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
             GUI.contentColor = Color.black;
-            GUI.Label(new Rect(10, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
+            GUI.Label(new Rect(slidermargin/2, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
             slidery += sliderHeight;
             bool changed = o != v;
             if (changed) lastmouse = Input.mousePosition;
@@ -568,10 +586,11 @@ namespace CSG {  // [ExecuteInEditMode]
         protected bool MSlider(string sliderName, ref float v, float low, float high) {
             GUI.contentColor = Color.white;
             float o = v;
-            v = GUI.HorizontalSlider(new Rect(20, slidery, sliderWidth, 20), v, low, high);
+            GUI.SetNextControlName(sliderName);
+            v = GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, 20), v, low, high);
             //if (o != v) Log (name + v);
             GUI.contentColor = Color.black;
-            GUI.Label(new Rect(10, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v));
+            GUI.Label(new Rect(slidermargin/2, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v));
             slidery += sliderHeight;
             bool changed = o != v;
             if (changed) lastmouse = Input.mousePosition;

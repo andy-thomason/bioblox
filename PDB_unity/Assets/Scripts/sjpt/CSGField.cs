@@ -365,8 +365,8 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         }
 
         public override CSGNode BCopy(Bakery bk) {
-            this.bk = bk;
             CSGFMETA n = new CSGFMETA();
+            n.bk = bk;
             for (int s = 0; s < levspheres[0]; s++) {
                 n.Add(spheres[0][s].BCopy(bk, bk.scale()));
             }
@@ -502,6 +502,8 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                 if (ddd > 0.001)
                     GUIBits.LogK("graderr", graderr++ + "");
                 col = Curvature.ctest(dxx, dxy, dxz, dyy, dyz, dzz, grad2);
+            } else {
+                col = CSGXX.colors[Math.Min(inn, CSGXX.colors.Length-1)];
             }
 
         }
