@@ -313,6 +313,10 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // keys that can operate regardless of curcam
             if (Input.GetKeyDown("p")) showProgress();
+            if (Input.GetKeyDown("escape")) {
+                lock (ktexts) ktexts.Clear();
+                showing = false;
+            }
             if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
                 showProgress();
 
@@ -703,6 +707,7 @@ namespace CSG {  // [ExecuteInEditMode]
             }
             savemeshA = savemeshB = null;
             lock (ktexts) ktexts.Clear();
+            showing = false;
         }
 
         // delete all children of some game object
