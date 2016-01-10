@@ -164,8 +164,11 @@ namespace CSGFIELD {
         public bool cubic = true;
 
         public MSPHERE BCopy(Bakery bk, float sc) {
-            Vector3 nc = bk.m.MultiplyPoint3x4(c);
-            MSPHERE nsp = new MSPHERE(nc, r*sc, radInfluence);
+            // Vector3 nc = bk.invM.MultiplyPoint3x4(c);
+            Vector4 c = new Vector4(cx, cy, cz, 1);
+            Vector4 tc = bk.m.transpose * c;
+
+            MSPHERE nsp = new MSPHERE(tc.x, tc.y, tc.z, r*sc, radInfluence);
             return nsp;
         }
 

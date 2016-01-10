@@ -162,7 +162,9 @@ namespace CSG {
             }
 
             if (testop("intersect")) {
-                csg = meta(molA, radInfluence).WithProvenance("molA") * meta(molB, radInfluence).WithProvenance("molB");
+                Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
+                csg = meta(molA, radInfluence).WithProvenance("molA") 
+                    * meta(molB, radInfluence).At(molB.pos - molA.pos).WithProvenance("molB");
                 //csg = meta(molA, radInfluence).WithProvenance("molA") * new Sphere(0,0,0, 20);
             }
 

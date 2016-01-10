@@ -243,6 +243,9 @@ namespace CSG {  // [ExecuteInEditMode]
                         + " model=" + toshow);
                     if (CSGStats)
                         Log2("verttypes {0:N0} {1:N0} {2:N0}", Poly.verttype[0], Poly.verttype[1], Poly.verttype[2]);
+                    if (Poly.polymixup != 0)
+                        Log2("poly mix up {0:N0}", Poly.polymixup);
+                    Poly.polymixup = 0;
                 }
 
                 // nb, minster model from OpenSCAD 1/2 minster vertices=30,656, triangles=61,891

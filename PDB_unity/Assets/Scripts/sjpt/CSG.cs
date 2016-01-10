@@ -3834,6 +3834,7 @@ namespace CSG {
         //}
 
         public static int splits = 0;  // for stats
+        public static int polymixup = 0; // for stats
         /// <summary>
         /// Split the poly at another csg
         /// This assumes convex, so just two parts
@@ -3893,7 +3894,9 @@ namespace CSG {
                 //} else
                 {
                     if (inpoly == this || outpoly == this) {
-                        throw new Exception("poly mix up");
+                        polymixup++;
+                        return;
+                        // throw new Exception("poly mix up");
                     }
                     if (d * lastd < 0) {  // switch sides, find new crossing point for both in and out
                         // worryingly, the lines below were significantly faster than the slow! line
