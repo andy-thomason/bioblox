@@ -164,8 +164,7 @@ namespace CSG {
             if (testop("intersect")) {
                 Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
                 csg = meta(molA, radInfluence).Colour(7) 
-                    * meta(molB, 1.2f, 2.5f).At(molB.pos - molA.pos).Colour(2);
-                //csg = meta(molA, radInfluence).WithProvenance("molA") * new Sphere(0,0,0, 20);
+                    * spheres(molB, 2.5f).At(molB.pos - molA.pos).Noshow().Colour(1);
             }
 
             if (testop("spheres")) {
@@ -373,8 +372,7 @@ namespace CSG {
                 filter();
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
                 filter();
-            if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8))
-                ; //  Show("pdb prep");
+            if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8)) { } //  Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
 

@@ -579,10 +579,12 @@ namespace CSG {
         public Matrix m;
         public Matrix invM;
         public bool neg;
+        public bool noshow;
 
         public Bakery Mat(Matrix m) {
             this.m = m;
             this.invM = m.inverse;
+            this.noshow = false;
             return this;
         }
 
@@ -594,7 +596,7 @@ namespace CSG {
             this.texweight = 0;
         }
 
-        public Bakery(string reason, object provenance = null, int provweight = -999, string texture = null, int texweight = -999, bool neg = false) {
+        public Bakery(string reason, object provenance = null, int provweight = -999, string texture = null, int texweight = -999, bool neg = false, bool noshow = false) {
             this.reason = reason;
             if (!CSGControl.CheatProvenance) {
                 this.provenance = provenance;
@@ -614,6 +616,7 @@ namespace CSG {
             this.m = Matrix.identity;
             this.invM = Matrix.identity;
             this.neg = neg;
+            this.noshow = noshow;
         }
 
         /** merge bakeries */
@@ -642,6 +645,7 @@ namespace CSG {
             n.invM = n.m.inverse;  // or bkn.mInv * bko.mInv;
 
             n.neg = bko.neg != bkn.neg;
+            n.noshow = bko.noshow || bkn.noshow;
             return n;
         }
 
@@ -767,7 +771,7 @@ namespace CSG {
             if (CSGControl.filterInput != null) {
                 if (this is CSGPrim && !CSGControl.filterInput.filter(bk.provstring))
                     return S.NONE;
-            }
+            } 
             CSGNode rr = BCopy(bk);
             if (csgmode == CSGMode.rendering && rr.bk.provstring != this.bk.provstring)
                 GUIBits.Log("prov error " + csgmode + " " + this + " " + rr + " prov " + this.Provenance + " <-> " + rr.Provenance);
@@ -1052,7 +1056,8 @@ namespace CSG {
         /// <param name="pl"></param>
         void Split(ICSGPoly poly, CSGPrim[] nodea, int i, int nextcuti, ICSGOutput pl) {
             CSGPrim polynode = nodea[i];
-            if (poly == null)
+
+            if (poly == null || polynode.bk.noshow)
                 return;
             //if (!Involves(nodea[i]))  // this never seems to happen so not worth checking, to check what ensures this.
             //    return;
@@ -1259,6 +1264,10 @@ namespace CSG {
             bk.provstring = prov.ToString();
             return this;
         }
+        public CSGNode Noshow() {
+            return TNode(new Bakery("noshow", noshow: true));
+        }
+
 
         public string Stats() {
             return string.Format("stats id:{0} nodes={1} unodes={2}", Id, nodes, Nodes().Distinct().Count());
@@ -1678,6 +1687,7 @@ namespace CSG {
             default:
                 throw new NotImplementedException();
             }
+            r.bk.noshow = ll.bk.noshow && rr.bk.noshow;
             shareda[pos] = r;
             r.mykey = key;
             NUniqueOP2++;
@@ -3139,6 +3149,8 @@ namespace CSG {
             // if (node.Color == CSGNode.DefaultColor) node.SetColor(Color.WhiteSmoke);
             //node.WithColTexture(CSGControl.DefaultTexture);
             CSGNode.csgmode = CSGMode.rendering;  // debug helper flag
+            if (node.bk.noshow)
+                return;
             try {
                 if (CSGControl.MaxLev == 0) {
                     CSGNode n2;
@@ -3174,6 +3186,15 @@ namespace CSG {
                 SDivNoUnion(vol, u.r, lev);
             }
         }
+        static float[] pows;
+        static  Subdivide() {
+            pows = new float[20];
+            float p = 1;
+            for (int i = 0; i < pows.Length; i++) {
+                pows[i] = p;
+                p /= 8;
+            }
+        }
 
         public void SDiv(Volume vol, CSGNode node, int lev) {
             if (CSGControl.UseBreak && !vol.Includes(CSGControl.BreakPosition))
@@ -3197,8 +3218,8 @@ namespace CSG {
             // snode.nodes does include duplicates, but that is less serious
             int nUnodes = 0;
             CSGNode snode = node.OSimplify(vol, S.Simpguid++, ref nUnodes);
-            if (snode.nodes == 0) {
-                done += Mathf.Pow(0.125f, lev);
+            if (snode.nodes == 0 || snode.bk.noshow) {
+                done += pows[lev];
                 return;
             }
             if (lev >= CSGControl.MinLev && (nUnodes <= DoDraw[lev] || lev >= CSGControl.MaxLev)) {  // TODO: TOCHECK was snode.nodes <=
@@ -3208,7 +3229,7 @@ namespace CSG {
                     UnityEngine.Debug.Log("sss = " + sss);
                     GUIBits.Log("sss = " + sss);
                 }
-                done += Mathf.Pow(0.125f, lev);
+                done += pows[lev];
                 int n = snode.Draw(csgoutput, vol);
                 if (CSGControl.stats) { // #if STATS
                     if (node.nodes < hits.Length) hits[snode.nodes]++;
@@ -3706,6 +3727,9 @@ namespace CSG {
             //debugpolypool.Remove(this);
             if (prov.Provenance == null) {
             }
+            //if (prov.bk.noshow) {
+            //    return;  //  should catch at higher level if possible
+            //}
             csg = prov;
             pl.Add(this);
 

@@ -279,7 +279,7 @@ namespace CSG {
 
         public int Count { get { return triangles.Count / 3; } }
 
-        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false) {
+        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false, string shaderName = "Standard") {
             CSGStats stats = new CSGStats(); 
             foreach (var kvp in meshes) {
                 //BasicMeshData bmd = kvp.Value; // meshes[k];
@@ -298,13 +298,16 @@ namespace CSG {
                 cnum = cnum % 10;
                 Color col = CSGXX.colors[cnum];
                 Material mat;
+                MeshRenderer pdbr;
                 if (cnum == 999) {
                     GameObject pdb = GameObject.Find("ProtoMaterial");
-                    MeshRenderer pdbr = pdb.GetComponent<MeshRenderer>();
+                    pdbr = pdb.GetComponent<MeshRenderer>();
                     mat = pdbr.material;
                 } else {
-                    Shader shader = Shader.Find("Standard");    // Set standard shader
+                    Shader shader = Shader.Find(shaderName);    // Set standard shader
                     mat = new Material(shader);
+                    pdbr = child.AddComponent<MeshRenderer>();
+                    pdbr.material = mat;
                 }
                 mat.SetColor("_Color", col);
 
@@ -318,7 +321,7 @@ namespace CSG {
 
         public static void ToGame(GameObject gameObject, Mesh[] meshes, string basename, Material mat, bool makeColliders = false) {
             GUIBits.DeleteChildren(gameObject);
-            IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
+            //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
             for (int i = 0; i < meshes.Length; i++) {
                 ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat);
             }

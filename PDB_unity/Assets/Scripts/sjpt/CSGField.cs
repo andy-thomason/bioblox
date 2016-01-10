@@ -230,7 +230,6 @@ namespace CSGFIELD {
 
 
             float x = p.x, y = p.y, z = p.z;
-            float rin3 = radInfluenceNorm3;
             float ri2 = ri * ri;
             float ri4 = ri2 * ri2;
 

@@ -517,7 +517,7 @@ namespace MatrixLibrary
 			double[,] AI, Mat1;
 			double AIN, AF;
 			int Rows, Cols;
-			int LL, LLM, L1, L2, LC, LCA, LCB;
+			int LL, /*LLM,*/ L1, L2, LC, LCA, LCB;
 
 			try 
 			{
@@ -530,7 +530,7 @@ namespace MatrixLibrary
 			if (Det(Mat) == 0) throw new MatrixDeterminentZero();
 
 			LL = Rows;
-			LLM = Cols;
+			//LLM = Cols;
 			AI = new double[LL+1, LL+1];
 
 			for (L2 = 0; L2 <= LL; L2++)
@@ -1327,7 +1327,7 @@ namespace MatrixLibrary
 		/// <returns>The pseudoinverse of the array as an array</returns>
 		public static double[,] PINV(double[,] Mat)
 		{
-			double[,] Matrix;
+			//??double[,] Matrix;
 			int i, m, n, j, l;
 			double[,] S, Part_I, Part_II;
 			double EPS, MulAdd, Tol, Largest_Item=0;
@@ -1336,7 +1336,7 @@ namespace MatrixLibrary
 
 			try	
 			{
-				Matrix = (double[,])Mat.Clone();
+				//??Matrix = (double[,])Mat.Clone();
 				Find_R_C(Mat , out m, out n);
 			}
 			catch{throw new MatrixNullException();}
