@@ -15,6 +15,7 @@ using CSGNonPlane;
 using CSGFIELD;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace CSG {
@@ -83,6 +84,8 @@ namespace CSG {
                         }
                     }
                 }
+                if (!idsAtDist[dd].Any())
+                    break;
             }
 
             return distFromMe;
@@ -93,7 +96,7 @@ namespace CSG {
             //GUIBits.Log("neighbour numbers " + nums);
         }
 
-        // generate new mesh from given indices
+        // generate new mesh from given indices, the first 
         private BigMesh generateNewMesh(int[] newnum, int nn) {
             // and generate new mesh
             Vector3[] nvertices = new Vector3[nn];
@@ -104,7 +107,7 @@ namespace CSG {
 
             for (int i = 0; i < N; i++) {
                 int ii = newnum[i];
-                if (0 <= ii && ii < 64000) {
+                if (0 <= ii) {
                     nvertices[ii] = vertices[i];
                     nnormals[ii] = normals[i];
                     nuv[ii] = uv[i];
@@ -184,6 +187,13 @@ namespace CSG {
             return newmesh;
         }
 
+
+        /// <summary>
+        /// remove all the separated (internal) parts of the surface mesh
+        /// find everything connected to vertex 0 (assumed external)
+        /// and get rid of the rest.
+        /// </summary>
+        /// <returns></returns>
         public BigMesh removeSeparated() {
             int[] distFromMe = findNeighbours(0, 9999);
 
