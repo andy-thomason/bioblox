@@ -43,6 +43,7 @@ namespace CSG {
             molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
             molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
             CSGControl.QuickUnion = false;
+            BasicMeshData.defaultShaderName = "Custom/Color";
         }
 
 
@@ -125,12 +126,12 @@ namespace CSG {
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
                     if (!useb) {
-                        BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
-                        BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
+                        BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), mrMol[Mols.molA].material);
+                        BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), mrMol[Mols.molAback].material);
                         savemeshA = tsavemesh;
                     } else {
-                        BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
-                        BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
+                        BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), mrMol[Mols.molB].material);
+                        BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), mrMol[Mols.molBback].material);
                         savemeshB = tsavemesh;
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
@@ -224,8 +225,8 @@ namespace CSG {
             //Log("mesh filter time=" + (tf1 - tf0));
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molAfilt], filtermesh.ToMeshes(), "CSGStephen", mrMol[Mols.molA].material);
-            BasicMeshData.ToGame(goMol[Mols.molAfiltback], filtermesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molAback].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfilt], filtermesh.ToMeshes(), mrMol[Mols.molA].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfiltback], filtermesh.ToMeshesBack(), mrMol[Mols.molAback].material);
         }
 
         void filterB() {
@@ -235,8 +236,8 @@ namespace CSG {
             BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molBfilt], filtermesh.ToMeshes(), "CSGStephen", mrMol[Mols.molB].material);
-            BasicMeshData.ToGame(goMol[Mols.molBfiltback], filtermesh.ToMeshesBack(), "CSGStephen", mrMol[Mols.molBback].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfilt], filtermesh.ToMeshes(), mrMol[Mols.molB].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfiltback], filtermesh.ToMeshesBack(), mrMol[Mols.molBback].material);
 
         }
 

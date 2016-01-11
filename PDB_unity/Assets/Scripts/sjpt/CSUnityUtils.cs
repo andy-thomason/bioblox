@@ -252,12 +252,12 @@ namespace CSG {
             }
         }
 
-        public static void showProgress(GameObject go) {
+        public static void showProgress(GameObject go, string basename) {
             try {
                 lock (UnityCSGOutput.parallelOutput) { 
                     var meshes = UnityCSGOutput.MeshesSoFar();
                     GUIBits.DeleteChildren(go);
-                    BasicMeshData.ToGame(go, meshes, "CSGStephen");
+                    BasicMeshData.ToGame(go, meshes, basename);
                 }
             } catch (System.Exception e) {
                 GUIBits.Log("Error showing progress:" + e);
@@ -278,8 +278,9 @@ namespace CSG {
         }
 
         public int Count { get { return triangles.Count / 3; } }
+        public static string defaultShaderName = "Standard";
 
-        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false, string shaderName = "Standard") {
+        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false, string shaderName = null) {
             CSGStats stats = new CSGStats(); 
             foreach (var kvp in meshes) {
                 //BasicMeshData bmd = kvp.Value; // meshes[k];
@@ -304,7 +305,8 @@ namespace CSG {
                     pdbr = pdb.GetComponent<MeshRenderer>();
                     mat = pdbr.material;
                 } else {
-                    Shader shader = Shader.Find(shaderName);    // Set standard shader
+                    if (shaderName == null) shaderName = defaultShaderName;
+                    Shader shader = Shader.Find(shaderName);    // Set chosen shader
                     mat = new Material(shader);
                     pdbr = child.AddComponent<MeshRenderer>();
                     pdbr.material = mat;
@@ -319,7 +321,7 @@ namespace CSG {
             return stats;
         }
 
-        public static void ToGame(GameObject gameObject, Mesh[] meshes, string basename, Material mat, bool makeColliders = false) {
+        public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat, bool makeColliders = false) {
             GUIBits.DeleteChildren(gameObject);
             //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
             for (int i = 0; i < meshes.Length; i++) {

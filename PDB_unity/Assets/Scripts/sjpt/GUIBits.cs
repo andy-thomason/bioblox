@@ -175,7 +175,7 @@ namespace CSG {  // [ExecuteInEditMode]
             if (parallelThread == null) return;
             try {
                 GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
-                BasicMeshData.showProgress(test1);
+                BasicMeshData.showProgress(test1, parallelPending);
             } catch (Exception e) {
                 Log("Error showing progress:" + e);
             }
@@ -226,14 +226,13 @@ namespace CSG {  // [ExecuteInEditMode]
                         return;
                     }
                     LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", parallelPending, t2 - t1, Subdivide.done * 100);
-                    parallelPending = null;
                     parallelThread = null;
 
                     var meshes = parallelMeshes;
                     parallelMeshes = null;
                     GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
                     DeleteChildren(test1);
-                    CSGStats stats = BasicMeshData.ToGame(test1, meshes, "CSGStephen");
+                    CSGStats stats = BasicMeshData.ToGame(test1, meshes, parallelPending);
 
                     Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", meshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
                         CSGNode.GiveUpCount, stats);
@@ -246,6 +245,7 @@ namespace CSG {  // [ExecuteInEditMode]
                     if (Poly.polymixup != 0)
                         Log2("poly mix up {0:N0}", Poly.polymixup);
                     Poly.polymixup = 0;
+                    parallelPending = null;
                 }
 
                 // nb, minster model from OpenSCAD 1/2 minster vertices=30,656, triangles=61,891
@@ -696,18 +696,6 @@ namespace CSG {  // [ExecuteInEditMode]
                 return new Vector3(float.NaN, float.NaN, float.NaN);
             else
                 return ray.origin + r * ray.direction;
-        }
-
-        // clear the CSGStephen game objects we have generated
-        protected void Clear() {
-            var objects = FindObjectsOfType(typeof(GameObject)); 
-            foreach (GameObject o in objects) { 
-                if (o.name.StartsWith("CSGStephen"))
-                    Destroy(o.gameObject); 
-            }
-            savemeshA = savemeshB = null;
-            lock (ktexts) ktexts.Clear();
-            showing = false;
         }
 
         // delete all children of some game object
