@@ -30,10 +30,12 @@ namespace CSG {
             || idist <= MustIncludeDistance);
         }
 
-        private List<int>[] baseNeigbourRules(int n) {
-            // find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
-            List<int>[] neigh = new List<int>[n];
-            for (int i = 0; i<n; i++) {
+        private List<int>[] neigh;
+
+        private void baseNeigbourRules() { // find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
+            if (neigh != null) return;
+            neigh = new List<int>[N];
+            for (int i = 0; i < N; i++) {
                 neigh[i] = new List<int>();
             }
             for (int t = 0; t<triangles.Length; t += 3) {
@@ -44,41 +46,20 @@ namespace CSG {
                 neigh[t1].Add(t2);
                 neigh[t2].Add(t0);
             }
-            return neigh;
+            return;
         }  // END find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~
 
-
-        /** filter according to selected rule 
-         * point is a sanple point that should be on or near the surface
-         * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
-         */
-        public BigMesh Filter(Vector3 point) {
-            
-            int n = vertices.Length;
-
-            List<int>[] neigh = baseNeigbourRules(n);
-
-            // find closest mesh point
-            float bestdist = float.MaxValue;
-            int bestind = 0;
-            for (int i = 0; i < n; i++) {
-                float d = Vector3.Distance(point, vertices[i]);
-                if (d < bestdist) {
-                    bestdist = d;
-                    bestind = i;
-                }
+        private int[] findNeighbours(int bestind, int UseDistance = -1) {
+            // find my neighours up to depth UseDistance
+            if (UseDistance < 0) {
+                UseDistance = MaxNeighbourDistance;
+                if (UseDistance < MustIncludeDistance) UseDistance = MustIncludeDistance;
             }
-            // fix point and its normal
-            Vector3 bestvert = vertices[bestind];
-            Vector3 bestnorm = normals[bestind];
-            // bestnorm = new Vector3(0,0,-1);  // temp debug
+            baseNeigbourRules();
 
-            // find my neighours up to depth D
-            int D = MaxNeighbourDistance;
-            if (D < MustIncludeDistance) D = MustIncludeDistance;
-            int[] distFromMe = new int[n];
-            List<int>[] idsAtDist = new List<int>[D + 1];
-            for (int i = 0; i < n; i++)
+            int[] distFromMe = new int[N];
+            List<int>[] idsAtDist = new List<int>[UseDistance + 1];
+            for (int i = 0; i < N; i++)
                 distFromMe[i] = int.MaxValue;
 
             // special case dist 0
@@ -92,9 +73,9 @@ namespace CSG {
                 distFromMe[i] = 1;
 
             // compute other distances incrementally
-            for (var dd = 2; dd <= D; dd++) {
+            for (var dd = 2; dd <= UseDistance; dd++) {
                 idsAtDist[dd] = new List<int>();
-                foreach (int i in idsAtDist[dd-1]) {
+                foreach (int i in idsAtDist[dd - 1]) {
                     foreach (int j in neigh[i]) {
                         if (distFromMe[j] == int.MaxValue) {
                             distFromMe[j] = dd;
@@ -104,43 +85,24 @@ namespace CSG {
                 }
             }
 
-            string nums = "";
-            for (int i = 0; i <= D; i++)
-                nums += " " + idsAtDist[i].Count;
+            return distFromMe;
+
+            //string nums = "";
+            //for (int i = 0; i <= UseDistance; i++)
+            //    nums += " " + idsAtDist[i].Count;
             //GUIBits.Log("neighbour numbers " + nums);
+        }
 
-
-            //IList<int> newvertices = new List<int>();
-            int[] newnum = new int[n];  // map from old index to new
-
-            int nn = 0;  // new vert number
-            float DD = 2;  // offset to get local
-            Vector3 refvert = bestvert - bestnorm * DD;
-            // now filter out vertices we want
-            for (int i = 0; i < n; i++) {
-                //     >>>>> core filter here
-                if (CoreFilter(refvert, bestnorm, vertices[i], normals[i], distFromMe[i])) {
-                    //if ( (Vector3.Dot ((vertices[i] - refvert).Normal(), bestnorm) > 0.8
-                    // /   && Vector3.Dot (normals[i], bestnorm) > 0
-                    //    && distFromMe[i] != int.MaxValue)
-                    //    || distFromMe[i] <= 3) {
-                    newnum[i] = nn++;
-                } else {
-                    newnum[i] = -1;
-                }
-            }
-
-
+        // generate new mesh from given indices
+        private BigMesh generateNewMesh(int[] newnum, int nn) {
             // and generate new mesh
-            //if (nn > 64000)
-            //    nn = 64000;  // save vertex mesh size complications for now
             Vector3[] nvertices = new Vector3[nn];
             Vector3[] nnormals = new Vector3[nn];
             Vector2[] nuv = new Vector2[nn];
             Color[] ncolor = new Color[nn];
             List<int> ntris = new List<int>();
 
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < N; i++) {
                 int ii = newnum[i];
                 if (0 <= ii && ii < 64000) {
                     nvertices[ii] = vertices[i];
@@ -166,23 +128,87 @@ namespace CSG {
                     }
                 }
             }
+            return new BigMesh(nvertices, nnormals, nuv, ncolor, ntris.ToArray());
 
-            // reminder to me: places to stash information in real mesh....
-            // newmesh.bindposes Matrix4
-            // newmesh.boneWeights // BoneWeight  (4 int and 4 float)
-            // newmesh.colors32 // Color32  (32 bits as 4 bytes)
-            // newmesh.tangents // Vector4
-            // newmesh.uv, uv2, uv3, uv4 // Vector2
-            BigMesh newmesh = new BigMesh(nvertices, nnormals, nuv, ncolor, ntris.ToArray());
+        }
+
+
+        /** filter according to selected rule 
+         * point is a sanple point that should be on or near the surface
+         * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
+         */
+        public BigMesh Filter(Vector3 point) {
+
+            // find closest mesh point
+            float bestdist = float.MaxValue;
+            int bestind = 0;
+            for (int i = 0; i < N; i++) {
+                float d = Vector3.Distance(point, vertices[i]);
+                if (d < bestdist) {
+                    bestdist = d;
+                    bestind = i;
+                }
+            }
+            // fix point and its normal
+            Vector3 bestvert = vertices[bestind];
+            Vector3 bestnorm = normals[bestind];
+            // bestnorm = new Vector3(0,0,-1);  // temp debug
+
+            int[] distFromMe = findNeighbours(bestind);
+
+            //IList<int> newvertices = new List<int>();
+            int[] newnum = new int[N];  // map from old index to new
+
+            int nn = 0;  // new vert number
+            float DD = 2;  // offset to get local
+            Vector3 refvert = bestvert - bestnorm * DD;
+            // now filter out vertices we want
+            for (int i = 0; i < N; i++) {
+                //     >>>>> core filter here
+                if (CoreFilter(refvert, bestnorm, vertices[i], normals[i], distFromMe[i])) {
+                    //if ( (Vector3.Dot ((vertices[i] - refvert).Normal(), bestnorm) > 0.8
+                    // /   && Vector3.Dot (normals[i], bestnorm) > 0
+                    //    && distFromMe[i] != int.MaxValue)
+                    //    || distFromMe[i] <= 3) {
+                    newnum[i] = nn++;
+                } else {
+                    newnum[i] = -1;
+                }
+            }
+            BigMesh newmesh = generateNewMesh(newnum, nn);
 
             //GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
             //" bestnorm" + bestnorm + " vertices=" + nn +
             //" cam forward= " + Camera.main.transform.forward);
 
             return newmesh;
+        }
 
+        public BigMesh removeSeparated() {
+            int[] distFromMe = findNeighbours(0, 9999);
+
+            int[] newnum = new int[N];  // map from old index to new
+            int nn = 0;
+            for (int i=0; i < N; i++) {
+                if (distFromMe[i] != int.MaxValue) {
+                    newnum[i] = nn++;
+                } else {
+                    newnum[i] = -1;
+                }
+            }
+
+            BigMesh newmesh = generateNewMesh(newnum, nn);
+            return newmesh;
 
         }
     }
 }
+
+// reminder to me: places to stash information in real mesh....
+// newmesh.bindposes Matrix4
+// newmesh.boneWeights // BoneWeight  (4 int and 4 float)
+// newmesh.colors32 // Color32  (32 bits as 4 bytes)
+// newmesh.tangents // Vector4
+// newmesh.uv, uv2, uv3, uv4 // Vector2
+
 

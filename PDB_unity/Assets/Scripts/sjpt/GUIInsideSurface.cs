@@ -119,6 +119,8 @@ namespace CSG {
 
                     // precompute the compacted version (common vertices)
                     tsavemesh = tsavemesh.RemapMesh();
+                    tsavemesh = tsavemesh.removeSeparated();
+                    Log("mesh external verts={0}, triangles={1}", tsavemesh.vertices.Length, tsavemesh.triangles.Length);
 
                     // Render outside and inside separately with different colours
                     // It would be more sensible to have a two-sided shader,
