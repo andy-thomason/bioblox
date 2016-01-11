@@ -169,6 +169,8 @@ namespace CSGNonPlane {
         public Sphere(float cx, float cy, float cz, float cr) : this(cx, cy, cz, cr, S.DefaultBakery) {}
 
         public Sphere(Vector3 p, float r) : this(p.x, p.y, p.z, r) {}
+        public Sphere(float r) : this(0, 0, 0, r) { }
+
         public override string ToString() { return "Sphere(" + x + "," + y + "," + z + " r=" + r + ")"; }
 
         public override CSGNode BCopy(Bakery bk) { 

@@ -225,7 +225,7 @@ namespace CSG {  // [ExecuteInEditMode]
                         parallelThread = null;
                         return;
                     }
-                    LogK("done", "parallel complete: " + parallelPending + " time=" + (t2 - t1));
+                    LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", parallelPending, t2 - t1, Subdivide.done * 100);
                     parallelPending = null;
                     parallelThread = null;
 

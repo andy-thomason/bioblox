@@ -42,6 +42,7 @@ namespace CSG {
             PDB_parser.automesh = false;
             molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
             molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+            CSGControl.QuickUnion = false;
         }
 
 
@@ -275,6 +276,9 @@ namespace CSG {
         }
 
         protected override void UpdateI() {
+            // perform standard update options
+            base.UpdateI();
+
             if (curcamnum < 0) return;
 
             if (Input.GetKey("q") && curcam == Cameras[0]) {
@@ -356,8 +360,6 @@ namespace CSG {
             if (Input.GetKeyDown("3")) { shown[curcamnum, 2] = !shown[curcamnum, 2]; setshow(); }
             if (Input.GetKeyDown("4")) { shown[curcamnum, 3] = !shown[curcamnum, 3]; setshow(); }
 
-            // perform standard update options
-            base.UpdateI();
 
         }
 

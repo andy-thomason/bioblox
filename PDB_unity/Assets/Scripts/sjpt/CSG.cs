@@ -3186,6 +3186,8 @@ namespace CSG {
                 SDivNoUnion(vol, u.r, lev);
             }
         }
+
+        // slightly more efficient setup for measuring progress
         static float[] pows;
         static  Subdivide() {
             pows = new float[20];
@@ -3219,7 +3221,7 @@ namespace CSG {
             int nUnodes = 0;
             CSGNode snode = node.OSimplify(vol, S.Simpguid++, ref nUnodes);
             if (snode.nodes == 0 || snode.bk.noshow) {
-                done += pows[lev];
+                done += pows[lev];  //not reliable for quickUnion
                 return;
             }
             if (lev >= CSGControl.MinLev && (nUnodes <= DoDraw[lev] || lev >= CSGControl.MaxLev)) {  // TODO: TOCHECK was snode.nodes <=
