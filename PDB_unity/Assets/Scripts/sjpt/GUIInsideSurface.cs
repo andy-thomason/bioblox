@@ -9,7 +9,6 @@ using CSG;
 using CSGNonPlane;
 using CSGFIELD;
 using Random = UnityEngine.Random;
-using Filter;
 
 namespace CSG {
     //[ExecuteInEditMode]
@@ -125,6 +124,8 @@ namespace CSG {
                     // It would be more sensible to have a two-sided shader,
                     // but I haven't managed to make a sensible one yet. .... (Stephen 13 Dec 2015)
                     // and the extra cost doesn't seem to significant.
+                    // Sensible double-sided shader impeded by Unity bug submitted 8 Jan 2016
+                    //    (Case 760127) Incorrect shader generation: normal not passed into surf(), black results
                     if (!useb) {
                         BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), mrMol[Mols.molA].material);
                         BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), mrMol[Mols.molAback].material);
@@ -220,24 +221,24 @@ namespace CSG {
                 Show("pdb prep");
 
             //float tf0 = Time.realtimeSinceStartup;
-            BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshA, filterpointA);
+            BigMesh BigMesh = savemeshA.Filter(filterpointA);
             //float tf1 = Time.realtimeSinceStartup;
             //Log("mesh filter time=" + (tf1 - tf0));
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molAfilt], filtermesh.ToMeshes(), mrMol[Mols.molA].material);
-            BasicMeshData.ToGame(goMol[Mols.molAfiltback], filtermesh.ToMeshesBack(), mrMol[Mols.molAback].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfilt], BigMesh.ToMeshes(), mrMol[Mols.molA].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfiltback], BigMesh.ToMeshesBack(), mrMol[Mols.molAback].material);
         }
 
         void filterB() {
             if (molB == null || savemeshB == null || prepRadinf != radInfluence)
                 Show("pdb prepB");
 
-            BigMesh filtermesh = Filter.FilterMesh.Filter(savemeshB, filterpointB);
+            BigMesh BigMesh = savemeshB.Filter(filterpointB);
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molBfilt], filtermesh.ToMeshes(), mrMol[Mols.molB].material);
-            BasicMeshData.ToGame(goMol[Mols.molBfiltback], filtermesh.ToMeshesBack(), mrMol[Mols.molBback].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfilt], BigMesh.ToMeshes(), mrMol[Mols.molB].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfiltback], BigMesh.ToMeshesBack(), mrMol[Mols.molBback].material);
 
         }
 
@@ -283,7 +284,6 @@ namespace CSG {
             if (curcamnum < 0) return;
 
             if (Input.GetKey("q") && curcam == Cameras[0]) {
-
                 Vector3 h = Hitpoint();
                 if (!float.IsNaN(h.x) && Cameras.Length > 1) {
                     Camera cam = Cameras[1];
@@ -330,11 +330,13 @@ namespace CSG {
                 //Log ("hitp" + hitpoint);
                 if (!float.IsNaN(hitpoint.x)) {
                     lookat = hitpoint;
-                    if (mf.name.StartsWith("molA"))
+                    if (mf.name.StartsWith("molA")) {
+                        filterpointA = hitpoint;
                         filterA();
-                    else if (mf.name.StartsWith("molB"))
+                    } else if (mf.name.StartsWith("molB")) {
+                        filterpointB = hitpoint;
                         filterB();
-                    else
+                    }  else
                         Log("unexpected object hit for key 'q' {0}", mf.name);
 
                 } else {
@@ -380,9 +382,9 @@ namespace CSG {
             setobjs();
             //GUIBits.text = "";
 
-            if (MSlider("MaxNeighbourDist", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
+            if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
-            if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
+            if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
                 filter();
             if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8)) { } //  Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  

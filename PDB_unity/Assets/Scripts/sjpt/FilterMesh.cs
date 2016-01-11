@@ -17,13 +17,10 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-namespace Filter {
-    public class FilterMesh {
+namespace CSG {
+    public partial class BigMesh {
         public static int MaxNeighbourDistance = 10;
         public static int MustIncludeDistance = 20;
-
-        public FilterMesh() {
-        }
 
         /** core filter used to decide if ivert should be included */
         static bool CoreFilter(Vector3 refvert, Vector3 refnorm, Vector3 ivert, Vector3 inorm, float idist) {
@@ -33,37 +30,33 @@ namespace Filter {
             || idist <= MustIncludeDistance);
         }
 
+        private List<int>[] baseNeigbourRules(int n) {
+            // find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
+            List<int>[] neigh = new List<int>[n];
+            for (int i = 0; i<n; i++) {
+                neigh[i] = new List<int>();
+            }
+            for (int t = 0; t<triangles.Length; t += 3) {
+                int t0 = triangles[t], t1 = triangles[t + 1], t2 = triangles[t + 2];
+                // only do in one direction, neighbour triangles wound the other way
+                // will do the others, and we don't want to double count
+                neigh[t0].Add(t1);
+                neigh[t1].Add(t2);
+                neigh[t2].Add(t0);
+            }
+            return neigh;
+        }  // END find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~
+
+
         /** filter according to selected rule 
          * point is a sanple point that should be on or near the surface
          * e.g. might be found by ray hit to the surface itself, or from neighbouring atom centre
          */
-        public static BigMesh Filter(BigMesh mesh, Vector3 point) {
-
-            //Mesh nmesh = mesh;
-            Vector3[] vertices = mesh.vertices;
-            Vector3[] normals = mesh.normals;
-            Vector2[] uv = mesh.uv;
-            Color[] color = mesh.colors;
-            int[] triangles = mesh.triangles;
+        public BigMesh Filter(Vector3 point) {
             
             int n = vertices.Length;
 
-
-            // find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~~
-            List<int>[] neigh = new List<int>[n];
-            for (int i = 0; i < n; i++) {
-                neigh[i] = new List<int>();
-            }
-            for (int t = 0; t < triangles.Length; t += 3) {
-                int t0 = triangles[t], t1 = triangles[t + 1], t2 = triangles[t + 2];
-                // only do in one direction, neighbour triangles wound the other way
-                // will do the others, and we don't want to double count
-                neigh[t0].Add(t1); 
-                neigh[t1].Add(t2);
-                neigh[t2].Add(t0);
-            }
-            // END find basic neighbour rules (could precompute) ~~~~~~~~~~~~~~~~~
-
+            List<int>[] neigh = baseNeigbourRules(n);
 
             // find closest mesh point
             float bestdist = float.MaxValue;
@@ -154,7 +147,7 @@ namespace Filter {
                     nnormals[ii] = normals[i];
                     nuv[ii] = uv[i];
                     //float dist = (Vector3.Distance(bestvert, vertices[i]) - bestdist) / 10;
-                    ncolor[ii] = color[i];
+                    ncolor[ii] = colors[i];
                     //ncolor[ii] = new Color(1-dist, dist, 1);
                 }
             }
@@ -173,18 +166,14 @@ namespace Filter {
                     }
                 }
             }
-            BigMesh newmesh = new BigMesh();
-            // places to stash information ....
+
+            // reminder to me: places to stash information in real mesh....
             // newmesh.bindposes Matrix4
             // newmesh.boneWeights // BoneWeight  (4 int and 4 float)
             // newmesh.colors32 // Color32  (32 bits as 4 bytes)
             // newmesh.tangents // Vector4
             // newmesh.uv, uv2, uv3, uv4 // Vector2
-            newmesh.vertices = nvertices;
-            newmesh.normals = nnormals;
-            newmesh.uv = nuv;
-            newmesh.colors = ncolor;
-            newmesh.triangles = ntris.ToArray();
+            BigMesh newmesh = new BigMesh(nvertices, nnormals, nuv, ncolor, ntris.ToArray());
 
             //GUIBits.Log("bestvert" + bestvert + " best distance=" + bestdist +
             //" bestnorm" + bestnorm + " vertices=" + nn +

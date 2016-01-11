@@ -62,6 +62,7 @@ namespace CSG {
             }
         }
 
+        /***
         // expect to refactor return type
         public IDictionary<string, BigMesh> Meshes {
             get {
@@ -71,6 +72,7 @@ namespace CSG {
                 return newDict;
             }
         }
+        ***/
 
         // generate meshes with usual limit
         public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds) {
@@ -133,18 +135,19 @@ namespace CSG {
         public int fullsize = 0;
 
         public IList<BigMesh> GetAllMeshes() {
-            extraMeshes.Add(GetMesh());
+            extraMeshes.Add(GetExtraMesh());        // make sure last mesh finished off
             return extraMeshes;
         }
 
-        public BigMesh GetMesh() {
-            BigMesh mesh = new BigMesh();
-            mesh.vertices = verts.ToArray<Vector3>(); //nb: ToArray method is in Linq namespace
-            mesh.uv = uvs.ToArray<Vector2>();
-            mesh.colors = colors.ToArray<Color>();
-            mesh.triangles = triangles.ToArray<int>();
+        private BigMesh GetExtraMesh() {
+            BigMesh mesh = new BigMesh(
+                verts.ToArray<Vector3>(), //nb: ToArray method is in Linq namespace
+                normals.ToArray<Vector3>(),
+                uvs.ToArray<Vector2>(),
+                colors.ToArray<Color>(),
+                triangles.ToArray<int>());
+
             //mesh.RecalculateNormals();
-            mesh.normals = normals.ToArray<Vector3>();
             //if (fullsize > 64000) 
             //    GUIBits.Log("mesh truncated from " + fullsize + " to " + mesh.vertices.Count());
 
@@ -158,15 +161,12 @@ namespace CSG {
         }
 
         public BigMesh GetBigMesh() {
-            BigMesh mesh = new BigMesh();
-            mesh.vertices = verts.ToArray<Vector3>(); //nb: ToArray method is in Linq namespace
-            mesh.uv = uvs.ToArray<Vector2>();
-            mesh.colors = colors.ToArray<Color>();
-            mesh.triangles = triangles.ToArray<int>();
-            //mesh.RecalculateNormals();
-            mesh.normals = normals.ToArray<Vector3>();
-            //if (fullsize > 64000) 
-            //    GUIBits.Log("mesh truncated from " + fullsize + " to " + mesh.vertices.Count());
+            BigMesh mesh = new BigMesh(
+                verts.ToArray<Vector3>(), //nb: ToArray method is in Linq namespace
+                normals.ToArray<Vector3>(),
+                uvs.ToArray<Vector2>(),
+                colors.ToArray<Color>(),
+                triangles.ToArray<int>());
             return mesh;
         }
 
@@ -195,7 +195,7 @@ namespace CSG {
                 }  // ignore degenerate polys
                 int startIndex = verts.Count;
                 if (startIndex > limit) {
-                    extraMeshes.Add(GetMesh());
+                    extraMeshes.Add(GetExtraMesh());
                     startIndex = 0;
 
                 }
@@ -410,7 +410,7 @@ namespace CSG {
     }
 
     // like a simplified mesh but without limits
-    public class BigMesh {
+    public partial class BigMesh {
         public Vector3[] vertices;
         public Vector3[] normals;
         public Vector2[] uv;
@@ -418,15 +418,15 @@ namespace CSG {
         public int[] triangles;
 
         public Mesh[] meshes;   // cach after real meshes generated
+        public int N;   // number of vertices
 
-        public BigMesh() {
-        }
         public BigMesh(Vector3[] vertices, Vector3[] normals, Vector2[] uv, Color[] colors, int[] triangles) {
             this.vertices = vertices;
             this.normals = normals;
             this.uv = uv;
             this.colors = colors;
             this.triangles = triangles;
+            N = vertices.Length;
         }
 
 
@@ -464,12 +464,12 @@ namespace CSG {
         }
 
         public static BigMesh ToBigMesh(Mesh mesh) {
-            BigMesh bigmesh = new BigMesh();
-            bigmesh.vertices = mesh.vertices;
-            bigmesh.normals = mesh.normals;
-            bigmesh.uv = mesh.uv;
-            bigmesh.colors = mesh.colors;
-            bigmesh.triangles = mesh.triangles;
+            BigMesh bigmesh = new BigMesh(
+                mesh.vertices,
+                mesh.normals,
+                mesh.uv,
+                mesh.colors,
+                mesh.triangles);
             return bigmesh;
         }
 
@@ -566,12 +566,7 @@ namespace CSG {
                 }
             }
 
-            BigMesh nmesh = new BigMesh();
-            nmesh.vertices = n1vertices;
-            nmesh.normals = n1normals;
-            nmesh.uv = n1uv;
-            nmesh.colors = n1colors;
-            nmesh.triangles = n1triangles;
+            BigMesh nmesh = new BigMesh(n1vertices, n1normals, n1uv, n1colors, n1triangles);
 
             if (!hascolor) {
                 n1colors = new Color[nnn];
