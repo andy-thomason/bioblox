@@ -508,20 +508,20 @@ namespace CSG {  // [ExecuteInEditMode]
         private bool showing = true;
         // standard Unity OnGUI function, protecting from exceptions
         void OnGUI() {
+            int ww = sliderWidth + 2 * slidermargin;
+            if (Input.mousePosition.x < 20) showing = true;
+            if (Input.mousePosition.x > ww) showing = false;
+            Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
+            GUI.BeginGroup(rect);
+            GUI.color = new Color(1.0f, 1.0f, 1.0f, 0.5f); //0.5 is half opacity 
+            GUI.Box(rect, "box");
             try {
-                int ww = sliderWidth + 2 * slidermargin;
-                if (Input.mousePosition.x < 20) showing = true;
-                if (Input.mousePosition.x > ww) showing = false;
-                Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
-                GUI.BeginGroup(rect);
-                GUI.color = new Color(1.0f, 1.0f, 1.0f, 0.5f); //0.5 is half opacity 
-                GUI.Box(rect, "box");
                 OnGUII();
-                GUI.EndGroup();
-                showlog();
             } catch (System.Exception e) {
                 Log(e.ToString() + e.StackTrace);
             }
+            GUI.EndGroup();
+            showlog();
         }
 
         int slidery = 0;

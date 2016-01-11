@@ -355,6 +355,7 @@ namespace CSG {
 
             }
 
+            if (Input.GetKeyDown("0")) { shownother[curcamnum] = !shownother[curcamnum]; setshow(); }
             if (Input.GetKeyDown("1")) { shown[curcamnum, 0] = !shown[curcamnum, 0]; setshow(); }
             if (Input.GetKeyDown("2")) { shown[curcamnum, 1] = !shown[curcamnum, 1]; setshow(); }
             if (Input.GetKeyDown("3")) { shown[curcamnum, 2] = !shown[curcamnum, 2]; setshow(); }
@@ -363,6 +364,14 @@ namespace CSG {
 
         }
 
+        public bool[,] shown  = new bool[,] {   // whether shown, for each camera and each mol type
+                    { true, true, true, true},
+                    { false, false, true, false},
+                    { false, true, false, true},
+                    { false, false, false, true}
+                };
+        public bool[] shownother = new bool[] { true, false, false, false };  // whether shown, for each camera and other
+
         // application specific parts of GUI code
         protected override void OnGUII() {
             base.OnGUII();
@@ -370,7 +379,7 @@ namespace CSG {
             setobjs();
             //GUIBits.text = "";
 
-            if (MSlider("MaxNeighbourDistance", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
+            if (MSlider("MaxNeighbourDist", ref FilterMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref FilterMesh.MustIncludeDistance, 0, 250))
                 filter();
@@ -378,12 +387,17 @@ namespace CSG {
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
 
-            for (int i = 0; i < N/2; i++)
-                if (Mcheck(Mols.name[2*i], ref shown[0,i]))
-                    setshow();
+            if (curcamnum >= 0) {
+                for (int i = 0; i < N / 2; i++)
+                    if (Mcheck(Mols.name[2 * i], ref shown[curcamnum, i]))
+                        setshow();
+                // for some reason, shownother was getting set to an array of length 0, not sure how ... ???
+                if (shownother == null || shownother.Length != 4)
+                    shownother = new bool[] { true, false, false, false };
+                if (Mcheck("other", ref shownother[curcamnum])) setshow();
+            }
 
         }
-        public bool[,] shown = new bool[4,4];
 
         protected void setshow() {
             for (int cam=0; cam < Cameras.Length; cam++) {
@@ -393,6 +407,7 @@ namespace CSG {
                         c |= 3 << (i * 2 + 8);
                     }
                 }
+                if (shownother[cam]) c |= 255;  // << show the first 8 'standard' filters
                 Cameras[cam].cullingMask = c;
             }
         }
@@ -497,13 +512,8 @@ namespace CSG {
                     { false, true, false, true},
                     { false, false, false, true}
                 };
+            shownother = new bool[] { true, false, false, false };
             setshow();
-            /**
-            show(Cameras[0], Mols.molA, Mols.molAback, Mols.molAfilt, Mols.molAfiltback);
-            show(Cameras[1], Mols.molAfilt, Mols.molAfiltback);
-            show(Cameras[2], Mols.molB, Mols.molBback, Mols.molBfilt, Mols.molBfiltback);
-            show(Cameras[3], Mols.molBfilt, Mols.molBfiltback);
-            **/
             for (int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = true;
             cam0.rect = new Rect(0, 0, 0.5f, 0.5f);
 
@@ -513,6 +523,7 @@ namespace CSG {
             Camera.main.rect = new Rect(0, 0, 1, 1);
             for (int i = 1; i < Cameras.Length; i++) Cameras[i].enabled = false;
             for (int i = 0; i < 4; i++) shown[0, i] = true;
+            curcamnum = 0;
             setshow();
         }
 
