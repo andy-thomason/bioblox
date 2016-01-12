@@ -216,7 +216,7 @@ namespace CSG {
                 for (int i = 1; i < n - 1; i++) {
                     int w = 0;  // 1 for wrong
                     if (CheckWind) {  // note, CheckWrap costing about 10% on Minst
-                        Vector3 cross = Vector3.Cross(verts[startIndex] - verts[startIndex + i], verts[startIndex] - verts[startIndex + i + 1]);
+                        Vector3 cross = (verts[startIndex] - verts[startIndex + i]).cross(verts[startIndex] - verts[startIndex + i + 1]);
                         Vector3 crossn = cross.Normal();
                         float test = Vector3.Dot(crossn, normals[startIndex]);
                         if (test < 0) {

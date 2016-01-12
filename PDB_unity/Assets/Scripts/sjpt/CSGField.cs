@@ -499,7 +499,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                     col = new Color(0, 0, 0, 0);  // should take it from first sphere ?
                 } else {
                     float dxx, dxy, dxz, dyy, dyz, dzz;
-                    Vector3 grad2;   // used as cross-check
+                    Vector3 grad2;   // used as cross-check ?? why is it -ve from grad to check ??
                     dd(p, out dxx, out dxy, out dxz, out dyy, out dyz, out dzz, out grad2);
 
                     Vector3 gradd = grad + grad2;
@@ -516,7 +516,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                             col = Color.red;
                         }
                     }
-                    normal = grad2.Normal();
+                    normal = -grad2.Normal();
                 }
             } else {
                 col = CSGXX.colors[Math.Min(inn, CSGXX.colors.Length-1)];

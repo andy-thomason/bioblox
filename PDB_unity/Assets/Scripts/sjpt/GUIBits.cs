@@ -114,9 +114,18 @@ namespace CSG {  // [ExecuteInEditMode]
             // make sure some CSG metaball details correct for this experiment
             BasicMeshData.Sides = 1;                // just show outside surface on main
             BasicMeshData.CheckWind = CheckWind;    // check and correct winding
-            BasicMeshData.WindShow = 3;             //show all windings, correct = 1 + wrong = 2
-            Poly.windDebug = false;                 // do not do further winding debug
+            BasicMeshData.WindShow = WindShow;             //show all windings, correct = 1 + wrong = 2
+            Poly.windDebug = windDebug;                 // do not do further winding debug
             BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
+
+            CSGControl.MinLev = MinLev;
+            //CSGControl.MaxLev = MaxLev;
+            BasicMeshData.Sides = CullSides;
+            CSGXPrim.CylNum = CylNum;
+            CSGControl.GiveUpNodes = GiveUpNodes;
+            // CSGControl.radInfluence = radInfluence; MSPHERE.UpdateRadInfluence();
+            CSGControl.stats = showCSGStats;
+
 
             // update local control variables (so they show in Unity editor) 
             // to be reflected in the 'real' places

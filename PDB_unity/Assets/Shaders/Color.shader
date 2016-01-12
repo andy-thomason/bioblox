@@ -40,7 +40,7 @@ Shader "Custom/Color" {
         _PMStep("PMean step", Range(0,1)) = 0.5 // step for p1 contours
         _PMWidth("PMean width", Range(0,0.1)) = 0 // width of P1
 
-        _Normtest("Normal test value", Range(0,1.1)) = 1 // normal length below this bright yellow
+        _Normtest("Normal test value", Range(0,1.1)) = 1.1 // normal length below this bright yellow, helps find grid
     }
 
 
