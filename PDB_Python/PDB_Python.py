@@ -1,17 +1,18 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2
 
+import sys
 import array
 import io
 import re
 import urllib.request
 from PIL import Image
-
-# our extensions
-import thumbnail
 import time
 import os
 import http.server
 import ssl
+
+# our extensions
+import thumbnail
 
 
 """
@@ -147,6 +148,7 @@ def download_entries():
 
 
 def build_resources(pdb):
+  print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % pdb))
   req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
   with urllib.request.urlopen(req) as req:
     pdb_file = req.read()
@@ -182,6 +184,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       s.wfile.write(b"<h1>Bioblox data server</h1>\n")
       s.wfile.write(b"<h3>Example urls:</h3>\n")
       s.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
+      s.wfile.write(b"<p><a href='/thumbnails/2ptc.png'>/thumbnails/2ptc.png</p>\n")
       s.wfile.write(b"<p><a href='/mesh/2ptc.txt'>/mesh/2ptc.txt</p>\n")
       s.wfile.write(b"<p><a href='/mesh/2ptc.1.vertics'>/mesh/2ptc.1.vertics</p>\n")
       s.wfile.write(b"<p><a href='/mesh/2ptc.1.colors'>/mesh/2ptc.1.colors</p>\n")
@@ -208,7 +211,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       s.end_headers()
         
 
-def main():
+def main(argv):
   # example of a python class
   try:
     os.mkdir('data')
@@ -224,7 +227,7 @@ def main():
     pass
 
   download_entries()
-   
+  
   host = os.getenv('IP', '0.0.0.0')
   port = int(os.getenv('PORT', '8080'))
   print(host, port)
@@ -234,5 +237,5 @@ def main():
   httpd.serve_forever()
 
 if __name__ == "__main__":
-  main()
+  main(sys.argv)
 
