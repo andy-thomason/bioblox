@@ -154,8 +154,8 @@ def build_resources(pdb):
     pdb_file = req.read()
     mols = parse_pdb(io.BytesIO(pdb_file))
 
-  width = 1024
-  height = 1024
+  width = 128
+  height = 128
   i = 0
   tot = PDB_molecule()
   for mol in mols:
