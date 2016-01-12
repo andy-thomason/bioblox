@@ -179,7 +179,8 @@ namespace CSG {
             }
 
             if (testop("spheres")) {
-                csg = spheres(molA);
+                BasicMeshData.defaultShaderName = "Standard";
+                csg = spheres(molA, 2.5f);
             }
 
 
@@ -210,7 +211,7 @@ namespace CSG {
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm += new Sphere(v[i], r[i] * radMult);
+                csgm += new Sphere(v[i], r[i] * radMult).Colour(i % 8);
             }
             csgm = ((Union)csgm).balance();
             return csgm;

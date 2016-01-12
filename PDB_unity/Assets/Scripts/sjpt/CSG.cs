@@ -1029,7 +1029,7 @@ namespace CSG {
                 if (poly != null) {
 
                     // DEBUG TODO
-                    if (Poly.windDebug && !(node as CSGPlane).CheckPolyWind(poly)) {
+                    if (Poly.windDebug && node as CSGPlane != null && !(node as CSGPlane).CheckPolyWind(poly)) {
                         //ICSGPoly pp = Poly.Make();
                         //for (int ii = poly.Count - 1; ii >= 0; ii--) pp.Add(poly[ii].point);
                         poly = poly.Reverse();

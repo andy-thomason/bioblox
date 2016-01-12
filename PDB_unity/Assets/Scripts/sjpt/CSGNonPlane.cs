@@ -182,7 +182,8 @@ namespace CSGNonPlane {
         public override float Dist(float px, float py, float pz) {
             float dd = (x - px) * (x - px) + (y - py) * (y - py) + (z - pz) * (z - pz);
             float d = (float)Math.Sqrt(dd);
-            return bk.neg ? r - d : d - r;
+            float fd = bk.neg ? r - d : d - r;
+            return fd;
         }
 
 
