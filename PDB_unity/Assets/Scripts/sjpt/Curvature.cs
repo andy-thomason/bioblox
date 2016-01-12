@@ -48,8 +48,12 @@ namespace CSG {
             double gradl = grad.magnitude;                  // | delta F |
             double KG = KGX / (gradl.sq().sq());            // (4.1)
             double KM = (MatrixX.Multiply(G, MatrixX.Multiply(H, GT))[0,0] - gradl.sq() * (dxx + dyy + dzz)) / (2 * gradl.sq() * gradl);      // (4.2)
-            double K1 = KM + Math.Sqrt(KM * KM - KG);       // (4.3)
-            double K2 = KM - Math.Sqrt(KM * KM - KG);
+            double ss = KM * KM - KG;
+            if (ss < -0.001) GUIBits.Log("odd ss in curvature {0}", ss);
+            if (ss < 0) ss = 0;
+            double sss = Math.Sqrt(ss);
+            double K1 = KM + sss;       // (4.3)
+            double K2 = KM - sss;
             if (KG < 0)
                 kgnegs++; //  GUIBits.LogK("kgnegs", kgnegs++ + "");
 

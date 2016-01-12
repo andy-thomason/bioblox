@@ -39,6 +39,8 @@ Shader "Custom/Color" {
         _PMColor("PMean colour", Color) = (0,0,1,0)  // colour for mean curvature
         _PMStep("PMean step", Range(0,1)) = 0.5 // step for p1 contours
         _PMWidth("PMean width", Range(0,0.1)) = 0 // width of P1
+
+        _Normtest("Normal test value", Range(0,1.1)) = 1 // normal length below this bright yellow
     }
 
 
@@ -69,6 +71,7 @@ Shader "Custom/Color" {
       float4 _P2Color; float _P2Step, _P2Width;
       float4 _PGColor; float _PGStep, _PGWidth;
       float4 _PMColor; float _PMStep, _PMWidth;
+      float _Normtest;
 
 
       /**
@@ -112,6 +115,9 @@ Shader "Custom/Color" {
           contour(g, 2);
           contour(b, G);
           contour(a, M);
+
+          if (length(o.Normal) > _Normtest)
+              o.Emission += float3(1, 1, 0);
 
           o.Albedo = rgb * _Albedo.xyz;
           o.Smoothness = _Glossiness;

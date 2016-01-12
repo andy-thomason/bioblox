@@ -811,7 +811,7 @@ namespace CSG {
         }
 
         public int nodes = 0;
-        protected const float delta = 0.001f;
+        protected const float delta = 0.00001f;
         // static bool Close(float a, float b) { return Math.Abs(a - b) < delta; }
         public static bool Small(float a) {
             return -delta < a && a < delta;

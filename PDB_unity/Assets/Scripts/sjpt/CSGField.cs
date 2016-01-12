@@ -452,21 +452,20 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
-            //float field = 0;
-            // Vector3 n = new Vector3();
-            //Vector3 p = new Vector3(x, y, z);
+
             Vector3 grad = new Vector3();
             col = new Color();
+            float ftot = 0;
             if (inn == 0) {  // unexpected
-                normal = new Vector3(0, 0, 1);
+                grad = normal = Vector3.forward;
                 col.r = 0; col.g = 1; col.b = 1; col.a = 1; 
             } else if (inn == 1 && colThresh == -999) {  // partly for efficiency, partly for tight radInfluence
-                normal = inspheres[0].Normal(p);
+                grad = inspheres[0].grad(p);
+                normal = inspheres[0].Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
                 col.set(inspheres[0].color);
             } else {
                 //normal.set(0, 0, 0);
                 //col.set(0, 0, 0, 0);
-                float ftot = 0;
                 float ftotpos = 0; // sum of positive contributions
                 for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
                     float myfield = inspheres[ini].field(p);
@@ -476,33 +475,56 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                     ftot += myfield;
                     if (myfield > 0) ftotpos += ftot;
                 }
-                normal = grad.Normal();
                 if (colThresh != -999) {
                     float x = ftotpos / colThresh;
                     Color cc = inspheres[0].color;
                     if (!grayscale) {
                         col.set(x * cc.r, 0.1f * cc.g, (1 - x) * cc.b, (x > 0.9f ? 1 : x / 0.9f) * cc.a); //pjt TODO: allow other colour palettes
                     } else col.set(x * cc.r, x * cc.g, x * cc.b, (x > 0.3f ? 1 : x / 0.3f) * cc.a);
+                    normal = grad.Normal();
                 } else if (ftot < 0.001f) {  // can happen with very tight radInfluence
+                    ftot = 0;
                     normal = inspheres[0].Normal(p);
-                    // grad = ???
+                    grad = Vector3.zero;
                     col.set(inspheres[0].color);
                 } else {
                     col /= ftot;
+                    normal = grad.Normal();
                 }
             }
 
+
             if (computeCurvature) {
-                float dxx, dxy, dxz, dyy, dyz, dzz;
-                Vector3 grad2;
-                dd(p, out dxx, out dxy, out dxz, out dyy, out dyz, out dzz, out grad2);
-                Vector3 gradd = grad + grad2;
-                float ddd = gradd.magnitude;
-                if (ddd > 0.001)
-                    GUIBits.LogK("graderr", graderr++ + "");
-                col = Curvature.ctest(dxx, dxy, dxz, dyy, dyz, dzz, grad2);
+                if (ftot == 0) {
+                    col = new Color(0, 0, 0, 0);  // should take it from first sphere ?
+                } else {
+                    float dxx, dxy, dxz, dyy, dyz, dzz;
+                    Vector3 grad2;   // used as cross-check
+                    dd(p, out dxx, out dxy, out dxz, out dyy, out dyz, out dzz, out grad2);
+
+                    Vector3 gradd = grad + grad2;
+                    float ddd = gradd.magnitude;
+                    if (ddd > 0.001)
+                        GUIBits.LogK("graderr", graderr++ + "");
+                    col = Curvature.ctest(dxx, dxy, dxz, dyy, dyz, dzz, grad2);
+                    if (float.IsNaN(col.grayscale)) {
+                        if (grad2.sqrMagnitude == 0) {
+                            col = new Color(0, 1000, 0, 1);
+                            GUIBits.Log("odd curvature A {0} dxx{1}, dxy{2}, dxz{3}, dyy{4}, dyz{5}, dzz{6}, grad2{7}, ftot{8}", col, dxx, dxy, dxz, dyy, dyz, dzz, grad2, ftot);
+                        } else {
+                            GUIBits.Log("odd curvature B {0} dxx{1}, dxy{2}, dxz{3}, dyy{4}, dyz{5}, dzz{6}, grad2{7}, ftot{8}", col, dxx, dxy, dxz, dyy, dyz, dzz, grad2, ftot);
+                            col = Color.red;
+                        }
+                    }
+                    normal = grad2.Normal();
+                }
             } else {
                 col = CSGXX.colors[Math.Min(inn, CSGXX.colors.Length-1)];
+            }
+
+            float s = normal.sqrMagnitude;
+            if (s < 0.99 || s > 1.01) {
+                GUIBits.Log("odd normal {0}  {1}", s, normal);
             }
 
         }

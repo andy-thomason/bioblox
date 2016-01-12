@@ -17,14 +17,14 @@ namespace CSG {  // [ExecuteInEditMode]
         GameObject child;
 
         [Range(0, 4)] public int NBOX = 2;  // number of boxes to draw behind text to get enough opacity
-        [Range(0, 5)]
+        [Range(1.1f, 5)]
         public float radInfluence = 2.5f;  // controls the blobiness of the metaballs,
                                            // a sphere of radius r has influence up to distance r*radInfluence
 
 
         public bool keepUpright = false;
         public bool parallel = true;
-        public bool CSGStats = false;
+        public bool showCSGStats = false;
 
         [Range(1, 12)]
         public int MinLev = 1;
@@ -112,10 +112,10 @@ namespace CSG {  // [ExecuteInEditMode]
             toshow = ptoshow;
 
             // make sure some CSG metaball details correct for this experiment
-            BasicMeshData.Sides = 1;             // just show outside surface on main
-            BasicMeshData.CheckWind = true;        // check and correct winding
-            BasicMeshData.WindShow = 3;            //show all windings, correct = 1 + wrong = 2
-            Poly.windDebug = false;                // do not do further winding debug
+            BasicMeshData.Sides = 1;                // just show outside surface on main
+            BasicMeshData.CheckWind = CheckWind;    // check and correct winding
+            BasicMeshData.WindShow = 3;             //show all windings, correct = 1 + wrong = 2
+            Poly.windDebug = false;                 // do not do further winding debug
             BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
 
             // update local control variables (so they show in Unity editor) 
@@ -228,23 +228,24 @@ namespace CSG {  // [ExecuteInEditMode]
                     LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", parallelPending, t2 - t1, Subdivide.done * 100);
                     parallelThread = null;
 
-                    var meshes = parallelMeshes;
-                    parallelMeshes = null;
+                    //var meshes = parallelMeshes;
+
                     GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
                     DeleteChildren(test1);
-                    CSGStats stats = BasicMeshData.ToGame(test1, meshes, parallelPending);
+                    CSGStats stats = BasicMeshData.ToGame(test1, parallelMeshes, parallelPending);
 
-                    Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", meshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
+                    Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelMeshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
                         CSGNode.GiveUpCount, stats);
                     if (BasicMeshData.CheckWind)
                         Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
                         + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
                         + " model=" + toshow);
-                    if (CSGStats)
+                    if (showCSGStats)
                         Log2("verttypes {0:N0} {1:N0} {2:N0}", Poly.verttype[0], Poly.verttype[1], Poly.verttype[2]);
                     if (Poly.polymixup != 0)
                         Log2("poly mix up {0:N0}", Poly.polymixup);
                     Poly.polymixup = 0;
+                    parallelMeshes = null;
                     parallelPending = null;
                 }
 
@@ -662,7 +663,15 @@ namespace CSG {  // [ExecuteInEditMode]
                 }
             }
             if (bestmf != null) {
-                LogK("lasthit", "p={0} mf={1}", bestpoint, bestmf.name);
+                LogK("lasthit", "p={0} mf={1} t#={2}", bestpoint, bestmf.name, triangleNumber);
+                Mesh mesh = bestmf.mesh;
+                Vector3[] vv = new Vector3[3];
+                for (int i=0; i<3; i++) {
+                    int v = mesh.triangles[triangleNumber + i];
+                    vv[i] = mesh.vertices[v];
+                    LogK("v" + i, "vert = {0}, norm = {1}, col = {2}", mesh.vertices[v], mesh.normals[v], mesh.colors[v]);
+                }
+                LogK("cross", "x={0}", (vv[1] - vv[0]).cross(vv[2] - vv[0]).Normal());
                 if (bestmf.name.StartsWith("molA")) hitpointA = bestpoint;
                 else if (bestmf.name.StartsWith("molB")) hitpointB = bestpoint;
             }

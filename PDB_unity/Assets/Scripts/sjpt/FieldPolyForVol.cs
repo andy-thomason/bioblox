@@ -128,7 +128,18 @@ namespace CSG {
         // polyEdges[1] = { {0,3,7} }
         private static int/*byte*/[][][] polyEdges = new int/*byte*/[256][][];
 
+        /***
+        public static int[] usedbm = new int[256];
+        public static int[] wrongbm = new int[256];
+        public static void showbm() {
+            for (int i = 0; i < 256; i++) {
+                if (wrongbm[i] != 0) GUIBits.Log("wrong bm={0} wrong={1} ok{2}", i, wrongbm[i], usedbm[i]);
+                wrongbm[i] = usedbm[i] = 0;
+            }
+        }
+
         public static int sharebm;
+        ***/
         // used for debug where wind goes wrong
         /// <summary>
         /// Compute the polygon in for this primitive using field values at the corners.
@@ -169,7 +180,8 @@ namespace CSG {
                     bm += k;
                 k *= 2;
             }
-            sharebm = bm;  // to help debug winding
+            ////sharebm = bm;  // to help debug winding
+            ////usedbm[bm]++;
             bool newpolys = false;
             if (polyEdges[bm] == null) {
                 newpolys = true;

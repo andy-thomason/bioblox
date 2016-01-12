@@ -20,6 +20,7 @@ namespace CSG {
 
         public float outsideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go inside object 
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
+        public int detailLevel = 7;
         public float smooth = 0.6f;
         public float metallic = 0.8f;
         public float CurveMapRange = 0.4f;  // range of curvature to map to colours
@@ -51,9 +52,7 @@ namespace CSG {
             if (base.Show(ptoshow)) return true;
 
             CSGFMETA.computeCurvature = computeCurvature;
-            if (CSGControl.MinLev < 5)
-                CSGControl.MinLev = 7;
-            CSGControl.MaxLev = CSGControl.MinLev;
+            CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
 
 
             text = "";
@@ -115,6 +114,13 @@ namespace CSG {
 
 
                     Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
+                    if (BasicMeshData.CheckWind) {
+                        Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
+                        + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
+                        + " model=" + toshow);
+                        //CSGPrim.showbm();
+                    }
+
                     prepRadinf = radInfluence;
 
                     // precompute the compacted version (common vertices)
@@ -384,11 +390,12 @@ namespace CSG {
             setobjs();
             //GUIBits.text = "";
 
+            MSlider("RadInfluence", ref radInfluence, 1.1f, 5);
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
                 filter();
-            if (MSlider("Detail Level", ref CSGControl.MinLev, 5, 8)) { } //  Show("pdb prep");
+            if (MSlider("Detail Level", ref detailLevel, 0, 8)) { } //  Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
 

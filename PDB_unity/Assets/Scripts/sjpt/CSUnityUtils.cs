@@ -185,7 +185,7 @@ namespace CSG {
 		}
 
         // primitive lock for viewing mesh while in flight
-        public void Add(Poly poly) {
+        internal void Add(Poly poly) {
             lock (UnityCSGOutput.parallelOutput) {  // n.b. no serious performance impact when not needed
                 int n = poly.Count;
                 fullsize += n;
@@ -220,6 +220,7 @@ namespace CSG {
                         Vector3 crossn = cross.Normal();
                         float test = Vector3.Dot(crossn, normals[startIndex]);
                         if (test < 0) {
+                            //CSGPrim.wrongbm[CSGPrim.sharebm]++;
                             WrongWind++;
                             w = 1;
                         } else {
