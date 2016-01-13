@@ -133,6 +133,34 @@ private:
     }
     Py_RETURN_NONE;
   }
+
+  static PyObject *make_mesh(PyObject *self, PyObject *args) {
+    Py_buffer pos_buf = {0};
+    Py_buffer radii_buf = {0};
+    Py_buffer chain_buf = {0};
+
+    float resolution = 0.5f;
+    PyArg_ParseTuple(args, "z*z*z*f", &pos_buf, &radii_buf, &chain_buf, &resolution);
+    std::cout << pos_buf.buf << "\n";
+    float *pos = (float*)pos_buf.buf;
+    float *radii = (float*)radii_buf.buf;
+    std::uint8_t *chain = (std::uint8_t *)chain_buf.buf;
+    size_t natoms = (size_t)radii_buf.len/4;
+    
+    Py_buffer indices_buf = {0};
+    Py_buffer vertices_buf = {0};
+    Py_buffer colours_buf = {0};
+    Py_buffer normals_buf = {0};
+    
+    std::uint16_t *indices = calloc(3, sizeof(std::uint16_t));
+    float *vertices = calloc(3, sizeof(float));
+    float *colours = calloc(4, sizeof(float));
+    float *normals = calloc(3, sizeof(float));
+    indices_buf.buf = (void*)indices;
+    vertices_buf.buf = (void*)vertices;
+    colours_buf.buf = (void*)colours;
+    normals_buf.buf = (void*)normals;
+    return Py_BuildValue("(z*z*z*)", &indices_buf, &vertices_buf, &colours_buf, &normals_buf)
 };
 
 

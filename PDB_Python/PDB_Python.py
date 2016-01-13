@@ -75,9 +75,18 @@ class PDB_molecule:
     thumbnail.make_thumbnail(image, self.pos, self.radii, self.chain, width, height)
     img = Image.frombytes('RGB', (width, height), bytes(image));
     img.save(filename)
-    #svg_file.write('<svg version="1.1" baseProfile="full" width="300" height="200" xmlns="http://www.w3.org/2000/svg">\n')
-    #svg_file.write('  <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" />\n')
-    #svg_file.write('</svg>\n')
+
+  def make_mesh(self, filename, resolution):
+    indices, vertices, colours, normals = thumbnail.make_mesh(self.pos, self.radii, self.chain, resolution)
+    res = str(resolution)
+    with open(filename + '.' + res + '.indices', 'wb') as f:
+      f.write(indices)
+    with open(filename + '.' + res + '.vertices', 'wb') as f:
+      f.write(vertices)
+    with open(filename + '.' + res + '.colours', 'wb') as f:
+      f.write(colours)
+    with open(filename + '.' + res + '.normals', 'wb') as f:
+      f.write(normals)
 
   def add(self, mol):
     self.serial += mol.serial
@@ -154,61 +163,61 @@ def build_resources(pdb):
     pdb_file = req.read()
     mols = parse_pdb(io.BytesIO(pdb_file))
 
-  width = 128
-  height = 128
   i = 0
   tot = PDB_molecule()
   for mol in mols:
-    #mol.make_thumbnail('%s.%d.png' % (pdb, i), width, height)
     i = i + 1
     tot.add(mol)
 
-  tot.make_thumbnail('thumbnails/%s.png' % (pdb), width, height)
-  # pdb = '4hhb';
-  # pdb = '5cdo';
-  # pdb = '2ptc';
-  # pdb = '1e79';
+  tot.make_thumbnail('thumbnails/%s.32.png' % (pdb), 32, 32)
+  tot.make_thumbnail('thumbnails/%s.64.png' % (pdb), 64, 64)
+  tot.make_thumbnail('thumbnails/%s.128.png' % (pdb), 128, 128)
+  tot.make_thumbnail('thumbnails/%s.256.png' % (pdb), 256, 256)
+  tot.make_thumbnail('thumbnails/%s.512.png' % (pdb), 512, 512)
+  tot.make_thumbnail('thumbnails/%s.1024.png' % (pdb), 1024, 1024)
+  #tot.make_mesh('mesh/%s' % (pdb), 2)
 
-thumbnails_png_re = re.compile('^/thumbnails/(\\w+)\.png$')
+thumbnails_png_re = re.compile('^/thumbnails/(\\w+)\.([0-9]+)\.png$')
 mesh_txt_re = re.compile('^/mesh/(\\w+)\.txt$')
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
-  def do_GET(s):
-    print(s.path)
-    if s.path == '/':
-      s.send_response(200)
-      s.send_header(b"Content-type", "text/html")
-      s.end_headers()
-      s.wfile.write(b"<html>\n<head>\n<title>Bioblox data server</title>\n</head>")
-      s.wfile.write(b"<body>\n")
-      s.wfile.write(b"<h1>Bioblox data server</h1>\n")
-      s.wfile.write(b"<h3>Example urls:</h3>\n")
-      s.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
-      s.wfile.write(b"<p><a href='/thumbnails/2ptc.png'>/thumbnails/2ptc.png</p>\n")
-      s.wfile.write(b"<p><a href='/mesh/2ptc.txt'>/mesh/2ptc.txt</p>\n")
-      s.wfile.write(b"<p><a href='/mesh/2ptc.1.vertics'>/mesh/2ptc.1.vertics</p>\n")
-      s.wfile.write(b"<p><a href='/mesh/2ptc.1.colors'>/mesh/2ptc.1.colors</p>\n")
-      s.wfile.write(b"</body></html>\n")
-    elif s.path[0:12] == '/thumbnails/' or s.path[0:6] == '/mesh/' or s.path[0:6] == '/data/':
-      s.send_response(200)
-      if s.path[-4:] == '.png':
-        s.send_header(b"Content-type", "image/png")
+  def do_GET(self):
+    print(self.path)
+    if self.path == '/':
+      self.send_response(200)
+      self.send_header(b"Content-type", "text/html")
+      self.end_headers()
+      self.wfile.write(b"<html>\n<head>\n<title>Bioblox data server</title>\n</head>")
+      self.wfile.write(b"<body>\n")
+      self.wfile.write(b"<h1>Bioblox data server</h1>\n")
+      self.wfile.write(b"<h3>Example urls:</h3>\n")
+      self.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
+      self.wfile.write(b"<p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>\n")
+      self.wfile.write(b"<p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.txt'>/mesh/2ptc.txt</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.1.vertices'>/mesh/2ptc.1.vertices</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.1.colors'>/mesh/2ptc.1.colors</p>\n")
+      self.wfile.write(b"</body></html>\n")
+    elif self.path[0:12] == '/thumbnails/' or self.path[0:6] == '/mesh/' or self.path[0:6] == '/data/':
+      self.send_response(200)
+      if self.path[-4:] == '.png':
+        self.send_header(b"Content-type", "image/png")
       else:
-        s.send_header(b"Content-type", "text/plain")
-      s.end_headers()
+        self.send_header(b"Content-type", "text/plain")
+      self.end_headers()
       try:
-        with open(s.path[1:], 'rb') as rf:
-          s.wfile.write(rf.read())
+        with open(self.path[1:], 'rb') as rf:
+          self.wfile.write(rf.read())
       except:
-        m = thumbnails_png_re.match(s.path)
+        m = thumbnails_png_re.match(self.path)
         if m:
           build_resources(str(m.group(1)))
         pass
-      with open(s.path[1:], 'rb') as rf:
-        s.wfile.write(rf.read())
+      with open(self.path[1:], 'rb') as rf:
+        self.wfile.write(rf.read())
     else:
-      s.send_response(404)
-      s.end_headers()
+      self.send_response(404)
+      self.end_headers()
         
 
 def main(argv):
