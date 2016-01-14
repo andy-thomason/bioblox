@@ -211,8 +211,35 @@ namespace CSG {
             return newmesh;
 
         }
-    }
-}
+
+        /** find unmatched vertices, indicative of error during mesh generation */
+        public Dictionary<Vector2, int> unmatched() {
+            // note: do not use Tuple<int,int>, no equality, hash, etc defined, so Dictionary does not work
+            Dictionary<Vector2, int> lines = new Dictionary<Vector2, int>();
+            // scan counting +ve, -ve */
+            for (int t = 0; t < triangles.Length; t++) {
+                int v1 = triangles[t];
+                int v2 = triangles[ t + ((t % 3 == 2) ? -2 : 1)];
+                int s = 1;
+                if (v1 > v2) { s = v2;  v2 = v1;  v1 = s;  s = -1;  }
+                Vector2 line = new Vector2(v1, v2);
+                if (!lines.ContainsKey(line)) lines.Add(line, 0);
+                lines[line] += s;
+            }
+
+            Dictionary<Vector2, int> badlines = new Dictionary<Vector2, int>();
+            foreach (var kvp in lines) {
+                if (kvp.Value != 0) {
+                    // GUIBits.Log("unmatched line {0}..{1} count={2} {3} {4}", kvp.Key.x, kvp.Key.y, kvp.Value, vertices[(int)kvp.Key.x], vertices[(int)kvp.Key.y]);
+                    badlines.Add(kvp.Key, kvp.Value);
+                }
+            }
+            GUIBits.LogK("unmatched#", "{0}", badlines.Count);
+            return badlines;
+        }
+
+    }  // class BigMesh
+} // namespace CSG
 
 // reminder to me: places to stash information in real mesh....
 // newmesh.bindposes Matrix4

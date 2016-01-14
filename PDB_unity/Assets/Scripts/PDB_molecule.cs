@@ -154,9 +154,9 @@ public class PDB_molecule
 	}
 
     // https://en.wikipedia.org/wiki/Marching_cubes
-    void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
-		const float grid_spacing = 0.5f; // set this to 0.5f for final game and 2.0f for rough builds.
-		const float rgs = 1.0f / grid_spacing;
+    public void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices, float grid_spacing = 0.5f, CSGFIELD.CSGFMETA csg = null ) {
+		// const float grid_spacing = 0.5f; // set this to 0.5f for final game and 2.0f for rough builds.
+		float rgs = 1.0f / grid_spacing;
 
 		// Create a 3D array for each molecule
 		Vector3 min = atom_centres[0];
@@ -244,7 +244,29 @@ public class PDB_molecule
 				}
 			}
 		}
-		Debug.Log (DateTime.Now - start_time + "s to make values");
+        Debug.Log(DateTime.Now - start_time + "s to make values");
+        for (int x = x0; x <= x1; x++) {
+            for (int y = y0; y <= y1; y++) {
+                bool s = false;
+                string ss = String.Format("x={0}, y={1}:  ", x* grid_spacing, y* grid_spacing);
+                for (int z = z0; z <= z1; z++) {
+                    float v = mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim];
+                    if (v != -0.5) s = true;
+                    Vector3 p = new Vector3(x * grid_spacing, y * grid_spacing, z * grid_spacing);
+                    float csgd = csg.Dist(p) * -0.5f;
+                    Vector3 csgn = csg.Normal(p);
+                    //ss += String.Format(" {0} {1},", v, csgd);
+
+
+                    mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = csgd;
+                    if (csgd != -0.5f)
+                        mc_normals[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = -csgn;
+                }
+                //if (s)
+                //    CSG.GUIBits.Log(ss);
+            }
+        }
+                    
 
 		//MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
 		MarchingCubes mc = new MarchingCubes(x0, y0, z0, xdim, ydim, zdim, grid_spacing, mc_values, mc_normals, mc_colours);

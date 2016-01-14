@@ -448,7 +448,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public static float colThresh = -999;
 
         public override void normalColor(Vector3 p, out Vector3 normal, out Color col) {
-            int subdivideLevel = CSGControl.MaxLev; //??
+            int subdivideLevel = CSGControl.MinLev; //??
             int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];

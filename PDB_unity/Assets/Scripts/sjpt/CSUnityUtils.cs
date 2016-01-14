@@ -322,9 +322,13 @@ namespace CSG {
             return stats;
         }
 
-        public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat, bool makeColliders = false) {
+        public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat = null, bool makeColliders = false) {
             GUIBits.DeleteChildren(gameObject);
             //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
+            if (mat == null) {
+                Shader shader = Shader.Find(BasicMeshData.defaultShaderName);    // Set chosen shader
+                mat = new Material(shader);
+            }
             for (int i = 0; i < meshes.Length; i++) {
                 ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat);
             }

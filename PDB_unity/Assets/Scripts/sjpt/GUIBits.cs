@@ -17,8 +17,10 @@ namespace CSG {  // [ExecuteInEditMode]
         GameObject child;
 
         [Range(0, 4)] public int NBOX = 2;  // number of boxes to draw behind text to get enough opacity
-        [Range(1.1f, 5)]
-        public float radInfluence = 2.5f;  // controls the blobiness of the metaballs,
+        [Range(1.1f, 5)]         public float radInfluence = 2.5f;  // controls the blobiness of the metaballs,
+                                                                    // a sphere of radius r has influence up to distance r*radInfluence
+        [Range(0.5f, 2)]
+        public float radMult = 1f;  // controls the radius multiplier of the metaballs,
                                            // a sphere of radius r has influence up to distance r*radInfluence
 
 
@@ -264,7 +266,11 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public static void Log(string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
-            if (text.Length < 5000) text += ss + "\n";
+            if (text.Length < 5000) text += "\n" + ss;
+        }
+        public static void LogC(string s, params object[] xparms) {
+            string ss = String.Format(s, xparms);
+            if (text.Length < 5000) text += " " + ss;
         }
 
         public static void LogK(string k, string s, params object[] xparms) {
@@ -560,7 +566,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
         void showlog() {
             // int w = Screen.width / 2;  // width of text
-            string xtext = text;
+            string xtext = text.Length == 0 ? "" : text.Substring(1);
             lock (ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
 
             try {
@@ -678,7 +684,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 for (int i=0; i<3; i++) {
                     int v = mesh.triangles[triangleNumber + i];
                     vv[i] = mesh.vertices[v];
-                    LogK("v" + i, "vert = {0}, norm = {1}, col = {2}", mesh.vertices[v], mesh.normals[v], mesh.colors[v]);
+                    LogK("v" + i, "v#={3} vert = {0}, norm = {1}, col = {2}", mesh.vertices[v], mesh.normals[v], mesh.colors[v], v);
                 }
                 LogK("cross", "x={0}", (vv[1] - vv[0]).cross(vv[2] - vv[0]).Normal());
                 if (bestmf.name.StartsWith("molA")) hitpointA = bestpoint;

@@ -87,8 +87,13 @@ namespace CSG {
                 goMol[Mols.molAback].SetActive(a);
                 return true;
             }
+
+            if (testop("BioBloxMesh")) {
+                useBioBloxMesh(molA);
+                return true;
+            }
             /**/
-            Bounds bounds = new Bounds(Vector3.zero, new Vector3(70, 70, 70));  // same bounds for both molecules
+            Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
@@ -96,7 +101,7 @@ namespace CSG {
                 mol = (useb) ? molB : molA;
 
                 // prepare and populate the metaball object
-                csg = meta(mol, radInfluence);
+                csg = meta(mol, radInfluence, radMult);
                 Volume molvol = csg.Volume();       // find bounding volume   
                 // bounds = molvol.BoundsExpand(1.1f); // and get a little leway
                 // bounds = new Bounds(Vector3.zero, new Vector3(70,70,70));  // same bounds for both molecules
@@ -106,6 +111,7 @@ namespace CSG {
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
                     var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999);
+
                     BigMesh tsavemesh = null;
                     foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
 
@@ -125,6 +131,7 @@ namespace CSG {
 
                     // precompute the compacted version (common vertices)
                     tsavemesh = tsavemesh.RemapMesh();
+                    //tsavemesh.unmatched();  // debug
                     tsavemesh = tsavemesh.removeSeparated();
                     Log("mesh external verts={0}, triangles={1}", tsavemesh.vertices.Length, tsavemesh.triangles.Length);
 
@@ -174,7 +181,7 @@ namespace CSG {
 
             if (testop("intersect")) {
                 Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
-                csg = meta(molA, radInfluence).Colour(7) 
+                csg = meta(molA, radInfluence, radMult).Colour(7) 
                     * spheres(molB, 2.5f).At(molB.pos - molA.pos).Noshow().Colour(1);
             }
 
@@ -183,6 +190,8 @@ namespace CSG {
                 csg = spheres(molA, 2.5f);
             }
 
+            if (testop("unmatched")) { savemeshA.unmatched(); return true; }
+            // if (testop("resetPolyEdges")) { CSGPrim.resetPolyEdges(); return true; }
 
             if (opdone) showCSGParallel(bounds);
             return opdone;
@@ -195,13 +204,13 @@ namespace CSG {
         /// <param name="mol"></param>
         /// <param name="radInfluence"></param>
         /// <returns></returns>
-        CSGFMETA meta(PDB_molecule mol, float radInfluence, float radMult = 1) {
+        CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult) {
             // prepare and populate the metaball object
             CSGFMETA csgm = new CSGFMETA();
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm.Add(new MSPHERE(v[i], r[i] * radMult, radInfluence));
+                csgm.Add(new MSPHERE(v[i], r[i] * pradMult, radInfluence));
             }
             return csgm;
         }
@@ -373,6 +382,12 @@ namespace CSG {
             if (Input.GetKeyDown("3")) { shown[curcamnum, 2] = !shown[curcamnum, 2]; setshow(); }
             if (Input.GetKeyDown("4")) { shown[curcamnum, 3] = !shown[curcamnum, 3]; setshow(); }
 
+            if (Input.GetKeyDown("-")) {
+                shown[curcamnum, 0] = !shown[curcamnum, 0];
+                shownother[curcamnum] = !shown[curcamnum, 0];
+                setshow();
+            } // swap 
+
 
         }
 
@@ -392,6 +407,7 @@ namespace CSG {
             //GUIBits.text = "";
 
             MSlider("RadInfluence", ref radInfluence, 1.1f, 5);
+            MSlider("RadMult", ref radMult, 0.5f, 2);
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
@@ -546,6 +562,26 @@ namespace CSG {
         }
 
         protected override GameObject getSubObject() { return goMolB; }
+
+        BigMesh useBioBloxMesh(PDB_molecule mol) {
+            int save = CSGControl.MinLev;
+            CSGControl.MinLev = -1;
+            CSGFMETA csg = meta(mol, radInfluence, radMult);
+            CSGFMETA.computeCurvature = false;  // no need to save, will be reset from local anyway
+
+            Vector3[] vertices; Vector3[] normals; Vector2[] uvs; Color[] colours; int[] indices;
+            float spacing = 64f / (1 << detailLevel);
+            mol.build_metasphere_mesh(out vertices, out normals, out uvs, out colours, out indices, spacing, csg);
+            BigMesh bm = new BigMesh(vertices, normals, uvs, colours, indices);
+            Log("mesh bioblox verts={0}, triangles={1}", bm.vertices.Length, bm.triangles.Length);
+
+            bm = bm.RemapMesh();
+            Log("mesh bioblox verts={0}, triangles={1}", bm.vertices.Length, bm.triangles.Length);
+            bm.unmatched();
+            BasicMeshData.ToGame(goTest, bm.ToMeshes());
+            CSGControl.MinLev = save;
+            return bm;
+        }
 
 
 

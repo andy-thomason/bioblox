@@ -463,14 +463,14 @@ MonoBehaviour:
   radInfluence: 2.5
   keepUpright: 0
   parallel: 1
-  CSGStats: 0
+  showCSGStats: 0
   MinLev: 1
   CylNum: 6
   GiveUpNodes: 50
   CullSides: 1
   WindShow: 3
-  CheckWind: 1
-  windDebug: 1
+  CheckWind: 0
+  windDebug: 0
   hitpoint: {x: NaN, y: NaN, z: NaN}
   lookat: {x: 0, y: 0, z: 0}
   goTest: {fileID: 0}
@@ -482,10 +482,12 @@ MonoBehaviour:
   mouseRotRate: 0.1
   outsideDist: 20
   insideDist: 20
+  detailLevel: 7
   smooth: 0.6
   metallic: 0.8
   CurveMapRange: 0.4
   computeCurvature: 1
+  shownother: 01000000
 --- !u!4 &1182041625
 Transform:
   m_ObjectHideFlags: 0
