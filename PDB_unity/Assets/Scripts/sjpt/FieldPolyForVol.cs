@@ -1,11 +1,12 @@
-#define noNEWNEW
+// #define GEN // uncomment this to generate bmpolys from mc_triangles
+// With no defined GEN we will use the precomputed bmpolys
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using UnityEngine;
-
+using qbyte = System.Byte;
 
 /// initially part of CSGFIELD rather than pure CSG;
 /// but it turned out to be good for non-axially aligned planes as well.
@@ -14,16 +15,366 @@ using UnityEngine;
 ///
 /// This had two implementations to derive marching cubes order,
 /// but neither worked reliably.
-/// So we have lifted the precomputed working version of the from MarchingCubes.cs
+/// So we have lifted the precomputed working version (mc_triangles) of the from MarchingCubes.cs
+/// and regenerated that (see makepolys() below) to create appropriate polygon structures (bmpolys).
 ///
 
 namespace CSG {
     public partial class CSGPrim {
+
+        // derived from MarchingCubes, from 
+        qbyte[,] edges = new qbyte[,] {
+            { 0,1 }, 
+            { 1,2 },
+            { 2,3 },
+            { 3,0 },
+            { 4,5 },
+            { 5,6 },
+            { 6,7 },
+            { 7,4 },
+            { 0,4 },
+            { 1,5 },
+            { 2,6 },
+            { 3,7 }
+        };
+
+#if GEN
+#else 
+        private static qbyte[][][] I3(params qbyte[][][] piii) {  return piii; }
+        private static qbyte[][] I2(params qbyte[][] pii) { return pii; }
+        private static qbyte[] I(params qbyte[] pi) { return pi; }
+
+
+        qbyte[][][] bmpolys = I3(I2(),
+I2(I(0, 8, 3)),
+I2(I(0, 1, 9)),
+I2(I(8, 3, 1, 9)),
+I2(I(1, 2, 10)),
+I2(I(0, 8, 3), I(1, 2, 10)),
+I2(I(2, 10, 9, 0)),
+I2(I(8, 3, 2, 10, 9)),
+I2(I(3, 11, 2)),
+I2(I(11, 2, 0, 8)),
+I2(I(1, 9, 0), I(2, 3, 11)),
+I2(I(11, 2, 1, 9, 8)),
+I2(I(10, 1, 3, 11)),
+I2(I(10, 1, 0, 8, 11)),
+I2(I(9, 0, 3, 11, 10)),
+I2(I(9, 8, 11, 10)),
+I2(I(4, 7, 8)),
+I2(I(3, 0, 4, 7)),
+I2(I(0, 1, 9), I(8, 4, 7)),
+I2(I(1, 9, 4, 7, 3)),
+I2(I(1, 2, 10), I(8, 4, 7)),
+I2(I(4, 7, 3, 0), I(1, 2, 10)),
+I2(I(2, 10, 9, 0), I(8, 4, 7)),
+I2(I(2, 10, 9, 4, 7, 3)),
+I2(I(8, 4, 7), I(3, 11, 2)),
+I2(I(4, 7, 11, 2, 0)),
+I2(I(9, 0, 1), I(8, 4, 7), I(2, 3, 11)),
+I2(I(4, 7, 11, 2, 1, 9)),
+I2(I(10, 1, 3, 11), I(7, 8, 4)),
+I2(I(11, 10, 1, 0, 4, 7)),
+I2(I(4, 7, 8), I(9, 0, 3, 11, 10)),
+I2(I(4, 7, 11, 10, 9)),
+I2(I(9, 5, 4)),
+I2(I(9, 5, 4), I(0, 8, 3)),
+I2(I(5, 4, 0, 1)),
+I2(I(5, 4, 8, 3, 1)),
+I2(I(1, 2, 10), I(9, 5, 4)),
+I2(I(3, 0, 8), I(1, 2, 10), I(4, 9, 5)),
+I2(I(2, 10, 5, 4, 0)),
+I2(I(2, 10, 5, 4, 8, 3)),
+I2(I(9, 5, 4), I(2, 3, 11)),
+I2(I(11, 2, 0, 8), I(4, 9, 5)),
+I2(I(5, 4, 0, 1), I(2, 3, 11)),
+I2(I(2, 1, 5, 4, 8, 11)),
+I2(I(3, 11, 10, 1), I(9, 5, 4)),
+I2(I(4, 9, 5), I(0, 8, 11, 10, 1)),
+I2(I(5, 4, 0, 3, 11, 10)),
+I2(I(5, 4, 8, 11, 10)),
+I2(I(7, 8, 9, 5)),
+I2(I(3, 0, 9, 5, 7)),
+I2(I(7, 8, 0, 1, 5)),
+I2(I(1, 5, 7, 3)),
+I2(I(7, 8, 9, 5), I(10, 1, 2)),
+I2(I(10, 1, 2), I(9, 5, 7, 3, 0)),
+I2(I(8, 0, 2, 10, 5, 7)),
+I2(I(2, 10, 5, 7, 3)),
+I2(I(9, 5, 7, 8), I(3, 11, 2)),
+I2(I(9, 5, 7, 11, 2, 0)),
+I2(I(2, 3, 11), I(0, 1, 5, 7, 8)),
+I2(I(11, 2, 1, 5, 7)),
+I2(I(9, 5, 7, 8), I(10, 1, 3, 11)),
+I2(I(5, 7, 11, 10, 1, 0, 9)),
+I2(I(11, 10, 5, 7, 8, 0, 3)),
+I2(I(11, 10, 5, 7)),
+I2(I(10, 6, 5)),
+I2(I(0, 8, 3), I(5, 10, 6)),
+I2(I(9, 0, 1), I(5, 10, 6)),
+I2(I(8, 3, 1, 9), I(5, 10, 6)),
+I2(I(6, 5, 1, 2)),
+I2(I(6, 5, 1, 2), I(3, 0, 8)),
+I2(I(6, 5, 9, 0, 2)),
+I2(I(5, 9, 8, 3, 2, 6)),
+I2(I(2, 3, 11), I(10, 6, 5)),
+I2(I(0, 8, 11, 2), I(10, 6, 5)),
+I2(I(0, 1, 9), I(2, 3, 11), I(5, 10, 6)),
+I2(I(5, 10, 6), I(1, 9, 8, 11, 2)),
+I2(I(3, 11, 6, 5, 1)),
+I2(I(0, 8, 11, 6, 5, 1)),
+I2(I(3, 11, 6, 5, 9, 0)),
+I2(I(6, 5, 9, 8, 11)),
+I2(I(5, 10, 6), I(4, 7, 8)),
+I2(I(3, 0, 4, 7), I(6, 5, 10)),
+I2(I(1, 9, 0), I(5, 10, 6), I(8, 4, 7)),
+I2(I(10, 6, 5), I(1, 9, 4, 7, 3)),
+I2(I(1, 2, 6, 5), I(4, 7, 8)),
+I2(I(1, 2, 6, 5), I(3, 0, 4, 7)),
+I2(I(8, 4, 7), I(9, 0, 2, 6, 5)),
+I2(I(7, 3, 2, 6, 5, 9, 4)),
+I2(I(3, 11, 2), I(7, 8, 4), I(10, 6, 5)),
+I2(I(5, 10, 6), I(4, 7, 11, 2, 0)),
+I2(I(0, 1, 9), I(4, 7, 8), I(2, 3, 11), I(5, 10, 6)),
+I2(I(2, 1, 9, 4, 7, 11), I(5, 10, 6)),
+I2(I(8, 4, 7), I(3, 11, 6, 5, 1)),
+I2(I(5, 1, 0, 4, 7, 11, 6)),
+I2(I(5, 9, 0, 3, 11, 6), I(8, 4, 7)),
+I2(I(6, 5, 9, 4, 7, 11)),
+I2(I(4, 9, 10, 6)),
+I2(I(10, 6, 4, 9), I(0, 8, 3)),
+I2(I(0, 1, 10, 6, 4)),
+I2(I(8, 3, 1, 10, 6, 4)),
+I2(I(4, 9, 1, 2, 6)),
+I2(I(3, 0, 8), I(1, 2, 6, 4, 9)),
+I2(I(0, 2, 6, 4)),
+I2(I(8, 3, 2, 6, 4)),
+I2(I(4, 9, 10, 6), I(11, 2, 3)),
+I2(I(0, 8, 11, 2), I(4, 9, 10, 6)),
+I2(I(3, 11, 2), I(0, 1, 10, 6, 4)),
+I2(I(6, 4, 8, 11, 2, 1, 10)),
+I2(I(6, 4, 9, 1, 3, 11)),
+I2(I(8, 11, 6, 4, 9, 1, 0)),
+I2(I(3, 11, 6, 4, 0)),
+I2(I(6, 4, 8, 11)),
+I2(I(10, 6, 7, 8, 9)),
+I2(I(7, 3, 0, 9, 10, 6)),
+I2(I(10, 6, 7, 8, 0, 1)),
+I2(I(10, 6, 7, 3, 1)),
+I2(I(1, 2, 6, 7, 8, 9)),
+I2(I(2, 6, 7, 3, 0, 9, 1)),
+I2(I(7, 8, 0, 2, 6)),
+I2(I(7, 3, 2, 6)),
+I2(I(2, 3, 11), I(10, 6, 7, 8, 9)),
+I2(I(2, 0, 9, 10, 6, 7, 11)),
+I2(I(8, 0, 1, 10, 6, 7), I(2, 3, 11)),
+I2(I(11, 2, 1, 10, 6, 7)),
+I2(I(8, 9, 1, 3, 11, 6, 7)),
+I2(I(0, 9, 1), I(11, 6, 7)),
+I2(I(7, 8, 0, 3, 11, 6)),
+I2(I(7, 11, 6)),
+I2(I(7, 6, 11)),
+I2(I(3, 0, 8), I(11, 7, 6)),
+I2(I(0, 1, 9), I(11, 7, 6)),
+I2(I(1, 9, 8, 3), I(11, 7, 6)),
+I2(I(10, 1, 2), I(6, 11, 7)),
+I2(I(1, 2, 10), I(3, 0, 8), I(6, 11, 7)),
+I2(I(9, 0, 2, 10), I(6, 11, 7)),
+I2(I(6, 11, 7), I(2, 10, 9, 8, 3)),
+I2(I(2, 3, 7, 6)),
+I2(I(0, 8, 7, 6, 2)),
+I2(I(7, 6, 2, 3), I(0, 1, 9)),
+I2(I(6, 2, 1, 9, 8, 7)),
+I2(I(7, 6, 10, 1, 3)),
+I2(I(7, 6, 10, 1, 0, 8)),
+I2(I(0, 3, 7, 6, 10, 9)),
+I2(I(7, 6, 10, 9, 8)),
+I2(I(8, 4, 6, 11)),
+I2(I(6, 11, 3, 0, 4)),
+I2(I(6, 11, 8, 4), I(9, 0, 1)),
+I2(I(9, 4, 6, 11, 3, 1)),
+I2(I(8, 4, 6, 11), I(2, 10, 1)),
+I2(I(1, 2, 10), I(3, 0, 4, 6, 11)),
+I2(I(11, 8, 4, 6), I(0, 2, 10, 9)),
+I2(I(10, 9, 4, 6, 11, 3, 2)),
+I2(I(2, 3, 8, 4, 6)),
+I2(I(0, 4, 6, 2)),
+I2(I(1, 9, 0), I(2, 3, 8, 4, 6)),
+I2(I(1, 9, 4, 6, 2)),
+I2(I(1, 3, 8, 4, 6, 10)),
+I2(I(10, 1, 0, 4, 6)),
+I2(I(4, 6, 10, 9, 0, 3, 8)),
+I2(I(10, 9, 4, 6)),
+I2(I(4, 9, 5), I(7, 6, 11)),
+I2(I(0, 8, 3), I(4, 9, 5), I(11, 7, 6)),
+I2(I(0, 1, 5, 4), I(7, 6, 11)),
+I2(I(11, 7, 6), I(8, 3, 1, 5, 4)),
+I2(I(9, 5, 4), I(10, 1, 2), I(7, 6, 11)),
+I2(I(6, 11, 7), I(1, 2, 10), I(0, 8, 3), I(4, 9, 5)),
+I2(I(7, 6, 11), I(5, 4, 0, 2, 10)),
+I2(I(4, 8, 3, 2, 10, 5), I(11, 7, 6)),
+I2(I(2, 3, 7, 6), I(5, 4, 9)),
+I2(I(9, 5, 4), I(0, 8, 7, 6, 2)),
+I2(I(6, 2, 3, 7), I(1, 5, 4, 0)),
+I2(I(6, 2, 1, 5, 4, 8, 7)),
+I2(I(9, 5, 4), I(10, 1, 3, 7, 6)),
+I2(I(6, 10, 1, 0, 8, 7), I(9, 5, 4)),
+I2(I(4, 0, 3, 7, 6, 10, 5)),
+I2(I(7, 6, 10, 5, 4, 8)),
+I2(I(9, 5, 6, 11, 8)),
+I2(I(6, 11, 3, 0, 9, 5)),
+I2(I(11, 8, 0, 1, 5, 6)),
+I2(I(6, 11, 3, 1, 5)),
+I2(I(1, 2, 10), I(9, 5, 6, 11, 8)),
+I2(I(11, 3, 0, 9, 5, 6), I(1, 2, 10)),
+I2(I(11, 8, 0, 2, 10, 5, 6)),
+I2(I(6, 11, 3, 2, 10, 5)),
+I2(I(8, 9, 5, 6, 2, 3)),
+I2(I(9, 5, 6, 2, 0)),
+I2(I(1, 5, 6, 2, 3, 8, 0)),
+I2(I(1, 5, 6, 2)),
+I2(I(1, 3, 8, 9, 5, 6, 10)),
+I2(I(10, 1, 0, 9, 5, 6)),
+I2(I(0, 3, 8), I(5, 6, 10)),
+I2(I(10, 5, 6)),
+I2(I(5, 10, 11, 7)),
+I2(I(5, 10, 11, 7), I(8, 3, 0)),
+I2(I(11, 7, 5, 10), I(1, 9, 0)),
+I2(I(7, 5, 10, 11), I(9, 8, 3, 1)),
+I2(I(1, 2, 11, 7, 5)),
+I2(I(0, 8, 3), I(1, 2, 11, 7, 5)),
+I2(I(7, 5, 9, 0, 2, 11)),
+I2(I(7, 5, 9, 8, 3, 2, 11)),
+I2(I(5, 10, 2, 3, 7)),
+I2(I(2, 0, 8, 7, 5, 10)),
+I2(I(9, 0, 1), I(5, 10, 2, 3, 7)),
+I2(I(9, 8, 7, 5, 10, 2, 1)),
+I2(I(1, 3, 7, 5)),
+I2(I(0, 8, 7, 5, 1)),
+I2(I(9, 0, 3, 7, 5)),
+I2(I(9, 8, 7, 5)),
+I2(I(8, 4, 5, 10, 11)),
+I2(I(0, 4, 5, 10, 11, 3)),
+I2(I(0, 1, 9), I(8, 4, 5, 10, 11)),
+I2(I(10, 11, 3, 1, 9, 4, 5)),
+I2(I(5, 1, 2, 11, 8, 4)),
+I2(I(0, 4, 5, 1, 2, 11, 3)),
+I2(I(0, 2, 11, 8, 4, 5, 9)),
+I2(I(9, 4, 5), I(2, 11, 3)),
+I2(I(5, 10, 2, 3, 8, 4)),
+I2(I(5, 10, 2, 0, 4)),
+I2(I(10, 2, 3, 8, 4, 5), I(0, 1, 9)),
+I2(I(5, 10, 2, 1, 9, 4)),
+I2(I(8, 4, 5, 1, 3)),
+I2(I(0, 4, 5, 1)),
+I2(I(8, 4, 5, 9, 0, 3)),
+I2(I(9, 4, 5)),
+I2(I(11, 7, 4, 9, 10)),
+I2(I(0, 8, 3), I(4, 9, 10, 11, 7)),
+I2(I(1, 10, 11, 7, 4, 0)),
+I2(I(3, 1, 10, 11, 7, 4, 8)),
+I2(I(11, 7, 4, 9, 1, 2)),
+I2(I(7, 4, 9, 1, 2, 11), I(0, 8, 3)),
+I2(I(11, 7, 4, 0, 2)),
+I2(I(11, 7, 4, 8, 3, 2)),
+I2(I(9, 10, 2, 3, 7, 4)),
+I2(I(9, 10, 2, 0, 8, 7, 4)),
+I2(I(3, 7, 4, 0, 1, 10, 2)),
+I2(I(1, 10, 2), I(8, 7, 4)),
+I2(I(4, 9, 1, 3, 7)),
+I2(I(4, 9, 1, 0, 8, 7)),
+I2(I(4, 0, 3, 7)),
+I2(I(4, 8, 7)),
+I2(I(9, 10, 11, 8)),
+I2(I(3, 0, 9, 10, 11)),
+I2(I(0, 1, 10, 11, 8)),
+I2(I(3, 1, 10, 11)),
+I2(I(1, 2, 11, 8, 9)),
+I2(I(3, 0, 9, 1, 2, 11)),
+I2(I(0, 2, 11, 8)),
+I2(I(3, 2, 11)),
+I2(I(2, 3, 8, 9, 10)),
+I2(I(9, 10, 2, 0)),
+I2(I(2, 3, 8, 0, 1, 10)),
+I2(I(1, 10, 2)),
+I2(I(1, 3, 8, 9)),
+I2(I(0, 9, 1)),
+I2(I(0, 3, 8)),
+I2());
+#endif
+
+        public static bool oldFieldPoly = false;
+        protected Poly PolyForVolField(Volume vol) {
+            // This reproduced the vertex order of Paul Bourke's (borrowed) table.
+            //
+            //     7 6   y   z
+            // 3 2 4 5   | /
+            // 0 1       0 - x
+            //
+
+            Vector3[] points = new Vector3[8];
+            points[0] = new Vector3(vol.x1, vol.y1, vol.z1);
+            points[1] = new Vector3(vol.x2, vol.y1, vol.z1);
+            points[3] = new Vector3(vol.x1, vol.y2, vol.z1);
+            points[2] = new Vector3(vol.x2, vol.y2, vol.z1);
+            points[4] = new Vector3(vol.x1, vol.y1, vol.z2);
+            points[5] = new Vector3(vol.x2, vol.y1, vol.z2);
+            points[7] = new Vector3(vol.x1, vol.y2, vol.z2);
+            points[6] = new Vector3(vol.x2, vol.y2, vol.z2);
+
+            float[] vv = new float[8];  // vertex values
+
+            // bm summarizes the 'topology' of this fit
+            int bm = 0;
+            int k = 1;  // bitmap val and val for each pos
+            bool[] sign = new bool[8];
+            for (int v = 0; v < 8; v++) {
+                vv[v] = Dist(points[v]);
+                if (vv[v] == 0)
+                    vv[v] = delta;
+                sign[v] = vv[v] > 0;
+                if (sign[v])
+                    bm += k;
+                k *= 2;
+            }
+
+            int i = bm * 16;
+            qbyte[][] polys = bmpolys[bm];
+
+            Poly mainpoly = null;
+            foreach (qbyte[] ipoly in polys) {  // ipoly in polys
+                Poly poly = Poly.Make();
+                if (mainpoly == null)
+                    mainpoly = poly;
+                else {
+                    if (mainpoly.extraPolys == null)
+                        mainpoly.extraPolys = new List<Poly>();
+                    mainpoly.extraPolys.Add(poly);
+                }
+                foreach(int e in ipoly) {
+                    int v0 = edges[e, 0], v1 = edges[e, 1];  // vertex indices
+                    // GUIBits.LogC(" {0} {1}..{2}", e, v0, v1);
+                    Vector3 xing = (points[v0] * vv[v1] - points[v1] * vv[v0]) / (vv[v1] - vv[v0]);
+                    poly.Add(xing);
+                }
+            }    // ipoly in polys
+            return mainpoly;
+        }  // end PolyForVolField
+
+#if GEN
         // poly points will be computed on demand for the bit pattern of +ve and -ve vertices
         // it holds polyPoints[bitpattern][polynum][pointWithinPolyNum]
         //
         // marching cubes edge lists
-        readonly sbyte[] mc_triangles = new sbyte[]{
+        // This reproduced the vertex order of Paul Bourke's (borrowed) table.
+        // The indices in edge_indices have the following offsets.
+        //
+        //     7 6   y   z
+        // 3 2 4 5   | /
+        // 0 1       0 - x
+        //
+
+        static readonly qbyte[] mc_triangles = new qbyte[]{
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -281,84 +632,83 @@ namespace CSG {
         0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
+        struct IPair { internal int x; internal int y; internal IPair(int x, int y) { this.x = x; this.y = y; } }
 
-        // derived from MarchingCubes, from 
-        int[,] edges = new int[,] {
-            { 0,1 },
-            { 1,2 },
-            { 2,3 },
-            { 3,0 },
-            { 4,5 },
-            { 5,6 },
-            { 6,7 },
-            { 7,4 },
-            { 0,4 },
-            { 1,5 },
-            { 2,6 },
-            { 3,7 }
-        };
-
-        protected Poly PolyForVolField(Volume vol) {
-            // This reproduced the vertex order of Paul Bourke's (borrowed) table.
-            //
-            //     7 6   y   z
-            // 3 2 4 5   | /
-            // 0 1       0 - x
-            //
-
-            Vector3[] points = new Vector3[8];
-            points[0] = new Vector3(vol.x1, vol.y1, vol.z1);
-            points[1] = new Vector3(vol.x2, vol.y1, vol.z1);
-            points[3] = new Vector3(vol.x1, vol.y2, vol.z1);
-            points[2] = new Vector3(vol.x2, vol.y2, vol.z1);
-            points[4] = new Vector3(vol.x1, vol.y1, vol.z2);
-            points[5] = new Vector3(vol.x2, vol.y1, vol.z2);
-            points[7] = new Vector3(vol.x1, vol.y2, vol.z2);
-            points[6] = new Vector3(vol.x2, vol.y2, vol.z2);
-
-            float[] vv = new float[8];  // vertex values
-
-            // bm summarizes the 'topology' of this fit
-            int bm = 0;
-            int k = 1;  // bitmap val and val for each pos
-            bool[] sign = new bool[8];
-            for (int v = 0; v < 8; v++) {
-                vv[v] = Dist(points[v]);
-                if (vv[v] == 0)
-                    vv[v] = delta;
-                sign[v] = vv[v] > 0;
-                if (sign[v])
-                    bm += k;
-                k *= 2;
-            }
-
-            sbyte[] t = mc_triangles;
-            int i = bm * 16;
-            Poly mainpoly = null;
-            while (t[i] != -1) {
-                Poly poly = new Poly();
-                if (mainpoly == null)
-                    mainpoly = poly;
-                else {
-                    if (mainpoly.extraPolys == null)
-                        mainpoly.extraPolys = new List<Poly>();
-                    mainpoly.extraPolys.Add(poly);
-                }
-                for (int j = i; j < i + 3; j++) {
-                    int e = t[j];
-                    // poly.Add((points[edges[e, 0]] + points[edges[e, 1]]) / 2);
-
-                    int v0 = edges[e, 0], v1 = edges[e, 1];  // vertex indices
-                    Vector3 xing = (points[v0] * vv[v1] - points[v1] * vv[v0]) / (vv[v1] - vv[v0]);
-                    poly.Add(xing);
-
-                }
-                i += 3;
-
-            }
-            return mainpoly;
+        public static int[][][] bmpolys;
+        /** reformat mc_triangles into polygons */
+        static CSGPrim() {
+            makepolys();
         }
+        public static string makepolys() {
+            // string.Join(",", sss.ToArray());
+            int k = 0;
+            qbyte[] t = mc_triangles;
+            bmpolys = new int[256][][];
+            List<string> sss = new List<string>();
+
+            for (int bm = 0; bm < 256; bm++) {
+                // find true pairs
+                List<IPair> pairs = new List<IPair>();
+                int start = bm * 16; int end = bm * 16 + 15;
+                for (int i = start; i < end; i += 3) {
+                    if (t[i] == -1) break;
+                    for (int j = i; j < i + 3; j++) {
+                        int e1 = t[j];
+                        int j1 = j == i + 2 ? i : j + 1;
+                        int e2 = t[j1];
+                        int back = -1;
+                        for (int l = 0; l < pairs.Count; l++) if (pairs[l].x == e2 && pairs[l].y == e1) back = l;
+                        if (back != -1)
+                            pairs.RemoveAt(back);
+                        else
+                            pairs.Add(new IPair(e1, e2));
+                    } // end j
+                } // end i
+
+                List<int[]> polys = new List<int[]>();
+                List<string> ss = new List<string>();
+
+                // turn them into polys
+                while (pairs.Any()) {
+                    List<int> poly = new List<int>();
+                    List<string> s = new List<string>();
+
+                    IPair pair = pairs.First();
+                    poly.Add(pair.x); s.Add(pair.x + "");
+                    poly.Add(pair.y); s.Add(pair.y + "");
+                    pairs.Remove(pair);
+                    while(true) {
+                        if (k++ > 9999) { GUIBits.Log("failed init"); return "";  }
+
+                        pair.x = -999;
+                        foreach(var tpair in pairs) {
+                            if (tpair.x == poly.Last()) {
+                                pair = tpair;
+                                break;
+                            }
+                        }  // search for next pair
+                        pairs.Remove(pair);
+                        if (pair.y == poly.First())
+                            break;
+                        poly.Add(pair.y); s.Add(pair.y + "");
+                        
+                    }
+                    polys.Add(poly.ToArray());
+                    ss.Add("I(" + string.Join(", ", s.ToArray()) + ")");
+                }
+                bmpolys[bm] = polys.ToArray();
+                sss.Add("I2(" + string.Join(", ", ss.ToArray()) + ")");
+
+            } // end bm
+            string r = "bmpolys = I3(" + string.Join(",\n", sss.ToArray()) + ");\n";
+            GUIBits.Log2(r);
+            return r;
+        }  // makepolys
+#else
+        public static void makepolys() { Debug.Log("makepolys not used, pregenerated."); }
+
+#endif
 
 
-    }    // class CSGPrim
-}   // namespace CSG
+        }    // class CSGPrim
+    }   // namespace CSG

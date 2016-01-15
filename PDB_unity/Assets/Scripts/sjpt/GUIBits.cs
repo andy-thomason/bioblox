@@ -28,11 +28,11 @@ namespace CSG {  // [ExecuteInEditMode]
         public bool parallel = true;
         public bool showCSGStats = false;
 
-        [Range(1, 12)]
+        [Range(0, 12)]
         public int MinLev = 1;
 
-        //[Range(1, 12)]
-        //public int MaxLev = 10;
+        [Range(0, 12)]
+        public int MaxLev = 10;
 
         [Range(-1, 20)]
         public float CylNum = 6;
@@ -44,9 +44,9 @@ namespace CSG {  // [ExecuteInEditMode]
         [Range(0, 3)]
         public int CullSides = 1;
 
+        public bool CheckWind = true;
         [Range(0, 3)]
         public int WindShow = 3;
-        public bool CheckWind = true;
         public bool windDebug = true;
 
         protected BigMesh savemeshA, savemeshB;
@@ -121,7 +121,7 @@ namespace CSG {  // [ExecuteInEditMode]
             BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
 
             CSGControl.MinLev = MinLev;
-            //CSGControl.MaxLev = MaxLev;
+            CSGControl.MaxLev = MaxLev;
             BasicMeshData.Sides = CullSides;
             CSGXPrim.CylNum = CylNum;
             CSGControl.GiveUpNodes = GiveUpNodes;
@@ -139,6 +139,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 DeleteChildren(goTest);
                 DeleteChildren(goFiltered);
                 csg = S.NONE;
+                Poly.ClearPool();
                 return true;
             }
             if (testop("progress")) {
@@ -541,6 +542,8 @@ namespace CSG {  // [ExecuteInEditMode]
         }
 
         int slidery = 0;
+        protected int butheight = 18, butwidth = 80;
+
         protected virtual void OnGUII() {
             GUI.contentColor = Color.white;
             GUI.color = Color.white;
@@ -551,14 +554,19 @@ namespace CSG {  // [ExecuteInEditMode]
                 Show("");  // get things initialized
 
             // display buttons for all the options set up by Show()
-            int y = 0, yh = 18;
+            int y = 0, yh = butheight, x = 2;
+            int opsc = ops.Count;
             foreach (var kvp in ops) {    // and show buttons for tests
-                if (GUI.Button(new Rect(20, kvp.Value.y * yh, 80, yh), kvp.Key))
+                if (GUI.Button(new Rect(x, y * yh, butwidth, yh), kvp.Key))
                     Show(kvp.Key);
-                y = kvp.Value.y;
+                if (ops.Count != opsc) break; // happens when items dynamically added
+                //y = kvp.Value.y;
+                y++;
+                if (y*yh > Screen.height/2) { x += butwidth;  y = 0; }
+
             }
             y += 2;
-            slidery = yh * y;
+            slidery = Screen.height / 2 + 40;
 
             MSlider("progress rate", ref progressInterval, 0.0f, 10.0f);
 

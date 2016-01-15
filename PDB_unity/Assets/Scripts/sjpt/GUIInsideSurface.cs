@@ -52,7 +52,6 @@ namespace CSG {
             if (base.Show(ptoshow)) return true;
 
             CSGFMETA.computeCurvature = computeCurvature;
-            CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
 
 
             text = "";
@@ -89,12 +88,14 @@ namespace CSG {
             }
 
             if (testop("BioBloxMesh")) {
+                CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
                 useBioBloxMesh(molA);
                 return true;
             }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
+                CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
@@ -564,6 +565,10 @@ namespace CSG {
         protected override GameObject getSubObject() { return goMolB; }
 
         BigMesh useBioBloxMesh(PDB_molecule mol) {
+#if CSGUNITY
+            Log("useBioBloxMesh not supported in CSGUNITY");
+            return null;
+#else
             int save = CSGControl.MinLev;
             CSGControl.MinLev = -1;
             CSGFMETA csg = meta(mol, radInfluence, radMult);
@@ -581,6 +586,7 @@ namespace CSG {
             BasicMeshData.ToGame(goTest, bm.ToMeshes());
             CSGControl.MinLev = save;
             return bm;
+#endif
         }
 
 

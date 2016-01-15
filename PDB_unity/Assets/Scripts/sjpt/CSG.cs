@@ -3795,28 +3795,13 @@ namespace CSG {
         /// </summary>
         /// <returns></returns>
         public static Poly Make() {
-            //if (pool.Count == 0) {
-            //    fromnew++;
-            //    return new Poly();
-            //} else {
-            //    frompool++;
-            //    return pool.Pop();
-            //}
-            Poly p;
-//?? TODO check why this caused deadlock even on single thread			
-//??            lock (pool) {
-                p = pool.Pop();
-                if (p == null) {
-                    fromnew++;
-                    pool.Push(null);
-                } else {
-                    frompool++;
-                }
-//??            }
-            if (p == null)
-                p = new Poly();
-            //debugpolypool.Add(p);
-            return p;
+            //?? TODO check why this caused deadlock even on single thread			
+            //??            lock (pool) {
+            if (pool.Any()) {
+                frompool++;
+                return pool.Pop();
+            }
+            return new Poly();
         }
 
         //public static List<Poly> debugpolypool = new List<Poly>();  // debug to help track missing ones after pooling, see CSGToXList for associated debug
@@ -3825,12 +3810,7 @@ namespace CSG {
         public static int frompool = 0, fromnew = 0;
         /// <summary>Poly pool; will always contain a null at the bottom to help detect empty.  Why no efficient IsEmpty() method?</summary>
         private static Stack<Poly> pool = new Stack<Poly>();
-
-        static Poly() {
-//??            lock (pool)
-                pool.Push(null);
-        }
-        // needed if checking for null as empty pool
+        public static void ClearPool() { pool = new Stack<Poly>(); }
 
         /// <summary>
         /// If the poly is not used as output, release it to pool.
@@ -3843,6 +3823,7 @@ namespace CSG {
             if (extraPolys != null) {
                 foreach (Poly sp in extraPolys)
                     sp.ConditionalReleaseToPool();
+                extraPolys = null;
             }
             num = 0;
 //??            lock (pool)
