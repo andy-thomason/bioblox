@@ -304,7 +304,9 @@ I2());
 #endif
 
         public static bool oldFieldPoly = false;
+        //// public static float gradCompPow = -2;
         protected Poly PolyForVolField(Volume vol) {
+            //// float gradcomp = Mathf.Pow(10, gradCompPow);
             // This reproduced the vertex order of Paul Bourke's (borrowed) table.
             //
             //     7 6   y   z
@@ -355,6 +357,18 @@ I2());
                     int v0 = edges[e, 0], v1 = edges[e, 1];  // vertex indices
                     // GUIBits.LogC(" {0} {1}..{2}", e, v0, v1);
                     Vector3 xing = (points[v0] * vv[v1] - points[v1] * vv[v0]) / (vv[v1] - vv[v0]);
+                    /* * experiment with refining point did not really help much
+                    if (csg is CSGFIELD.CSGFMETA) {
+                        CSGFIELD.CSGFMETA meta = (CSGFIELD.CSGFMETA)csg;
+                        float dd = meta.Dist(xing);
+                        Vector3 grad = meta.grad(xing);
+                        if (grad.sqrMagnitude > gradcomp)
+                            xing -= dd * grad / (grad.sqrMagnitude);
+                        float dd2 = meta.Dist(xing);
+                        float r = dd - dd2;
+                    }
+                    ** */
+
                     poly.Add(xing);
                 }
             }    // ipoly in polys

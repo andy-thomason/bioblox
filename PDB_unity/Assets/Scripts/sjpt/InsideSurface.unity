@@ -461,15 +461,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NBOX: 2
   radInfluence: 2.5
+  radMult: 1
   keepUpright: 0
   parallel: 1
   showCSGStats: 0
   MinLev: 1
+  MaxLev: 10
   CylNum: 6
   GiveUpNodes: 50
   CullSides: 1
-  WindShow: 3
   CheckWind: 0
+  WindShow: 3
   windDebug: 0
   hitpoint: {x: NaN, y: NaN, z: NaN}
   lookat: {x: 0, y: 0, z: 0}

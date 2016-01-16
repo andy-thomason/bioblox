@@ -38,10 +38,12 @@ namespace CSG {
         protected Vector3 filterpointB = new Vector3(float.NaN, float.NaN, float.NaN);
 
 
-        public GUIInsideSurface() {
+        public GUIInsideSurface() { init(); }
+        private void init() { 
             PDB_parser.automesh = false;
             molB = PDB_parser.get_molecule("pdb2ptcWithTags.2");  // read the (cached) molecule data
             molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+            if (molA == null || molB == null) LogK("mol load", "molecule data missing");
             CSGControl.QuickUnion = false;
             BasicMeshData.defaultShaderName = "Custom/Color";
         }
@@ -50,6 +52,8 @@ namespace CSG {
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
             if (base.Show(ptoshow)) return true;
+
+            if (molA == null) init();  // for some reason, does not get called from GUIInsideSurface() in build version
 
             CSGFMETA.computeCurvature = computeCurvature;
 
@@ -111,7 +115,9 @@ namespace CSG {
                 // prepare the mesh in a way I can raycast it and filter it
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
+                    //Probe.Probe.StartProbe("MeshesFromCsg");  // freezes in both edit game mode and built run mode
                     var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999);
+                    //Probe.Probe.StopProbe();
 
                     BigMesh tsavemesh = null;
                     foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
@@ -206,8 +212,11 @@ namespace CSG {
         /// <param name="radInfluence"></param>
         /// <returns></returns>
         CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult) {
+            if (mol == null) { LogK("mol load", "molecule data missing"); return null; }
             // prepare and populate the metaball object
+            Log("in meta, mol {0}", mol);
             CSGFMETA csgm = new CSGFMETA();
+            Log("in meta, csgm {0}", csgm);
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
@@ -416,6 +425,7 @@ namespace CSG {
             if (MSlider("Detail Level", ref detailLevel, 0, 8)) { } //  Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
+            ////MSlider("gradCompPow", ref CSGPrim.gradCompPow, -10, 10);
 
             if (curcamnum >= 0) {
                 for (int i = 0; i < N / 2; i++)

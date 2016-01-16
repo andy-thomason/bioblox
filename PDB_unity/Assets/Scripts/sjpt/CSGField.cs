@@ -447,6 +447,20 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         //        public @GUIVal(description = "field threshold, usually 1", level= GUIVal.ADVANCED) float fieldThresh = 1;  // probably fixed, algorithm is incorrect with other values
         public static float colThresh = -999;
 
+		// grad for metaballs without other overheads.  not generally used, but ...
+        public Vector3 grad(Vector3 p) {
+            int inlev = CSGControl.MinLev + 1;
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+            if (inn == 1) return inspheres[0].grad(p);
+            Vector3 grad = Vector3.zero;
+            for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
+                float myfield = inspheres[ini].field(p);
+                grad += inspheres[ini].grad(p);
+            }
+            return grad;
+        }
+
         public override void normalColor(Vector3 p, out Vector3 normal, out Color col) {
             int subdivideLevel = CSGControl.MinLev; //??
             int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
