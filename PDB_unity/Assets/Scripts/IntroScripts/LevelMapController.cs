@@ -60,6 +60,7 @@ public class LevelMapController : MonoBehaviour {
         WWW DataConnection = new WWW(url_image);
         yield return DataConnection;
         thumb_sprite = Sprite.Create(DataConnection.texture, thumb_rect_SD, thumb_pivot);
+        current_level.GetComponent<LevelStructure>().thumb_32 = thumb_sprite;
         current_level.GetComponentInChildren<Image>().sprite = thumb_sprite;
     }
 
