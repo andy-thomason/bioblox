@@ -77,16 +77,12 @@ class PDB_molecule:
     img.save(filename)
 
   def make_mesh(self, filename, resolution):
-    indices, vertices, colours, normals = thumbnail.make_mesh(self.pos, self.radii, self.chain, resolution)
-    res = str(resolution)
-    with open(filename + '.' + res + '.indices', 'wb') as f:
-      f.write(indices)
-    with open(filename + '.' + res + '.vertices', 'wb') as f:
-      f.write(vertices)
-    with open(filename + '.' + res + '.colours', 'wb') as f:
-      f.write(colours)
-    with open(filename + '.' + res + '.normals', 'wb') as f:
-      f.write(normals)
+    print("make_mesh2")
+    bytes = thumbnail.make_mesh(self.pos, self.radii, self.chain, resolution)
+    if len(bytes):
+      with open(filename, 'wb') as file:
+        file.write(bytes)
+      pass
 
   def add(self, mol):
     self.serial += mol.serial
@@ -154,35 +150,42 @@ def download_entries():
     names.append(line[:-1])
   print(names)
 
-
-
-def build_resources(pdb):
+def get_mols(pdb):
   print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % pdb))
   req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
   with urllib.request.urlopen(req) as req:
     pdb_file = req.read()
     mols = parse_pdb(io.BytesIO(pdb_file))
+  return mols
 
+def build_thumbnail(pdb, size):
+  mols = get_mols(pdb)
   i = 0
   tot = PDB_molecule()
   for mol in mols:
     i = i + 1
     tot.add(mol)
+  tot.make_thumbnail('thumbnails/%s.%d.png' % (pdb, size), size, size)
 
-  tot.make_thumbnail('thumbnails/%s.32.png' % (pdb), 32, 32)
-  tot.make_thumbnail('thumbnails/%s.64.png' % (pdb), 64, 64)
-  tot.make_thumbnail('thumbnails/%s.128.png' % (pdb), 128, 128)
-  tot.make_thumbnail('thumbnails/%s.256.png' % (pdb), 256, 256)
-  tot.make_thumbnail('thumbnails/%s.512.png' % (pdb), 512, 512)
-  tot.make_thumbnail('thumbnails/%s.1024.png' % (pdb), 1024, 1024)
-  #tot.make_mesh('mesh/%s' % (pdb), 2)
+def build_mesh(pdb, index, resolution):
+  print("build_mesh")
+  mols = get_mols(pdb)
+  if index < len(mols):
+    filename = 'mesh/%s.%d.%d.bin' % (pdb, index, resolution)
+    mols[index].make_mesh(filename, resolution)
 
 thumbnails_png_re = re.compile('^/thumbnails/(\\w+)\.([0-9]+)\.png$')
-mesh_txt_re = re.compile('^/mesh/(\\w+)\.txt$')
+mesh_re = re.compile('^/mesh/(\\w+)\.([0-9]+)\.([0-9]+)\.bin$')
+data_re = re.compile('^/data/(\\w+)\..*$')
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
     print(self.path)
+    
+    match_thumbnail = thumbnails_png_re.match(self.path)
+    match_mesh = mesh_re.match(self.path)
+    match_data = data_re.match(self.path)
+    print(match_thumbnail, match_mesh)
     if self.path == '/':
       self.send_response(200)
       self.send_header(b"Content-type", "text/html")
@@ -194,31 +197,46 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       self.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
       self.wfile.write(b"<p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>\n")
       self.wfile.write(b"<p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.txt'>/mesh/2ptc.txt</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.1.vertices'>/mesh/2ptc.1.vertices</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.1.colors'>/mesh/2ptc.1.colors</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.0.1.bin'>/mesh/2ptc.0.1.bin</p>\n")
       self.wfile.write(b"</body></html>\n")
-    elif self.path[0:12] == '/thumbnails/' or self.path[0:6] == '/mesh/' or self.path[0:6] == '/data/':
-      self.send_response(200)
-      if self.path[-4:] == '.png':
-        self.send_header(b"Content-type", "image/png")
-      else:
-        self.send_header(b"Content-type", "text/plain")
-      self.end_headers()
+    elif match_thumbnail or match_mesh or match_data:
       try:
-        with open(self.path[1:], 'rb') as rf:
+        with open('!' + self.path[1:], 'rb') as rf:
           self.wfile.write(rf.read())
       except:
-        m = thumbnails_png_re.match(self.path)
-        if m:
-          build_resources(str(m.group(1)))
-        pass
-      with open(self.path[1:], 'rb') as rf:
-        self.wfile.write(rf.read())
+        if match_thumbnail:
+          pdb = str(match_thumbnail.group(1))
+          size = int(match_thumbnail.group(2))
+          build_thumbnail(pdb, size)
+        elif match_mesh:
+          pdb = str(match_mesh.group(1))
+          index = int(match_mesh.group(2))
+          resolution = int(match_mesh.group(3))
+          build_mesh(pdb, index, resolution)
+        else:
+          self.send_response(404)
+          self.end_headers()
+          return
+      try:
+        with open(self.path[1:], 'rb') as rf:
+          self.send_response(200)
+          if self.path[-4:] == '.bin':
+            self.send_header(b"Content-type", "application/octet-stream")
+          elif self.path[-4:] == '.png':
+            self.send_header(b"Content-type", "image/png")
+          else:
+            self.send_header(b"Content-type", "text/plain")
+          self.end_headers()
+          self.wfile.write(rf.read())
+      except:
+        self.send_response(404)
+        self.end_headers()
+        return
     else:
       self.send_response(404)
       self.end_headers()
-        
+      return
+      
 
 def main(argv):
   # example of a python class
@@ -238,7 +256,7 @@ def main(argv):
   download_entries()
   
   host = os.getenv('IP', '0.0.0.0')
-  port = int(os.getenv('PORT', '8080'))
+  port = int(os.getenv('PORT', '443'))
   print(host, port)
   httpd = http.server.HTTPServer((host, port), MyHandler)
   #httpd.socket = ssl.wrap_socket(httpd.socket)
