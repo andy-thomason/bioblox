@@ -15,7 +15,7 @@ public class DataController : MonoBehaviour {
 
     IEnumerator DownloadData()
     {
-        WWW DataConnection = new WWW("http://quiley.com/BB/names4.txt");
+        WWW DataConnection = new WWW("http://quiley.com/BB/names3.txt");
         //WWW DataConnection = new WWW("http://158.223.59.221:8080/data/names.txt"); 
         yield return DataConnection;
         Debug.Log(DataConnection.text);

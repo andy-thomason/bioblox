@@ -38,6 +38,8 @@ public class LevelMapController : MonoBehaviour {
                 //put the name
                 LevelPrefabReference.GetComponentInChildren<Text>().text = level_name;
                 LevelPrefabReference.GetComponent<LevelStructure>().level_name = level_name;
+                //set the coordinates of it
+                LevelPrefabReference.GetComponent<LevelStructure>().coordinates = initial_position;
                 //image 
                 StartCoroutine(DownloadThumbLD(level_name, LevelPrefabReference));
                 //move next position
