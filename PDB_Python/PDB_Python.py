@@ -14,6 +14,8 @@ import ssl
 # our extensions
 import thumbnail
 
+disable_cache = False
+
 
 """
  ATOM AND CONECT LINE FORMATS
@@ -168,7 +170,7 @@ def build_thumbnail(pdb, size):
   tot.make_thumbnail('thumbnails/%s.%d.png' % (pdb, size), size, size)
 
 def build_mesh(pdb, index, resolution):
-  print("build_mesh")
+  print("build_mesh res=%d" % resolution)
   mols = get_mols(pdb)
   if index < len(mols):
     filename = 'mesh/%s.%d.%d.bin' % (pdb, index, resolution)
@@ -200,10 +202,17 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       self.wfile.write(b"<p><a href='/mesh/2ptc.0.1.bin'>/mesh/2ptc.0.1.bin</p>\n")
       self.wfile.write(b"</body></html>\n")
     elif match_thumbnail or match_mesh or match_data:
-      try:
-        with open('!' + self.path[1:], 'rb') as rf:
-          self.wfile.write(rf.read())
-      except:
+      make_new = True
+      if not disable_cache:
+        try:
+          with open(self.path[1:], 'rb') as rf:
+            self.wfile.write(rf.read())
+            return
+          make_new = False
+        except:
+          pass
+      
+      if make_new:
         if match_thumbnail:
           pdb = str(match_thumbnail.group(1))
           size = int(match_thumbnail.group(2))
