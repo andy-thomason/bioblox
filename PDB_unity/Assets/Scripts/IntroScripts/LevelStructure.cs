@@ -8,8 +8,10 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
 
     public string level_name;
     public Vector3 coordinates;
-    Transform map_canvas;
+    public int level_id;
+    //Transform map_canvas;
     LevelMapController levelMapController;
+    MapController mapController;
     //thumbs
     public Sprite thumb_32;
     public Sprite nrnalo;
@@ -35,9 +37,22 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
     //the sprite to replace
     Image thumb_image;
 
+    //camera new
+    Camera micro_camera;
+
+    float lastClickTime;
+
+    float catchTime = 0.25f;
+
+    void Awake()
+    {
+        micro_camera = GameObject.Find("MiscroscopeCamera").GetComponent<Camera>();
+        mapController = FindObjectOfType<MapController>();
+    }
+
     void Start()
     {
-        map_canvas = gameObject.transform.parent.GetComponent<Transform>();
+        // map_canvas = gameObject.transform.parent.GetComponent<Transform>();
         //map_canvas = GameObject.Find("MapPanel").GetComponent<Transform>();
         //set the frame cmaera focus
         x_frame_min = Screen.width / 8.0f;
@@ -45,36 +60,55 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
         x_frame_max = Screen.width - x_frame_min;
         y_frame_max = Screen.height - y_frame_min;
         thumb_image = GetComponentInChildren<Image>();
+        //Debug.Log(Screen.width / 2.0f + "/" + Screen.height / 2.0f);
 
     }
+    int number_clicks = 0;
+    float time_double_clicks = 0;
 
     public void OnPointerClick(PointerEventData data)
     {
-        levelMapController = FindObjectOfType<LevelMapController>();
+        //levelMapController = FindObjectOfType<LevelMapController>();
         //map_canvas.position = Vector3.zero;
         //map_canvas.position = new Vector3(coordinates.x, -coordinates.y, coordinates.z);
-        // Vector2 testaa = new Vector2((-coordinates.x + 400.0f) * map_canvas.localScale.x, (-coordinates.y - 240.0f) * map_canvas.localScale.x);
-        // transform.parent.GetComponent<RectTransform>().anchoredPosition = testaa;
-        // Debug.Log(testaa.x + "/"+testaa.y);
+        //Vector2 testaa = new Vector2((-coordinates.x + micro_camera.WorldToScreenPoint(transform.position).x), (-coordinates.y - micro_camera.WorldToScreenPoint(transform.position).y));
+        //transform.parent.GetComponent<RectTransform>().anchoredPosition = testaa;
+        //Debug.Log(testaa.x + "/"+testaa.y);
 
         // map_canvas.Translate(new Vector3(coordinates.x, -coordinates.y, coordinates.z));
         // levelMapController.CreateLevelDescription(level_name);
-        Vector2 viewportPoint = GameObject.Find("MiscroscopeCamera").GetComponent<Camera>().WorldToViewportPoint(coordinates);
-        map_canvas.GetComponent<RectTransform>().anchorMax = viewportPoint;
-        map_canvas.GetComponent<RectTransform>().anchorMin = viewportPoint;
+        //mapController.OnClickProtein();
+        if (number_clicks == 0)
+        {
+            time_double_clicks = Time.time;
+        }
+        number_clicks++;
     }
+
 
     public void OnPointerEnter(PointerEventData data)
     {
-        Debug.Log(coordinates);
+        mapController.zoom_position = coordinates;
+        //Debug.Log(coordinates);
     }
 
     void Update()
     {
-        //if the thumb is inside the frame focus
-        if (transform.position.x > x_frame_min && transform.position.x < x_frame_max && transform.position.y > y_frame_min && transform.position.y < y_frame_max)
+
+        if (number_clicks == 2)
         {
-            if (map_canvas.localScale.x > 0.5f && map_canvas.localScale.x < 1.0f && current_thumb.texture.width != 128)
+            if (Time.time - time_double_clicks < 0.5f)
+            {
+                mapController.DoubleClickLevel();
+            }
+            number_clicks = 0;
+        }
+        //Debug.Log(micro_camera.WorldToScreenPoint(transform.position));
+        //if the thumb is inside the frame focus
+        if (micro_camera.WorldToScreenPoint(transform.position).x > x_frame_min && micro_camera.WorldToScreenPoint(transform.position).x < x_frame_max && micro_camera.WorldToScreenPoint(transform.position).y > y_frame_min && micro_camera.WorldToScreenPoint(transform.position).y < y_frame_max && micro_camera.orthographicSize <= 500)
+        {
+            //if (map_canvas.localScale.x > 0.5f && map_canvas.localScale.x < 1.0f && current_thumb.texture.width != 128)
+            if (micro_camera.orthographicSize > 100 && micro_camera.orthographicSize <= 500 && current_thumb.texture.width != 128)
             {
                 //if the thumb is null, download ONCE
                 if (!download_128)
@@ -91,13 +125,14 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
                     thumb_128 = thumb_temp;
                 }
                 //replace the downloaded thumb and change the value of the current thumb
-                else if(thumb_128)
+                else if (thumb_128)
                 {
                     thumb_image.overrideSprite = thumb_128;
                     current_thumb = thumb_128;
                 }
             }
-            else if(map_canvas.localScale.x >= 1.0f && current_thumb.texture.width != 512)
+            //else if(map_canvas.localScale.x >= 1.0f && current_thumb.texture.width != 512)
+            else if (micro_camera.orthographicSize <= 100 && current_thumb.texture.width != 512)
             {
                 //if the thumb is null, download ONCE
                 if (!download_512)
@@ -121,20 +156,24 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
             }
         }
         //if not, set the low resolution thimb only once
-        else if(current_thumb.texture.width != 32)
+        else if (current_thumb.texture.width != 32)
         {
-           GetComponentInChildren<Image>().overrideSprite = thumb_32;
-           current_thumb = thumb_32;
+            GetComponentInChildren<Image>().overrideSprite = thumb_32;
+            current_thumb = thumb_32;
         }
     }
 
     //couritine download thimb
     IEnumerator DownloadThumb(string thumb_size)
     {
-        url_image = "http://quiley.com/BB/BB"+ thumb_size +"/"+ level_name + ".png";
-        // string url_image = "http://158.223.59.221:8080/" + level_name + ".png";
-        DataConnection = new WWW(url_image);
-        yield return DataConnection;
+        url_image = "http://quiley.com/BB/BB" + thumb_size + "/" + level_name + ".png";
+        //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + "." + thumb_size + ".png";
+        do//wait for the server to get the image
+        {
+            DataConnection = new WWW(url_image);
+            yield return DataConnection;
+        } while (!string.IsNullOrEmpty(DataConnection.error));
+    
     }
 
 }

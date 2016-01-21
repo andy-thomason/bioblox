@@ -1,58 +1,137 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.EventSystems;
 
-public class MapController : MonoBehaviour, IPointerClickHandler
+public class MapController : MonoBehaviour
 {
     
     float current_scroll;
+    Camera micro_camera;
+    public Vector3 zoom_position;
+    public RectTransform map_panel;
+    public GameObject level_description;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+    // Use this for initialization
+    void Awake () {
+        micro_camera = GetComponent<Camera>();
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        
+        // float key = Mathf.Lerp(0.0f, 40.0f, Time.time);
+        //Debug.Log(key);
+        //Debug.Log(Input.mousePosition);
+        //Debug.Log(micro_camera.cameraToWorldMatrix);
+
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
-            if (transform.localScale.x >= 0.05f && transform.localScale.x <= 2.05f)
+            StopAllCoroutines();
+            if (micro_camera.orthographicSize >= 100 && micro_camera.orthographicSize <= 4700)
             {
                 /*Vector3 temp = MainCamera.transform.position;
                 temp.z += Input.GetAxis("Mouse ScrollWheel") * 5;
                 MainCamera.transform.position = temp;*/
 
                // current_scroll = Input.GetAxis("Mouse ScrollWheel") / 10;
-                if(Input.GetAxis("Mouse ScrollWheel") > 0)
+                if(Input.GetAxis("Mouse ScrollWheel") < 0)
                 {
-                    transform.localScale += new Vector3(0.1f, 0.1f, 0.1f);
+                    StopAllCoroutines();
+                    StartCoroutine(MoveMapCanvas());
+                    micro_camera.orthographicSize = micro_camera.orthographicSize + 200.0f;
+                    //map_panel.anchoredPosition = new Vector2((-zoom_position.x + 400.0f), (-zoom_position.y - 237.0f));
                 }
                 else
                 {
-                    transform.localScale += new Vector3(-0.1f, -0.1f, -0.1f);
+                    StopAllCoroutines();
+                    StartCoroutine(MoveMapCanvas());
+                    micro_camera.orthographicSize = micro_camera.orthographicSize - 200.0f;
+                    //map_panel.anchoredPosition = new Vector2((-zoom_position.x + 400.0f), (-zoom_position.y - 237.0f));
                 }
-               // MapCanvas.transform.position = Input.mousePosition;
-            }
 
-            if(transform.localScale.x <= 0.05f)
-            {
-                transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+                if(micro_camera.orthographicSize > 4700)
+                {
+                    micro_camera.orthographicSize = 4700;
+                }
+                
+                if(micro_camera.orthographicSize < 100)
+                {
+                    micro_camera.orthographicSize = 100;
+                }
             }
-            if (transform.localScale.x >= 2.05f)
-            {
-                transform.localScale = new Vector3(2.05f, 2.05f, 2.05f);
-            }
+        }
+       
+        //if maximum zoom, show canvas descrptin
+        if(micro_camera.orthographicSize == 100 && !level_description.activeSelf)
+        {
+            level_description.SetActive(true);
+        }
+        if (micro_camera.orthographicSize > 100 && level_description.activeSelf)
+        {
+            level_description.SetActive(false);
         }
     }
 
-    public void OnPointerClick(PointerEventData data)
+    IEnumerator MoveMapCanvas()
     {
-        Vector2 viewportPoint = GameObject.Find("MiscroscopeCamera").GetComponent<Camera>().WorldToViewportPoint(Input.mousePosition);
-        Debug.Log(viewportPoint);
-        GetComponent<RectTransform>().anchorMax = viewportPoint;
-        GetComponent<RectTransform>().anchorMin = viewportPoint;
+        float timeSinceStarted = 0f;
+        Vector3 newPosition = new Vector2((-zoom_position.x + 348.0f), (-zoom_position.y - 237.0f));
+        while (true)
+        {
+            timeSinceStarted += Time.deltaTime;
+            map_panel.anchoredPosition = Vector3.Lerp(map_panel.anchoredPosition, newPosition, timeSinceStarted);
 
+            // If the object has arrived, stop the coroutine
+            if (map_panel.anchoredPosition.x == newPosition.x && map_panel.anchoredPosition.y == newPosition.y)
+            {
+                yield break;
+            }
+
+            // Otherwise, continue next frame
+            yield return null;
+        }
     }
+
+    public void DoubleClickLevel()
+    {
+        StopAllCoroutines();
+        StartCoroutine(MoveMapCanvasDoubleClick());
+    }
+
+    IEnumerator MoveMapCanvasDoubleClick()
+    {
+        float timeSinceStarted = 0f;
+        Vector3 newPosition = new Vector2((-zoom_position.x + 348.0f), (-zoom_position.y - 237.0f));
+        while (true)
+        {
+            timeSinceStarted += Time.deltaTime;
+
+            if(timeSinceStarted <= 1.0f)
+            {
+                map_panel.anchoredPosition = Vector3.Lerp(map_panel.anchoredPosition, newPosition, timeSinceStarted);
+            }
+
+            if (micro_camera.orthographicSize > 100.0f)
+            {
+                micro_camera.orthographicSize = micro_camera.orthographicSize - 100.0f;
+            }
+            
+
+            // If the object has arrived, stop the coroutine
+            if (timeSinceStarted > 1.0f && micro_camera.orthographicSize == 100.0f)
+            {
+                yield break;
+            }
+
+            // Otherwise, continue next frame
+            yield return null;
+        }
+    }
+
+    public void OnClickProtein()
+    {
+        StopAllCoroutines();
+        StartCoroutine(MoveMapCanvas());
+        micro_camera.orthographicSize = micro_camera.orthographicSize - 1000.0f;
+    }
+
 }
