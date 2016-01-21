@@ -58,7 +58,8 @@ public class LevelMapController : MonoBehaviour
                 level_index++;
             }
         }*/
-        StartCoroutine(CreateLevelsCoru());
+        //StartCoroutine(CreateLevelsCoru());
+        StartCoroutine(CreateLevelsCoruTest());
 
     }
 
@@ -104,6 +105,34 @@ public class LevelMapController : MonoBehaviour
                 thumb_sprite = Sprite.Create(DataConnection.texture, thumb_rect_SD, thumb_pivot);
                 LevelPrefabReference.GetComponent<LevelStructure>().thumb_32 = thumb_sprite;
                 LevelPrefabReference.GetComponentInChildren<Image>().sprite = thumb_sprite;
+
+                level_index++;
+            }
+        }
+    }
+
+    IEnumerator CreateLevelsCoruTest()
+    {
+        string nombre;
+        foreach (Transform level in transform)
+        {
+            nombre = dataController.level_index[level_index];
+            if (nombre != "")
+            {
+                level.GetComponentInChildren<Text>().text = nombre;
+                level.GetComponent<LevelStructure>().level_name = nombre;
+                level.GetComponent<LevelStructure>().level_id = level_index;
+                //image 
+                url_image = "http://quiley.com/BB/BB32/" + nombre + ".png";
+                //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + ".8.png";
+                do
+                {//wait for the server to get the image
+                    DataConnection = new WWW(url_image);
+                    yield return DataConnection;
+                } while (!string.IsNullOrEmpty(DataConnection.error));
+                thumb_sprite = Sprite.Create(DataConnection.texture, thumb_rect_SD, thumb_pivot);
+                level.GetComponent<LevelStructure>().thumb_32 = thumb_sprite;
+                level.GetComponent<Image>().sprite = thumb_sprite;
 
                 level_index++;
             }
