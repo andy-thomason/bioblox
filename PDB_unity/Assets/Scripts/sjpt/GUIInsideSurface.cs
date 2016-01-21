@@ -202,8 +202,10 @@ namespace CSG {
 
             if (testop("intersect")) {
                 Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
-                csg = meta(molA, radInfluence, radMult).Colour(7) 
+                csg = meta(molA, radInfluence, radMult)
                     * spheres(molB, 2.5f).At(molB.pos - molA.pos).Noshow().Colour(1);
+                showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goMol[Mols.molAfiltback]);
+                return true;
             }
 
             if (testop("spheres")) {

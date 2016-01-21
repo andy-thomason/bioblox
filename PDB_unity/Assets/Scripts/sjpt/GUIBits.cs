@@ -271,9 +271,12 @@ private static float progressInterval;
 
                 //var meshes = parallelMeshes;
 
-                GameObject test1 = goFront;
-                DeleteChildren(test1);
-                CSGStats stats = BasicMeshData.ToGame(test1, parallelMeshes, toshow);
+                DeleteChildren(goFront);
+                CSGStats stats = BasicMeshData.ToGame(goFront, parallelMeshes, toshow);
+                if (goBack != null) {
+                    DeleteChildren(goBack);
+                    BasicMeshData.ToGame(goBack, parallelMeshes, toshow, back: true);
+                }
 
                 Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelMeshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
                     CSGNode.GiveUpCount, stats);

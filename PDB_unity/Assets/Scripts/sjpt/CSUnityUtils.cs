@@ -281,7 +281,7 @@ namespace CSG {
         public int Count { get { return triangles.Count / 3; } }
         public static string defaultShaderName = "Standard";
 
-        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false, string shaderName = null) {
+        public static CSGStats ToGame(GameObject gameObject, IDictionary<string, BasicMeshData> meshes, string basename, bool makeColliders = false, string shaderName = null, bool back = false) {
             CSGStats stats = new CSGStats(); 
             foreach (var kvp in meshes) {
                 //BasicMeshData bmd = kvp.Value; // meshes[k];
@@ -294,27 +294,29 @@ namespace CSG {
                 child.transform.rotation = (gameObject.transform.rotation);
 
 
-                // prepare one material for all children
-                int cnum = 7;
-                System.Int32.TryParse(kvp.Key.Split('_')[0], out cnum);
-                cnum = cnum % 10;
-                Color col = CSGXX.colors[cnum];
-                Material mat;
-                MeshRenderer pdbr;
-                if (cnum == 999) {
-                    GameObject pdb = GameObject.Find("ProtoMaterial");
-                    pdbr = pdb.GetComponent<MeshRenderer>();
-                    mat = pdbr.material;
-                } else {
-                    if (shaderName == null) shaderName = defaultShaderName;
-                    Shader shader = Shader.Find(shaderName);    // Set chosen shader
-                    mat = new Material(shader);
-                    pdbr = child.AddComponent<MeshRenderer>();
-                    pdbr.material = mat;
+                Material mat = gameObject.material();
+                if (kvp.Key != "notexture" || mat == null) {
+                    // prepare one material for all children
+                    int cnum = 7;
+                    System.Int32.TryParse(kvp.Key.Split('_')[0], out cnum);
+                    cnum = cnum % 10;
+                    Color col = CSGXX.colors[cnum];
+                    MeshRenderer pdbr;
+                    if (cnum == 999) {
+                        GameObject pdb = GameObject.Find("ProtoMaterial");
+                        pdbr = pdb.GetComponent<MeshRenderer>();
+                        mat = pdbr.material;
+                    } else {
+                        if (shaderName == null) shaderName = defaultShaderName;
+                        Shader shader = Shader.Find(shaderName);    // Set chosen shader
+                        mat = new Material(shader);
+                        pdbr = child.AddComponent<MeshRenderer>();
+                        pdbr.material = mat;
+                    }
+                    mat.SetColor("_Color", col);
                 }
-                mat.SetColor("_Color", col);
 
-				stats += kvp.Value.ToGame(child, name, mat, makeColliders);
+				stats += kvp.Value.ToGame(child, name, mat, makeColliders, back: back);
 
                 //child.AddComponent<MeshRenderer> ().material = mat;
 
@@ -329,7 +331,7 @@ namespace CSG {
         /// <param name="meshes"></param>
         /// <param name="mat"></param>
         /// <param name="makeColliders"></param>
-        public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat = null, bool makeColliders = false) {
+        public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat = null, bool makeColliders = false, bool back = false) {
             GUIBits.DeleteChildren(gameObject);
             //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
             mat = mat ?? gameObject.material();
@@ -338,21 +340,21 @@ namespace CSG {
                 mat = new Material(shader);
             }
             for (int i = 0; i < meshes.Length; i++) {
-                ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat);
+                ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat, back: back);
             }
         }
 
 
-        CSGStats ToGame(GameObject parent, string basename, Material mat, bool makeColliders = false) {
+        CSGStats ToGame(GameObject parent, string basename, Material mat, bool makeColliders = false, bool back = false) {
             CSGStats stats = new CSGStats();
             int nextId = 0;
             foreach (var mesh in GetAllMeshes()) {
-                stats += ToGame(parent, mesh.ToMesh(), basename + "_" + nextId++, mat, makeColliders);
+                stats += ToGame(parent, mesh.ToMesh(), basename + "_" + nextId++, mat, makeColliders, back: back);
             }
             return stats;
         }
 
-        public static CSGStats ToGame(GameObject parent, Mesh mesh, string name, Material mat, bool makeColliders = false) {
+        public static CSGStats ToGame(GameObject parent, Mesh mesh, string name, Material mat, bool makeColliders = false, bool back = false ) {
             CSGStats stats = new CSGStats();
             try {
                 GameObject cchild = new GameObject(name);
@@ -364,6 +366,7 @@ namespace CSG {
                 cchild.layer = parent.layer;
 
                 cchild.AddComponent<MeshRenderer>().material = mat;
+                if (back) mesh = mesh.ToBack();
 
                 //Mesh mesh = bmd.GetMesh();
                 //http://answers.unity3d.com/questions/380284/attaching-an-model-via-script.html
@@ -610,6 +613,11 @@ namespace CSG {
             MeshRenderer mt = go.GetComponent<MeshRenderer>();
             if (mt == null) return null;
             return mt.material;
+        }
+
+        public static Mesh ToBack(this Mesh mesh) {
+            BigMesh bm = new BigMesh(mesh);
+            return bm.ToMeshBack();
         }
 
     }
