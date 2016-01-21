@@ -151,12 +151,25 @@ def download_entries():
   for line in rfile:
     names.append(line[:-1])
   print(names)
+  for name in names:
+    name = name.decode()
+    local_name = 'pdb/%s.pdb' % name
+    try:
+      os.stat(local_name)
+    except:
+      print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % name))
+      req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % name)
+      with urllib.request.urlopen(req) as req:
+        print(req)
+        pdb_file = req.read()
+        with open(local_name, 'wb') as file:
+          file.write(pdb_file)
 
-def get_mols(pdb):
-  print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % pdb))
-  req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % pdb)
-  with urllib.request.urlopen(req) as req:
-    pdb_file = req.read()
+def get_mols(name):
+  local_name = 'pdb/%s.pdb' % name
+  print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % name))
+  with open(local_name, 'rb') as file:
+    pdb_file = file.read()
     mols = parse_pdb(io.BytesIO(pdb_file))
   return mols
 
@@ -182,12 +195,11 @@ data_re = re.compile('^/data/(\\w+)\..*$')
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
   def do_GET(self):
-    print(self.path)
+    print("GET %s" % self.path)
     
     match_thumbnail = thumbnails_png_re.match(self.path)
     match_mesh = mesh_re.match(self.path)
     match_data = data_re.match(self.path)
-    print(match_thumbnail, match_mesh)
     if self.path == '/':
       self.send_response(200)
       self.send_header(b"Content-type", "text/html")
@@ -199,7 +211,8 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       self.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
       self.wfile.write(b"<p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>\n")
       self.wfile.write(b"<p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.0.1.bin'>/mesh/2ptc.0.1.bin</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</p>\n")
+      self.wfile.write(b"<p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</p>\n")
       self.wfile.write(b"</body></html>\n")
     elif match_thumbnail or match_mesh or match_data:
       make_new = True
@@ -210,6 +223,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             return
           make_new = False
         except:
+          print("failed to find cached %s" % self.path[1:]);
           pass
       
       if make_new:
@@ -254,6 +268,10 @@ def main(argv):
   except:
     pass
   try:
+    os.mkdir('pdb')
+  except:
+    pass
+  try:
     os.mkdir('thumbnails')
   except:
     pass
@@ -266,7 +284,7 @@ def main(argv):
   
   host = os.getenv('IP', '0.0.0.0')
   port = int(os.getenv('PORT', '443'))
-  print(host, port)
+  print("serving on %s:%d" % (host, port))
   httpd = http.server.HTTPServer((host, port), MyHandler)
   #httpd.socket = ssl.wrap_socket(httpd.socket)
   print("serving")
