@@ -149,7 +149,7 @@ private:
     PyArg_ParseTuple(args, "s*s*s*i", &pos_buf, &radii_buf, &chain_buf, &resolution);
 
     molecule_builder mb(pos_buf.len/12, (const vector3*)pos_buf.buf, (const float*)radii_buf.buf, (const char*)chain_buf.buf, resolution / 100.0f);
-    
+
     return PyBytes_FromStringAndSize((const char*)mb.image().data(), mb.image().size()*4);
   }
 };

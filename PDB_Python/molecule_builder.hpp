@@ -181,9 +181,9 @@ public:
               // a little like exp(-v)
               float val = (2 * v - 3) * v * v + 1;
               values[idx] += val;
-              normals[idx].x += fdx;
-              normals[idx].y += fdy;
-              normals[idx].z += fdz;
+              //normals[idx].x += fdx;
+              //normals[idx].y += fdy;
+              //normals[idx].z += fdz;
               //if (wcol) colours[idx] = colour::lerp(colours[idx], colour, val*2);
             }
             idx++;
@@ -223,6 +223,6 @@ public:
 private:
   std::vector<int> image_;
   std::vector<float> values;
-  std::vector<vector3> normals;
-  std::vector<colour> colours;
+  //std::vector<vector3> normals;
+  //std::vector<colour> colours;
 };
