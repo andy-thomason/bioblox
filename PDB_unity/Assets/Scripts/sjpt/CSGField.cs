@@ -384,7 +384,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         }
 
         public override float Dist(float x, float y, float z) {
-            int inlev = CSGControl.MinLev + 1; // todo mlevspheres[vol.lev];
+            int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
             float field = 0;
@@ -425,8 +425,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz, out Vector3 grad) {
             dxx = dxy = dxz = dyy = dyz = dzz = 0;
             grad = new Vector3();
-            int subdivideLevel = CSGControl.MaxLev; //??
-            int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
+            int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
             for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
@@ -449,7 +448,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
 
 		// grad for metaballs without other overheads.  not generally used, but ...
         public Vector3 grad(Vector3 p) {
-            int inlev = CSGControl.MinLev + 1;
+            int inlev = simplev;
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
             if (inn == 1) return inspheres[0].grad(p);
@@ -462,8 +461,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         }
 
         public override void normalColor(Vector3 p, out Vector3 normal, out Color col) {
-            int subdivideLevel = CSGControl.MinLev; //??
-            int inlev = subdivideLevel + 1; // todo mlevspheres[vol.lev];
+            int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
 
@@ -549,10 +547,10 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             throw new NotImplementedException();
         }
 
-
+        int simplev;  // used to record the 'current' depth for which spheres is valid
         public override CSGNode Simplify(Volume vol, int simpguid, ref int nUnodes) {
             int inlev = vol.lev;
-            int outlev = inlev + 1;
+            int outlev = simplev = inlev + 1;
             MSPHERE[] inspheres = spheres[inlev];
             MSPHERE[] outspheres = spheres[outlev];
             int inn = levspheres[inlev];

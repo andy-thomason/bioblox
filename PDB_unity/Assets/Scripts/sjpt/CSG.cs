@@ -294,12 +294,12 @@ namespace CSG {
         /// <param name="csg"></param>
         /// <param name="vol"></param>
         /// <returns></returns>
-        public static void CSGToCSGOutput(this CSGNode csg, Volume vol, ICSGOutput output) {
+        public static void CSGToCSGOutput(this CSGNode csg, Volume vol, ICSGOutput output, int minLev, int maxLev) {
             CSGNode.GiveUpCount = 0;
             CSGNode.MaxnodesForDraw = 0;
 
             Subdivide.SetVals();  // set the level control each cycle, so we can tinker with the levels
-            Subdivide sd = new Subdivide(output);
+            Subdivide sd = new Subdivide(output, minLev, maxLev);
 
             //ClearCache();
             CSGNode csgnp = csg;
@@ -313,8 +313,8 @@ namespace CSG {
             sd.SD(vol, ncsg, 0);
         }
 
-        public static void CSGToCSGOutput(this CSGNode csg, BoundingBox bb, ICSGOutput output) {
-            csg.CSGToCSGOutput(new Volume(bb), output);
+        public static void CSGToCSGOutput(this CSGNode csg, BoundingBox bb, ICSGOutput output, int minLev, int maxLev) {
+            csg.CSGToCSGOutput(new Volume(bb), output, minLev, maxLev);
         }
 
         public static T TProvenance<T>(this T applyTo, object prov) where T : IHasProvenance {
@@ -3117,9 +3117,12 @@ namespace CSG {
     /// </summary>
     class Subdivide {
         public static float done;
-        public Subdivide(ICSGOutput output) {
+        private int minLev, maxLev;
+        public Subdivide(ICSGOutput output, int minLev, int maxLev) {
             done = 0;
             csgoutput = output;
+            this.minLev = minLev;
+            this.maxLev = maxLev;
         }
 
         //if (CSGControl.stats) { # if STATS
@@ -3152,7 +3155,7 @@ namespace CSG {
             if (node.bk.noshow)
                 return;
             try {
-                if (CSGControl.MaxLev == 0) {
+                if (maxLev == 0) {
                     CSGNode n2;
                     //int unodes = 0;
                     //n2 = node.Bake().Simplify(vol, -999, ref unodes);
@@ -3224,7 +3227,7 @@ namespace CSG {
                 done += pows[lev];  //not reliable for quickUnion
                 return;
             }
-            if (lev >= CSGControl.MinLev && (nUnodes <= DoDraw[lev] || lev >= CSGControl.MaxLev)) {  // TODO: TOCHECK was snode.nodes <=
+            if (lev >= minLev && (nUnodes <= DoDraw[lev] || lev >= maxLev)) {  // TODO: TOCHECK was snode.nodes <=
                 //volList.Add(vol);
                 if (CSGControl.UseBreak) {
                     string sss = snode.ToStringF("\n");  // <<< key draw point
@@ -3457,9 +3460,9 @@ namespace CSG {
 
         public int Count { get { return n; } }
 
-        public static void CSGToDummy(CSGNode csg, Volume vol) {
+        public static void CSGToDummy(CSGNode csg, Volume vol, int minLev, int maxLev) {
             NOCSGOut nolist = new NOCSGOut();
-            S.CSGToCSGOutput(csg, vol, nolist);
+            S.CSGToCSGOutput(csg, vol, nolist, minLev, maxLev);
         }
 
     }
@@ -3514,9 +3517,9 @@ namespace CSG {
         /// <param name="csg"></param>
         /// <param name="vol"></param>
         /// <returns></returns>
-        public static XList CSGToXList(CSGNode csg, Volume vol) {
+        public static XList CSGToXList(CSGNode csg, Volume vol, int minLev, int maxLev) {
             XList xlist = new XList();
-            S.CSGToCSGOutput(csg, vol, xlist);
+            S.CSGToCSGOutput(csg, vol, xlist, minLev, maxLev);
             // Console.WriteLine("XList count = {0}, frompool={1}, fromnew={2}", xlist.Count, Poly.frompool, Poly.fromnew); // debug pooling
             return xlist;
         }

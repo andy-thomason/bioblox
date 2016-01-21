@@ -21,9 +21,9 @@ namespace CSG {  // [ExecuteInEditMode]
                                                                     // a sphere of radius r has influence up to distance r*radInfluence
         [Range(0.5f, 2)]
         public float radMult = 1f;  // controls the radius multiplier of the metaballs,
-                                           // a sphere of radius r has influence up to distance r*radInfluence
+                                    // a sphere of radius r has influence up to distance r*radInfluence
 
-
+        public static GUIBits maingui;
         public bool keepUpright = false;
         public bool parallel = true;
         public bool showCSGStats = false;
@@ -71,6 +71,7 @@ namespace CSG {  // [ExecuteInEditMode]
         Vector3 lastmouse = new Vector3(0, 0, 0);
 
         public GUIBits() {
+            maingui = this;
             //home(Camera.main.transform);
         }
 
@@ -89,7 +90,6 @@ namespace CSG {  // [ExecuteInEditMode]
         public static Dictionary<string, string> ktexts = new Dictionary<string, string>();
 
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
-        // protected Bounds bounds;
 
         protected bool opdone = false;
         protected bool testop(string s) {
@@ -150,7 +150,6 @@ namespace CSG {  // [ExecuteInEditMode]
                 interrupt();
             }
 
-            // bounds = new Bounds();
             t0 = Time.realtimeSinceStartup;
 
             return false;
@@ -159,111 +158,157 @@ namespace CSG {  // [ExecuteInEditMode]
         protected float t0;
         private float t1 = 0;
 
-        private IDictionary<string, BasicMeshData> parallelMeshes;
-        private string parallelPending = null;
-        private Thread parallelThread = null;
-        private float progressInterval;
-        private float lastProgressTime = 0;
+        private List<ParallelCSG> parallels = new List<ParallelCSG>();
+        void showProgress() { foreach (var p in parallels) p.showProgress(); }
+        void interrupt() { foreach (var p in parallels) p.interrupt(); }
 
-        private void interrupt() {
-            if (parallelThread != null) {
-                CSGControl.Interrupt = true;
-                Log("Interrupt requested by user");
-                float t2 = Time.realtimeSinceStartup;
-                parallelThread.Abort();
-                Log("INTERRUPTED: {0} interrupted at done={1}% time={2} est total time={3}", parallelPending, Subdivide.done * 100, (t2 - t1), (t2 - t1) / Subdivide.done);
-                parallelPending = null;
-                parallelThread = null;
-                if (CSGNode.csgmode != CSGMode.collecting) {
-                    Log("csgmode forced after interrupt from " + CSGNode.csgmode);
-                    CSGNode.csgmode = CSGMode.collecting;
+        void finishParallel() { 
+            List<ParallelCSG> remove = new List<ParallelCSG>();
+            foreach (var p in parallels) {
+                if (p.testFinishParallel())
+                    remove.Add(p);
+            }
+            foreach (var p in remove)
+                parallels.Remove(p);
+        }
+
+private static float progressInterval;
+
+
+        class ParallelCSG {
+            private IDictionary<string, BasicMeshData> parallelMeshes;
+            private Thread parallelThread = null;
+            private float lastProgressTime = 0;
+            private float t1 = Time.realtimeSinceStartup;
+            private readonly GameObject goFront, goBack;
+            private string toshow;
+            private int minLev, maxLev;
+
+            internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev) {
+                goFront = front;
+                goBack = back;
+                this.toshow = toshow;
+                this.minLev = minLev;
+                this.maxLev = maxLev;
+
+                if (parallel) {
+                    Log("running in parallel:  " + toshow);
+                    parallelThread = new Thread(() => {
+                        try {
+                            parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        } catch (Exception e) {
+                            Log("parallel thread failed: " + e);
+                            Log(e.StackTrace);
+                        }
+                    });
+                    parallelThread.Name = "CSGWorker_" + toshow;
+                    parallelThread.Start();
+                } else {
+                    parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds, minLev, maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    finish();
                 }
-            } else {
-                // Log("interrupt: no parallel thread to kill");
             }
-        } // interrupt
 
-        protected void showProgress() {
-            if (parallelThread == null) return;
-            try {
-                GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
-                BasicMeshData.showProgress(test1, parallelPending);
-            } catch (Exception e) {
-                Log("Error showing progress:" + e);
+            internal void interrupt() {
+                if (parallelThread != null) {
+                    CSGControl.Interrupt = true;
+                    Log("Interrupt requested by user");
+                    float t2 = Time.realtimeSinceStartup;
+                    parallelThread.Abort();
+                    Log("INTERRUPTED: {0} interrupted at done={1}% time={2} est total time={3}", toshow, Subdivide.done * 100, (t2 - t1), (t2 - t1) / Subdivide.done);
+                    toshow = null;
+                    parallelThread = null;
+                    if (CSGNode.csgmode != CSGMode.collecting) {
+                        Log("csgmode forced after interrupt from " + CSGNode.csgmode);
+                        CSGNode.csgmode = CSGMode.collecting;
+                    }
+                } else {
+                    // Log("interrupt: no parallel thread to kill");
+                }
+            } // interrupt
+
+            internal void showProgress() {
+
+                if (parallelThread == null) return;
+                if (!(progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)) return;
+
+                try {
+                    GameObject test1 = goFront;
+                    BasicMeshData.showProgress(test1, toshow);
+                } catch (Exception e) {
+                    Log("Error showing progress:" + e);
+                }
+                lastProgressTime = Time.realtimeSinceStartup;
+            }  // showProgress()
+
+            internal bool testFinishParallel() {
+                if (parallelThread == null) {
+                    Log("Incorrect parallelThread == null");
+                    return true;
+                }
+                float t2 = Time.realtimeSinceStartup;
+                LogK("done", "{0,3:0.0}%, time={1,5:0.00}, est remaining time={2,5:0.00}, splits={3}", Subdivide.done * 100, (t2 - t1), (t2 - t1) * (1 - Subdivide.done) / Subdivide.done, Poly.splits);
+
+
+                if (!parallelThread.IsAlive) {
+                    finish();
+                    return true;
+                }
+                // nb, minster model from OpenSCAD 1/2 minster vertices=30,656, triangles=61,891
+                return false;
+            }  // testFinishParallel
+
+            private void finish() {
+                //showProgress();  // ???? <<< killer ???
+                parallelThread = null;
+                float t2 = Time.realtimeSinceStartup;
+                if (parallelMeshes == null) {
+                    Log("parallel thread finished but no meshes created, time=" + (t2 - t1));
+                    toshow = null;
+                    return;
+                }
+                LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", toshow, t2 - t1, Subdivide.done * 100);
+
+                //var meshes = parallelMeshes;
+
+                GameObject test1 = goFront;
+                DeleteChildren(test1);
+                CSGStats stats = BasicMeshData.ToGame(test1, parallelMeshes, toshow);
+
+                Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelMeshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
+                    CSGNode.GiveUpCount, stats);
+                if (BasicMeshData.CheckWind)
+                    Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
+                    + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
+                    + " model=" + toshow);
+                if (maingui.showCSGStats)
+                    Log2("verttypes {0:N0} {1:N0} {2:N0}", Poly.verttype[0], Poly.verttype[1], Poly.verttype[2]);
+                if (Poly.polymixup != 0)
+                    Log2("poly mix up {0:N0}", Poly.polymixup);
+                Poly.polymixup = 0;
+                parallelMeshes = null;
+                toshow = null;
+
             }
-            lastProgressTime = Time.realtimeSinceStartup;
-        }  // showProgress()
+        } // class ParallelCSG
 
-        protected bool showCSGParallel(Bounds bounds) {
+
+
+        protected bool showCSGParallel(CSGNode csg, Bounds bounds, GameObject front, GameObject back = null) {
+            Poly.verttype[0] = Poly.verttype[1] = Poly.verttype[2] = 0;
             if (toshow == "")
                 return false;
 
             t1 = Time.realtimeSinceStartup;
             Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
 
-            if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
-            if (parallel) {
-                parallelPending = toshow;
-                Log("running in parallel:  " + parallelPending);
-                parallelThread = new Thread(() => {
-                    try {
-                        parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                    } catch (Exception e) {
-                        Log("parallel thread failed: " + e);
-                        Log(e.StackTrace);
-                    }
-                });
-                parallelThread.Name = "CSGWorker";
-                parallelThread.Start();
-            } else {
-                parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            }
+            // if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
+            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev);
+            if (parallel) parallels.Add(pcsg);
             return true;
 
         }  // showCSGparallel
 
-
-        private void finishParallel() {
-            if (parallelThread != null) {
-                float t2 = Time.realtimeSinceStartup;
-                LogK("done", "{0,3:0.0}%, time={1,5:0.00}, est remaining time={2,5:0.00}, splits={3}", Subdivide.done * 100, (t2 - t1), (t2 - t1) * (1 - Subdivide.done) / Subdivide.done, Poly.splits);
-
-
-                if (!parallelThread.IsAlive) {
-                    //showProgress();  // ???? <<< killer ???
-                    if (parallelMeshes == null) {
-                        Log("parallel thread finished but no meshes created, time=" + (t2 - t1));
-                        parallelPending = null;
-                        parallelThread = null;
-                        return;
-                    }
-                    LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", parallelPending, t2 - t1, Subdivide.done * 100);
-                    parallelThread = null;
-
-                    //var meshes = parallelMeshes;
-
-                    GameObject test1 = CSGControl.UseBreak ? goFiltered : goTest;
-                    DeleteChildren(test1);
-                    CSGStats stats = BasicMeshData.ToGame(test1, parallelMeshes, parallelPending);
-
-                    Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelMeshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
-                        CSGNode.GiveUpCount, stats);
-                    if (BasicMeshData.CheckWind)
-                        Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
-                        + BasicMeshData.VeryWrongWind + " right winding=" + BasicMeshData.RightWind
-                        + " model=" + toshow);
-                    if (showCSGStats)
-                        Log2("verttypes {0:N0} {1:N0} {2:N0}", Poly.verttype[0], Poly.verttype[1], Poly.verttype[2]);
-                    if (Poly.polymixup != 0)
-                        Log2("poly mix up {0:N0}", Poly.polymixup);
-                    Poly.polymixup = 0;
-                    parallelMeshes = null;
-                    parallelPending = null;
-                }
-
-                // nb, minster model from OpenSCAD 1/2 minster vertices=30,656, triangles=61,891
-            }
-        }  // finishParallel
 
         public static void Log(string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
@@ -334,8 +379,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 lock (ktexts) ktexts.Clear();
                 showing = false;
             }
-            if (progressInterval != 0 && Time.realtimeSinceStartup > lastProgressTime + progressInterval)
-                showProgress();
+            showProgress();
 
 
             int mousebuts = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);

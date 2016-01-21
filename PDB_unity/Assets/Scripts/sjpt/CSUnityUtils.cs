@@ -75,8 +75,8 @@ namespace CSG {
         ***/
 
         // generate meshes with usual limit
-        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds) {
-            return MeshesFromCsg(csg, bounds, 64000);
+        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds, int minLev, int maxLev) {
+            return MeshesFromCsg(csg, bounds, 64000, minLev, maxLev);
         }
 
         // mechanism for peeking at work in progress, should be less static based
@@ -86,10 +86,10 @@ namespace CSG {
         }
 
         // generate meshes with specified limit
-        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds, int limit) {
+        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds, int limit, int minLev, int maxLev) {
             UnityCSGOutput output = new UnityCSGOutput(limit);
             parallelOutput = output;
-            csg.CSGToCSGOutput(bounds, output);
+            csg.CSGToCSGOutput(bounds, output, minLev, maxLev);
             return output.meshData; // .Meshes;
         }
     }
@@ -322,9 +322,17 @@ namespace CSG {
             return stats;
         }
 
+        /// <summary>
+        /// show the
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="meshes"></param>
+        /// <param name="mat"></param>
+        /// <param name="makeColliders"></param>
         public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat = null, bool makeColliders = false) {
             GUIBits.DeleteChildren(gameObject);
             //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
+            mat = mat ?? gameObject.material();
             if (mat == null) {
                 Shader shader = Shader.Find(BasicMeshData.defaultShaderName);    // Set chosen shader
                 mat = new Material(shader);
@@ -593,8 +601,17 @@ namespace CSG {
             Color.red,
             Color.magenta,
             Color.yellow,
-            Color.white
+            Color.white,
+            new Color(0.5f, 0.25f, 0.25f),
+            new Color(0.25f, 0.5f, 0.25f)
         };
+
+        public static Material material(this GameObject go) {
+            MeshRenderer mt = go.GetComponent<MeshRenderer>();
+            if (mt == null) return null;
+            return mt.material;
+        }
+
     }
 
     public class CSGStats {

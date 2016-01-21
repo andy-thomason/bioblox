@@ -32,7 +32,7 @@ namespace CSG {
         GameObject goMolA, goMolB;
         GameObject[] goMol;
         MeshFilter[] mfMol;
-        MeshRenderer[] mrMol;
+        // MeshRenderer[] mrMol;
         protected PDB_molecule molA, molB;
         protected Vector3 filterpointA = new Vector3(float.NaN, float.NaN, float.NaN);
         protected Vector3 filterpointB = new Vector3(float.NaN, float.NaN, float.NaN);
@@ -52,10 +52,21 @@ namespace CSG {
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
             if (base.Show(ptoshow)) return true;
+            CSGFMETA.computeCurvature = computeCurvature;
+            int smin = CSGControl.MinLev, smax = CSGControl.MaxLev;
+            CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
+            bool r = true;
+            try {
+                r = IShow(ptoshow);
+            } finally {
+                CSGControl.MinLev = smin; CSGControl.MaxLev = smax;
+            }
+            return r;
+        }
 
+        private bool IShow(string ptoshow) {
             if (molA == null) init();  // for some reason, does not get called from GUIInsideSurface() in build version
 
-            CSGFMETA.computeCurvature = computeCurvature;
 
 
             text = "";
@@ -91,15 +102,18 @@ namespace CSG {
                 return true;
             }
 
+          //  if (testop("FindStacks")) {
+          //      Dictionary<int, string[]> p = Probe.Probe.FindStacks();
+          //      Log("Findtacks #' {0}", p.Count);
+          //  }
+
             if (testop("BioBloxMesh")) {
-                CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
                 useBioBloxMesh(molA);
                 return true;
             }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
-                CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
@@ -116,7 +130,7 @@ namespace CSG {
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
                     //Probe.Probe.StartProbe("MeshesFromCsg");  // freezes in both edit game mode and built run mode
-                    var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999);
+                    var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999, detailLevel, detailLevel);
                     //Probe.Probe.StopProbe();
 
                     BigMesh tsavemesh = null;
@@ -149,12 +163,12 @@ namespace CSG {
                     // Sensible double-sided shader impeded by Unity bug submitted 8 Jan 2016
                     //    (Case 760127) Incorrect shader generation: normal not passed into surf(), black results
                     if (!useb) {
-                        BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes(), mrMol[Mols.molA].material);
-                        BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack(), mrMol[Mols.molAback].material);
+                        BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes());
+                        BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack());
                         savemeshA = tsavemesh;
                     } else {
-                        BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes(), mrMol[Mols.molB].material);
-                        BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack(), mrMol[Mols.molBback].material);
+                        BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes());
+                        BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack());
                         savemeshB = tsavemesh;
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
@@ -194,13 +208,20 @@ namespace CSG {
 
             if (testop("spheres")) {
                 BasicMeshData.defaultShaderName = "Standard";
-                csg = spheres(molA, 2.5f);
+                csg = spheres(molA, radMult);
+            }
+
+            if (testop("triangles")) {
+                //BasicMeshData.defaultShaderName = "Standard";
+                BigMesh bm = triangles(molA, radInfluence / 4, radMult);
+                BasicMeshData.ToGame(goTest, bm.ToMeshes());
+                return true;
             }
 
             if (testop("unmatched")) { savemeshA.unmatched(); return true; }
             // if (testop("resetPolyEdges")) { CSGPrim.resetPolyEdges(); return true; }
 
-            if (opdone) showCSGParallel(bounds);
+            if (opdone) showCSGParallel(csg, bounds, goTest);
             return opdone;
 
         }  // Show()
@@ -225,19 +246,63 @@ namespace CSG {
             return csgm;
         }
 
+        /// <summary>
+        /// compute triangles for the molecule based on ALL triples close enough to be possible 'surface triples' for SAS
+        /// temporary inefficient algorithm, finds all inside triples as well
+        /// </summary>
+        /// <param name="mol"></param>
+        /// <param name="probeRad"></param>
+        /// <param name="pradMult"></param>
+        /// <returns></returns>
+        BigMesh triangles(PDB_molecule mol, float probeRad, float pradMult) {
+            float probeDi = 2 * probeRad;
+            Vector3[] v = mol.atom_centres;
+            float[] r = mol.atom_radii;
+
+            List<Vector3> vertices = new List<Vector3>();
+            List<Vector3> normals = new List<Vector3>();
+            List<Color> colours = new List<Color>();
+            List<Vector2> uvs = new List<Vector2>();
+            List<int> indices = new List<int>();
+            int V = 0;  // # vertices
+            Color W = Color.white;
+            for (int i = 0; i < v.Length; i++) {
+                float ri = r[i] * pradMult;
+                for (int j = 0; j < v.Length; j++) {
+                    float rj = r[j] * pradMult;
+                    if (v[i].Distance(v[j]) > ri + rj + probeDi) continue;
+                    for (int k = 0; k < v.Length; k++) {
+                        float rk = r[k] * pradMult;
+                        if (v[i].Distance(v[k]) > ri + rk + probeDi) continue;
+                        if (v[j].Distance(v[k]) > rj + rk + probeDi) continue;
+                        Vector3 n = (v[i] - v[j]).cross(v[i] - v[k]).Normal();
+
+                        // insert two triangles
+                        vertices.Add(v[i]); colours.Add(W); normals.Add(n); uvs.Add(new Vector2(j, k)); indices.Add(V++);
+                        vertices.Add(v[j]); colours.Add(W); normals.Add(n); uvs.Add(new Vector2(k, i)); indices.Add(V++);
+                        vertices.Add(v[k]); colours.Add(W); normals.Add(n); uvs.Add(new Vector2(i, j)); indices.Add(V++);
+
+                        vertices.Add(v[i]); colours.Add(W); normals.Add(-n); uvs.Add(new Vector2(k, j)); indices.Add(V++);
+                        vertices.Add(v[k]); colours.Add(W); normals.Add(-n); uvs.Add(new Vector2(j, i)); indices.Add(V++);
+                        vertices.Add(v[j]); colours.Add(W); normals.Add(-n); uvs.Add(new Vector2(i, k)); indices.Add(V++);
+
+                    }
+                }
+            }
+            LogK("triangles", "{0} t={1}", V / 3, Time.realtimeSinceStartup - t0);
+            return new BigMesh(vertices.ToArray(), normals.ToArray(), uvs.ToArray(), colours.ToArray(), indices.ToArray());
+        }
+
         CSGNode spheres(PDB_molecule mol, float radMult = 1) {
             CSGNode csgm = S.NONE;
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm += new Sphere(v[i], r[i] * radMult).Colour(i % 8);
+                csgm += new Sphere(v[i], r[i] * radMult).Colour(i);
             }
             csgm = ((Union)csgm).balance();
             return csgm;
         }
-
-
-
 
         void filter() {
             filterA();
@@ -254,8 +319,8 @@ namespace CSG {
             //Log("mesh filter time=" + (tf1 - tf0));
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molAfilt], BigMesh.ToMeshes(), mrMol[Mols.molA].material);
-            BasicMeshData.ToGame(goMol[Mols.molAfiltback], BigMesh.ToMeshesBack(), mrMol[Mols.molAback].material);
+            BasicMeshData.ToGame(goMol[Mols.molAfilt], BigMesh.ToMeshes()); 
+            BasicMeshData.ToGame(goMol[Mols.molAfiltback], BigMesh.ToMeshesBack());
         }
 
         void filterB() {
@@ -265,8 +330,8 @@ namespace CSG {
             BigMesh BigMesh = savemeshB.Filter(filterpointB);
 
             // double-sided filtered surface (again, silly way to do double-sided)
-            BasicMeshData.ToGame(goMol[Mols.molBfilt], BigMesh.ToMeshes(), mrMol[Mols.molB].material);
-            BasicMeshData.ToGame(goMol[Mols.molBfiltback], BigMesh.ToMeshesBack(), mrMol[Mols.molBback].material);
+            BasicMeshData.ToGame(goMol[Mols.molBfilt], BigMesh.ToMeshes());
+            BasicMeshData.ToGame(goMol[Mols.molBfiltback], BigMesh.ToMeshesBack());
 
         }
 
@@ -422,7 +487,7 @@ namespace CSG {
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
                 filter();
-            if (MSlider("Detail Level", ref detailLevel, 0, 8)) { } //  Show("pdb prep");
+            if (MSlider("Detail Level", ref detailLevel, 0, 10)) { } //  Show("pdb prep");
             if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
                 CurveMap();
             ////MSlider("gradCompPow", ref CSGPrim.gradCompPow, -10, 10);
@@ -454,7 +519,7 @@ namespace CSG {
 
         private void CurveMap() {
             for (int i = 0; i < N; i++) {
-                mrMol[i].material.SetFloat("_Range", CurveMapRange);
+                goMol[i].material().SetFloat("_Range", CurveMapRange);
             }
         }
 
@@ -466,7 +531,7 @@ namespace CSG {
             Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
             goMol = new GameObject[N];
             mfMol = new MeshFilter[N];
-            mrMol = new MeshRenderer[N];
+            // mrMol = new MeshRenderer[N];
 
             goMolA = GameObject.Find("MolAH");
             if (goMolA == null) goMolA = new GameObject("MolAH");
@@ -481,7 +546,7 @@ namespace CSG {
                     goMol[i].transform.parent = Mols.name[i].Contains("molA") ? goMolA.transform : goMolB.transform;
                     goMol[i].layer = i + 8;
                     mfMol[i] = goMol[i].AddComponent<MeshFilter>();
-                    mrMol[i] = goMol[i].AddComponent<MeshRenderer>();
+                    MeshRenderer mrMol = goMol[i].AddComponent<MeshRenderer>();
                     Material mat = new Material(shader);
                     mat.color = Mols.colors[i];
                     mat.SetColor("_Albedo", Mols.colors[i]);
@@ -494,10 +559,10 @@ namespace CSG {
                     mat.SetFloat("_LowB", -1000);
                     mat.SetFloat("_HighB", 1000);
                     mat.SetFloat("_Brightness", 2.5f);
-                    mrMol[i].material = mat;
+                    mrMol.material = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();
-                    mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
+                    // mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
                 }
             }
         }
