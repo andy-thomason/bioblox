@@ -109,7 +109,7 @@
 
 class molecule_builder {
 public:
-  molecule_builder(size_t num_atoms, const vector3 *pos, const float *radii, const char *chain, float resolution) {
+  molecule_builder(size_t num_atoms, const vector3 *pos, const float *radii, const colour *atom_colours, float resolution) {
     printf("molecule_builder(%d, %f)\n", (int)num_atoms, resolution);
 
     // Create a 3D array for each molecule
@@ -136,7 +136,6 @@ public:
     int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
     values.resize(xdim*ydim*zdim);
-    normals.resize(xdim*ydim*zdim);
     colours.resize(xdim*ydim*zdim);
     
     float threshold = 0.5f;
@@ -148,7 +147,7 @@ public:
     for (size_t ac = 0; ac != num_atoms; ++ac) {
       vector3 c = pos[ac];
       float r = radii[ac] * (0.8f * rgs);
-      //colour col = colours[ac];
+      colour atom_colour = atom_colours[ac];
       float cx = c.x * rgs;
       float cy = c.y * rgs;
       float cz = c.z * rgs;
@@ -165,7 +164,7 @@ public:
       int zmax = std::min(z1, ciz+irgs);
       float fk = std::log(threshold) / (r * r);
       float fkk = -fk * 0.5f; // 0.5 is a magic number!
-      //bool wcol = col != colour::white;
+      bool wcol = atom_colour.r != 1.0f || atom_colour.g != 1.0f || atom_colour.b != 1.0f;
 
       for (int z = zmin; z != zmax; ++z) {
         float fdz = z - cz;
@@ -181,10 +180,7 @@ public:
               // a little like exp(-v)
               float val = (2 * v - 3) * v * v + 1;
               values[idx] += val;
-              //normals[idx].x += fdx;
-              //normals[idx].y += fdy;
-              //normals[idx].z += fdz;
-              //if (wcol) colours[idx] = colour::lerp(colours[idx], colour, val*2);
+              if (wcol) colours[idx] = colour::lerp(colours[idx], atom_colour, val*2);
             }
             idx++;
           }
@@ -196,7 +192,7 @@ public:
     
     printf("(%d %d %d) (%d %d %d)\n", x0, y0, z0, xdim, ydim, zdim);
 
-    marching_cubes mc(x0, y0, z0, xdim, ydim, zdim, 1.0f / resolution, values.data(), normals.data(), colours.data());
+    marching_cubes mc(x0, y0, z0, xdim, ydim, zdim, 1.0f / resolution, values.data(), colours.data());
     
     std::cout << mc.vertices.size() << " v\n";
     std::cout << mc.indices.size() << " i\n";
@@ -224,5 +220,5 @@ private:
   std::vector<int> image_;
   std::vector<float> values;
   //std::vector<vector3> normals;
-  //std::vector<colour> colours;
+  std::vector<colour> colours;
 };

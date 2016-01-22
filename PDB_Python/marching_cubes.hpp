@@ -11,7 +11,7 @@ public:
 
 
   // Given a 3D lattice of values (mc_values) generate triangles where values transition from positive to negative.
-  marching_cubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, const float *mc_values, const vector3 *mc_normals, const colour *mc_colours) {
+  marching_cubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, const float *mc_values, const colour *mc_colours) {
     //float rgs = 1.0f / grid_spacing;
 
     // This reproduced the vertex order of Paul Bourke's (borrowed) table.
@@ -65,7 +65,7 @@ public:
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+0] = (int)vertices.size();
               vertices.push_back(vector3(float(x0 + i + lambda), float(y0 + j), float(z0 + k)) * grid_spacing);
-              normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalised());
+              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalised());
               colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+1], lambda));
             }
           }
@@ -77,7 +77,7 @@ public:
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+1] = (int)vertices.size();
               vertices.push_back(vector3(float(x0 + i), float(y0 + j + lambda), float(z0 + k)) * grid_spacing);
-              normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalised());
+              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalised());
               colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+xdim], lambda));
             }
           }
@@ -89,7 +89,7 @@ public:
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+2] = (int)vertices.size();
               vertices.push_back(vector3(x0 + i, y0 + j, z0 + k + lambda) * grid_spacing);
-              normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalised());
+              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalised());
               colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+xdim*ydim], lambda));
             }
           }
