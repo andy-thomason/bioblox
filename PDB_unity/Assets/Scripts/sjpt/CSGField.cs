@@ -140,6 +140,7 @@ namespace CSGFIELD {
         public float cx, cy, cz, r, ri;  // centre, radius and radius inverse
         public Color color = Color.white;
         public Vector3 c {  get { return new Vector3(cx, cy, cz); } }
+        public int index;
 
         public MSPHERE(float px, float py, float pz, float pr, float radInfluence) {
             cx = px;
@@ -342,6 +343,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
     public class CSGFMETA : CSGXPrim {
         public bool grayscale = false;
         public static bool computeCurvature = false;
+        public static float radShrink = 0;  // shrink the points towards the centres by this amount
 
         int MAXD = 15;          // max depth, just for allocation
         int MAXN = 2500;        // max num spheres, just for allocation
@@ -380,7 +382,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public void Add(MSPHERE ms) {
             baked = null;
             spheres[0][levspheres[0]] = ms;
-            levspheres[0]++;
+            ms.index = levspheres[0]++;
         }
 
         public override float Dist(float x, float y, float z) {
@@ -417,7 +419,8 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public override Vector3 Normal(Vector3 p) {
             Vector3 normal;
             Color color;
-            normalColor(p, out normal, out color);                   
+            Vector2 uv = Vector2.zero;
+            normalColor(ref p, out normal, out color, ref uv);                   
             return normal;
         }
         /**/
@@ -460,7 +463,26 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             return grad;
         }
 
-        public override void normalColor(Vector3 p, out Vector3 normal, out Color col) {
+        public MSPHERE nearest(Vector3 p) {
+            int inlev = simplev;
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+            if (inn == 1) return inspheres[0];
+            float bestf = float.MaxValue;
+            MSPHERE bests = null;
+            for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
+                float myfield = inspheres[ini].field(p);
+                if (myfield < bestf) {
+                    bestf = myfield;
+                    bests = inspheres[ini];
+                }
+            }
+            return bests;
+
+        }
+
+        // ref p allows us to adjust the position at the last moment
+        public override void normalColor(ref Vector3 p, out Vector3 normal, out Color col, ref Vector2 uv) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
@@ -534,6 +556,12 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                 col = CSGXX.colors[Math.Min(inn, CSGXX.colors.Length-1)];
             }
 
+            if (radShrink != 0) {
+                MSPHERE near = nearest(p);
+                // p -= near.Normal(p) * radShrink; // defer till all combined
+                uv.x = near.index;
+            }
+
             float s = normal.sqrMagnitude;
             if (s < 0.99 || s > 1.01) {
                 GUIBits.Log("odd normal {0}  {1}", s, normal);
@@ -541,6 +569,10 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
 
         }
         static int graderr = 0;
+
+        public MSPHERE sphereAt(int i) {
+            return spheres[0][i];
+        }
 
 
         public override CSGNode Expand(float e) {

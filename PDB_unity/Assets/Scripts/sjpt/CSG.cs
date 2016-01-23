@@ -2282,7 +2282,7 @@ namespace CSG {
             return null;
         }
 
-        public virtual void normalColor(Vector3 p, out Vector3 normal, out Color color) {
+        public virtual void normalColor(ref Vector3 p, out Vector3 normal, out Color color, ref Vector2 uv) {
             normal = Normal(p);
             color = Color;
         }

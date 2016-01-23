@@ -176,10 +176,10 @@ namespace CSG {
 			public Vector2 uv;
 			public Color color;
 			public CsgOutVert(Poly poly, int i) {
-				Vector3 p = position = poly[i].point;
-                poly.Csg.normalColor(p, out normal, out color);
+				position = poly[i].point;
+                uv = poly.Csg.TextureCoordinate(position);
+                poly.Csg.normalColor(ref position, out normal, out color, ref uv);
 				//normal = poly.Csg.Normal(p);
-				uv = poly.Csg.TextureCoordinate(p);
 				//color = poly.Csg.Color;// Color.white;
 			}
 		}
@@ -292,6 +292,7 @@ namespace CSG {
                 child.transform.Rotate(new Vector3(0, 0, 0));
                 child.transform.position = (gameObject.transform.position);
                 child.transform.rotation = (gameObject.transform.rotation);
+                child.layer = gameObject.layer;
 
 
                 Material mat = gameObject.material();
