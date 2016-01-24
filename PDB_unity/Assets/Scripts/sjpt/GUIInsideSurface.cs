@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 using CSG;
 using CSGNonPlane;
@@ -17,8 +18,8 @@ namespace CSG {
         //[Range(1, 8)]
         //public int MaxLev = 10;
 
-        [Range(0.5f, 2)]
-        public float radMult = 1f;  // controls the radius multiplier of the metaballs,
+        [Range(0.5f, 2)]  public float radMult = 1f;  // controls the radius multiplier of the spheres/metaballs,
+        [Range(0.5f, 2)]  public float radAdd = 0f;  // controls the radius multiplier of the spheres/metaballs,
 
         [Range(-1, 1)]
         public float radShrink = 0f;  // amounmt to shrink towards sphere centre
@@ -131,7 +132,7 @@ namespace CSG {
                 mol = (useb) ? molB : molA;
 
                 // prepare and populate the metaball object
-                csg = meta(mol, radInfluence, radMult);
+                csg = meta(mol, radInfluence, radMult, radAdd);
                 Volume molvol = csg.Volume();       // find bounding volume   
                 // bounds = molvol.BoundsExpand(1.1f); // and get a little leway
                 // bounds = new Bounds(Vector3.zero, new Vector3(70,70,70));  // same bounds for both molecules
@@ -164,8 +165,8 @@ namespace CSG {
                     // precompute the compacted version (common vertices)
                     tsavemesh = tsavemesh.RemapMesh();
                     //tsavemesh.unmatched();  // debug
-                    if (radShrink != 0)
-                        shrink(tsavemesh.vertices, tsavemesh.uv, (CSGFMETA)csg);
+                  //  if (radShrink != 0)
+                  //      shrink(tsavemesh.vertices, tsavemesh.uv, (CSGFMETA)csg);
                     tsavemesh = tsavemesh.removeSeparated();
                     Log("mesh external verts={0}, triangles={1}", tsavemesh.vertices.Length, tsavemesh.triangles.Length);
 
@@ -178,10 +179,14 @@ namespace CSG {
                     if (!useb) {
                         BasicMeshData.ToGame(goMol[Mols.molA], tsavemesh.ToMeshes());
                         BasicMeshData.ToGame(goMol[Mols.molAback], tsavemesh.ToMeshesBack());
+                        csgfmetaA = (CSGFMETA)csg;
+                        shrinkA();
                         savemeshA = tsavemesh;
                     } else {
                         BasicMeshData.ToGame(goMol[Mols.molB], tsavemesh.ToMeshes());
                         BasicMeshData.ToGame(goMol[Mols.molBback], tsavemesh.ToMeshesBack());
+                        csgfmetaB = (CSGFMETA)csg;
+                        shrinkB();
                         savemeshB = tsavemesh;
                     }
                     Color cmax = tsavemesh.colors.Aggregate(new Color(-999,-999,-999,-999), (Color c1, Color c2) => c1.Max(c2));
@@ -194,41 +199,24 @@ namespace CSG {
                 }
             }
 
-            if  (testop("dock")) {
-                Log("positions: A {0} B {1}", molA.pos, molB.pos);
-                goMolB.transform.position = molB.pos - molA.pos;
-
-                int ba = -999, bb = -999; float bd = 999999; float d;
-                for (int a = 0; a < molA.atom_centres.Length; a++) {
-                    for (int b = 0; b < molB.atom_centres.Length; b++) {
-                        if ((d = molA.atom_centres[a].Distance(molA.atom_centres[b])) < bd) {
-                            ba = a; bb = b;
-                            bd = d;
-                        }
-                    }
-                }
-                //filterpointA = (molA.atom_centres[ba] + molB.atom_centres[bb]) / 2;
-                //filterpointB = filterpointA + molA.pos - molB.pos;
-                //filter();
-                return true;
-            }
+            if  (testop("dock")) { dock(); return true; }
 
             if (testop("roiA")) { roiA(bounds); return true; }
-            if (testop("shrinkA")) { shrinkAfilt(); return true; }
+            if (testop("shrinkA")) { shrinkA(); return true; }
             if (testop("roiB")) { roiB(bounds); return true; }
-            if (testop("shrinkB")) { shrinkBfilt(); return true; }
+            if (testop("shrinkB")) { shrinkB(); return true; }
             if (testop("overlap")) { intersect(bounds); return true; }
             if (testop("holes")) { holes(bounds); return true; }
             if (testop("copyProps")) { copyProps(); return true; }
 
             if (testop("spheres")) {
                 BasicMeshData.defaultShaderName = "Standard";
-                csg = spheres(molA, radMult);
+                csg = spheres(molA, radMult, radAdd);
             }
 
             if (testop("triangles")) {
                 //BasicMeshData.defaultShaderName = "Standard";
-                BigMesh bm = triangles(molA, radInfluence / 4, radMult);
+                BigMesh bm = triangles(molA, radInfluence / 4, radMult, radAdd);
                 BasicMeshData.ToGame(goTest, bm.ToMeshes());
                 return true;
             }
@@ -241,56 +229,76 @@ namespace CSG {
 
         }  // Show()
 
+        void dock() {
+            Log("positions: A {0} B {1}", molA.pos, molB.pos);
+            goMolB.transform.position = molB.pos - molA.pos;
+
+            int ba = -999, bb = -999; float bd = 999999; float d;
+            for (int a = 0; a < molA.atom_centres.Length; a++) {
+                for (int b = 0; b < molB.atom_centres.Length; b++) {
+                    if ((d = molA.atom_centres[a].Distance(molA.atom_centres[b])) < bd) {
+                        ba = a; bb = b;
+                        bd = d;
+                    }
+                }
+            }
+            //filterpointA = (molA.atom_centres[ba] + molB.atom_centres[bb]) / 2;
+            //filterpointB = filterpointA + molA.pos - molB.pos;
+            //filter();
+        }
+
         void roiA(Bounds bounds) {
             Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
-            csgfmetaA = meta(molA, radInfluence, radMult);
+            csgfmetaA = meta(molA, radInfluence, radMult, radAdd);
             csg = csgfmetaA
-                * spheres(molB, 2.5f).At(molB.pos - molA.pos).Noshow().Colour(1);
-            showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goMol[Mols.molAfiltback]);
+                * spheres(molB, 2.5f, 0).At(molB.pos - molA.pos).Noshow().Colour(1);
+            showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goMol[Mols.molAfiltback], after: shrinkAPrep);
 
             //remap(goMol[Mols.molAfilt].transform);
             //remap(goMol[Mols.molAfiltback].transform);
             //savevert(goMol[Mols.molAfilt].transform);
             //savevert(goMol[Mols.molAfiltback].transform);
-            // shrinkAfilt(); // called on the first frame immediately undoes itself
         }
 
-        void shrinkAfilt() {
-            remap(goMol[Mols.molAfilt].transform);
-            remap(goMol[Mols.molAfiltback].transform);
-
-            shrink(goMol[Mols.molAfilt].transform, csgfmetaA);
-            shrink(goMol[Mols.molAfiltback].transform, csgfmetaA);
+        void shrinkAPrep() {
+            remap(goMolA.transform);
+            shrinkA();
         }
-        void shrinkBfilt() {
-            remap(goMol[Mols.molBfilt].transform);
-            remap(goMol[Mols.molBfiltback].transform);
 
-            shrink(goMol[Mols.molBfilt].transform, csgfmetaB);
-            shrink(goMol[Mols.molBfiltback].transform, csgfmetaB);
+        void shrinkA() {
+            shrink(goMolA.transform, csgfmetaA);
+        }
+
+        void shrinkBPrep() {
+            remap(goMolB.transform);
+            shrinkB();
+        }
+
+        void shrinkB() {
+            shrink(goMolB.transform, csgfmetaB);
         }
 
 
         void roiB(Bounds bounds) {
             Log("positions for intersect: B {0} B {1}", molA.pos, molB.pos);
-            csgfmetaB = meta(molB, radInfluence, radMult);
+            csgfmetaB = meta(molB, radInfluence, radMult, radAdd);
 
             csg = csgfmetaB
-                * spheres(molA, 2.5f).At(molA.pos - molB.pos).Noshow().Colour(1);
-            showCSGParallel(csg, bounds, goMol[Mols.molBfilt], goMol[Mols.molBfiltback]);
+                * spheres(molA, 2.5f, 0).At(molA.pos - molB.pos).Noshow().Colour(1);
+            showCSGParallel(csg, bounds, goMol[Mols.molBfilt], goMol[Mols.molBfiltback], after: shrinkBPrep);
         }
 
         void intersect(Bounds bounds) {
-            csg = spheres(molA, radMult)
-                * spheres(molB, radMult).At(molB.pos - molA.pos).Colour(1);
+            csg = spheres(molA, radMult, radAdd)
+                * spheres(molB, radMult, radAdd).At(molB.pos - molA.pos).Colour(1);
             showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goTest);
         }
 
         void holes(Bounds bounds) {
             float rroi = 2;
-            CSGNode roi = spheres(molA, rroi)
-                * spheres(molB, rroi).At(molB.pos - molA.pos);
-            csg = roi - spheres(molA, radMult) - spheres(molB, radMult).At(molB.pos - molA.pos);
+            CSGNode roi = spheres(molA, rroi, 0)
+                * spheres(molB, rroi, 0).At(molB.pos - molA.pos);
+            csg = roi - spheres(molA, radMult, radAdd) - spheres(molB, radMult, radAdd).At(molB.pos - molA.pos);
 
             showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goTest);
         }
@@ -302,7 +310,7 @@ namespace CSG {
         /// <param name="mol"></param>
         /// <param name="radInfluence"></param>
         /// <returns></returns>
-        CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult) {
+        CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult, float pradAdd) {
             if (mol == null) { LogK("mol load", "molecule data missing"); return null; }
             // prepare and populate the metaball object
             Log("in meta, mol {0}", mol);
@@ -311,7 +319,7 @@ namespace CSG {
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm.Add(new MSPHERE(v[i], r[i] * pradMult, radInfluence));
+                csgm.Add(new MSPHERE(v[i], r[i] * pradMult + pradAdd, radInfluence));
             }
             return csgm;
         }
@@ -324,7 +332,7 @@ namespace CSG {
         /// <param name="probeRad"></param>
         /// <param name="pradMult"></param>
         /// <returns></returns>
-        BigMesh triangles(PDB_molecule mol, float probeRad, float pradMult) {
+        BigMesh triangles(PDB_molecule mol, float probeRad, float pradMult, float pradAdd) {
             float probeDi = 2 * probeRad;
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
@@ -337,12 +345,12 @@ namespace CSG {
             int V = 0;  // # vertices
             Color W = Color.white;
             for (int i = 0; i < v.Length; i++) {
-                float ri = r[i] * pradMult;
+                float ri = r[i] * pradMult + pradAdd;
                 for (int j = 0; j < v.Length; j++) {
-                    float rj = r[j] * pradMult;
+                    float rj = r[j] * pradMult + pradAdd;
                     if (v[i].Distance(v[j]) > ri + rj + probeDi) continue;
                     for (int k = 0; k < v.Length; k++) {
-                        float rk = r[k] * pradMult;
+                        float rk = r[k] * pradMult + pradAdd;
                         if (v[i].Distance(v[k]) > ri + rk + probeDi) continue;
                         if (v[j].Distance(v[k]) > rj + rk + probeDi) continue;
                         Vector3 n = (v[i] - v[j]).cross(v[i] - v[k]).Normal();
@@ -420,12 +428,12 @@ namespace CSG {
                 remap(tr.GetChild(i));
         }
 
-        CSGNode spheres(PDB_molecule mol, float radMult = 1) {
+        CSGNode spheres(PDB_molecule mol, float radMult, float radAdd) {
             CSGNode csgm = S.NONE;
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {
-                csgm += new Sphere(v[i], r[i] * radMult).Colour(i);
+                csgm += new Sphere(v[i], r[i] * radMult + radAdd).Colour(i);
             }
             csgm = ((Union)csgm).balance();
             return csgm;
@@ -497,7 +505,9 @@ namespace CSG {
                 show(c, molid, true);
         }
 
+        int frameNum = 0;
         protected override void UpdateI() {
+            frameNum++;
             // perform standard update options
             base.UpdateI();
 
@@ -610,10 +620,11 @@ namespace CSG {
             //GUIBits.text = "";
 
             MSlider("RadInfluence", ref radInfluence, 1.1f, 5);
-            MSlider("RadMult", ref radMult, 0.5f, 2);
+            MSlider("RadMult", ref radMult, 0.25f, 3);
+            MSlider("RadAdd", ref radAdd, -2, 2);
             if (MSlider("RadShrink", ref radShrink, -2, 2)) {
-                shrinkAfilt();
-                shrinkBfilt();
+                shrinkA();
+                shrinkB();
             };
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
@@ -733,6 +744,10 @@ namespace CSG {
                     // mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
                 }
             }
+
+            dock();
+            setLights();
+
         }
 
 
@@ -815,7 +830,7 @@ namespace CSG {
 #else
             int save = CSGControl.MinLev;
             CSGControl.MinLev = -1;
-            CSGFMETA csg = meta(mol, radInfluence, radMult);
+            CSGFMETA csg = meta(mol, radInfluence, radMult, radAdd);
             CSGFMETA.computeCurvature = false;  // no need to save, will be reset from local anyway
 
             Vector3[] vertices; Vector3[] normals; Vector2[] uvs; Color[] colours; int[] indices;

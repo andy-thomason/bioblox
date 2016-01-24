@@ -173,7 +173,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
 
 
-        protected bool showCSGParallel(CSGNode csg, Bounds bounds, GameObject front, GameObject back = null) {
+        protected bool showCSGParallel(CSGNode csg, Bounds bounds, GameObject front, GameObject back = null, voidvoid after = null) {
             Poly.verttype[0] = Poly.verttype[1] = Poly.verttype[2] = 0;
             if (toshow == "")
                 return false;
@@ -182,7 +182,7 @@ namespace CSG {  // [ExecuteInEditMode]
             Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
 
             // if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
-            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev);
+            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after);
             if (parallel) parallels.Add(pcsg);
             return true;
 
@@ -671,10 +671,13 @@ namespace CSG {  // [ExecuteInEditMode]
             t.position = new Vector3(0, 0, -30);
         }
 
+
         #endregion
 
 
     }     // class GUIBits
+
+    public delegate void voidvoid();
 
     class ParallelCSG {
         private IDictionary<string, BasicMeshData> parallelMeshes;
@@ -684,13 +687,15 @@ namespace CSG {  // [ExecuteInEditMode]
         private readonly GameObject goFront, goBack;
         private string toshow;
         private int minLev, maxLev;
+        private voidvoid after;
 
-        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev) {
+        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev, voidvoid after = null) {
             goFront = front;
             goBack = back;
             this.toshow = toshow;
             this.minLev = minLev;
             this.maxLev = maxLev;
+            this.after = after;
 
             if (parallel) {
                 GUIBits.Log("running in parallel:  " + toshow);
@@ -759,7 +764,7 @@ namespace CSG {  // [ExecuteInEditMode]
             return false;
         }  // testFinishParallel
 
-        protected virtual void finish() {
+        protected void finish() {
             //showProgress();  // ???? <<< killer ???
             parallelThread = null;
             float t2 = Time.realtimeSinceStartup;
@@ -793,6 +798,7 @@ namespace CSG {  // [ExecuteInEditMode]
             parallelMeshes = null;
             toshow = null;
 
+            if (after != null) after();
         }
     } // class ParallelCSG
 
