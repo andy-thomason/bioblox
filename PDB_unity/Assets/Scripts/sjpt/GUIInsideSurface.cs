@@ -619,25 +619,25 @@ namespace CSG {
             setobjs();
             //GUIBits.text = "";
 
-            MSlider("RadInfluence", ref radInfluence, 1.1f, 5);
-            MSlider("RadMult", ref radMult, 0.25f, 3);
-            MSlider("RadAdd", ref radAdd, -2, 2);
-            if (MSlider("RadShrink", ref radShrink, -2, 2)) {
+            MSlider("RadInfluence", ref radInfluence, 1.1f, 5, 2.5f);
+            MSlider("RadMult", ref radMult, 0.25f, 3, 1);
+            MSlider("RadAdd", ref radAdd, -2, 2, 0);
+            if (MSlider("RadShrink", ref radShrink, -2, 2, 0)) {
                 shrinkA();
                 shrinkB();
             };
-            if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
+            if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50, 20)) 
                 filter();
-            if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
+            if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250, 20))
                 filter();
-            if (MSlider("Detail Level", ref detailLevel, 0, 10)) { } //  Show("pdb prep");
-            if (MSlider("Curv Map range", ref CurveMapRange, -1, 1))  
+            if (MSlider("Detail Level", ref detailLevel, 0, 10, 7)) { } //  Show("pdb prep");
+            if (MSlider("Curv Map range", ref CurveMapRange, -1, 1, 0.4f))  
                 CurveMap();
             ////MSlider("gradCompPow", ref CSGPrim.gradCompPow, -10, 10);
 
             if (curcamnum >= 0) {
                 for (int i = 0; i < N / 2; i++)
-                    if (Mcheck(Mols.name[2 * i], ref shown[curcamnum, i]))
+                    if (Mcheck(Mols.name[2 * i] + (i == 0 ? "_" + curcamnum: ""), ref shown[curcamnum, i]))
                         setshow();
                 // for some reason, shownother was getting set to an array of length 0, not sure how ... ???
                 if (shownother == null || shownother.Length != 4)

@@ -263,7 +263,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
             int mousebuts = (Input.GetMouseButton(0) ? 1 : 0) + (Input.GetMouseButton(1) ? 2 : 0) + (Input.GetMouseButton(2) ? 4 : 0);
             // mouse may go down in odd position on new click
-            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)) {
+            if ((Input.mousePosition.x > currentMenuWidth) && (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))) {
                 mousebuts = 0;
                 findcam();
             }
@@ -335,12 +335,22 @@ namespace CSG {  // [ExecuteInEditMode]
             mousedelta *= a;
             // int triangleNumber = -1;
 
+            if (Input.GetMouseButtonDown(1)) {
+                if (Input.mousePosition.x < currentMenuWidth) {
+                    boxopacity++;  // right click in menu to darken opacity
+                }
+            }
+
             if (Input.GetMouseButtonDown(0)) {
-                Vector3 hit = Hitpoint();
-                if (!float.IsNaN(hit.x))
-                    lookat = hit;
-                else
-                    lookat = Vector3.zero;
+                if (Input.mousePosition.x < currentMenuWidth) {
+                    // boxopacity++;  // for some reason this caused us to need two clicks to operate sliders
+                } else {
+                    Vector3 hit = Hitpoint();
+                    if (!float.IsNaN(hit.x))
+                        lookat = hit;
+                    else
+                        lookat = Vector3.zero;
+                }
             }
 
             //lookat = Vector3.zero; // t.position + t.forward * 20;
@@ -446,20 +456,29 @@ namespace CSG {  // [ExecuteInEditMode]
         protected virtual GameObject getSubObject() { return null; }
 
         private bool showing = true;
+
+        float boxopacity = 0.5f;
+        int currentMenuWidth = 0;
         // standard Unity OnGUI function, protecting from exceptions
         void OnGUI() {
-            int ww = sliderWidth + 2 * slidermargin;
+            int ww = currentMenuWidth = sliderWidth + 2 * slidermargin;
             if (Input.mousePosition.x < 20) showing = true;
-            if (Input.mousePosition.x > ww) showing = false;
+            if (Input.mousePosition.x > ww) { showing = false; boxopacity = 0.5f; }
+
             Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
             GUI.BeginGroup(rect);
-            GUI.color = new Color(1.0f, 1.0f, 1.0f, 0.5f); //0.5 is half opacity 
-            GUI.Box(rect, "box");
+
+            // draw a background
+            GUI.color = new Color(1.0f, 1.0f, 1.0f, boxopacity); //0.5 is half opacity 
+            for (int i = 0; i < boxopacity; i++) GUI.Box(rect, "box");
+
+            // main gui, which will draw all the buttons etc within the box
             try {
                 OnGUII();
             } catch (System.Exception e) {
                 Log(e.ToString() + e.StackTrace);
             }
+
             GUI.EndGroup();
             showlog();
         }
@@ -491,7 +510,7 @@ namespace CSG {  // [ExecuteInEditMode]
             y += 2;
             slidery = Screen.height / 2 + 40;
 
-            MSlider("progress rate", ref progressInterval, 0.0f, 10.0f);
+            MSlider("progress rate", ref progressInterval, 0.0f, 10.0f, 0);
 
         }     // OnGUII
 
@@ -516,32 +535,25 @@ namespace CSG {  // [ExecuteInEditMode]
 
         int sliderWidth = 160, sliderHeight = 25, slidermargin = 20;
         /** make an int slider, y position w.i.p, return true if value changed */
-        protected bool MSlider(string sliderName, ref int v, int low, int high) {
-            GUI.contentColor = Color.white;
-            GUI.color = Color.white;
-            GUI.backgroundColor = Color.white;
-
+        protected bool MSlider(string sliderName, ref int v, int low, int high, int def) {
             int o = v;
-            GUI.SetNextControlName(sliderName);
-            v = (int)GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, 20), v, low, high);
-            //if (o != v) Log (name + v);
-            GUI.contentColor = Color.black;
-            GUI.Label(new Rect(slidermargin/2, slidery - 15, sliderWidth, 20), sliderName + " = " + v);
-            slidery += sliderHeight;
-            bool changed = o != v;
+            float vv = v;
+            bool changed = MSlider(sliderName, ref vv, low, high, def);
+            v = (int)vv;
+
+            changed = o != v;
             if (changed) lastmouse = Input.mousePosition;
             return changed;
         }
 
         /** make an int slider, y position w.i.p, return true if value changed */
-        protected bool MSlider(string sliderName, ref float v, float low, float high) {
+        protected bool MSlider(string sliderName, ref float v, float low, float high, float def) {
             GUI.contentColor = Color.white;
             float o = v;
             GUI.SetNextControlName(sliderName);
-            v = GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, 20), v, low, high);
-            //if (o != v) Log (name + v);
-            GUI.contentColor = Color.black;
-            GUI.Label(new Rect(slidermargin/2, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v));
+            v = GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, sliderHeight / 2), v, low, high);
+            if (GUI.Button(new Rect(slidermargin / 4, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v), "Label"))
+            v = def;
             slidery += sliderHeight;
             bool changed = o != v;
             if (changed) lastmouse = Input.mousePosition;
