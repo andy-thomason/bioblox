@@ -554,7 +554,7 @@ namespace CSG {
                     // could verify normals etc equal here, we are assuming this
                 }
             }
-            GUIBits.Log("vertices=" + n + ", unique vertices=" + nnn);
+            //GUIBits.Log("vertices=" + n + ", unique vertices=" + nnn);
 
             // now pack down the structures -----------
             Vector3[] n1vertices = new Vector3[nnn];

@@ -200,6 +200,10 @@ namespace CSGFIELD {
             return ret;
         }
 
+        public float dist(Vector3 p) {
+            return new Vector3(cx, cy, cz).Distance(p) - r;
+        }
+
         public override float field(Vector3 p) {
             float dx = (p.x - cx);
             float dy = (p.y - cy);
@@ -468,17 +472,40 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
             if (inn == 1) return inspheres[0];
-            float bestf = float.MaxValue;
+            float bestd = float.MaxValue;
             MSPHERE bests = null;
             for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
-                float myfield = inspheres[ini].field(p);
-                if (myfield < bestf) {
-                    bestf = myfield;
+                float myfield = inspheres[ini].dist(p);
+                if (myfield < bestd) {
+                    bestd = myfield;
                     bests = inspheres[ini];
                 }
             }
             return bests;
+        }
 
+        public MSPHERE[] nearest3(Vector3 p) {
+            int inlev = simplev;
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+
+            if (inn == 1) return new MSPHERE[] { inspheres[0], null, null };
+            float[] bestd = new float[] { float.MaxValue, float.MaxValue, float.MaxValue };
+            MSPHERE[] bests = new MSPHERE[3];
+            for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
+                float myfield = inspheres[ini].dist(p);
+                for (int pos = 2; pos >= 0; pos--) {
+                    if (myfield < bestd[pos]) {
+                        if (pos != 2) {
+                            bestd[pos + 1] = bestd[pos];
+                            bests[pos + 1] = bests[pos];
+                        }
+                        bestd[pos] = myfield;
+                        bests[pos] = inspheres[ini];
+                    }
+                }
+            }
+            return bests;
         }
 
         // ref p allows us to adjust the position at the last moment
@@ -556,11 +583,13 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                 col = CSGXX.colors[Math.Min(inn, CSGXX.colors.Length-1)];
             }
 
-            if (radShrink != 0) {
-                MSPHERE near = nearest(p);
+            // always do this in case radShrink becomes 0 later,
+            // TODO, consider some alternative optimization to avoid cost of nearest(p) when we know we never want radShrink
+            // if (radShrink != 0) {  
+            MSPHERE near = nearest(p);
                 // p -= near.Normal(p) * radShrink; // defer till all combined
                 uv.x = near.index;
-            }
+            // }
 
             float s = normal.sqrMagnitude;
             if (s < 0.99 || s > 1.01) {

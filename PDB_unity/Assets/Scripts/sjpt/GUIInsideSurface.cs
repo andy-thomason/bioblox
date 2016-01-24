@@ -43,6 +43,9 @@ namespace CSG {
         protected Vector3 filterpointA = new Vector3(float.NaN, float.NaN, float.NaN);
         protected Vector3 filterpointB = new Vector3(float.NaN, float.NaN, float.NaN);
 
+        protected CSGFMETA csgfmetaA, csgfmetaB;
+        protected Vector3[] vertAfilt, vertBfilt;
+
 
         public GUIInsideSurface() { init(); }
         private void init() { 
@@ -98,6 +101,7 @@ namespace CSG {
                 foreach ( var go in goMol)
                     DeleteChildren(go);
 
+                meshverts.Clear();
                 return true;
             }
 
@@ -215,6 +219,7 @@ namespace CSG {
             if (testop("shrinkB")) { shrinkBfilt(); return true; }
             if (testop("overlap")) { intersect(bounds); return true; }
             if (testop("holes")) { holes(bounds); return true; }
+            if (testop("copyProps")) { copyProps(); return true; }
 
             if (testop("spheres")) {
                 BasicMeshData.defaultShaderName = "Standard";
@@ -238,33 +243,39 @@ namespace CSG {
 
         void roiA(Bounds bounds) {
             Log("positions for intersect: A {0} B {1}", molA.pos, molB.pos);
-            csgfmeta = meta(molA, radInfluence, radMult);
-            csg = csgfmeta
+            csgfmetaA = meta(molA, radInfluence, radMult);
+            csg = csgfmetaA
                 * spheres(molB, 2.5f).At(molB.pos - molA.pos).Noshow().Colour(1);
             showCSGParallel(csg, bounds, goMol[Mols.molAfilt], goMol[Mols.molAfiltback]);
 
-            // shrinkAfilt();
+            //remap(goMol[Mols.molAfilt].transform);
+            //remap(goMol[Mols.molAfiltback].transform);
+            //savevert(goMol[Mols.molAfilt].transform);
+            //savevert(goMol[Mols.molAfiltback].transform);
+            // shrinkAfilt(); // called on the first frame immediately undoes itself
         }
 
         void shrinkAfilt() {
             remap(goMol[Mols.molAfilt].transform);
             remap(goMol[Mols.molAfiltback].transform);
 
-            shrink(goMol[Mols.molAfilt].transform, csgfmeta);
-            shrink(goMol[Mols.molAfiltback].transform, csgfmeta);
+            shrink(goMol[Mols.molAfilt].transform, csgfmetaA);
+            shrink(goMol[Mols.molAfiltback].transform, csgfmetaA);
         }
         void shrinkBfilt() {
             remap(goMol[Mols.molBfilt].transform);
             remap(goMol[Mols.molBfiltback].transform);
 
-            shrink(goMol[Mols.molBfilt].transform, csgfmeta);
-            shrink(goMol[Mols.molBfiltback].transform, csgfmeta);
+            shrink(goMol[Mols.molBfilt].transform, csgfmetaB);
+            shrink(goMol[Mols.molBfiltback].transform, csgfmetaB);
         }
 
 
         void roiB(Bounds bounds) {
             Log("positions for intersect: B {0} B {1}", molA.pos, molB.pos);
-            csg = meta(molB, radInfluence, radMult)
+            csgfmetaB = meta(molB, radInfluence, radMult);
+
+            csg = csgfmetaB
                 * spheres(molA, 2.5f).At(molA.pos - molB.pos).Noshow().Colour(1);
             showCSGParallel(csg, bounds, goMol[Mols.molBfilt], goMol[Mols.molBfiltback]);
         }
@@ -365,13 +376,34 @@ namespace CSG {
             // p -= near.Normal(p) * radShrink; // defer till all combined
         }
 
+        Dictionary<string, Vector3[]> meshverts = new Dictionary<string, Vector3[]>();
+
+        void bshrink(Mesh mesh, CSGFMETA meta) {
+            if (meta == null || radShrink == 0) return;
+            Vector3[] vertices = mesh.vertices;
+            if (vertices.Length == 0) return;
+            Vector2[] uv = mesh.uv;
+            if (!meshverts.ContainsKey(mesh.name) || meshverts[mesh.name].Length != mesh.vertices.Length)
+                meshverts[mesh.name] = (Vector3[])mesh.vertices.Clone();
+            Vector3[] invertices = meshverts[mesh.name];
+
+            for (int i = 0; i < vertices.Length; i++) {
+                Vector3 in3 = invertices[i];
+                vertices[i] = in3 - meta.sphereAt((int)uv[i].x).Normal(in3) * radShrink;
+            }
+            mesh.vertices = vertices;
+            // p -= near.Normal(p) * radShrink; // defer till all combined
+        }
+
+
         void shrink(Transform tr, CSGFMETA meta) {
             if (meta == null || radShrink == 0) return;
             MeshFilter mf = tr.GetComponent<MeshFilter>();
             if (mf != null) {
-                Vector3[] vertices = mf.mesh.vertices;
-                shrink(vertices, mf.mesh.uv, meta);
-                mf.mesh.vertices = vertices;
+                //Vector3[] vertices = mf.mesh.vertices;
+                mf.mesh.name = "mesh.." + mf.name;
+                bshrink(mf.mesh, meta);
+                //mf.mesh.vertices = vertices;
             }
             for (int i = 0; i < tr.childCount; i++)
                 shrink(tr.GetChild(i), meta);
@@ -387,7 +419,6 @@ namespace CSG {
             for (int i = 0; i < tr.childCount; i++)
                 remap(tr.GetChild(i));
         }
-
 
         CSGNode spheres(PDB_molecule mol, float radMult = 1) {
             CSGNode csgm = S.NONE;
@@ -559,6 +590,7 @@ namespace CSG {
                 setshow();
             } // swap 
 
+            autoCopyProps();
 
         }
 
@@ -579,7 +611,10 @@ namespace CSG {
 
             MSlider("RadInfluence", ref radInfluence, 1.1f, 5);
             MSlider("RadMult", ref radMult, 0.5f, 2);
-            MSlider("RadShrink", ref radShrink, -1, 1);
+            if (MSlider("RadShrink", ref radShrink, -2, 2)) {
+                shrinkAfilt();
+                shrinkBfilt();
+            };
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250))
@@ -620,6 +655,37 @@ namespace CSG {
             }
         }
 
+        readonly string[] floatProps = {
+            "_Glossiness", "_Brightness", "_Metallic", "_VertexColors",
+            "_Range", "_LowR", "_HighR", "_LowG", "_HighG", "_LowB", "_HighB",
+            "_P1Step", "_P1Width", "_P2Step", "_P2Width","_PGStep", "_PGWidth","_PMStep", "_PMWidth"
+             };
+        void copyProps(Material to, Material from) {
+            foreach (string s in floatProps)
+                to.SetFloat(s, from.GetFloat(s));
+        }
+
+        void copyProps(Transform tr, Material from) {
+            MeshRenderer mr = tr.GetComponent<MeshRenderer>();
+            if (mr != null)
+                copyProps(mr.material, from);
+    
+            for (int i = 0; i < tr.childCount; i++)
+                copyProps(tr.GetChild(i), from);
+        }
+
+        void autoCopyProps() {
+            Material from = goMolA.GetComponent<MeshRenderer>().material;
+            if (from.GetFloat("_COPY") != 0)
+                copyProps();
+
+        }
+        void copyProps() {
+            Material from = goMolA.GetComponent<MeshRenderer>().material;
+            copyProps(goMolA.transform, from);
+            copyProps(goMolB.transform, from);
+        }
+
         int N = 8;
         private void setobjs() { 
             if (goMol != null) return;
@@ -635,6 +701,19 @@ namespace CSG {
             goMolB = GameObject.Find("MolBH");
             if (goMolB == null) goMolB = new GameObject("MolBH");
 
+            // representative top level material, used for copying but not directly
+            MeshRenderer mrMolA = goMolA.AddComponent<MeshRenderer>();
+            Material matref = new Material(shader);
+            matref.SetFloat("_Glossiness", smooth);
+            matref.SetFloat("_Metallic", metallic);
+            matref.SetFloat("_LowR", -1);
+            matref.SetFloat("_HighR", 1);
+            matref.SetFloat("_LowG", -1);
+            matref.SetFloat("_HighG", 1);
+            matref.SetFloat("_LowB", -1000);
+            matref.SetFloat("_HighB", 1000);
+            matref.SetFloat("_Brightness", 2.5f);
+            mrMolA.material = matref;
 
             for (int i = 0; i < N; i++) {
                 goMol[i] = GameObject.Find(Mols.name[i]);
@@ -647,15 +726,7 @@ namespace CSG {
                     Material mat = new Material(shader);
                     mat.color = Mols.colors[i];
                     mat.SetColor("_Albedo", Mols.colors[i]);
-                    mat.SetFloat("_Glossiness", smooth);
-                    mat.SetFloat("_Metallic", metallic);
-                    mat.SetFloat("_LowR", -1);
-                    mat.SetFloat("_HighR", 1);
-                    mat.SetFloat("_LowG", -1);
-                    mat.SetFloat("_HighG", 1);
-                    mat.SetFloat("_LowB", -1000);
-                    mat.SetFloat("_HighB", 1000);
-                    mat.SetFloat("_Brightness", 2.5f);
+                    copyProps(mat, matref);
                     mrMol.material = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();
@@ -663,6 +734,7 @@ namespace CSG {
                 }
             }
         }
+
 
         static float ddd = 1000;
         static Vector3[] lpos = new Vector3[] { new Vector3(ddd, 0, 0),

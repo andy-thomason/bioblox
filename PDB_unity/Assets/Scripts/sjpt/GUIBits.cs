@@ -59,7 +59,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public GameObject goTest, goFiltered;
         public TransformData savedTransform;
-        protected CSGNode csg; protected CSGFMETA csgfmeta;
+        protected CSGNode csg;
         protected Camera[] Cameras;
 
         protected string toshow;

@@ -7,6 +7,8 @@ Problem was that even with alpha=1 (or alpha large) there was still some transpa
 
 Shader "Custom/Color" {
     Properties{
+        _COPY("Copy", Range(0,1)) = 1
+
       _Albedo("Albedo", Color) = (1,1,1,1)
       _Metallic("Metallic", Range(0,1)) = 0.8
       _Glossiness("Glossiness", Range(0,1)) = 0.6
