@@ -73,12 +73,11 @@ namespace CSG {  // [ExecuteInEditMode]
         }
 
         class ButtonPrepare {
-            public int y;
-            public string name;
+            public string name, tooltip;
 
-            public ButtonPrepare(string name, int y) {
+            public ButtonPrepare(string name, string tooltip) {
                 this.name = name;
-                this.y = y;
+                this.tooltip = tooltip;
             }
 
         }
@@ -89,10 +88,9 @@ namespace CSG {  // [ExecuteInEditMode]
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
 
         protected bool opdone = false;
-        protected bool testop(string s) {
+        protected bool testop(string s, string tip) {
             if (!ops.ContainsKey(s)) {
-                nexty += yinc;
-                ops.Add(s, new ButtonPrepare(s, nexty));
+                ops.Add(s, new ButtonPrepare(s, tip));
             }
 
             bool yes = (s == toshow);
@@ -132,18 +130,18 @@ namespace CSG {  // [ExecuteInEditMode]
             gameObject.transform.rotation = new Quaternion(0, 0, 0, 1);
 
 
-            if (testop("clear")) {  // clear button
+            if (testop("clear", "Clear out the objects associated with Test and Filtered, but not molecule objects.")) {  // clear button
                 DeleteChildren(goTest);
                 DeleteChildren(goFiltered);
                 csg = S.NONE;
                 Poly.ClearPool();
                 return true;
             }
-            if (testop("progress")) {
+            if (testop("progress", "Show progress so far for parallel csg->mesh")) {
                 showProgress();
                 return true;
             }
-            if (testop("interrupt")) {
+            if (testop("interrupt", "Interrupt any outstanding csg->mesh")) {
                 interrupt();
             }
 
@@ -498,15 +496,30 @@ namespace CSG {  // [ExecuteInEditMode]
             // display buttons for all the options set up by Show()
             int y = 0, yh = butheight, x = 2;
             int opsc = ops.Count;
+            GUI.skin.button.wordWrap = false;
+            Dictionary<string, Vector2> tippos = new Dictionary<string, Vector2>();
             foreach (var kvp in ops) {    // and show buttons for tests
-                if (GUI.Button(new Rect(x, y * yh, butwidth, yh), kvp.Key))
+                string tooltip = kvp.Key + ": " + kvp.Value.tooltip;
+                tippos[tooltip] = new Vector2(x, y);
+                if (GUI.Button(new Rect(x, y, butwidth, yh), new GUIContent(kvp.Key, tooltip)))
                     Show(kvp.Key);
                 if (ops.Count != opsc) break; // happens when items dynamically added
                 //y = kvp.Value.y;
-                y++;
-                if (y*yh > Screen.height/2) { x += butwidth;  y = 0; }
-
+                y += yh;
+                if (y > Screen.height/2) { x += butwidth;  y = 0; }
             }
+            if (GUI.tooltip != "" ) {
+                Vector2 pos = tippos[GUI.tooltip];
+                GUI.skin.label.wordWrap = true;
+                // sadly the line below just causes problems so we can't get sensible height
+                // Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(GUI.tooltip), GUI.skin.label, GUILayout.MaxWidth(currentMenuWidth));
+                Rect labelRect = new Rect(0, (int)pos.y + 20, currentMenuWidth, 80);
+                for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
+                    GUI.Box(labelRect, "");
+                GUI.Label(labelRect, GUI.tooltip);
+            }
+            GUI.skin.button.wordWrap = false;
+
             y += 2;
             slidery = Screen.height / 2 + 40;
 
@@ -520,7 +533,7 @@ namespace CSG {  // [ExecuteInEditMode]
             lock (ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
 
             try {
-                Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), "label");
+                Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), GUI.skin.label);
                 labelRect.x = Screen.width - labelRect.width;
                 for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
                     GUI.Box(labelRect, "");

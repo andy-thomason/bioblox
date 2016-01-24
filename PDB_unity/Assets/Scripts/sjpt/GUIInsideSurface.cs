@@ -82,20 +82,11 @@ namespace CSG {
 
             text = "";
             toshow = ptoshow;
-            if (testop("mwin")) {
-                setmwin();
-                return true;
-            }
-            if (testop("onewin")) {
-                setonewin();
-                return true;
-            }
-            if (testop("4lights")) {
-                setLights();
-                return true;
-            }
+            if (testop("mwin", "Set up multiple windows.")) { setmwin(); return true; }
+            if (testop("onewin", "Set up single window.")) { setonewin(); return true;  }
+            // if (testop("4lights", "Set up standard 4 lights")) { setLights();  return true; }
 
-            if (testop("clearMol")) {
+            if (testop("clearMol", "Clear the molecular associated game objects (MolA etc")) {
                 foreach (var mf in mfMol)
                     mf.mesh = null;
                 
@@ -107,7 +98,7 @@ namespace CSG {
             }
 
             /** for debugging two faced shaders **/
-            if (testop("flipfrontback")) {
+            if (testop("flipfrontback", "Flip visibility of front and back,  for debugging two faced shaders")) {
                 bool a = goMol[Mols.molA].activeSelf;
                 goMol[Mols.molA].SetActive(!a);
                 goMol[Mols.molAback].SetActive(a);
@@ -119,13 +110,13 @@ namespace CSG {
           //      Log("Findtacks #' {0}", p.Count);
           //  }
 
-            if (testop("BioBloxMesh")) {
+            if (testop("BioBloxMesh", "Run the BioBlox mesh generation for comparison")) {
                 useBioBloxMesh(molA);
                 return true;
             }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
-            if (testop("pdb") || testop("pdb prep") || testop("pdb prepB")) {
+            if (testop("pdb TEST", "generate sample pdb" ) || testop("pdb prep", "prepare mesh for molecule A") || testop("pdb prepB", "prepare mesh for molecule B")) {
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
@@ -199,29 +190,29 @@ namespace CSG {
                 }
             }
 
-            if  (testop("dock")) { dock(); return true; }
+            if  (testop("dock", "set molB in docking position to MolA")) { dock(); return true; }
 
-            if (testop("roiA")) { roiA(bounds); return true; }
-            if (testop("shrinkA")) { shrinkA(); return true; }
-            if (testop("roiB")) { roiB(bounds); return true; }
-            if (testop("shrinkB")) { shrinkB(); return true; }
-            if (testop("overlap")) { intersect(bounds); return true; }
-            if (testop("holes")) { holes(bounds); return true; }
-            if (testop("copyProps")) { copyProps(); return true; }
+            if (testop("roiA", "Prepare mesh for docking area of A")) { roiA(bounds); return true; }
+            //if (testop("shrinkA")) { shrinkA(); return true; }
+            if (testop("roiB", "Prepare mesh for docking area of B")) { roiB(bounds); return true; }
+            //if (testop("shrinkB")) { shrinkB(); return true; }
+            if (testop("overlap", "Show the int4ersection between spheres for A and B")) { intersect(bounds); return true; }
+            if (testop("holes", "Show the holes between A and B in the docking area")) { holes(bounds); return true; }
+            if (testop("copyProps", "Copy the properties from material for MolAH into other molecule materials")) { copyProps(); return true; }
 
-            if (testop("spheres")) {
+            if (testop("spheres", "Show sphere represnetation for A")) {
                 BasicMeshData.defaultShaderName = "Standard";
                 csg = spheres(molA, radMult, radAdd);
             }
 
-            if (testop("triangles")) {
+            if (testop("triangles", "Show all triangles (internal and external) for 'close' sphere triples (SLOW, DEAD? EXPERIMENT)")) {
                 //BasicMeshData.defaultShaderName = "Standard";
                 BigMesh bm = triangles(molA, radInfluence / 4, radMult, radAdd);
                 BasicMeshData.ToGame(goTest, bm.ToMeshes());
                 return true;
             }
 
-            if (testop("unmatched")) { savemeshA.unmatched(); return true; }
+            if (testop("unmatched", "show the 'holes' inside mol A usually discarded")) { savemeshA.unmatched(); return true; }
             // if (testop("resetPolyEdges")) { CSGPrim.resetPolyEdges(); return true; }
 
             if (opdone) showCSGParallel(csg, bounds, goTest);
