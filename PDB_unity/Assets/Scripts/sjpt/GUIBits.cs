@@ -457,27 +457,47 @@ namespace CSG {  // [ExecuteInEditMode]
 
         float boxopacity = 0.5f;
         int currentMenuWidth = 0;
+        Dictionary<string, Vector2> tippos;
+
         // standard Unity OnGUI function, protecting from exceptions
         void OnGUI() {
             int ww = currentMenuWidth = sliderWidth + 2 * slidermargin;
             if (Input.mousePosition.x < 20) showing = true;
             if (Input.mousePosition.x > ww) { showing = false; boxopacity = 0.5f; }
 
-            Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
-            GUI.BeginGroup(rect);
-
-            // draw a background
-            GUI.color = new Color(1.0f, 1.0f, 1.0f, boxopacity); //0.5 is half opacity 
-            for (int i = 0; i < boxopacity; i++) GUI.Box(rect, "box");
-
             // main gui, which will draw all the buttons etc within the box
             try {
+                Rect rect = new Rect(0, 0, showing ? ww : 0, Screen.height);
+                GUI.BeginGroup(rect);
+
+                // draw a background
+                GUI.color = new Color(1.0f, 1.0f, 1.0f, boxopacity); //0.5 is half opacity 
+                for (int i = 0; i < boxopacity; i++) GUI.Box(rect, "box");
+
                 OnGUII();
+
+                GUI.EndGroup();
+
+
+                // now, a bit of a faffle, show any tooltip in the correct place
+                // keep to left to allow full width, tooltip is also limited to current parent region
+                // ?? better to display toolip at higher level after 
+                if (GUI.tooltip != "") {
+                    Vector2 pos = tippos[GUI.tooltip];
+                    GUI.skin.label.wordWrap = true;
+                    // sadly the line below just causes problems so we can't get sensible height
+                    // Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(GUI.tooltip), GUI.skin.label, GUILayout.MaxWidth(currentMenuWidth));
+                    Rect labelRect = new Rect((int)pos.x + 20, (int)pos.y + 20, currentMenuWidth, 80);
+                    for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
+                        GUI.Box(labelRect, "");
+                    GUI.Label(labelRect, GUI.tooltip);
+                    GUI.skin.button.wordWrap = false;
+                }
+
             } catch (System.Exception e) {
                 Log(e.ToString() + e.StackTrace);
             }
 
-            GUI.EndGroup();
             showlog();
         }
 
@@ -497,7 +517,7 @@ namespace CSG {  // [ExecuteInEditMode]
             int y = 0, yh = butheight, x = 2;
             int opsc = ops.Count;
             GUI.skin.button.wordWrap = false;
-            Dictionary<string, Vector2> tippos = new Dictionary<string, Vector2>();
+            tippos = new Dictionary<string, Vector2>();
             foreach (var kvp in ops) {    // and show buttons for tests
                 string tooltip = kvp.Key + ": " + kvp.Value.tooltip;
                 tippos[tooltip] = new Vector2(x, y);
@@ -508,17 +528,6 @@ namespace CSG {  // [ExecuteInEditMode]
                 y += yh;
                 if (y > Screen.height/2) { x += butwidth;  y = 0; }
             }
-            if (GUI.tooltip != "" ) {
-                Vector2 pos = tippos[GUI.tooltip];
-                GUI.skin.label.wordWrap = true;
-                // sadly the line below just causes problems so we can't get sensible height
-                // Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(GUI.tooltip), GUI.skin.label, GUILayout.MaxWidth(currentMenuWidth));
-                Rect labelRect = new Rect(0, (int)pos.y + 20, currentMenuWidth, 80);
-                for (int i = 0; i < NBOX; i++)  // get right opacity, seems silly but ...
-                    GUI.Box(labelRect, "");
-                GUI.Label(labelRect, GUI.tooltip);
-            }
-            GUI.skin.button.wordWrap = false;
 
             y += 2;
             slidery = Screen.height / 2 + 40;
