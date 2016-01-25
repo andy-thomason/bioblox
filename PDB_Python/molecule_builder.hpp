@@ -135,14 +135,14 @@ public:
 
     int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
-    values.resize(xdim*ydim*zdim);
-    colours.resize(xdim*ydim*zdim);
-    
-    float threshold = 0.5f;
-    std::fill(values.begin(), values.end(), -threshold);
-    
     printf("min %f %f %f\n", min.x, min.y, min.z);
     printf("max %f %f %f\n", max.x, max.y, max.z);
+
+    float threshold = 0.5f;
+
+    values.resize(xdim*ydim*zdim);
+    colours.resize(xdim*ydim*zdim);
+    std::fill(values.begin(), values.end(), -threshold);
 
     for (size_t ac = 0; ac != num_atoms; ++ac) {
       vector3 c = pos[ac];
