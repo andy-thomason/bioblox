@@ -249,7 +249,7 @@ def download_entries():
     tot.make_thumbnail(map_name, 2048, 2048)
     
 def get_mols(name):
-  name = name.decode()
+  if type(name) is bytes: name = name.decode()
   local_name = 'pdb/%s.pdb' % name
   print('reading %s' % local_name)
   with open(local_name, 'rb') as file:
@@ -263,7 +263,7 @@ def build_thumbnail(pdb, size):
   tot = PDB_molecule()
   for mol in mols:
     i = i + 1
-    tot.add(mol)
+    tot.add(mol, 0, 0)
   tot.make_thumbnail('thumbnails/%s.%d.png' % (pdb, size), size, size)
 
 def build_mesh(pdb, index, resolution):
