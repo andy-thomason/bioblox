@@ -1,22 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
-public class MapController : MonoBehaviour
+public class MapController : MonoBehaviour, IPointerClickHandler
 {
     
     float current_scroll;
-    Camera micro_camera;
+    public Camera micro_camera;
     public Vector3 zoom_position;
-    public RectTransform map_panel;
+    RectTransform map_panel;
     public GameObject level_description;
 
     // Use this for initialization
     void Awake () {
-        micro_camera = GetComponent<Camera>();
+        map_panel = GetComponent<RectTransform>();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public void OnPointerClick(PointerEventData data)
+    {
+        //Debug.Log("position mapa : "+map_panel.position);
+        //Debug.Log(micro_camera.ScreenToWorldPoint(Input.mousePosition));
+    }
+
+
+        // Update is called once per frame
+        void Update ()
     {
         // float key = Mathf.Lerp(0.0f, 40.0f, Time.time);
         //Debug.Log(key);
@@ -74,7 +82,8 @@ public class MapController : MonoBehaviour
     IEnumerator MoveMapCanvas()
     {
         float timeSinceStarted = 0f;
-        Vector3 newPosition = new Vector2((-zoom_position.x + 348.0f), (-zoom_position.y - 237.0f));
+        Vector3 newPosition = map_panel.position - micro_camera.ScreenToWorldPoint(Input.mousePosition);
+        newPosition.z = 0;
         while (true)
         {
             timeSinceStarted += Time.deltaTime;
@@ -100,7 +109,7 @@ public class MapController : MonoBehaviour
     IEnumerator MoveMapCanvasDoubleClick()
     {
         float timeSinceStarted = 0f;
-        Vector3 newPosition = new Vector2((-zoom_position.x + 348.0f), (-zoom_position.y - 237.0f));
+        Vector3 newPosition = new Vector2((-zoom_position.x), (-zoom_position.y));
         while (true)
         {
             timeSinceStarted += Time.deltaTime;

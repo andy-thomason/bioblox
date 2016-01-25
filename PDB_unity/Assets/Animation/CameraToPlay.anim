@@ -447,7 +447,7 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_GenerateMotionCurves: 0
   m_Events:
-  - time: 9.25
+  - time: 8.783334
     functionName: StartFadeCanvas
     data: 
     objectReferenceParameter: {fileID: 0}
