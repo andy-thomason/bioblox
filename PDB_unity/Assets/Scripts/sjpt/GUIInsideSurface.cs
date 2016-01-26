@@ -83,14 +83,14 @@ namespace CSG {
             text = "";
             toshow = ptoshow;
             if (testop("mwin", "Set up multiple windows.")) { setmwin(); return true; }
-            if (testop("onewin", "Set up single window.")) { setonewin(); return true;  }
+            if (testop("onewin", "Set up single window.")) { setonewin(); return true; }
             // if (testop("4lights", "Set up standard 4 lights")) { setLights();  return true; }
 
             if (testop("clearMol", "Clear the molecular associated game objects (MolA etc")) {
                 foreach (var mf in mfMol)
                     mf.mesh = null;
-                
-                foreach ( var go in goMol)
+
+                foreach (var go in goMol)
                     DeleteChildren(go);
 
                 meshverts.Clear();
@@ -105,15 +105,19 @@ namespace CSG {
                 return true;
             }
 
-          //  if (testop("FindStacks")) {
-          //      Dictionary<int, string[]> p = Probe.Probe.FindStacks();
-          //      Log("Findtacks #' {0}", p.Count);
-          //  }
+            //  if (testop("FindStacks")) {
+            //      Dictionary<int, string[]> p = Probe.Probe.FindStacks();
+            //      Log("Findtacks #' {0}", p.Count);
+            //  }
 
             if (testop("BioBloxMesh", "Run the BioBlox mesh generation for comparison")) {
                 useBioBloxMesh(molA);
                 return true;
             }
+
+            // note, clear because running any test with outstanding graphics considerably slows down CSG preparation thread
+            if (testop("pdb TEST4", "run 4 parallel tests")) { clear(); for (int i = 0; i < 4; i++) IShow("pdb TEST"); return true; }
+            if (testop("pdb TEST10", "run 10 parallel tests")) { clear();  for (int i = 0; i < 10; i++) IShow("pdb TEST"); return true; }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb TEST", "generate sample pdb" ) || testop("pdb prep", "prepare mesh for molecule A") || testop("pdb prepB", "prepare mesh for molecule B")) {

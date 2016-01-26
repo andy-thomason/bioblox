@@ -276,6 +276,7 @@ namespace CSG {
             return Plane(a, b, c, d, S.DefaultBakery);
         }
 
+        [ThreadStatic]
         public static int Simpguid = 1001;
         // global place to generate a guid
 
@@ -731,14 +732,16 @@ namespace CSG {
     /// Node class is any node of a CSG tree
     /// </summary>
     public abstract class CSGNode : CSGControl, IDist, IColorable, IHasProvenance {
-//?        [ThreadStatic]
+        [ThreadStatic]
         protected static int rid = 0;
         public int Id = rid++;
         /// <summary>Count of give ups
+        [ThreadStatic]
         public static int GiveUpCount = 0;
+        [ThreadStatic]
         public static int MaxnodesForDraw = 0;
 
-        public static CSGMode csgmode = CSGMode.collecting;
+        public static CSGMode csgmode = CSGMode.collecting;  // << consider threading implications ...
 
         protected CSGNode baked = null;
         /// <summary>
@@ -1588,8 +1591,10 @@ namespace CSG {
         }
 
 
+        [ThreadStatic]
         public static int NOP2 = 0;
         // number of make primitive calls
+        [ThreadStatic]
         public static int NUniqueOP2 = 0;
         // number of unique primitives
 
@@ -1610,7 +1615,7 @@ namespace CSG {
         // we only use one of these
         //protected static Dictionary<int, CSGOP2> sharedd;
         //protected static Hashtable sharedh;
-//?        [ThreadStatic]
+        [ThreadStatic]
         protected static CSGOP2[] _shareda;
 
         protected static CSGOP2[] shareda {
@@ -2203,8 +2208,10 @@ namespace CSG {
     /// CSG primitive
     /// </summary>
     public abstract partial class CSGPrim : CSGNode {
+        [ThreadStatic]
         public static int NPrims = 0;
         // number of make primitive calls
+        [ThreadStatic]
         public static int NUniquePrims = 0;
         // number of unique primitives
         public override abstract CSGNode Simplify(Volume vol, int simpguid, ref int nUnodes);
@@ -2529,7 +2536,7 @@ namespace CSG {
         static int SHAREDSIZE = 1024;
         // must be power 2
         //static int FirstOfGroup;
- //?       [ThreadStatic]
+        [ThreadStatic]
         static List<CSGPlane>[] _shared = new List<CSGPlane>[SHAREDSIZE];
 
         static List<CSGPlane>[] shared {
@@ -3812,6 +3819,7 @@ namespace CSG {
         /// <summary>stats for Poly pool</summary>
         public static int frompool = 0, fromnew = 0;
         /// <summary>Poly pool; will always contain a null at the bottom to help detect empty.  Why no efficient IsEmpty() method?</summary>
+   [ThreadStatic]
         private static Stack<Poly> pool = new Stack<Poly>();
         public static void ClearPool() { pool = new Stack<Poly>(); }
 
@@ -3853,7 +3861,9 @@ namespace CSG {
         //    yield return this.First();
         //}
 
+        [ThreadStatic]
         public static int splits = 0;  // for stats
+        [ThreadStatic]
         public static int polymixup = 0; // for stats
         /// <summary>
         /// Split the poly at another csg
@@ -4048,6 +4058,7 @@ namespace CSG {
             //if ((inpoly != null && inpoly.Count < 3) || (outpoly != null && outpoly.Count < 3)) { }
         }
 
+        [ThreadStatic]
         public static int debugsmall = 0;
 
     }

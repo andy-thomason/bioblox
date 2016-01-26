@@ -131,10 +131,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
 
             if (testop("clear", "Clear out the objects associated with Test and Filtered, but not molecule objects.")) {  // clear button
-                DeleteChildren(goTest);
-                DeleteChildren(goFiltered);
-                csg = S.NONE;
-                Poly.ClearPool();
+                clear();
                 return true;
             }
             if (testop("progress", "Show progress so far for parallel csg->mesh")) {
@@ -185,6 +182,13 @@ namespace CSG {  // [ExecuteInEditMode]
             return true;
 
         }  // showCSGparallel
+
+        protected void clear() {
+            DeleteChildren(goTest);
+            DeleteChildren(goFiltered);
+            csg = S.NONE;
+            Poly.ClearPool();
+        }
 
 
         public static void Log(string s, params object[] xparms) {
@@ -614,7 +618,7 @@ namespace CSG {  // [ExecuteInEditMode]
             }
         }
 
-        private static int simpguid = -1;
+        private static int simpguid = -1;  // use so we can call Simplify with unique guid
 
 #region Utility functions
         // find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
@@ -735,6 +739,8 @@ namespace CSG {  // [ExecuteInEditMode]
                 GUIBits.Log("running in parallel:  " + toshow);
                 parallelThread = new Thread(() => {
                     try {
+                        Poly.ClearPool();
+                        S.Simpguid = 1001;
                         parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     } catch (Exception e) {
                         GUIBits.Log("parallel thread failed: " + e);
