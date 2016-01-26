@@ -4,12 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace CSG {
-    struct Vertdata {
-        Vector3 vertex;
-        Vector3 normal;
-        Color color;
-        Vector2 uv;
-    }
 
     public class UnityCSGOutput : ICSGOutput {
         int limit;
@@ -122,6 +116,7 @@ namespace CSG {
     /// Data is inserted with Add(Poly).
     /// </summary>
     public class BasicMeshData {
+
         int limit;
 
         public BasicMeshData(int limit) {
@@ -142,11 +137,7 @@ namespace CSG {
         public static int VeryWrongWind = 0;
 
         //I could use IList<VertStruct> maybe instead
-        //private IList<Vertdata> verts = new List<Vertdata>()
-        private IList<Vector3> verts = new List<Vector3>();
-        private IList<Vector3> normals = new List<Vector3>();
-        private IList<Vector2> uvs = new List<Vector2>();
-        private IList<Color> colors = new List<Color>();
+        private IList<CsgOutVert> verts = new List<CsgOutVert>();
 
         public IList<BigMesh> extraMeshes = new List<BigMesh>();  // list of meshes, usually <65000 but saved as BigMesh for parallel creation
         /// <summary>
@@ -161,33 +152,33 @@ namespace CSG {
         }
 
         private BigMesh GetExtraMesh() {
-            BigMesh mesh = new BigMesh(
-                verts.ToArray<Vector3>(), //nb: ToArray method is in Linq namespace
-                normals.ToArray<Vector3>(),
-                uvs.ToArray<Vector2>(),
-                colors.ToArray<Color>(),
-                triangles.ToArray<int>());
 
             //mesh.RecalculateNormals();
             //if (fullsize > 64000) 
             //    GUIBits.Log("mesh truncated from " + fullsize + " to " + mesh.vertices.Count());
 
-            verts = new List<Vector3>();
-            normals = new List<Vector3>();
-            uvs = new List<Vector2>();
-            colors = new List<Color>();
+            BigMesh mesh = GetBigMesh();  // get the big mesh
+            verts = new List<CsgOutVert>(); // and prepare for more to be added
             triangles = new List<int>();
 
             return mesh;
         }
 
         public BigMesh GetBigMesh() {
-            BigMesh mesh = new BigMesh(
-                verts.ToArray<Vector3>(), //nb: ToArray method is in Linq namespace
-                normals.ToArray<Vector3>(),
-                uvs.ToArray<Vector2>(),
-                colors.ToArray<Color>(),
-                triangles.ToArray<int>());
+            int N = verts.Count;
+            Vector3[] averts = new Vector3[N];
+            Vector3[] anormals = new Vector3[N];
+            Color[] acols = new Color[N];
+            Vector2[] auv = new Vector2[N];
+            int i = 0;
+            foreach (CsgOutVert v in verts) {
+                averts[i] = v.position;
+                anormals[i] = v.normal;
+                acols[i] = v.color;
+                auv[i] = v.uv;
+				i++;
+            }
+            BigMesh mesh = new BigMesh(averts, anormals, auv, acols, triangles.ToArray<int>());
             return mesh;
         }
 
@@ -227,20 +218,16 @@ namespace CSG {
                 //note, this mechanism doesn't allow for re-using vertices.
                 //if we collect the data in Dictionary we could get around that...
                 //would need to be using entire vert struct as key, not just point.
-				verts.Add(v.position);
-                //Vector2 uv = poly.Csg.TextureCoordinate(p);
-                uvs.Add(v.uv);
-				colors.Add(v.color);
-				normals.Add(v.normal);
+				verts.Add(v);
             }
             //simple fan: pretty sure poly is always convex.
             int w0 = 99;
             for (int i = 1; i < n - 1; i++) {
                 int w = 0;  // 1 for wrong
                 if (CheckWind) {  // note, CheckWrap costing about 10% on Minst
-                    Vector3 cross = (verts[startIndex] - verts[startIndex + i]).cross(verts[startIndex] - verts[startIndex + i + 1]);
+                    Vector3 cross = (verts[startIndex].position - verts[startIndex + i].position).cross(verts[startIndex].position - verts[startIndex + i + 1].position);
                     Vector3 crossn = cross.Normal();
-                    float test = Vector3.Dot(crossn, normals[startIndex]);
+                    float test = Vector3.Dot(crossn, verts[startIndex].normal);
                     if (test < 0) {
                         //CSGPrim.wrongbm[CSGPrim.sharebm]++;
                         WrongWind++;
