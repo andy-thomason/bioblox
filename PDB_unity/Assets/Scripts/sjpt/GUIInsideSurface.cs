@@ -271,8 +271,8 @@ namespace CSG {
 
         void parallelAB() {
             CSGControl.MinLev = CSGControl.MaxLev = detailLevel - 1;
-            CSGNode csgA = meta(molA, radInfluence, radMult, radAdd);
-            CSGNode csgB = meta(molB, radInfluence, radMult, radAdd);
+            CSGNode csgA1 = meta(molA, radInfluence, radMult, radAdd);
+            CSGNode csgB1 = meta(molB, radInfluence, radMult, radAdd);
             DeleteChildren(goMol[Mols.molA]);
             DeleteChildren(goMol[Mols.molAback]);
             DeleteChildren(goMol[Mols.molB]);
@@ -282,6 +282,9 @@ namespace CSG {
             for (int i=0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++) {
+                        // these should not be necessary, need to think about relationship between baking and threads
+                        CSGNode csgA = meta(molA, radInfluence, radMult, radAdd);
+                        CSGNode csgB = meta(molB, radInfluence, radMult, radAdd);
                         Bounds bounds = new Bounds(new Vector3((i - 0.5f) * s/2, (j - 0.5f) * s/2, (k - 0.5f) * s/2), new Vector3(s / 2, s / 2, s / 2));
                         showCSGParallel(csgA, bounds, goMol[Mols.molA], goMol[Mols.molAback], after: shrinkAPrep, clear: false);
                         showCSGParallel(csgB, bounds, goMol[Mols.molB], goMol[Mols.molBback], after: shrinkBPrep, clear: false);
@@ -341,9 +344,9 @@ namespace CSG {
         CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult, float pradAdd) {
             if (mol == null) { LogK("mol load", "molecule data missing"); return null; }
             // prepare and populate the metaball object
-            Log("in meta, mol {0}", mol);
+            //Log("in meta, mol {0}", mol);
             CSGFMETA csgm = new CSGFMETA();
-            Log("in meta, csgm {0}", csgm);
+            //Log("in meta, csgm {0}", csgm);
             Vector3[] v = mol.atom_centres;
             float[] r = mol.atom_radii;
             for (int i = 0; i < v.Length; i++) {

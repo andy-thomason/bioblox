@@ -33,7 +33,7 @@ namespace CSGFIELD {
     }
 
     public class CSGFBIG : CSGFNODE {
-        public static CSGFBIG std = new CSGFBIG();
+        readonly public static CSGFBIG std = new CSGFBIG();
 
         public override Interval ifield(Volume vol) {
             return Interval.MAX;
@@ -53,7 +53,7 @@ namespace CSGFIELD {
     }
 
     public class CSGFZERO : CSGFNODE {
-        public static CSGFZERO std = new CSGFZERO();
+        readonly public static CSGFZERO std = new CSGFZERO();
 
         public override Interval ifield(Volume vol) {
             return Interval.ZERO;
@@ -608,7 +608,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             throw new NotImplementedException();
         }
 
-        int simplev;  // used to record the 'current' depth for which spheres is valid
+        private int simplev = -9999;  // used to record the 'current' depth for which spheres is valid
         public override CSGNode Simplify(Volume vol, int simpguid, ref int nUnodes) {
             int inlev = vol.lev;
             int outlev = simplev = inlev + 1;

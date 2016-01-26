@@ -322,7 +322,14 @@ namespace CSG {
             return (T)(applyTo.SetProvenance(prov));
         }
 
-
+        /** make sure thread initializations done ~~not used but maybe should be * /
+        public static void NewThread() {
+			Simpguid = 1001;
+			ClearCache();
+			CSGNode.rid = 0;
+			Poly.ClearPool();
+        }
+        * **/
 
     }
     // utility class S
@@ -733,7 +740,7 @@ namespace CSG {
     /// </summary>
     public abstract class CSGNode : CSGControl, IDist, IColorable, IHasProvenance {
         [ThreadStatic]
-        protected static int rid = 0;
+        internal static int rid = 0;
         public int Id = rid++;
         /// <summary>Count of give ups
         [ThreadStatic]
