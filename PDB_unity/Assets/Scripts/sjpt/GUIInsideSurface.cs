@@ -209,7 +209,7 @@ namespace CSG {
 
             if  (testop("dock", "set molB in docking position to MolA")) { dock(); return true; }
 
-            if (testop("|| A", "Prepare mesh parallel")) { parallelA(); return true; }
+            if (testop("|| test", "Prepare mesh parallel")) { parallelAB(); return true; }
             if (testop("roiA", "Prepare mesh for docking area of A")) { roiA(bounds); return true; }
             //if (testop("shrinkA")) { shrinkA(); return true; }
             if (testop("roiB", "Prepare mesh for docking area of B")) { roiB(bounds); return true; }
@@ -269,18 +269,22 @@ namespace CSG {
             //savevert(goMol[Mols.molAfiltback].transform);
         }
 
-        void parallelA() {
+        void parallelAB() {
             CSGControl.MinLev = CSGControl.MaxLev = detailLevel - 1;
-            csg = meta(molA, radInfluence, radMult, radAdd);
+            CSGNode csgA = meta(molA, radInfluence, radMult, radAdd);
+            CSGNode csgB = meta(molB, radInfluence, radMult, radAdd);
             DeleteChildren(goMol[Mols.molA]);
             DeleteChildren(goMol[Mols.molAback]);
+            DeleteChildren(goMol[Mols.molB]);
+            DeleteChildren(goMol[Mols.molBback]);
 
             float s = 64;
             for (int i=0; i < 2; i++)
                 for (int j = 0; j < 2; j++)
                     for (int k = 0; k < 2; k++) {
                         Bounds bounds = new Bounds(new Vector3((i - 0.5f) * s/2, (j - 0.5f) * s/2, (k - 0.5f) * s/2), new Vector3(s / 2, s / 2, s / 2));
-                        showCSGParallel(csg, bounds, goMol[Mols.molA], goMol[Mols.molAback], after: shrinkAPrep, clear: false);
+                        showCSGParallel(csgA, bounds, goMol[Mols.molA], goMol[Mols.molAback], after: shrinkAPrep, clear: false);
+                        showCSGParallel(csgB, bounds, goMol[Mols.molB], goMol[Mols.molBback], after: shrinkBPrep, clear: false);
                     }
         }
 

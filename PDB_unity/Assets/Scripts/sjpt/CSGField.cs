@@ -347,12 +347,12 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
     public class CSGFMETA : CSGXPrim {
         public bool grayscale = false;
         public static bool computeCurvature = false;
-        public static float radShrink = 0;  // shrink the points towards the centres by this amount
+        public static float radShrink = 0;  // shrink the points towards the centres by this amount, performed at morph level, not here
 
-        int MAXD = 15;          // max depth, just for allocation
-        int MAXN = 2500;        // max num spheres, just for allocation
-        MSPHERE[][] spheres;    // list of spheres for each recursion level
-        int[] levspheres;       //number of used spheres at each level
+        readonly int MAXD = 15;          // max depth, just for allocation
+        readonly int MAXN = 2500;        // max num spheres, just for allocation
+        readonly MSPHERE[][] spheres;    // list of spheres for each recursion level
+        readonly int[] levspheres;       //number of used spheres at each level
 
         public CSGFMETA() {
             spheres = new MSPHERE[MAXD][];

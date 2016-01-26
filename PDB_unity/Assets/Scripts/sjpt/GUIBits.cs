@@ -162,6 +162,7 @@ namespace CSG {  // [ExecuteInEditMode]
             }
             foreach (var p in remove)
                 parallels.Remove(p);
+            GUIBits.LogK("||", "running in parallel:  n={0}", parallels.Count);
         }
 
          internal static float progressInterval;
@@ -178,7 +179,10 @@ namespace CSG {  // [ExecuteInEditMode]
 
             // if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
             ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after, clear);
-            if (parallel) parallels.Add(pcsg);
+            if (parallel) {
+                parallels.Add(pcsg);
+                GUIBits.LogK("||", "running in parallel:  n={0}, {1}", parallels.Count, toshow);
+            }
             return true;
 
         }  // showCSGparallel
@@ -542,8 +546,9 @@ namespace CSG {  // [ExecuteInEditMode]
 
         void showlog() {
             // int w = Screen.width / 2;  // width of text
-            string xtext = text.Length == 0 ? "" : text.Substring(1);
-            lock (ktexts) foreach (var kvp in ktexts) xtext += "\n" + kvp.Key + ": " + kvp.Value;
+            string xtext = "";
+            lock (ktexts) foreach (var kvp in ktexts) xtext += kvp.Key + ": " + kvp.Value + "\n";
+            xtext += text.Length == 0 ? "" : text.Substring(1);
 
             try {
                 Rect labelRect = GUILayoutUtility.GetRect(new GUIContent(xtext), GUI.skin.label);
@@ -739,15 +744,15 @@ namespace CSG {  // [ExecuteInEditMode]
             this.clear = clear;
 
             if (parallel) {
-                GUIBits.Log("running in parallel:  " + toshow);
+                // GUIBits.Log("running in parallel:  " + toshow);
                 parallelThread = new Thread(() => {
                     try {
                         Poly.ClearPool();
                         S.Simpguid = 1001;
                         parallelOutput = UnityCSGOutput.MakeCSGOutput(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     } catch (Exception e) {
-                        GUIBits.Log("parallel thread failed: " + e);
-                        GUIBits.Log(e.StackTrace);
+                        GUIBits.Log2("parallel thread failed: " + e);
+                        GUIBits.Log2(e.StackTrace);
                     }
                 });
                 parallelThread.Name = "CSGWorker_" + toshow;
