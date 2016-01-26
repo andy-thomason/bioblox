@@ -129,7 +129,10 @@ namespace CSG {
             }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
-            if (testop("pdb TEST", "generate sample pdb" ) || testop("pdb prep", "prepare mesh for molecule A") || testop("pdb prepB", "prepare mesh for molecule B")) {
+            if (testop("pdb TEST", "generate sample pdb" )
+                || testop("pdb prep", "prepare mesh for molecule A") 
+                || testop("pdb prepB", "prepare mesh for molecule B")) {
+
                 bool useb = ptoshow == "pdb prepB";
                 PDB_molecule mol;
 
@@ -142,12 +145,13 @@ namespace CSG {
                 // bounds = new Bounds(Vector3.zero, new Vector3(70,70,70));  // same bounds for both molecules
 
 
+
                 // prepare the mesh in a way I can raycast it and filter it
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
-                    //Probe.Probe.StartProbe("MakeCSGOutput");  // freezes in both edit game mode and built run mode
+                    // Probe.Probe.StartProbe("MakeCSGOutput");  // freezes in both edit game mode and built run mode
                     var savemeshx = UnityCSGOutput.MakeCSGOutput(csg, bounds, 999999, detailLevel, detailLevel).MeshesSoFar();
-                    //Probe.Probe.StopProbe();
+                    // Probe.Probe.StopProbe();
 
                     BigMesh tsavemesh = null;
                     foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
@@ -205,6 +209,7 @@ namespace CSG {
 
             if  (testop("dock", "set molB in docking position to MolA")) { dock(); return true; }
 
+            if (testop("|| A", "Prepare mesh parallel")) { parallelA(); return true; }
             if (testop("roiA", "Prepare mesh for docking area of A")) { roiA(bounds); return true; }
             //if (testop("shrinkA")) { shrinkA(); return true; }
             if (testop("roiB", "Prepare mesh for docking area of B")) { roiB(bounds); return true; }
@@ -262,6 +267,21 @@ namespace CSG {
             //remap(goMol[Mols.molAfiltback].transform);
             //savevert(goMol[Mols.molAfilt].transform);
             //savevert(goMol[Mols.molAfiltback].transform);
+        }
+
+        void parallelA() {
+            CSGControl.MinLev = CSGControl.MaxLev = detailLevel - 1;
+            csg = meta(molA, radInfluence, radMult, radAdd);
+            DeleteChildren(goMol[Mols.molA]);
+            DeleteChildren(goMol[Mols.molAback]);
+
+            float s = 64;
+            for (int i=0; i < 2; i++)
+                for (int j = 0; j < 2; j++)
+                    for (int k = 0; k < 2; k++) {
+                        Bounds bounds = new Bounds(new Vector3((i - 0.5f) * s/2, (j - 0.5f) * s/2, (k - 0.5f) * s/2), new Vector3(s / 2, s / 2, s / 2));
+                        showCSGParallel(csg, bounds, goMol[Mols.molA], goMol[Mols.molAback], after: shrinkAPrep, clear: false);
+                    }
         }
 
         void shrinkAPrep() {

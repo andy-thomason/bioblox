@@ -168,7 +168,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
 
 
-        protected bool showCSGParallel(CSGNode csg, Bounds bounds, GameObject front, GameObject back = null, voidvoid after = null) {
+        protected bool showCSGParallel(CSGNode csg, Bounds bounds, GameObject front, GameObject back = null, voidvoid after = null, bool clear = true) {
             Poly.verttype[0] = Poly.verttype[1] = Poly.verttype[2] = 0;
             if (toshow == "")
                 return false;
@@ -177,7 +177,7 @@ namespace CSG {  // [ExecuteInEditMode]
             Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
 
             // if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
-            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after);
+            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after, clear);
             if (parallel) parallels.Add(pcsg);
             return true;
 
@@ -727,14 +727,16 @@ namespace CSG {  // [ExecuteInEditMode]
         private string toshow;
         private int minLev, maxLev;
         private voidvoid after;
+        private bool clear;
 
-        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev, voidvoid after = null) {
+        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev, voidvoid after = null, bool clear = true) {
             goFront = front;
             goBack = back;
             this.toshow = toshow;
             this.minLev = minLev;
             this.maxLev = maxLev;
             this.after = after;
+            this.clear = clear;
 
             if (parallel) {
                 GUIBits.Log("running in parallel:  " + toshow);
@@ -816,8 +818,8 @@ namespace CSG {  // [ExecuteInEditMode]
             }
             GUIBits.LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", toshow, t2 - t1, Subdivide.done * 100);
 
-
-            GUIBits.DeleteChildren(goFront);
+            if (clear)
+                GUIBits.DeleteChildren(goFront);
             var meshes = parallelOutput.MeshesSoFar();
             CSGStats stats = BasicMeshData.ToGame(goFront, meshes, toshow);
             if (goBack != null) {
