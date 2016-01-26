@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace CSG {
+    struct Vertdata {
+        Vector3 vertex;
+        Vector3 normal;
+        Color color;
+        Vector2 uv;
+    }
+
     public class UnityCSGOutput : ICSGOutput {
         int limit;
 
@@ -41,9 +48,11 @@ namespace CSG {
 
             string text = p.Csg == null ? "nocsg" : p.Csg.Texture ?? "notexture";
             if (separateCSGS) text += "#" + p.Csg.Id + "#" + p.Csg.Provenance.ToString();
-            if (!meshData.ContainsKey(text))
-                meshData.Add(text, new BasicMeshData(limit));
-            meshData[text].Add(p);
+            lock (meshData) {  // // n.b. no serious performance impact when not needed by ShowProgress(), but was when lock was on static (crossthread) object
+                if (!meshData.ContainsKey(text))
+                    meshData.Add(text, new BasicMeshData(limit));
+                meshData[text].Add(p);
+            }
         }
 
         public void AddLoop(CSGPrim prim, Vector3[] polyp) {
@@ -75,23 +84,34 @@ namespace CSG {
         ***/
 
         // generate meshes with usual limit
-        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds, int minLev, int maxLev) {
-            return MeshesFromCsg(csg, bounds, 64000, minLev, maxLev);
+        public static UnityCSGOutput MakeCSGOutput(CSGNode csg, Bounds bounds, int minLev, int maxLev) {
+            return MakeCSGOutput(csg, bounds, 64000, minLev, maxLev);
         }
 
-        // mechanism for peeking at work in progress, should be less static based
-        internal static UnityCSGOutput parallelOutput;
-        public static IDictionary<string, BasicMeshData> MeshesSoFar() {
-            return parallelOutput.meshData;
+        // peek at work in progress
+        public IDictionary<string, BasicMeshData> MeshesSoFar() {
+            return meshData;
         }
 
         // generate meshes with specified limit
-        public static IDictionary<string, BasicMeshData> MeshesFromCsg(CSGNode csg, Bounds bounds, int limit, int minLev, int maxLev) {
+        public static UnityCSGOutput MakeCSGOutput(CSGNode csg, Bounds bounds, int limit, int minLev, int maxLev) {
             UnityCSGOutput output = new UnityCSGOutput(limit);
-            parallelOutput = output;
             csg.CSGToCSGOutput(bounds, output, minLev, maxLev);
-            return output.meshData; // .Meshes;
+            return output; // .Meshes;
         }
+
+        public void showProgress(GameObject go, string basename) {
+            try {
+                lock (meshData) {
+                    GUIBits.DeleteChildren(go);
+                    BasicMeshData.ToGame(go, meshData, basename);
+                }
+            } catch (System.Exception e) {
+                GUIBits.Log("Error showing progress:" + e);
+            }
+
+        }
+
     }
 
     /// <summary>
@@ -122,6 +142,7 @@ namespace CSG {
         public static int VeryWrongWind = 0;
 
         //I could use IList<VertStruct> maybe instead
+        //private IList<Vertdata> verts = new List<Vertdata>()
         private IList<Vector3> verts = new List<Vector3>();
         private IList<Vector3> normals = new List<Vector3>();
         private IList<Vector2> uvs = new List<Vector2>();
@@ -184,86 +205,73 @@ namespace CSG {
 			}
 		}
 
+        Dictionary<Vector3, int> indexid = new Dictionary<Vector3, int>();
+
         // primitive lock for viewing mesh while in flight
         internal void Add(Poly poly) {
-            lock (UnityCSGOutput.parallelOutput) {  // n.b. no serious performance impact when not needed
-                int n = poly.Count;
-                fullsize += n;
-                if (poly.Count < 3) {
-                    poly.ConditionalReleaseToPool();
-                    return;
-                }  // ignore degenerate polys
-                int startIndex = verts.Count;
-                if (startIndex > limit) {
-                    extraMeshes.Add(GetExtraMesh());
-                    startIndex = 0;
+            int n = poly.Count;
+            fullsize += n;
+            if (poly.Count < 3) {
+                poly.ConditionalReleaseToPool();
+                return;
+            }  // ignore degenerate polys
+            int startIndex = verts.Count;
+            if (startIndex > limit) {
+                extraMeshes.Add(GetExtraMesh());
+                startIndex = 0;
 
-                }
-                for (int i = 0; i < n; i++) {
-					var v = new CsgOutVert(poly, i);
-                    //Vector3 p = poly[i].point;
-                    //note, this mechanism doesn't allow for re-using vertices.
-                    //if we collect the data in Dictionary we could get around that...
-                    //would need to be using entire vert struct as key, not just point.
-					verts.Add(v.position);
-                    //Vector2 uv = poly.Csg.TextureCoordinate(p);
-                    uvs.Add(v.uv);
-					colors.Add(v.color);
-					normals.Add(v.normal);
-                }
-                //simple fan: pretty sure poly is always convex.
-                int w0 = 99;
-                for (int i = 1; i < n - 1; i++) {
-                    int w = 0;  // 1 for wrong
-                    if (CheckWind) {  // note, CheckWrap costing about 10% on Minst
-                        Vector3 cross = (verts[startIndex] - verts[startIndex + i]).cross(verts[startIndex] - verts[startIndex + i + 1]);
-                        Vector3 crossn = cross.Normal();
-                        float test = Vector3.Dot(crossn, normals[startIndex]);
-                        if (test < 0) {
-                            //CSGPrim.wrongbm[CSGPrim.sharebm]++;
-                            WrongWind++;
-                            w = 1;
-                        } else {
-                            RightWind++;
-                        }
-                        if (i == 1) {
-                            w0 = w;
-                        } else if (w != w0) {
-                            VeryWrongWind++;
-                        }
-
+            }
+            for (int i = 0; i < n; i++) {
+				var v = new CsgOutVert(poly, i);
+                //Vector3 p = poly[i].point;
+                //note, this mechanism doesn't allow for re-using vertices.
+                //if we collect the data in Dictionary we could get around that...
+                //would need to be using entire vert struct as key, not just point.
+				verts.Add(v.position);
+                //Vector2 uv = poly.Csg.TextureCoordinate(p);
+                uvs.Add(v.uv);
+				colors.Add(v.color);
+				normals.Add(v.normal);
+            }
+            //simple fan: pretty sure poly is always convex.
+            int w0 = 99;
+            for (int i = 1; i < n - 1; i++) {
+                int w = 0;  // 1 for wrong
+                if (CheckWind) {  // note, CheckWrap costing about 10% on Minst
+                    Vector3 cross = (verts[startIndex] - verts[startIndex + i]).cross(verts[startIndex] - verts[startIndex + i + 1]);
+                    Vector3 crossn = cross.Normal();
+                    float test = Vector3.Dot(crossn, normals[startIndex]);
+                    if (test < 0) {
+                        //CSGPrim.wrongbm[CSGPrim.sharebm]++;
+                        WrongWind++;
+                        w = 1;
+                    } else {
+                        RightWind++;
                     }
-                    if (((1 << w) & WindShow) != 0) {  // debug wrong wind, WindShow: 1 right, 2 wrong, 3 (default) both
-                                                       //option for changing winding order.
-                                                       // the w allows for corrected winding
-                        if ((Sides & 1) != 0) {
-                            triangles.Add(startIndex);
-                            triangles.Add(startIndex + i + w);
-                            triangles.Add(startIndex + i + 1 - w);
-                        }
+                    if (i == 1) {
+                        w0 = w;
+                    } else if (w != w0) {
+                        VeryWrongWind++;
+                    }
 
-                        if ((Sides & 2) != 0) {
-                            triangles.Add(startIndex);
-                            triangles.Add(startIndex + i + 1 - w);
-                            triangles.Add(startIndex + i + w);
+                }
+                if (((1 << w) & WindShow) != 0) {  // debug wrong wind, WindShow: 1 right, 2 wrong, 3 (default) both
+                                                    //option for changing winding order.
+                                                    // the w allows for corrected winding
+                    if ((Sides & 1) != 0) {
+                        triangles.Add(startIndex);
+                        triangles.Add(startIndex + i + w);
+                        triangles.Add(startIndex + i + 1 - w);
+                    }
 
-                        }
+                    if ((Sides & 2) != 0) {
+                        triangles.Add(startIndex);
+                        triangles.Add(startIndex + i + 1 - w);
+                        triangles.Add(startIndex + i + w);
+
                     }
                 }
             }
-        }
-
-        public static void showProgress(GameObject go, string basename) {
-            try {
-                lock (UnityCSGOutput.parallelOutput) { 
-                    var meshes = UnityCSGOutput.MeshesSoFar();
-                    GUIBits.DeleteChildren(go);
-                    BasicMeshData.ToGame(go, meshes, basename);
-                }
-            } catch (System.Exception e) {
-                GUIBits.Log("Error showing progress:" + e);
-            }
-
         }
 
         public void SwitchWinding() {

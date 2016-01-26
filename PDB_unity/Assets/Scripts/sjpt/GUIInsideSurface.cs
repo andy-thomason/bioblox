@@ -118,6 +118,15 @@ namespace CSG {
             // note, clear because running any test with outstanding graphics considerably slows down CSG preparation thread
             if (testop("pdb TEST4", "run 4 parallel tests")) { clear(); for (int i = 0; i < 4; i++) IShow("pdb TEST"); return true; }
             if (testop("pdb TEST10", "run 10 parallel tests")) { clear();  for (int i = 0; i < 10; i++) IShow("pdb TEST"); return true; }
+            // check for gui overhead, only around 5% as long as no objects being displayed
+            if (testop("pdb TEST10X", "run 10 parallel tests, no gui running")) {
+                clear();
+                for (int i = 0; i < 9; i++) IShow("pdb TEST");
+                parallel = false;
+                IShow("pdb TEST");
+                parallel = true;
+                return true;
+            }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb TEST", "generate sample pdb" ) || testop("pdb prep", "prepare mesh for molecule A") || testop("pdb prepB", "prepare mesh for molecule B")) {
@@ -136,8 +145,8 @@ namespace CSG {
                 // prepare the mesh in a way I can raycast it and filter it
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
-                    //Probe.Probe.StartProbe("MeshesFromCsg");  // freezes in both edit game mode and built run mode
-                    var savemeshx = UnityCSGOutput.MeshesFromCsg(csg, bounds, 999999, detailLevel, detailLevel);
+                    //Probe.Probe.StartProbe("MakeCSGOutput");  // freezes in both edit game mode and built run mode
+                    var savemeshx = UnityCSGOutput.MakeCSGOutput(csg, bounds, 999999, detailLevel, detailLevel).MeshesSoFar();
                     //Probe.Probe.StopProbe();
 
                     BigMesh tsavemesh = null;

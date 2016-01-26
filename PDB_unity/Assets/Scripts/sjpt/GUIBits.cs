@@ -718,7 +718,8 @@ namespace CSG {  // [ExecuteInEditMode]
     public delegate void voidvoid();
 
     class ParallelCSG {
-        private IDictionary<string, BasicMeshData> parallelMeshes;
+        private UnityCSGOutput parallelOutput;
+        
         private Thread parallelThread = null;
         private float lastProgressTime = 0;
         private float t1 = Time.realtimeSinceStartup;
@@ -741,7 +742,7 @@ namespace CSG {  // [ExecuteInEditMode]
                     try {
                         Poly.ClearPool();
                         S.Simpguid = 1001;
-                        parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                        parallelOutput = UnityCSGOutput.MakeCSGOutput(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                     } catch (Exception e) {
                         GUIBits.Log("parallel thread failed: " + e);
                         GUIBits.Log(e.StackTrace);
@@ -750,7 +751,7 @@ namespace CSG {  // [ExecuteInEditMode]
                 parallelThread.Name = "CSGWorker_" + toshow;
                 parallelThread.Start();
             } else {
-                parallelMeshes = UnityCSGOutput.MeshesFromCsg(csg, bounds, minLev, maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                parallelOutput = UnityCSGOutput.MakeCSGOutput(csg, bounds, minLev, maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 finish();
             }
         }
@@ -780,7 +781,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
             try {
                 GameObject test1 = goFront;
-                BasicMeshData.showProgress(test1, toshow);
+                parallelOutput.showProgress(test1, toshow);
             } catch (Exception e) {
                 GUIBits.Log("Error showing progress:" + e);
             }
@@ -808,23 +809,23 @@ namespace CSG {  // [ExecuteInEditMode]
             //showProgress();  // ???? <<< killer ???
             parallelThread = null;
             float t2 = Time.realtimeSinceStartup;
-            if (parallelMeshes == null) {
+            if (parallelOutput == null) {
                 GUIBits.Log("parallel thread finished but no meshes created, time=" + (t2 - t1));
                 toshow = null;
                 return;
             }
             GUIBits.LogK("done", "parallel complete: {0}: time={1}  {2,3:0.0}% ", toshow, t2 - t1, Subdivide.done * 100);
 
-            //var meshes = parallelMeshes;
 
             GUIBits.DeleteChildren(goFront);
-            CSGStats stats = BasicMeshData.ToGame(goFront, parallelMeshes, toshow);
+            var meshes = parallelOutput.MeshesSoFar();
+            CSGStats stats = BasicMeshData.ToGame(goFront, meshes, toshow);
             if (goBack != null) {
                 GUIBits.DeleteChildren(goBack);
-                BasicMeshData.ToGame(goBack, parallelMeshes, toshow, back: true);
+                BasicMeshData.ToGame(goBack, meshes, toshow, back: true);
             }
 
-            GUIBits.Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelMeshes.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
+            GUIBits.Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelOutput.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),
                 CSGNode.GiveUpCount, stats);
             if (BasicMeshData.CheckWind)
                 GUIBits.Log("wrong winding=" + BasicMeshData.WrongWind + " very wrong winding="
@@ -835,7 +836,7 @@ namespace CSG {  // [ExecuteInEditMode]
             if (Poly.polymixup != 0)
                 GUIBits.Log2("poly mix up {0:N0}", Poly.polymixup);
             Poly.polymixup = 0;
-            parallelMeshes = null;
+            parallelOutput = null;
             toshow = null;
 
             if (after != null) after();
