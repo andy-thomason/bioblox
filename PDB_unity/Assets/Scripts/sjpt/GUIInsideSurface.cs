@@ -24,6 +24,8 @@ namespace CSG {
         [Range(-1, 1)]
         public float radShrink = 0f;  // amounmt to shrink towards sphere centre
 
+        [Range(0, 20)]
+        public int CacheComplexThresh = 6;  // # metaspheres to cache dist/field value
 
         public float outsideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go inside object 
         public float insideDist = 20;  // distance to jump beyond surface when using ';' or '/' to go outside object 
@@ -66,6 +68,7 @@ namespace CSG {
             CSGFMETA.radShrink = radShrink;
             int smin = CSGControl.MinLev, smax = CSGControl.MaxLev;
             CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
+            CSGFMETA.CacheComplexThresh = CacheComplexThresh;
             bool r = true;
             try {
                 r = IShow(ptoshow);
@@ -205,6 +208,7 @@ namespace CSG {
 
                     return true; // 
                 }
+                DeleteChildren(goTest);
             }
 
             if  (testop("dock", "set molB in docking position to MolA")) { dock(); return true; }

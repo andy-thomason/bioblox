@@ -304,6 +304,7 @@ I2());
 #endif
 
         public static bool oldFieldPoly = false;
+
         //// public static float gradCompPow = -2;
         protected Poly PolyForVolField(Volume vol) {
             //// float gradcomp = Mathf.Pow(10, gradCompPow);
@@ -331,10 +332,12 @@ I2());
             int k = 1;  // bitmap val and val for each pos
             bool[] sign = new bool[8];
             for (int v = 0; v < 8; v++) {
-                vv[v] = Dist(points[v]);
-                if (vv[v] == 0)
-                    vv[v] = delta;
-                sign[v] = vv[v] > 0;
+                Vector3 p = points[v];
+                float val = Dist(p);  // caching at this level did not help, selective cache specifically for meta did
+                if (val == 0)
+                    val = delta;
+                vv[v] = val;
+                sign[v] = val > 0;
                 if (sign[v])
                     bm += k;
                 k *= 2;

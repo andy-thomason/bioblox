@@ -569,8 +569,8 @@ namespace CSG {  // [ExecuteInEditMode]
         protected bool MSlider(string sliderName, ref int v, int low, int high, int def) {
             int o = v;
             float vv = v;
-            bool changed = MSlider(sliderName, ref vv, low, high, def);
-            v = (int)vv;
+            bool changed = MSlider(sliderName, ref vv, low - 0.45f, high + 0.45f, def);
+            v = (int)(vv + 0.5);
 
             changed = o != v;
             if (changed) lastmouse = Input.mousePosition;

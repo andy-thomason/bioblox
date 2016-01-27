@@ -196,7 +196,13 @@ namespace CSG {
 			}
 		}
 
-        Dictionary<Vector3, int> indexid = new Dictionary<Vector3, int>();
+        Dictionary<long, int> indexid = new Dictionary<long, int>();
+        int[] localInds = new int[100];  // local indices for the polygon verts
+        readonly private static float www = 128f;  // precision for floating vector key
+        readonly private static int ooo = 32768;   // offset for floating vector key
+        /// <summary>
+        /// </summary>
+        /// <param name="poly"></param>
 
         // primitive lock for viewing mesh while in flight
         internal void Add(Poly poly) {
@@ -210,24 +216,36 @@ namespace CSG {
             if (startIndex > limit) {
                 extraMeshes.Add(GetExtraMesh());
                 startIndex = 0;
-
             }
             for (int i = 0; i < n; i++) {
-				var v = new CsgOutVert(poly, i);
                 //Vector3 p = poly[i].point;
-                //note, this mechanism doesn't allow for re-using vertices.
+                //note, this mechanism allows for re-using vertices, but may get confused between different vertices of different objects
                 //if we collect the data in Dictionary we could get around that...
                 //would need to be using entire vert struct as key, not just point.
-				verts.Add(v);
+                // OR the very plus the csg id ..., or have separate dictionaries for each csg
+                // TODO, check on Minster etc
+				// This caching reduced test case "PDB test" from 3.7 secs to 2.7 secs.
+                Vector3 p = poly[i].point;
+                long kk = (((long)(p.x * www) + ooo) << 32) + (((long)(p.y * www) + ooo) << 16) + ((long)(p.z * www) + ooo);
+                int ind;
+                if (indexid.ContainsKey(kk)) {
+                    ind = indexid[kk];
+                }  else {
+                    var v = new CsgOutVert(poly, i);
+                    verts.Add(v);
+                    ind = verts.Count - 1;
+                    indexid[kk] = ind;
+                }
+                localInds[i] = ind;
             }
             //simple fan: pretty sure poly is always convex.
             int w0 = 99;
             for (int i = 1; i < n - 1; i++) {
                 int w = 0;  // 1 for wrong
                 if (CheckWind) {  // note, CheckWrap costing about 10% on Minst
-                    Vector3 cross = (verts[startIndex].position - verts[startIndex + i].position).cross(verts[startIndex].position - verts[startIndex + i + 1].position);
+                    Vector3 cross = (verts[localInds[0]].position - verts[localInds[i]].position).cross(verts[localInds[0]].position - verts[localInds[i + 1]].position);
                     Vector3 crossn = cross.Normal();
-                    float test = Vector3.Dot(crossn, verts[startIndex].normal);
+                    float test = Vector3.Dot(crossn, verts[localInds[0]].normal);
                     if (test < 0) {
                         //CSGPrim.wrongbm[CSGPrim.sharebm]++;
                         WrongWind++;
@@ -246,15 +264,15 @@ namespace CSG {
                                                     //option for changing winding order.
                                                     // the w allows for corrected winding
                     if ((Sides & 1) != 0) {
-                        triangles.Add(startIndex);
-                        triangles.Add(startIndex + i + w);
-                        triangles.Add(startIndex + i + 1 - w);
+                        triangles.Add(localInds[0]);
+                        triangles.Add(localInds[i + w]);
+                        triangles.Add(localInds[i + 1 - w]);
                     }
 
                     if ((Sides & 2) != 0) {
-                        triangles.Add(startIndex);
-                        triangles.Add(startIndex + i + 1 - w);
-                        triangles.Add(startIndex + i + w);
+                        triangles.Add(localInds[0]);
+                        triangles.Add(localInds[i + 1 - w]);
+                        triangles.Add(localInds[i + w]);
 
                     }
                 }

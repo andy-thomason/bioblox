@@ -389,17 +389,46 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             ms.index = levspheres[0]++;
         }
 
+        private Dictionary<long, float> gridCache = new Dictionary<long, float>();
+        public static int CacheComplexThresh = 6;  // # metaspheres to cache dist/field value, 
+        /* ** exact value non critical, test values vary more than precision below ...
+        0   ->  4.2,     (always cache)
+        2   ->  3.8,
+        4   ->  3.75,
+        5   ->  3.8, 
+        6   ->  3.67, 
+        7-  ->  3.75, 
+        8   ->  3.75, 
+        10  ->  3.75, 
+        12  ->  3.85, 
+        16  ->  3.97,
+        20  ->  4.33  (almost never cache)
+        inf ->  4.5   (never cache) 
+        ** */
+
+        readonly private static float www = 128f;  // precision for floating vector key
+        readonly private static int ooo = 32768;   // offset for floating vector key
         public override float Dist(float x, float y, float z) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
+            long kk = 0;
+            if (inn > CacheComplexThresh) {
+                kk = (((long)(x * www) + ooo) << 32) + (((long)(y * www) + ooo) << 16) + ((long)(z * www) + ooo);
+                if (gridCache.ContainsKey(kk))
+                    return gridCache[kk];
+            }
+
             float field = 0;
             Vector3 p = new Vector3(x, y, z);
             for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
                 field += inspheres[ini].field(p);
             }
             // the fields are +ve inside region of influence, but the dist is measured as +ve outside
-            return CSGControl.fieldThresh - field;
+            float r = CSGControl.fieldThresh - field;
+            if (inn > CacheComplexThresh)
+                gridCache[kk] = r;
+            return r;
         }
 
 
@@ -419,7 +448,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             return n.Normal();
         }
         /***********/
-/* temporary tilll we do colour properly */
+        /* temporary tilll we do colour properly */
         public override Vector3 Normal(Vector3 p) {
             Vector3 normal;
             Color color;
