@@ -16,6 +16,7 @@ public class ButtonStructure : MonoBehaviour {
 
 	public Dictionary<string, Color32> NormalColor;
 	public Dictionary<string, Color32> FunctionColor;
+    public Dictionary<string, int> FunctionType;
 
 	// Use this for initialization
 	void Awake () {
@@ -33,10 +34,12 @@ public class ButtonStructure : MonoBehaviour {
 			{" PHE",  HYDROColor},	{" PRO",  SPECIALColor}, {" SER",  POLARColor}, {" THR",  POLARColor}, {" GLN", POLARColor}, {" TRP",  HYDROColor},
 			{" TYR",  HYDROColor}, {" VAL",  HYDROColor},
 		};
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+        //hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
+        FunctionType = new Dictionary<string, int>{
+            {" ALA",  0}, {" ARG",  1}, {" ASN",  2}, {" ASP",  3}, {" CYS",  4}, {" GLU",  3},
+            {" GLY",  4}, {" HIS",  1}, {" ILE",  0}, {" LEU",  0}, {" LYS",  1}, {" MET",  0},
+            {" PHE",  0},  {" PRO",  4}, {" SER",  2}, {" THR",  2}, {" GLN", 2}, {" TRP",  0},
+            {" TYR",  0}, {" VAL",  0},
+        };
+    }
 }

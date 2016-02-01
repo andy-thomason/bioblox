@@ -31,8 +31,8 @@ public class AminoSliderController : MonoBehaviour {
 	bool ButtonA1LDown, ButtonA1RDown, ButtonA2LDown, ButtonA2RDown = false;	
 	public Scrollbar ScrollbarAmino1;
 	public Scrollbar ScrollbarAmino2;
-	List<Button> A1Buttons = new List<Button> ();
-	List<Button> A2Buttons = new List<Button> ();
+	public List<Button> A1Buttons = new List<Button> ();
+	public List<Button> A2Buttons = new List<Button> ();
 	//current button
 	public int CurrentButtonA1, CurrentButtonA2 = 0;
 	//text to link when there is the free camera
@@ -42,8 +42,9 @@ public class AminoSliderController : MonoBehaviour {
 	public GameObject LinkedGameObject;
 	GameObject LinkedGameObjectReference;
 	ButtonStructure buttonStructure;
-	
-	Text[] ButtonText;
+    UIController uIController;
+
+    Text[] ButtonText;
 
 	//dictionary for the function types of aunoacids
 	//protein 1
@@ -68,7 +69,8 @@ public class AminoSliderController : MonoBehaviour {
 	void Awake()
 	{
 		buttonStructure = FindObjectOfType<ButtonStructure> ();
-	}
+        uIController = FindObjectOfType<UIController>();
+    }
 
 	void Update()
 	{
@@ -205,10 +207,11 @@ public class AminoSliderController : MonoBehaviour {
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
 		ButtonText [0].text = currentAmino.Replace (" ", "");
 		ButtonText [1].text = tag;
+        AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
 
-		//AminoButtonReference.GetComponentsInChildrenGetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
-		//set the button id
-		AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
+        //AminoButtonReference.GetComponentsInChildrenGetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
+        //set the button id
+        AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
 	}
 
 	public void GeneratesAminoButtons2(string currentAmino, string tag, int index)
@@ -227,10 +230,11 @@ public class AminoSliderController : MonoBehaviour {
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
 		ButtonText [0].text = currentAmino.Replace (" ", "");
 		ButtonText [1].text = tag;
+        AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
 
-		//AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
-		//set the button id
-		AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
+        //AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
+        //set the button id
+        AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
 	}
 
 	void InsertButtonToListOfAminoAcidsFuntionA1(GameObject CurrentAmino, string NameAmino)
@@ -289,7 +293,25 @@ public class AminoSliderController : MonoBehaviour {
 			AddConnectionText.SetActive(false);
 			DeactivateAddConnectionButton ();
 		}
-	}
+/*
+        //if function type activated
+        if (uIController.auto_filter)
+        { 
+            switch(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino])
+            {//hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
+                case 0:
+                    uIController.ToggleHydroA1();
+                    break;
+                case 1:
+                    uIController.
+
+
+                default:
+                    break;
+            }
+        }
+        Debug.Log(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino]);*/
+    }
 
 	public void AddConnectionButton()
 	{		
