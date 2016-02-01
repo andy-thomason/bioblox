@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MatrixLibrary;
+//using MatrixLibrary;
 
 using UnityEngine;
 using CSGFIELD;
@@ -10,10 +10,11 @@ using CSGFIELD;
 
 namespace CSG {
     class Curvature {
-
         static int kgnegs = 0;
+
         /// <summary>
         /// compute a colour from curvature using input dxx etc partial derivatives,
+        /// This version written to reduce/eliminate generation of storage allocation, & reduces time 1.74->1.64 (approx)
         /// </summary>
         /// <param name="dxx"></param>
         /// <param name="dxy"></param>
@@ -23,6 +24,65 @@ namespace CSG {
         /// <param name="dzz"></param>
         /// <returns></returns>
         public static Color ctest(float dxx, float dxy, float dxz, float dyy, float dyz, float dzz, Vector3 grad) {
+            // from http://www.cgeo.ulg.ac.be/CAO/Goldman_Curvature_formulas_implicit.pdf
+            // page 642 (4.1, 4.2)
+            float dyx = dxy, dzx = dxz, dzy = dyz;
+
+            Matrix4x4 H;
+            H.m00 = dxx;
+            H.m01 = H.m10 = dxy;
+            H.m02 = H.m20 = dxz;
+            H.m11 = dyy;
+            H.m12 = H.m21 = dyz;
+            H.m22 = dzz;
+            H.m30 = H.m31 = H.m32 = H.m03 = H.m13 = H.m23 = 0;
+            H.m33 = 1;
+
+            Matrix4x4 HX; // H*(F)
+            HX.m00 = dyy * dzz - dyz * dzy; HX.m01 = dyz * dzx - dyx * dzz; HX.m02 = dyx * dzy - dyy * dzx;
+            HX.m10 = dxz * dzy - dxy * dzz; HX.m11 = dxx * dzz - dxz * dzx; HX.m12 = dxy * dzx - dxx * dzy;
+            HX.m20 = dxy * dyz - dxz * dyy; HX.m21 = dyx * dxz - dxx * dyz; HX.m22 = dxx * dyy - dxy * dyx;
+            HX.m30 = HX.m31 = HX.m32 = HX.m03 = HX.m13 = HX.m23 = 0;
+            HX.m33 = 1;
+
+            Vector3 G = new Vector3(grad.x, grad.y, grad.z );   // delta F
+           
+            double KGX = HX.MultiplyPoint3x4(G).dot(G);
+
+            double gradl = grad.magnitude;                  // | delta F |
+            double KG = KGX / (gradl.sq().sq());            // (4.1)
+
+            double KMX = H.MultiplyPoint3x4(G).dot(G);
+            double KM = (KMX - gradl.sq() * (dxx + dyy + dzz)) / (2 * gradl.sq() * gradl);      // (4.2)
+            double ss = KM * KM - KG;
+            if (ss < -0.001) GUIBits.Log("odd ss in curvature {0}", ss);
+            if (ss < 0) ss = 0;
+            double sss = Math.Sqrt(ss);
+            double K1 = KM + sss;       // (4.3)
+            double K2 = KM - sss;
+            if (KG < 0)
+                kgnegs++; //  GUIBits.LogK("kgnegs", kgnegs++ + "");
+
+            //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
+            // 0.4 typical for purish sphere, 0 for flat
+            return new Color((float)K1, (float)K2, (float)KG, (float)KM);
+
+            /** /
+                        double[,] om1, om2;
+                        Matrix.Eigen(H, out om1, out om2);
+                        Vector3 nx1 = new Vector3((float)om2[2, 0], (float)om2[2, 1], (float)om2[2, 2]);
+                        Vector3 nx2 = new Vector3((float)om2[0, 2], (float)om2[1,2], (float)om2[2, 2]);
+                        double[,] ommm = Matrix.Multiply(om2, Matrix.Transpose(om2));
+                        Vector3 normal = grad.Normal();
+                        float dd1 = nx1.Normal().dot(normal);  // should be close to 1/-1 if theory correct
+                        float dd2 = nx2.Normal().dot(normal);  // should be close to 1/-1 if theory correct
+                        //return new Color((float)om1[0, 0], (float)om1[1, 0], (float)om2[2, 0]);
+                        return new Color((float)om1[0, 0], (float)om1[1, 0], dd1, dd2);
+            /**/
+        }
+
+#if NOTUSED
+        public static Color ctestOLD(float dxx, float dxy, float dxz, float dyy, float dyz, float dzz, Vector3 grad) {
             // from http://www.cgeo.ulg.ac.be/CAO/Goldman_Curvature_formulas_implicit.pdf
             // page 642 (4.1, 4.2)
             float dyx = dxy, dzx = dxz, dzy = dyz;
@@ -74,7 +134,7 @@ namespace CSG {
                         return new Color((float)om1[0, 0], (float)om1[1, 0], dd1, dd2);
             /**/
         }
-
+#endif
 
     }
 }

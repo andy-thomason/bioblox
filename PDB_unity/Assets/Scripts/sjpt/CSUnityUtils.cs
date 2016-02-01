@@ -28,6 +28,14 @@ namespace CSG {
         /// string to look up such a thing in a Dictionary - which is what I may do first... but not much point in doing
         /// that when we could just have a meaningful object.
         /// 
+        /// Also note that almost all the UnityCSGOutput structures must be independent from Unity itself,
+        /// and data only moved to Unity at ToGame() time.  
+        /// This is because the Unity heirachy specific work (such as creating a Mesh class) must be on the main thread.
+        /// Thus we collect all the information required for Unity into 'neutral' arrays such as Vector3[] vertices,
+        /// and bundle them for convenience in BigMesh etc.
+        /// We have our own mirror classes (such as BigMesh) that can be freely used across threads,
+        /// and cheaply converted to and from Unity.Mesh class.
+        /// 
         /// </summary>
         IDictionary<string, BasicMeshData> meshData = new Dictionary<string, BasicMeshData>();
 
@@ -41,7 +49,7 @@ namespace CSG {
             }
 
             string text = p.Csg == null ? "nocsg" : p.Csg.Texture ?? "notexture";
-            if (separateCSGS) text += "#" + p.Csg.Id + "#" + p.Csg.Provenance.ToString();
+            if (separateCSGS) text += "#" + p.Csg.Id + "#" + p.Csg.Provenance.ToString();  // <<< this is costing about 3% ?
             lock (meshData) {  // // n.b. no serious performance impact when not needed by ShowProgress(), but was when lock was on static (crossthread) object
                 if (!meshData.ContainsKey(text))
                     meshData.Add(text, new BasicMeshData(limit));
@@ -78,7 +86,9 @@ namespace CSG {
         ***/
 
         // generate meshes with usual limit
-        public static UnityCSGOutput MakeCSGOutput(CSGNode csg, Bounds bounds, int minLev, int maxLev) {
+        public static UnityCSGOutput MakeCSGOutput(CSGNode csg, Bounds bounds, int minLev = -999, int maxLev = -999) {
+            if (minLev == -999) minLev = CSGControl.MinLev;
+            if (maxLev == -999) maxLev = CSGControl.MaxLev;
             return MakeCSGOutput(csg, bounds, 64000, minLev, maxLev);
         }
 
@@ -204,7 +214,6 @@ namespace CSG {
         /// </summary>
         /// <param name="poly"></param>
 
-        // primitive lock for viewing mesh while in flight
         internal void Add(Poly poly) {
             int n = poly.Count;
             fullsize += n;
@@ -212,10 +221,8 @@ namespace CSG {
                 poly.ConditionalReleaseToPool();
                 return;
             }  // ignore degenerate polys
-            int startIndex = verts.Count;
-            if (startIndex > limit) {
+            if (verts.Count > limit) {
                 extraMeshes.Add(GetExtraMesh());
-                startIndex = 0;
             }
             for (int i = 0; i < n; i++) {
                 //Vector3 p = poly[i].point;
@@ -223,7 +230,11 @@ namespace CSG {
                 //if we collect the data in Dictionary we could get around that...
                 //would need to be using entire vert struct as key, not just point.
                 // OR the very plus the csg id ..., or have separate dictionaries for each csg
-                // TODO, check on Minster etc
+                // Checks verify that if Separate CSGS is checked all is OK,
+                // but without there are predicted errors, for example on'boxatrot', and Minster gets some 'interesting' rounded corners
+                // so TODO at one point, move cache to csg, or otherwise correct
+                // Long term note: even csg test may fail when we have self-intersecting csgs (large small radius torus)
+                // but other things will fail for those as well, as lower level still uses vertex as key to compute normal etc ...
 				// This caching reduced test case "PDB test" from 3.7 secs to 2.7 secs.
                 Vector3 p = poly[i].point;
                 long kk = (((long)(p.x * www) + ooo) << 32) + (((long)(p.y * www) + ooo) << 16) + ((long)(p.z * www) + ooo);
@@ -309,23 +320,21 @@ namespace CSG {
 
 
                 Material mat = gameObject.material();
-                if (kvp.Key != "notexture" || mat == null) {
+                if (!kvp.Key.StartsWith("notexture") || mat == null) {
                     // prepare one material for all children
                     int cnum = 7;
                     System.Int32.TryParse(kvp.Key.Split('_')[0], out cnum);
                     cnum = cnum % 10;
                     Color col = CSGXX.colors[cnum];
-                    MeshRenderer pdbr;
+                    //MeshRenderer pdbr;
                     if (cnum == 999) {
                         GameObject pdb = GameObject.Find("ProtoMaterial");
-                        pdbr = pdb.GetComponent<MeshRenderer>();
-                        mat = pdbr.material;
+                        mat = pdb.material();
                     } else {
                         if (shaderName == null) shaderName = defaultShaderName;
                         Shader shader = Shader.Find(shaderName);    // Set chosen shader
                         mat = new Material(shader);
-                        pdbr = child.AddComponent<MeshRenderer>();
-                        pdbr.material = mat;
+                        child.setMaterial(mat);
                     }
                     mat.SetColor("_Color", col);
                 }
@@ -352,6 +361,7 @@ namespace CSG {
             if (mat == null) {
                 Shader shader = Shader.Find(BasicMeshData.defaultShaderName);    // Set chosen shader
                 mat = new Material(shader);
+                gameObject.setMaterial(mat);
             }
             for (int i = 0; i < meshes.Length; i++) {
                 ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat, back: back);
@@ -379,7 +389,7 @@ namespace CSG {
                 cchild.transform.rotation = (parent.transform.rotation);
                 cchild.layer = parent.layer;
 
-                cchild.AddComponent<MeshRenderer>().material = mat;
+                cchild.setMaterial(mat);
                 if (back) mesh = mesh.ToBack();
 
                 //Mesh mesh = bmd.GetMesh();
@@ -623,10 +633,17 @@ namespace CSG {
             new Color(0.25f, 0.5f, 0.25f)
         };
 
+        public static void setMaterial(this GameObject go, Material mat) {
+            var mr = go.GetComponent<MeshRenderer>();
+            if (mr == null) mr = go.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = mat;
+            mr.material.name = "asdfasdfasdf";
+        }
+
         public static Material material(this GameObject go) {
             MeshRenderer mt = go.GetComponent<MeshRenderer>();
             if (mt == null) return null;
-            return mt.material;
+            return mt.sharedMaterial;
         }
 
         public static Mesh ToBack(this Mesh mesh) {

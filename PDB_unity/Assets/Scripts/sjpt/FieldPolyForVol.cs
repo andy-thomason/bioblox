@@ -23,7 +23,7 @@ namespace CSG {
     public partial class CSGPrim {
 
         // derived from MarchingCubes, from 
-        qbyte[,] edges = new qbyte[,] {
+        private static readonly qbyte[,] edges = new qbyte[,] {
             { 0,1 }, 
             { 1,2 },
             { 2,3 },
@@ -45,7 +45,7 @@ namespace CSG {
         private static qbyte[] I(params qbyte[] pi) { return pi; }
 
 
-        qbyte[][][] bmpolys = I3(I2(),
+        private static readonly qbyte[][][] bmpolys = I3(I2(),
 I2(I(0, 8, 3)),
 I2(I(0, 1, 9)),
 I2(I(8, 3, 1, 9)),
@@ -305,6 +305,7 @@ I2());
 
         public static bool oldFieldPoly = false;
 
+        private Vector3[] points = new Vector3[8];
         //// public static float gradCompPow = -2;
         protected Poly PolyForVolField(Volume vol) {
             //// float gradcomp = Mathf.Pow(10, gradCompPow);
@@ -315,7 +316,6 @@ I2());
             // 0 1       0 - x
             //
 
-            Vector3[] points = new Vector3[8];
             points[0] = new Vector3(vol.x1, vol.y1, vol.z1);
             points[1] = new Vector3(vol.x2, vol.y1, vol.z1);
             points[3] = new Vector3(vol.x1, vol.y2, vol.z1);
@@ -359,7 +359,11 @@ I2());
                 foreach(int e in ipoly) {
                     int v0 = edges[e, 0], v1 = edges[e, 1];  // vertex indices
                     // GUIBits.LogC(" {0} {1}..{2}", e, v0, v1);
-                    Vector3 xing = (points[v0] * vv[v1] - points[v1] * vv[v0]) / (vv[v1] - vv[v0]);
+                    // Vector3 xing = (points[v0] * vv[v1] - points[v1] * vv[v0]) / (vv[v1] - vv[v0]); // measurable performance hit
+                    float inv = 1 / (vv[v1] - vv[v0]);
+                    float a0 = vv[v1] * inv;
+                    float a1 = vv[v0] * inv;
+                    Vector3 xing = points[v0] * a0 - points[v1] * a1;
                     /* * experiment with refining point did not really help much
                     if (csg is CSGFIELD.CSGFMETA) {
                         CSGFIELD.CSGFMETA meta = (CSGFIELD.CSGFMETA)csg;
@@ -722,7 +726,7 @@ I2());
             return r;
         }  // makepolys
 #else
-        public static void makepolys() { Debug.Log("makepolys not used, pregenerated."); }
+        public static void makepolys() { GUIBits.DLOG("makepolys not used, pregenerated."); }
 
 #endif
 

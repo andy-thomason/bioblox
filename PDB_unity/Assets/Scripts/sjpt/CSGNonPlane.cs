@@ -46,7 +46,7 @@ namespace CSGNonPlane {
         /// <param name="vol"></param>
         /// <returns></returns>
         public override int Draw(ICSGOutput xl, Volume vol) {
-            Poly poly = PolyForVol(vol); //pjt Unity debugging - getting null here, maybe wrong?
+            Poly poly = PolyForVol(vol); // can be null if vol does not intersect this primitive after all
             if (poly != null) {
                 poly.AddTo(this, xl);
                 if (poly.extraPolys != null)

@@ -167,7 +167,11 @@ namespace CSGFIELD {
         public MSPHERE BCopy(Bakery bk, float sc) {
             // Vector3 nc = bk.invM.MultiplyPoint3x4(c);
             Vector4 c = new Vector4(cx, cy, cz, 1);
+#if MAINTEST
+            Vector4 tc = bk.m /* !!!!!.transpose ***/ * c;
+#else
             Vector4 tc = bk.m.transpose * c;
+#endif
 
             MSPHERE nsp = new MSPHERE(tc.x, tc.y, tc.z, r*sc, radInfluence);
             return nsp;
@@ -369,12 +373,29 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                 spheres[0][s].UpdateRadInfluence(radInfluence);
         }
 
+        float ires, lowx, lowy, lowz;
+        int gmx, gmy;
+
         public override CSGNode BCopy(Bakery bk) {
             CSGFMETA n = new CSGFMETA();
             n.bk = bk;
             for (int s = 0; s < levspheres[0]; s++) {
                 n.Add(spheres[0][s].BCopy(bk, bk.scale()));
             }
+            n.gridVals = new float[S.threadGridArraySize];
+            for (int i = 0; i < S.threadGridArraySize; i++) n.gridVals[i] = 0;
+
+            n.ires = S.invThreadGridSize;
+            n.lowx = S.threadVol.x1;
+            n.lowy = S.threadVol.y1;
+            n.lowz = S.threadVol.z1;
+            n.gmx = S.threadGridMultX;
+            n.gmy = S.threadGridMultY;
+            //ikk = ((int)((x - S.threadVol.x1) * ires) * S.threadGridMultX)
+            //    + ((int)((y - S.threadVol.y1) * ires) * S.threadGridMultY)
+            //    + ((int)((z - S.threadVol.z1) * ires));
+
+
             return n;  // todo not complete
         }
 
@@ -389,35 +410,35 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             ms.index = levspheres[0]++;
         }
 
-        private Dictionary<long, float> gridCache = new Dictionary<long, float>();
-        public static int CacheComplexThresh = 6;  // # metaspheres to cache dist/field value, 
-        /* ** exact value non critical, test values vary more than precision below ...
-        0   ->  4.2,     (always cache)
-        2   ->  3.8,
-        4   ->  3.75,
-        5   ->  3.8, 
-        6   ->  3.67, 
-        7-  ->  3.75, 
-        8   ->  3.75, 
-        10  ->  3.75, 
-        12  ->  3.85, 
-        16  ->  3.97,
-        20  ->  4.33  (almost never cache)
-        inf ->  4.5   (never cache) 
-        ** */
-
-        readonly private static float www = 128f;  // precision for floating vector key
-        readonly private static int ooo = 32768;   // offset for floating vector key
+        private float[] gridVals;
+        public static int cacheCallCount = 0, cacheNewCount = 0, cacheOldCount = 0;
         public override float Dist(float x, float y, float z) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
-            long kk = 0;
-            if (inn > CacheComplexThresh) {
-                kk = (((long)(x * www) + ooo) << 32) + (((long)(y * www) + ooo) << 16) + ((long)(z * www) + ooo);
-                if (gridCache.ContainsKey(kk))
-                    return gridCache[kk];
+            int ikk = 0;
+
+            cacheCallCount++;
+            ikk = ((int)((x - lowx) * ires) * gmx)
+                + ((int)((y - lowy) * ires) * gmy)
+                + ((int)((z - lowz) * ires));
+
+            //float ires = S.invThreadGridSize;
+            //ikk =  ((int)((x - S.threadVol.x1) * ires) * S.threadGridMultX) 
+            //    + ((int)((y - S.threadVol.y1) * ires) * S.threadGridMultY) 
+            //    + ((int)((z - S.threadVol.z1) * ires) );
+
+            float v = 0;
+            try {
+                v = gridVals[ikk];
+            } catch (IndexOutOfRangeException e) {
+                GUIBits.Log("grid index error {0}", e);
             }
+            if (v != 0) {
+                cacheOldCount++;
+                return v;
+            }
+            cacheNewCount++;
 
             float field = 0;
             Vector3 p = new Vector3(x, y, z);
@@ -426,8 +447,8 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             }
             // the fields are +ve inside region of influence, but the dist is measured as +ve outside
             float r = CSGControl.fieldThresh - field;
-            if (inn > CacheComplexThresh)
-                gridCache[kk] = r;
+            if (r == 0) r = 0.0001f;
+            gridVals[ikk] = r;
             return r;
         }
 

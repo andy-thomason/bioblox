@@ -46,6 +46,11 @@ namespace CSG {  // [ExecuteInEditMode]
         public int WindShow = 3;
         public bool windDebug = true;
 
+        // probing does not work in Unity, make this protected so it doesn't show in GUI.
+        // Don't delete completely yet in case we find a way to make it work ....
+        protected string probeName = null;  // set to value to allow probing, never from within Unity as it doesn't work
+        public float probeRunTime = -1;  // > 0 for probe
+
         protected BigMesh savemeshA, savemeshB;
         // saved for processing
         //protected Mesh filtermesh;
@@ -88,8 +93,9 @@ namespace CSG {  // [ExecuteInEditMode]
         Dictionary<string, ButtonPrepare> ops = new Dictionary<string, ButtonPrepare>();
 
         protected bool opdone = false;
-        protected bool testop(string s, string tip) {
+        protected bool testop(string s, string tip = null) {
             if (!ops.ContainsKey(s)) {
+                if (tip == null) tip = "test " + s;
                 ops.Add(s, new ButtonPrepare(s, tip));
             }
 
@@ -104,6 +110,7 @@ namespace CSG {  // [ExecuteInEditMode]
         /// <param name="ptoshow"></param>
         /// <returns></returns>
         public virtual bool Show(string ptoshow) {
+
             opdone = false;
             text = "";
             toshow = ptoshow;
@@ -114,6 +121,7 @@ namespace CSG {  // [ExecuteInEditMode]
             BasicMeshData.WindShow = WindShow;             //show all windings, correct = 1 + wrong = 2
             Poly.windDebug = windDebug;                 // do not do further winding debug
             BasicMeshData.RightWind = BasicMeshData.WrongWind = BasicMeshData.VeryWrongWind = 0;
+            S.profileRunTime = probeRunTime;
 
             CSGControl.MinLev = MinLev;
             CSGControl.MaxLev = MaxLev;
@@ -178,7 +186,7 @@ namespace CSG {  // [ExecuteInEditMode]
             Log("csg stats" + csg.Stats() + ", csg generation time=" + (t1 - t0));
 
             // if (parallelThread != null) interrupt(); // even if not parallel now, parallel may just have changed
-            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after, clear);
+            ParallelCSG pcsg = new ParallelCSG(csg, bounds, front, back, toshow, parallel, CSGControl.MinLev, CSGControl.MaxLev, after, clear, probeName: probeName);
             if (parallel) {
                 parallels.Add(pcsg);
                 GUIBits.LogK("||", "running in parallel:  n={0}, {1}", parallels.Count, toshow);
@@ -194,7 +202,11 @@ namespace CSG {  // [ExecuteInEditMode]
             Poly.ClearPool();
         }
 
-
+#if MAINTEST
+        public static void DLOG(string s) { Console.WriteLine(s);  }
+#else
+        public static void DLOG(string s) { Debug.Log(s); }
+#endif
         public static void Log(string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
             if (text.Length < 5000) text += "\n" + ss;
@@ -211,12 +223,12 @@ namespace CSG {  // [ExecuteInEditMode]
 
         public static void Log2(string s, params object[] xparms) {
             string ss = String.Format(s, xparms);
-            Debug.Log(ss);
+            GUIBits.DLOG(ss);
             Log(ss);
         }
 
         public static void Log(Exception e) {
-            Debug.Log(e);
+            GUIBits.DLOG(e.ToString());
             Log("!!!!!!!!!!!!!!!!!!" + e.ToString());
         }
 
@@ -518,8 +530,11 @@ namespace CSG {  // [ExecuteInEditMode]
             GUI.backgroundColor = new Color(1.0f, 1.0f, 1.0f, 1f);
 
 
-            if (ops.Count == 0)
+            if (ops.Count == 0) {
+                Profiler.logFile = "profiler.unitylog";
+                Profiler.enableBinaryLog = true;
                 Show("");  // get things initialized
+            }
 
             // display buttons for all the options set up by Show()
             int y = 0, yh = butheight, x = 2;
@@ -722,7 +737,7 @@ namespace CSG {  // [ExecuteInEditMode]
 
     public delegate void voidvoid();
 
-    class ParallelCSG {
+    public class ParallelCSG {
         private UnityCSGOutput parallelOutput;
         
         private Thread parallelThread = null;
@@ -733,8 +748,12 @@ namespace CSG {  // [ExecuteInEditMode]
         private int minLev, maxLev;
         private voidvoid after;
         private bool clear;
+        private string shaderName;
+        private string probeName;
 
-        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev, voidvoid after = null, bool clear = true) {
+
+        internal ParallelCSG(CSGNode csg, Bounds bounds, GameObject front, GameObject back, string toshow, bool parallel, int minLev, int maxLev, 
+            voidvoid after = null, bool clear = true, string shaderName = null, string probeName = null) {
             goFront = front;
             goBack = back;
             this.toshow = toshow;
@@ -742,11 +761,16 @@ namespace CSG {  // [ExecuteInEditMode]
             this.maxLev = maxLev;
             this.after = after;
             this.clear = clear;
+            this.shaderName = shaderName ?? BasicMeshData.defaultShaderName;
+            this.probeName = probeName;
 
             if (parallel) {
                 // GUIBits.Log("running in parallel:  " + toshow);
                 parallelThread = new Thread(() => {
                     try {
+                        //if (probeName != null && probeName.Length > 0)
+                        //    Probe.Probe.StartProbe(probeName);  // freezes in both edit game mode and built run mode
+
                         Poly.ClearPool();
                         S.Simpguid = 1001;
                         parallelOutput = UnityCSGOutput.MakeCSGOutput(csg, bounds, this.minLev, this.maxLev);  // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -814,6 +838,9 @@ namespace CSG {  // [ExecuteInEditMode]
 
         protected void finish() {
             //showProgress();  // ???? <<< killer ???
+            //if (probeName != null && probeName.Length > 0)
+            //    Probe.Probe.StopProbe();
+
             parallelThread = null;
             float t2 = Time.realtimeSinceStartup;
             if (parallelOutput == null) {
@@ -826,10 +853,10 @@ namespace CSG {  // [ExecuteInEditMode]
             if (clear)
                 GUIBits.DeleteChildren(goFront);
             var meshes = parallelOutput.MeshesSoFar();
-            CSGStats stats = BasicMeshData.ToGame(goFront, meshes, toshow);
+            CSGStats stats = BasicMeshData.ToGame(goFront, meshes, toshow, shaderName: shaderName);
             if (goBack != null) {
                 GUIBits.DeleteChildren(goBack);
-                BasicMeshData.ToGame(goBack, meshes, toshow, back: true);
+                BasicMeshData.ToGame(goBack, meshes, toshow, back: true, shaderName: shaderName);
             }
 
             GUIBits.Log2("mesh count {0}, lev {1}..{2} time={3} givup#={4} stats={5}", parallelOutput.Count, CSGControl.MinLev, CSGControl.MaxLev, (t2 - t1),

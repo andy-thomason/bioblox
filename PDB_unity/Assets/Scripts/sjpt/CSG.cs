@@ -156,6 +156,9 @@ namespace CSG {
         public static readonly None NONE = new None();
         public static Bakery DefaultBakery = new Bakery("default", texweight: 0);
 
+        public static float profileRunTime = -1;  // set < 0 for no probe, >0 to run probe for given time (in secs)
+        public static float profileStopTime;  // checked during run
+
         // debug flag
 
         static S() {
@@ -288,6 +291,14 @@ namespace CSG {
             CSGOP2.ClearCache();
         }
 
+        // group below to be replaced with cleaner mechanism (? added to Bakery?)...
+        // Currently only used to set up cache for metaballs
+        [ThreadStatic]
+        public static Volume threadVol;
+        [ThreadStatic]
+        public static float threadGridSize, invThreadGridSize;
+        [ThreadStatic]
+        public static int threadGridMultX, threadGridMultY, threadGridArraySize;
 
         /// <summary>
         /// Perform CSG->CSGOutput
@@ -310,7 +321,23 @@ namespace CSG {
             }
             Poly.fromnew = 0;
             Poly.frompool = 0;
+
+            // to move from static into Bake or similar ...
+            threadVol = vol;
+            int gridnum = 1 << maxLev;
+            threadGridMultY = (gridnum + 1);
+            threadGridMultX = threadGridMultY * threadGridMultY;
+            threadGridArraySize = threadGridMultY * threadGridMultY * threadGridMultY;
+            threadGridSize = (vol.x2 - vol.x1) / gridnum;
+            invThreadGridSize = 1 / threadGridSize;
+
             CSGNode ncsg = csgnp.Bake();    // this should get a copy in the cache, with appropriate deduplication, and new cache
+#if MAINTEST
+#else
+            if (S.profileRunTime > 0)
+                S.profileStopTime = Time.realtimeSinceStartup + S.profileRunTime;
+#endif
+
             sd.SD(vol, ncsg, 0);
         }
 
@@ -349,6 +376,9 @@ namespace CSG {
         /// Define a new volume
         /// </summary>
         public Volume(int plev, float px1, float px2, float py1, float py2, float pz1, float pz2) {
+            set(plev, px1, px2, py1, py2, pz1, pz2);
+        }
+        public Volume set(int plev, float px1, float px2, float py1, float py2, float pz1, float pz2) {
             x1 = px1;
             y1 = py1;
             z1 = pz1;
@@ -360,6 +390,7 @@ namespace CSG {
             z = (z1 + z2) / 2;
             rsq = (x2 - x) * (x2 - x) + (y2 - y) * (y2 - y) + (z2 - z) * (z2 - z);
             lev = plev;
+            return this;
         }
 
         /// <summary>
@@ -397,24 +428,24 @@ namespace CSG {
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public Volume SV(int i) {
+        public Volume SV(int i, Volume svol) {
             switch (i) {
             case 0:
-                return new Volume(lev + 1, x1, x, y1, y, z1, z);
+                return svol.set(lev + 1, x1, x, y1, y, z1, z);
             case 1:
-                return new Volume(lev + 1, x1, x, y1, y, z, z2);
+                    return svol.set(lev + 1, x1, x, y1, y, z, z2);
             case 2:
-                return new Volume(lev + 1, x1, x, y, y2, z1, z);
+                    return svol.set(lev + 1, x1, x, y, y2, z1, z);
             case 3:
-                return new Volume(lev + 1, x1, x, y, y2, z, z2);
+                    return svol.set(lev + 1, x1, x, y, y2, z, z2);
             case 4:
-                return new Volume(lev + 1, x, x2, y1, y, z1, z);
+                    return svol.set(lev + 1, x, x2, y1, y, z1, z);
             case 5:
-                return new Volume(lev + 1, x, x2, y1, y, z, z2);
+                    return svol.set(lev + 1, x, x2, y1, y, z, z2);
             case 6:
-                return new Volume(lev + 1, x, x2, y, y2, z1, z);
+                    return svol.set(lev + 1, x, x2, y, y2, z1, z);
             case 7:
-                return new Volume(lev + 1, x, x2, y, y2, z, z2);
+                    return svol.set(lev + 1, x, x2, y, y2, z, z2);
             default:
                 throw new NotImplementedException();
             }
@@ -576,7 +607,22 @@ namespace CSG {
 
     }
 
-    /** class used to bake in details prior to rendering csg */
+    /** class used to bake in details prior to rendering csg 
+    Notes on Bakery.
+        Baking happens after csg tree is assembled and before it is used for subdivision/mesh generation.
+        Baking creates a complete copy with details such as transforms and provenance resolved down to the roots;
+        the resulting tree will not contain any BNodes.
+
+        Where we are multitjreading a separate Bake on the same CSG is performed for each thread;
+        thus nodes such as CSGFMETA nodes are unique for each thread and can carry their own independent 
+        state information such as caches without need for locking.
+
+        Current ? (20 Jan 2016) is that baking is required before finding volume,  but volume may be needed to decide rendering box.
+        We may want and extra Bake time pass to resolve this.
+        Also, baking is cached but the caching does not remember the threads.
+        This is currently handed by careful use from higher level software, but should be properly resolved.
+        */
+
     public struct Bakery {
         public string reason;
         public object provenance;
@@ -591,7 +637,11 @@ namespace CSG {
 
         public Bakery Mat(Matrix m) {
             this.m = m;
+#if MAINTEST
+            this.invM = m; //////// .inverse;
+#else
             this.invM = m.inverse;
+#endif
             this.noshow = false;
             return this;
         }
@@ -650,14 +700,23 @@ namespace CSG {
                 }
             }
             n.m = bko.m * bkn.m;
+#if MAINTEST
+            n.invM = n.m; //!!!!!!!!!!!!!!!!!!!!!!!!!!!.inverse;  // or bkn.mInv * bko.mInv;
+#else
             n.invM = n.m.inverse;  // or bkn.mInv * bko.mInv;
+#endif
 
             n.neg = bko.neg != bkn.neg;
             n.noshow = bko.noshow || bkn.noshow;
             return n;
         }
 
+#if MAINTEST
+        public float scale() { return 1; }
+#else
         public float scale() { return Mathf.Pow(m.determinant, 1f / 3);  }
+#endif
+
 
     }
 
@@ -690,7 +749,7 @@ namespace CSG {
         }
 
 
-        #region implemented abstract members of CSGNode
+#region implemented abstract members of CSGNode
 
         public override CSGNode Simplify(CSG.Volume vol, int simpguid, ref int nUnodes) {
             throw new UnbakedException();
@@ -729,7 +788,7 @@ namespace CSG {
             return s.Volume();
         }
 
-        #endregion
+#endregion
 
     }
 
@@ -757,6 +816,16 @@ namespace CSG {
         /// </summary>
         /// <returns></returns>
         public CSGNode Bake() {
+            /**
+                    public CSGNode Bake(Volume vol, int minLev, int maxLev) {
+                        threadVol = vol;
+                        int gridnum = 1 << maxLev;
+                        threadGridMultY = (gridnum + 1);
+                        threadGridMultX = threadGridMultY * threadGridMultY;
+                        threadGridArraySize = threadGridMultY * threadGridMultY * threadGridMultY;
+                        threadGridSize = (vol.x2 - vol.x1) / gridnum;
+                        invThreadGridSize = 1 / threadGridSize;
+            **/
             if (baked != null) return baked;
             try {
                 csgmode = CSGMode.baking;
@@ -3132,11 +3201,14 @@ namespace CSG {
     class Subdivide {
         public static float done;
         private int minLev, maxLev;
+        private Volume[] vols;
         public Subdivide(ICSGOutput output, int minLev, int maxLev) {
             done = 0;
             csgoutput = output;
             this.minLev = minLev;
             this.maxLev = maxLev;
+            vols = new Volume[maxLev];
+            for (int i = 0; i < maxLev; i++) vols[i] = new Volume(0);
         }
 
         //if (CSGControl.stats) { # if STATS
@@ -3232,6 +3304,13 @@ namespace CSG {
             //    uhits[n]++;
             //    return;
             //}
+#if MAINTEST
+#else
+            if (S.profileRunTime > 0 && Time.realtimeSinceStartup > S.profileStopTime) {
+                Profiler.enabled = false;
+                throw new Exception("stop profiling exception");
+            }
+#endif
 
             // uNodes is not reliable as it allows for nodes that were looked at but eliminated
             // snode.nodes does include duplicates, but that is less serious
@@ -3245,8 +3324,7 @@ namespace CSG {
                 //volList.Add(vol);
                 if (CSGControl.UseBreak) {
                     string sss = snode.ToStringF("\n");  // <<< key draw point
-                    UnityEngine.Debug.Log("sss = " + sss);
-                    GUIBits.Log("sss = " + sss);
+                    GUIBits.Log2("sss = " + sss);
                 }
                 done += pows[lev];
                 int n = snode.Draw(csgoutput, vol);
@@ -3257,8 +3335,9 @@ namespace CSG {
                 return;
             }
 
+            Volume svol = vols[lev];
             for (int i = 0; i < 8; i++) {
-                SDiv(vol.SV(i), snode, lev + 1);
+                SDiv(vol.SV(i, svol), snode, lev + 1);
             }
         }
 

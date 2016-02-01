@@ -34,6 +34,7 @@ namespace CSG {
         public float metallic = 0.8f;
         public float CurveMapRange = 0.4f;  // range of curvature to map to colours
         public bool computeCurvature = CSGFMETA.computeCurvature;
+        public string bioShader = "Custom/Color";
 
         // following are class so they can get reused between frames
         Shader shader;
@@ -57,18 +58,18 @@ namespace CSG {
             molA = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
             if (molA == null || molB == null) LogK("mol load", "molecule data missing");
             CSGControl.QuickUnion = false;
-            BasicMeshData.defaultShaderName = "Custom/Color";
+            BasicMeshData.defaultShaderName = bioShader;
         }
 
 
         // main function that will be called for display when something interesting has happened
         public override bool Show(string ptoshow) {
+            Profiler.maxNumberOfSamplesPerFrame = -1;
             if (base.Show(ptoshow)) return true;
             CSGFMETA.computeCurvature = computeCurvature;
             CSGFMETA.radShrink = radShrink;
             int smin = CSGControl.MinLev, smax = CSGControl.MaxLev;
             CSGControl.MaxLev = CSGControl.MinLev = detailLevel;
-            CSGFMETA.CacheComplexThresh = CacheComplexThresh;
             bool r = true;
             try {
                 r = IShow(ptoshow);
@@ -87,7 +88,9 @@ namespace CSG {
             toshow = ptoshow;
             if (testop("mwin", "Set up multiple windows.")) { setmwin(); return true; }
             if (testop("onewin", "Set up single window.")) { setonewin(); return true; }
-            // if (testop("4lights", "Set up standard 4 lights")) { setLights();  return true; }
+#if CSGUNITY
+            if (testop("4lights", "Set up standard 4 lights")) { setLights();  return true; }  // automatic if BioBlox
+#endif
 
             if (testop("clearMol", "Clear the molecular associated game objects (MolA etc")) {
                 foreach (var mf in mfMol)
@@ -130,6 +133,12 @@ namespace CSG {
                 parallel = true;
                 return true;
             }
+
+            if (testop("pdb prep2")) {
+                IShow("pdb prep");
+                IShow("pdb prepB");
+                return true;
+            }
             /**/
             Bounds bounds = new Bounds(Vector3.zero, new Vector3(64, 64, 64));  // same bounds for both molecules
             if (testop("pdb TEST", "generate sample pdb" )
@@ -152,16 +161,18 @@ namespace CSG {
                 // prepare the mesh in a way I can raycast it and filter it
                 // common up the common vertices, and if easily possible display
                 if (ptoshow.StartsWith("pdb prep")) {
-                    // Probe.Probe.StartProbe("MakeCSGOutput");  // freezes in both edit game mode and built run mode
+                    CSGFMETA.cacheCallCount = CSGFMETA.cacheNewCount = CSGFMETA.cacheOldCount = 0;
+                    //if (probeName != null && probeName.Length > 0) Probe.Probe.StartProbe(probeName);
                     var savemeshx = UnityCSGOutput.MakeCSGOutput(csg, bounds, 999999, detailLevel, detailLevel).MeshesSoFar();
-                    // Probe.Probe.StopProbe();
+                    //if (probeName != null && probeName.Length > 0) Probe.Probe.StopProbe();
 
                     BigMesh tsavemesh = null;
                     foreach (var s in savemeshx) tsavemesh = s.Value.GetBigMesh();  // should only be one
 
                     float tf1 = Time.realtimeSinceStartup;
-                    Log("pdb prep time={0}, vol used {1}", (tf1 - t0), molvol);
-
+                    Log2("pdb prep time=>>>>>>{0}<<<<<<<, vol used {1}", (tf1 - t0), molvol);
+                    Log2("cache total={0}, new={1}, old={2}, new%={3}", CSGFMETA.cacheCallCount, CSGFMETA.cacheNewCount, CSGFMETA.cacheOldCount,
+                        (int)(CSGFMETA.cacheNewCount * 100 / CSGFMETA.cacheCallCount));  // 1.66M, 1.4M
 
                     Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
                     if (BasicMeshData.CheckWind) {
@@ -222,7 +233,7 @@ namespace CSG {
             if (testop("holes", "Show the holes between A and B in the docking area")) { holes(bounds); return true; }
             if (testop("copyProps", "Copy the properties from material for MolAH into other molecule materials")) { copyProps(); return true; }
 
-            if (testop("spheres", "Show sphere represnetation for A")) {
+            if (testop("spheres", "Show sphere representation for A")) {
                 BasicMeshData.defaultShaderName = "Standard";
                 csg = spheres(molA, radMult, radAdd);
             }
@@ -345,7 +356,7 @@ namespace CSG {
         /// <param name="mol"></param>
         /// <param name="radInfluence"></param>
         /// <returns></returns>
-        CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult, float pradAdd) {
+        public static CSGFMETA meta(PDB_molecule mol, float radInfluence, float pradMult, float pradAdd) {
             if (mol == null) { LogK("mol load", "molecule data missing"); return null; }
             // prepare and populate the metaball object
             //Log("in meta, mol {0}", mol);
@@ -721,13 +732,13 @@ namespace CSG {
         }
 
         void autoCopyProps() {
-            Material from = goMolA.GetComponent<MeshRenderer>().material;
+            Material from = goMolA.material();
             if (from.GetFloat("_COPY") != 0)
                 copyProps();
 
         }
         void copyProps() {
-            Material from = goMolA.GetComponent<MeshRenderer>().material;
+            Material from = goMolA.material();
             copyProps(goMolA.transform, from);
             copyProps(goMolB.transform, from);
         }
@@ -735,7 +746,7 @@ namespace CSG {
         int N = 8;
         private void setobjs() { 
             if (goMol != null) return;
-            if (!shader) shader = Shader.Find("Custom/Color");    // Set shader
+            if (!shader) shader = Shader.Find(bioShader);    // Set shader
 
             Log2("gomol changed {0}", Time.realtimeSinceStartup + "");
             goMol = new GameObject[N];
@@ -750,6 +761,7 @@ namespace CSG {
             // representative top level material, used for copying but not directly
             MeshRenderer mrMolA = goMolA.AddComponent<MeshRenderer>();
             Material matref = new Material(shader);
+            matref.name = "referenceCommonMaterial";
             matref.SetFloat("_Glossiness", smooth);
             matref.SetFloat("_Metallic", metallic);
             matref.SetFloat("_LowR", -1);
@@ -770,10 +782,11 @@ namespace CSG {
                     mfMol[i] = goMol[i].AddComponent<MeshFilter>();
                     MeshRenderer mrMol = goMol[i].AddComponent<MeshRenderer>();
                     Material mat = new Material(shader);
+                    mat.name = "mat_" + Mols.name[i];
                     mat.color = Mols.colors[i];
                     mat.SetColor("_Albedo", Mols.colors[i]);
                     copyProps(mat, matref);
-                    mrMol.material = mat;
+                    mrMol.sharedMaterial = mat;
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();
                     // mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
@@ -781,7 +794,10 @@ namespace CSG {
             }
 
             dock();
+#if CSGUNITY
+#else
             setLights();
+#endif
 
         }
 
@@ -857,9 +873,9 @@ namespace CSG {
         }
 
         protected override GameObject getSubObject() { return goMolB; }
-
+        
         BigMesh useBioBloxMesh(PDB_molecule mol) {
-#if CSGUNITY
+#if CSGUNITY || MAINTEST
             Log("useBioBloxMesh not supported in CSGUNITY");
             return null;
 #else
