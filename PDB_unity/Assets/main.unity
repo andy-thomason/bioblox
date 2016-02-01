@@ -6454,6 +6454,7 @@ MonoBehaviour:
   DropDownProtein2: {fileID: 1166473378}
   DropDownSlider: {fileID: 1628117335}
   CameraSlider: {fileID: 1186857077}
+  AutoFilterToggle: {fileID: 1443767101}
   ToggleButtonFunctionsView:
   - {fileID: 1292228516}
   - {fileID: 887087896}
@@ -11384,17 +11385,28 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1524346378}
   toggleTransition: 1
   graphic: {fileID: 195599364}
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 913013348}
+        m_MethodName: AutoFilterAminoSlider
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1449298068
 GameObject:
   m_ObjectHideFlags: 0

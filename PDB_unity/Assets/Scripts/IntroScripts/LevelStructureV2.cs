@@ -29,7 +29,9 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     Sprite thumb_temp;
     Text text_level;
     Vector2 thumb_pivot = new Vector2(0.5f, 0.5f);
-    WWW DataConnection;
+    WWW DataConnection32;
+    WWW DataConnection128;
+    WWW DataConnection512;
 
     bool download_128 = false;
     bool download_512 = false;
@@ -108,76 +110,99 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
 
         if (number_clicks == 2)
         {
-            if (Time.time - time_double_clicks < 0.5f)
+            if (Time.time - time_double_clicks < 0.7f)
             {
                 mapController.DoubleClickLevel();
             }
             number_clicks = 0;
         }
         //Debug.Log(micro_camera.WorldToScreenPoint(transform.position));
-        //if the thumb is inside the frame focus
-        if (micro_camera.WorldToScreenPoint(transform.position).x > x_frame_min && micro_camera.WorldToScreenPoint(transform.position).x < x_frame_max && micro_camera.WorldToScreenPoint(transform.position).y > y_frame_min && micro_camera.WorldToScreenPoint(transform.position).y < y_frame_max && micro_camera.orthographicSize <= 500)
+        //wait for the sprite to be downloaded and placed
+        if (current_thumb)
         {
-            //if (map_canvas.localScale.x > 0.5f && map_canvas.localScale.x < 1.0f && current_thumb.texture.width != 128)
-            if (micro_camera.orthographicSize > 100 && micro_camera.orthographicSize <= 500 && current_thumb.texture.width != 128)
+            //if the thumb is inside the frame focus
+            if (micro_camera.WorldToScreenPoint(transform.position).x > x_frame_min && micro_camera.WorldToScreenPoint(transform.position).x < x_frame_max && micro_camera.WorldToScreenPoint(transform.position).y > y_frame_min && micro_camera.WorldToScreenPoint(transform.position).y < y_frame_max && micro_camera.orthographicSize <= 500)
             {
-                //if the thumb is null, download ONCE
-                if (!download_128)
+                //if (map_canvas.localScale.x > 0.5f && map_canvas.localScale.x < 1.0f && current_thumb.texture.width != 128)
+                if (micro_camera.orthographicSize > 100 && micro_camera.orthographicSize <= 500 && current_thumb.texture.width != 128)
                 {
-                    //thumb_image.overrideSprite = white_loading;
-                    download_128 = true;
-                    StartCoroutine(DownloadThumb("128"));
+                    //if the thumb is null, download ONCE
+                    if (!download_128)
+                    {
+                        //thumb_image.overrideSprite = white_loading;
+                        download_128 = true;
+                        StartCoroutine(DownloadThumb128());
+                    }
+                    //ask if the download is ready
+                    //if the thumb has been already dwnoaded, then loaded directly and dont enter here
+                    else if (DataConnection128.isDone && !thumb_128)
+                    {
+                        thumb_temp = Sprite.Create(DataConnection128.texture, new Rect(0, 0, 128, 128), thumb_pivot);
+                        thumb_128 = thumb_temp;
+                    }
+                    //replace the downloaded thumb and change the value of the current thumb
+                    else if (thumb_128)
+                    {
+                        thumb_image.overrideSprite = thumb_128;
+                        current_thumb = thumb_128;
+                    }
                 }
-                //ask if the download is ready
-                //if the thumb has been already dwnoaded, then loaded directly and dont enter here
-                else if (DataConnection.isDone && !thumb_128)
+                //else if(map_canvas.localScale.x >= 1.0f && current_thumb.texture.width != 512)
+                else if (micro_camera.orthographicSize <= 100 && current_thumb.texture.width != 512)
                 {
-                    thumb_temp = Sprite.Create(DataConnection.texture, new Rect(0, 0, 128, 128), thumb_pivot);
-                    thumb_128 = thumb_temp;
-                }
-                //replace the downloaded thumb and change the value of the current thumb
-                else if (thumb_128)
-                {
-                    thumb_image.overrideSprite = thumb_128;
-                    current_thumb = thumb_128;
+                    //if the thumb is null, download ONCE
+                    if (!download_512)
+                    {
+                        download_512 = true;
+                        StartCoroutine(DownloadThumb512());
+                    }
+                    //ask if the download is ready
+                    //if the thumb has been already dwnoaded, then loaded directly and dont enter here
+                    else if (DataConnection512.isDone && !thumb_512)
+                    {
+                        thumb_temp = Sprite.Create(DataConnection512.texture, new Rect(0, 0, 512, 512), thumb_pivot);
+                        thumb_512 = thumb_temp;
+                    }
+                    //replace the downloaded thumb and change the value of the current thumb
+                    else if (thumb_512)
+                    {
+                        thumb_image.overrideSprite = thumb_512;
+                        current_thumb = thumb_512;
+                    }
                 }
             }
-            //else if(map_canvas.localScale.x >= 1.0f && current_thumb.texture.width != 512)
-            else if (micro_camera.orthographicSize <= 100 && current_thumb.texture.width != 512)
+            //if not, set the low resolution thimb only once
+            else if (current_thumb.texture.width != 32)
             {
-                //if the thumb is null, download ONCE
-                if (!download_512)
-                {
-                    download_512 = true;
-                    StartCoroutine(DownloadThumb("512"));
-                }
-                //ask if the download is ready
-                //if the thumb has been already dwnoaded, then loaded directly and dont enter here
-                else if (DataConnection.isDone && !thumb_512)
-                {
-                    thumb_temp = Sprite.Create(DataConnection.texture, new Rect(0, 0, 512, 512), thumb_pivot);
-                    thumb_512 = thumb_temp;
-                }
-                //replace the downloaded thumb and change the value of the current thumb
-                else if (thumb_512)
-                {
-                    thumb_image.overrideSprite = thumb_512;
-                    current_thumb = thumb_512;
-                }
+                GetComponentInChildren<Image>().overrideSprite = thumb_32;
+                current_thumb = thumb_32;
             }
         }
     }
     
     //couritine download thimb
-    IEnumerator DownloadThumb(string thumb_size)
+    IEnumerator DownloadThumb128()
     {
-        url_image = "http://quiley.com/BB/BB" + thumb_size + "/" + level_name + ".png";
+        url_image = "http://quiley.com/BB/BB128/" + level_name + ".png";
         //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + "." + thumb_size + ".png";
         do//wait for the server to get the image
         {
-            DataConnection = new WWW(url_image);
-            yield return DataConnection;
-        } while (!string.IsNullOrEmpty(DataConnection.error));
+            DataConnection128 = new WWW(url_image);
+            yield return DataConnection128;
+        } while (!string.IsNullOrEmpty(DataConnection128.error));
+
+    }
+
+    //couritine download thimb
+    IEnumerator DownloadThumb512()
+    {
+        url_image = "http://quiley.com/BB/BB512/" + level_name + ".png";
+        //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + "." + thumb_size + ".png";
+        do//wait for the server to get the image
+        {
+            DataConnection512 = new WWW(url_image);
+            yield return DataConnection512;
+        } while (!string.IsNullOrEmpty(DataConnection512.error));
 
     }
 
@@ -187,10 +212,10 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
         //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + ".32.png";
         do//wait for the server to get the image
         {
-            DataConnection = new WWW(url_image);
-            yield return DataConnection;
-        } while (!string.IsNullOrEmpty(DataConnection.error));
-        thumb_32 = Sprite.Create(DataConnection.texture, new Rect(0, 0, 32, 32), thumb_pivot);
+            DataConnection32 = new WWW(url_image);
+            yield return DataConnection32;
+        } while (!string.IsNullOrEmpty(DataConnection32.error));
+        thumb_32 = Sprite.Create(DataConnection32.texture, new Rect(0, 0, 32, 32), thumb_pivot);
         thumb_image.sprite = current_thumb = thumb_32;
 
     }

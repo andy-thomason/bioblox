@@ -37,6 +37,9 @@ public class UIController : MonoBehaviour {
     public Dropdown DropDownSlider;
 
     public GameObject CameraSlider;
+    //autofilter
+    bool auto_filter = false;
+    public Toggle AutoFilterToggle;
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
@@ -129,21 +132,21 @@ public class UIController : MonoBehaviour {
 			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
 		}
 		FunctionInfoObject.SetActive (false);
-		//set all the buttons ON when return to normal view
-		//protein 1
-		ToggleAllButtonsSliderOn (aminoSliderController.A1Hydro);
-		ToggleAllButtonsSliderOn (aminoSliderController.A1Negative);
-		ToggleAllButtonsSliderOn (aminoSliderController.A1Polar);
-		ToggleAllButtonsSliderOn (aminoSliderController.A1Positive);
-		ToggleAllButtonsSliderOn (aminoSliderController.A1Other);
-		//protein 2
-		ToggleAllButtonsSliderOn (aminoSliderController.A2Hydro);
-		ToggleAllButtonsSliderOn (aminoSliderController.A2Polar);
-		ToggleAllButtonsSliderOn (aminoSliderController.A2Positive);
-		ToggleAllButtonsSliderOn (aminoSliderController.A2Negative);
-		ToggleAllButtonsSliderOn (aminoSliderController.A2Other);
+        //set all the buttons ON when return to normal view
+        //protein 1
+        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, true);
+        ToggleAllButtonsSlider(aminoSliderController.A1Negative, true);
+        ToggleAllButtonsSlider(aminoSliderController.A1Polar, true);
+        ToggleAllButtonsSlider(aminoSliderController.A1Positive, true);
+        ToggleAllButtonsSlider(aminoSliderController.A1Other, true);
+        //protein 2
+        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, true);
+        ToggleAllButtonsSlider(aminoSliderController.A2Polar, true);
+        ToggleAllButtonsSlider(aminoSliderController.A2Positive, true);
+        ToggleAllButtonsSlider(aminoSliderController.A2Negative, true);
+        ToggleAllButtonsSlider(aminoSliderController.A2Other, true);
 		//set all the togles ON
-		for (int i = 0; i<10; i++)
+		for (int i = 0; i< ToggleButtonFunctionsView.Length; i++)
 		{
 			ToggleButtonFunctionsView[i].isOn = true;
 		}
@@ -192,20 +195,113 @@ public class UIController : MonoBehaviour {
 		FunctionInfoPanelStatus = !FunctionInfoPanelStatus;
 	}
 
-	public void TogglePositiveA1()
+    public void AutoFilterAminoSlider()
+    {
+        //set all the buttons ON when return to normal view
+        //protein 1
+        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A1Negative, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A1Polar, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A1Positive, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A1Other, auto_filter);
+        //protein 2
+        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A2Polar, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A2Positive, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A2Negative, auto_filter);
+        ToggleAllButtonsSlider(aminoSliderController.A2Other, auto_filter);
+
+        //set all the togles ON
+        for (int i = 0; i < ToggleButtonFunctionsView.Length; i++)
+        {
+            ToggleButtonFunctionsView[i].isOn = auto_filter;
+        }
+
+        auto_filter = !auto_filter;
+    }
+
+    public void ToggleAminoAcidsToggles(bool status)
+    {
+        //set all the buttons ON when return to normal view
+        //protein 1
+        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, status);
+        ToggleAllButtonsSlider(aminoSliderController.A1Negative, status);
+        ToggleAllButtonsSlider(aminoSliderController.A1Polar, status);
+        ToggleAllButtonsSlider(aminoSliderController.A1Positive, status);
+        ToggleAllButtonsSlider(aminoSliderController.A1Other, status);
+        //protein 2
+        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, status);
+        ToggleAllButtonsSlider(aminoSliderController.A2Polar, status);
+        ToggleAllButtonsSlider(aminoSliderController.A2Positive, status);
+        ToggleAllButtonsSlider(aminoSliderController.A2Negative, status);
+        ToggleAllButtonsSlider(aminoSliderController.A2Other, status);
+
+        //set all the togles ON
+        for (int i = 0; i < ToggleButtonFunctionsView.Length; i++)
+        {
+            ToggleButtonFunctionsView[i].isOn = status;
+        }
+    }
+
+    bool amino_status;
+
+    public void TogglePositiveA1()
 	{
-		foreach (GameObject AminoButton in aminoSliderController.A1Positive)
-		{
-			AminoButton.SetActive(ToggleButtonFunctionsView[0].isOn);
-		}
+        if (auto_filter)
+        {
+            Debug.Log(ToggleButtonFunctionsView[0].isOn);
+            if (!ToggleButtonFunctionsView[0].isOn)
+            {
+                Debug.Log("apagar todo");
+                ToggleAminoAcidsToggles(false);
+            }
+            else
+            {
+                ToggleAminoAcidsToggles(false);
+                //amino_status = !ToggleButtonFunctionsView[0].isOn;
+                //ToggleButtonFunctionsView[0].isOn = amino_status;
+                foreach (GameObject AminoButton in aminoSliderController.A1Positive)
+                {
+                    AminoButton.SetActive(true);
+                }
+                foreach (GameObject AminoButton in aminoSliderController.A2Negative)
+                {
+                    AminoButton.SetActive(true);
+                }
+                ToggleButtonFunctionsView[0].isOn = true;
+            }
+        }
+        else
+        {
+            foreach (GameObject AminoButton in aminoSliderController.A1Positive)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[0].isOn);
+            }
+
+        }
 	}
 
 	public void ToggleNegativeA1()
 	{
-		foreach (GameObject AminoButton in aminoSliderController.A1Negative)
-		{
-			AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
-		}
+        if (auto_filter)
+        {
+            //StartCoroutine(ToggleAminoAcidsToggles(false));
+            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
+            }
+            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
+            }
+            ToggleButtonFunctionsView[5].isOn = ToggleButtonFunctionsView[1].isOn;
+        }
+        else {
+            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
+            }
+        }
 	}
 
 	public void TogglePolarA1()
@@ -236,18 +332,48 @@ public class UIController : MonoBehaviour {
 
 	public void TogglePositiveA2()
 	{
-		foreach (GameObject AminoButton in aminoSliderController.A2Positive)
-		{
-			AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
-		}
+        if (auto_filter)
+        {
+            //StartCoroutine(ToggleAminoAcidsToggles(false));
+            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
+            }
+            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
+            }
+            ToggleButtonFunctionsView[1].isOn = ToggleButtonFunctionsView[5].isOn;
+        }
+        else {
+            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
+            }
+        }
 	}
 	
 	public void ToggleNegativeA2()
 	{
-		foreach (GameObject AminoButton in aminoSliderController.A2Negative)
-		{
-			AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
-		}
+        if (auto_filter)
+        {
+            //StartCoroutine(ToggleAminoAcidsToggles(false));
+            foreach (GameObject AminoButton in aminoSliderController.A2Negative)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
+            }
+            foreach (GameObject AminoButton in aminoSliderController.A1Positive)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
+            }
+            ToggleButtonFunctionsView[0].isOn = ToggleButtonFunctionsView[6].isOn;
+        }
+        else {
+            foreach (GameObject AminoButton in aminoSliderController.A2Negative)
+            {
+                AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
+            }
+        }
 	}
 	
 	public void TogglePolarA2()
@@ -274,11 +400,11 @@ public class UIController : MonoBehaviour {
 		}
 	}
 
-	void ToggleAllButtonsSliderOn(List<GameObject> CurrentList)
+	void ToggleAllButtonsSlider(List<GameObject> CurrentList, bool status)
 	{
 		foreach (GameObject AminoButton in CurrentList)
 		{
-			AminoButton.SetActive(true);
+			AminoButton.SetActive(status);
 		}
 	}
 
@@ -326,9 +452,11 @@ public class UIController : MonoBehaviour {
         {
             case 0:
                 ChangeSliderViewToNormal();
+                AutoFilterToggle.interactable = false;
                 break;
             case 1:
                 ChangeSliderViewToFunction();
+                AutoFilterToggle.interactable = true;
                 break;
             default:
                 break;

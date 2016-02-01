@@ -16,15 +16,16 @@ public class MapController : MonoBehaviour, IPointerClickHandler
         map_panel = GetComponent<RectTransform>();
     }
 
+    bool clicko = false;
     public void OnPointerClick(PointerEventData data)
     {
         //Debug.Log("position mapa : "+map_panel.position);
         //Debug.Log(micro_camera.ScreenToWorldPoint(Input.mousePosition));
+        StopAllCoroutines();
     }
 
-
-        // Update is called once per frame
-        void Update ()
+    // Update is called once per frame
+    void Update ()
     {
         // float key = Mathf.Lerp(0.0f, 40.0f, Time.time);
         //Debug.Log(key);
