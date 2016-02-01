@@ -245,27 +245,29 @@ public class PDB_molecule
 			}
 		}
         Debug.Log(DateTime.Now - start_time + "s to make values");
-        for (int x = x0; x <= x1; x++) {
-            for (int y = y0; y <= y1; y++) {
-                bool s = false;
-                string ss = String.Format("x={0}, y={1}:  ", x* grid_spacing, y* grid_spacing);
-                for (int z = z0; z <= z1; z++) {
-                    float v = mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim];
-                    if (v != -0.5) s = true;
-                    Vector3 p = new Vector3(x * grid_spacing, y * grid_spacing, z * grid_spacing);
-                    float csgd = csg.Dist(p) * -0.5f;
-                    Vector3 csgn = csg.Normal(p);
-                    //ss += String.Format(" {0} {1},", v, csgd);
+        if (csg != null) {
+            for (int x = x0; x <= x1; x++) {
+                for (int y = y0; y <= y1; y++) {
+                    bool s = false;
+                    string ss = String.Format("x={0}, y={1}:  ", x * grid_spacing, y * grid_spacing);
+                    for (int z = z0; z <= z1; z++) {
+                        float v = mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim];
+                        if (v != -0.5) s = true;
+                        Vector3 p = new Vector3(x * grid_spacing, y * grid_spacing, z * grid_spacing);
+                        float csgd = csg.Dist(p) * -0.5f;
+                        Vector3 csgn = csg.Normal(p);
+                        //ss += String.Format(" {0} {1},", v, csgd);
 
 
-                    mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = csgd;
-                    if (csgd != -0.5f)
-                        mc_normals[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = -csgn;
+                        mc_values[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = csgd;
+                        if (csgd != -0.5f)
+                            mc_normals[(x - x0) + (y - y0) * xdim + (z - z0) * xdim * ydim] = -csgn;
+                    }
+                    //if (s)
+                    //    CSG.GUIBits.Log(ss);
                 }
-                //if (s)
-                //    CSG.GUIBits.Log(ss);
             }
-        }
+        }  // csg != null
                     
 
 		//MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
