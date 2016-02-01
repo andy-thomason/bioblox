@@ -319,7 +319,7 @@ namespace CSG {
                 child.layer = gameObject.layer;
 
 
-                Material mat = gameObject.material();
+                Material mat = gameObject.sharedMaterial();
                 if (!kvp.Key.StartsWith("notexture") || mat == null) {
                     // prepare one material for all children
                     int cnum = 7;
@@ -329,12 +329,12 @@ namespace CSG {
                     //MeshRenderer pdbr;
                     if (cnum == 999) {
                         GameObject pdb = GameObject.Find("ProtoMaterial");
-                        mat = pdb.material();
+                        mat = pdb.sharedMaterial();
                     } else {
                         if (shaderName == null) shaderName = defaultShaderName;
                         Shader shader = Shader.Find(shaderName);    // Set chosen shader
                         mat = new Material(shader);
-                        child.setMaterial(mat);
+                        child.setSharedMaterial(mat);
                     }
                     mat.SetColor("_Color", col);
                 }
@@ -357,11 +357,11 @@ namespace CSG {
         public static void ToGame(GameObject gameObject, Mesh[] meshes, Material mat = null, bool makeColliders = false, bool back = false) {
             GUIBits.DeleteChildren(gameObject);
             //IDictionary<string, BasicMeshData> meshdict = new Dictionary<string, BasicMeshData>();
-            mat = mat ?? gameObject.material();
+            mat = mat ?? gameObject.sharedMaterial();
             if (mat == null) {
                 Shader shader = Shader.Find(BasicMeshData.defaultShaderName);    // Set chosen shader
                 mat = new Material(shader);
-                gameObject.setMaterial(mat);
+                gameObject.setSharedMaterial(mat);
             }
             for (int i = 0; i < meshes.Length; i++) {
                 ToGame(gameObject, meshes[i], gameObject.name + "_" + i, mat, back: back);
@@ -389,7 +389,7 @@ namespace CSG {
                 cchild.transform.rotation = (parent.transform.rotation);
                 cchild.layer = parent.layer;
 
-                cchild.setMaterial(mat);
+                cchild.setSharedMaterial(mat);
                 if (back) mesh = mesh.ToBack();
 
                 //Mesh mesh = bmd.GetMesh();
@@ -633,14 +633,13 @@ namespace CSG {
             new Color(0.25f, 0.5f, 0.25f)
         };
 
-        public static void setMaterial(this GameObject go, Material mat) {
+        public static void setSharedMaterial(this GameObject go, Material mat) {
             var mr = go.GetComponent<MeshRenderer>();
             if (mr == null) mr = go.AddComponent<MeshRenderer>();
             mr.sharedMaterial = mat;
-            mr.material.name = "asdfasdfasdf";
         }
 
-        public static Material material(this GameObject go) {
+        public static Material sharedMaterial(this GameObject go) {
             MeshRenderer mt = go.GetComponent<MeshRenderer>();
             if (mt == null) return null;
             return mt.sharedMaterial;

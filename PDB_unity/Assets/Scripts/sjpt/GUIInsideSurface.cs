@@ -708,7 +708,7 @@ namespace CSG {
 
         private void CurveMap() {
             for (int i = 0; i < N; i++) {
-                goMol[i].material().SetFloat("_Range", CurveMapRange);
+                goMol[i].sharedMaterial().SetFloat("_Range", CurveMapRange);
             }
         }
 
@@ -725,20 +725,20 @@ namespace CSG {
         void copyProps(Transform tr, Material from) {
             MeshRenderer mr = tr.GetComponent<MeshRenderer>();
             if (mr != null)
-                copyProps(mr.material, from);
+                copyProps(mr.sharedMaterial, from);
     
             for (int i = 0; i < tr.childCount; i++)
                 copyProps(tr.GetChild(i), from);
         }
 
         void autoCopyProps() {
-            Material from = goMolA.material();
+            Material from = goMolA.sharedMaterial();
             if (from.GetFloat("_COPY") != 0)
                 copyProps();
 
         }
         void copyProps() {
-            Material from = goMolA.material();
+            Material from = goMolA.sharedMaterial();
             copyProps(goMolA.transform, from);
             copyProps(goMolB.transform, from);
         }
@@ -786,7 +786,7 @@ namespace CSG {
                     mat.color = Mols.colors[i];
                     mat.SetColor("_Albedo", Mols.colors[i]);
                     copyProps(mat, matref);
-                    mrMol.sharedMaterial = mat;
+                    goMol[i].setSharedMaterial(mat);
                 } else {
                     mfMol[i] = goMol[i].GetComponent<MeshFilter>();
                     // mrMol[i] = goMol[i].GetComponent<MeshRenderer>();
