@@ -1,4 +1,5 @@
 
+#include <algorithm>
 #include "marching_cubes.hpp"
 
 /*
