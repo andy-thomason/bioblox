@@ -1,2 +1,2 @@
 SET VS90COMNTOOLS=%VS140COMNTOOLS%
-setup.py build
+%HOMEPATH%\AppData\Local\Programs\Python\Python35\python.exe setup.py build
