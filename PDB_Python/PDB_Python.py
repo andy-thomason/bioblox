@@ -288,20 +288,12 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
     match_data = data_re.match(self.path)
     match_pdb = pdb_re.match(self.path)
     if self.path == '/':
-      
       self.send_response(200)
       self.send_header(b"Content-type", "text/html")
       self.end_headers()
-      self.wfile.write(b"<html>\n<head>\n<title>Bioblox data server</title>\n</head>")
-      self.wfile.write(b"<body>\n")
-      self.wfile.write(b"<h1>Bioblox data server</h1>\n")
-      self.wfile.write(b"<h3>Example urls:</h3>\n")
-      self.wfile.write(b"<p><a href='/data/names.txt'>/data/names.txt</p>\n")
-      self.wfile.write(b"<p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>\n")
-      self.wfile.write(b"<p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</p>\n")
-      self.wfile.write(b"<p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</p>\n")
-      self.wfile.write(b"</body></html>\n")
+      with open('index.html', 'rb') as rf:
+        self.wfile.write(rf.read())
+        return
     elif match_thumbnail or match_mesh or match_data or match_pdb:
       make_new = True
       if not disable_cache:

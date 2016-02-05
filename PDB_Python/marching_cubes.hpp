@@ -1,17 +1,19 @@
 
-#include "vector.hpp"
+//#include "vector.hpp"
 
 /// Helper to construct marching cubes meshes.
 class marching_cubes {
 public:
-  std::vector<vector3> vertices;
-  std::vector<vector3> normals;
-  std::vector<colour> colours;
+  std::vector<glslmath::vec3> vertices;
+  std::vector<glslmath::vec3> normals;
+  std::vector<glslmath::vec4> colours;
   std::vector<int> indices;
 
 
   // Given a 3D lattice of values (mc_values) generate triangles where values transition from positive to negative.
-  marching_cubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, const float *mc_values, const colour *mc_colours) {
+  marching_cubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, const float *mc_values, const glslmath::vec4 *mc_colours) {
+    using namespace glslmath;
+
     //float rgs = 1.0f / grid_spacing;
 
     // This reproduced the vertex order of Paul Bourke's (borrowed) table.
@@ -64,9 +66,9 @@ public:
             if (v0 * v1 < 0) {
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+0] = (int)vertices.size();
-              vertices.push_back(vector3(float(x0 + i + lambda), float(y0 + j), float(z0 + k)) * grid_spacing);
-              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalised());
-              colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+1], lambda));
+              vertices.push_back(vec3(float(x0 + i + lambda), float(y0 + j), float(z0 + k)) * grid_spacing);
+              //normals.push_back(vec3::lerp (mc_normals[idx], mc_normals[idx+1], lambda).normalised());
+              //colours.push_back(mix (mc_colours[idx], mc_colours[idx+1], lambda));
             }
           }
 
@@ -76,9 +78,9 @@ public:
             if (v0 * v1 < 0) {
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+1] = (int)vertices.size();
-              vertices.push_back(vector3(float(x0 + i), float(y0 + j + lambda), float(z0 + k)) * grid_spacing);
-              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalised());
-              colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+xdim], lambda));
+              vertices.push_back(vec3(float(x0 + i), float(y0 + j + lambda), float(z0 + k)) * grid_spacing);
+              //normals.push_back(vec3::lerp (mc_normals[idx], mc_normals[idx+xdim], lambda).normalised());
+              //colours.push_back(mix (mc_colours[idx], mc_colours[idx+xdim], lambda));
             }
           }
 
@@ -88,9 +90,9 @@ public:
             if (v0 * v1 < 0) {
               float lambda = v0 / (v0 - v1);
               edge_indices[idx*3+2] = (int)vertices.size();
-              vertices.push_back(vector3(x0 + i, y0 + j, z0 + k + lambda) * grid_spacing);
-              //normals.push_back(vector3::lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalised());
-              colours.push_back(colour::lerp (mc_colours[idx], mc_colours[idx+xdim*ydim], lambda));
+              vertices.push_back(vec3(x0 + i, y0 + j, z0 + k + lambda) * grid_spacing);
+              //normals.push_back(vec3::lerp (mc_normals[idx], mc_normals[idx+xdim*ydim], lambda).normalised());
+              //colours.push_back(mix (mc_colours[idx], mc_colours[idx+xdim*ydim], lambda));
             }
           }
         }
@@ -102,7 +104,7 @@ public:
       for (int j = 0; j != ydim-1; ++j) {
         for (int i = 0; i != xdim-1; ++i) {
           int idx = (k * ydim + j) * xdim + i;
-          //vector3 pos0 = new vector3 (x0 + i, y0 + j, z0 + k);
+          //vec3 pos0 = new vec3 (x0 + i, y0 + j, z0 + k);
 
           // Mask of vertices outside the isosurface (values are negative)
           // Example:

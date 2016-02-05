@@ -8,6 +8,8 @@
 #include <cmath>
 #include <vector>
 
+#include "glslmath/include/math.hpp"
+
 #if PY_MAJOR_VERSION < 3
   #error must be built with Python 3
 #endif
@@ -169,6 +171,8 @@ private:
   }
   
   static PyObject *make_mesh(PyObject *self, PyObject *args) {
+    using namespace glslmath;
+
     Py_buffer pos_buf = {0};
     Py_buffer radii_buf = {0};
     Py_buffer atom_colours_buf = {0};
@@ -178,7 +182,7 @@ private:
 
     printf("make_mesh %d\n", (int)atom_colours_buf.len);
 
-    molecule_builder mb(pos_buf.len/12, (const vector3*)pos_buf.buf, (const float*)radii_buf.buf, (colour*)atom_colours_buf.buf, resolution / 100.0f);
+    molecule_builder mb(pos_buf.len/12, (const vec3*)pos_buf.buf, (const float*)radii_buf.buf, (vec4*)atom_colours_buf.buf, resolution / 100.0f);
 
     return PyBytes_FromStringAndSize((const char*)mb.image().data(), mb.image().size()*4);
   }

@@ -109,34 +109,33 @@
 
 class molecule_builder {
 public:
-  molecule_builder(size_t num_atoms, const vector3 *pos, const float *radii, const colour *atom_colours, float resolution) {
+  molecule_builder(size_t num_atoms, const glslmath::vec3 *pos, const float *radii, const glslmath::vec4 *atom_colours, float resolution) {
+    using namespace glslmath;
+
     printf("molecule_builder(%d, %f)\n", (int)num_atoms, resolution);
 
     // Create a 3D array for each molecule
-    vector3 min = pos[0];
-    vector3 max = min;
+    vec3 pmin = pos[0];
+    vec3 pmax = pmin;
     float max_r = 0.0f;
     for (size_t j = 0; j != num_atoms; ++j)
     {
       float r = radii[j];
       max_r = std::max(max_r, r);
-      min = vector3::min(min, pos[j]);
-      max = vector3::max(max, pos[j]);
+      pmin = min(pmin, pos[j]);
+      pmax = max(pmax, pos[j]);
     }
     
     float rgs = resolution;
     int irgs = std::ceil(max_r * rgs) + 1;
-    int x0 = std::floor(min.x * rgs) - irgs;
-    int y0 = std::floor(min.y * rgs) - irgs;
-    int z0 = std::floor(min.z * rgs) - irgs;
-    int x1 = std::ceil(max.x * rgs) + irgs;
-    int y1 = std::ceil(max.y * rgs) + irgs;
-    int z1 = std::ceil(max.z * rgs) + irgs;
+    int x0 = std::floor(pmin.x() * rgs) - irgs;
+    int y0 = std::floor(pmin.y() * rgs) - irgs;
+    int z0 = std::floor(pmin.z() * rgs) - irgs;
+    int x1 = std::ceil(pmax.x() * rgs) + irgs;
+    int y1 = std::ceil(pmax.y() * rgs) + irgs;
+    int z1 = std::ceil(pmax.z() * rgs) + irgs;
 
     int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
-
-    printf("min %f %f %f\n", min.x, min.y, min.z);
-    printf("max %f %f %f\n", max.x, max.y, max.z);
 
     float threshold = 0.5f;
 
@@ -145,17 +144,17 @@ public:
     std::fill(values.begin(), values.end(), -threshold);
 
     for (size_t ac = 0; ac != num_atoms; ++ac) {
-      vector3 c = pos[ac];
+      vec3 c = pos[ac];
       float r = radii[ac] * (0.8f * rgs);
-      colour atom_colour = atom_colours[ac];
-      float cx = c.x * rgs;
-      float cy = c.y * rgs;
-      float cz = c.z * rgs;
+      //vec4 atom_colour = atom_colours[ac];
+      float cx = c.x() * rgs;
+      float cy = c.y() * rgs;
+      float cz = c.z() * rgs;
 
       // define a box around the atom.
-      int cix = std::floor(c.x * rgs);
-      int ciy = std::floor(c.y * rgs);
-      int ciz = std::floor(c.z * rgs);
+      int cix = std::floor(c.x() * rgs);
+      int ciy = std::floor(c.y() * rgs);
+      int ciz = std::floor(c.z() * rgs);
       int xmin = std::max(x0, cix-irgs);
       int ymin = std::max(y0, ciy-irgs);
       int zmin = std::max(z0, ciz-irgs);
@@ -164,7 +163,7 @@ public:
       int zmax = std::min(z1, ciz+irgs);
       float fk = std::log(threshold) / (r * r);
       float fkk = -fk * 0.5f; // 0.5 is a magic number!
-      bool wcol = atom_colour.r != 1.0f || atom_colour.g != 1.0f || atom_colour.b != 1.0f;
+      //bool wcol = atom_colour.r != 1.0f || atom_colour.g != 1.0f || atom_colour.b != 1.0f;
 
       for (int z = zmin; z != zmax; ++z) {
         float fdz = z - cz;
@@ -180,7 +179,7 @@ public:
               // a little like exp(-v)
               float val = (2 * v - 3) * v * v + 1;
               values[idx] += val;
-              if (wcol) colours[idx] = colour::lerp(colours[idx], atom_colour, val*2);
+              //if (wcol) colours[idx] = mix(colours[idx], atom_colour, val*2);
             }
             idx++;
           }
@@ -207,9 +206,9 @@ public:
     auto cast = [](float f) { union { int i; float f; } u; u.f = f; return u.i; };
 
     for (auto v : mc.vertices) {
-      image_.push_back(cast(v.x));
-      image_.push_back(cast(v.y));
-      image_.push_back(cast(v.z));
+      image_.push_back(cast(v.x()));
+      image_.push_back(cast(v.y()));
+      image_.push_back(cast(v.z()));
     }
   }
   
@@ -219,6 +218,5 @@ public:
 private:
   std::vector<int> image_;
   std::vector<float> values;
-  //std::vector<vector3> normals;
-  std::vector<colour> colours;
+  std::vector<glslmath::vec4> colours;
 };
