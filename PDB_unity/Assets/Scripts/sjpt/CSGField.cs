@@ -352,6 +352,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public bool grayscale = false;
         public static bool computeCurvature = false;
         public static float radShrink = 0;  // shrink the points towards the centres by this amount, performed at morph level, not here
+        public float myRadShrink = 0;  // last shrink applied to me
 
         readonly int MAXD = 15;          // max depth, just for allocation
         readonly int MAXN = 2500;        // max num spheres, just for allocation

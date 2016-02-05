@@ -13,7 +13,8 @@ Shader "Custom/Color" {
       _Metallic("Metallic", Range(0,1)) = 0.8
       _Glossiness("Glossiness", Range(0,1)) = 0.6
       _VertexColors("Vertex Coloring", Range(0,1)) = 1
-      _Brightness("Overall brightness", Range(0,10)) = 1
+        _IDColors("ID Coloring", Range(0,1)) = 0
+        _Brightness("Overall brightness", Range(0,10)) = 1
  //~     _Alpha("Alpha", Range(0,1)) = 1
 
         //curv range min RGBA(-3.402, -10.734, -10.353, -4.928) max RGBA(2.687, 0.481, 18.382, 0.527)
@@ -43,6 +44,8 @@ Shader "Custom/Color" {
         _PMWidth("PMean width", Range(0,0.1)) = 0 // width of P1
 
         _Normtest("Normal test value", Range(0,1.1)) = 1.1 // normal length below this bright yellow, helps find grid
+
+        _Tex("Base (RGB)", 2D) = "white" {}  // seem to be needed to get the uv to be used?
     }
 
 
@@ -60,12 +63,14 @@ Shader "Custom/Color" {
       #pragma surface surf Standard //~ alpha:fade
       struct Input {
           float4 color : COLOR;
+          float2 uv_Tex : TEXCOORD0;
       };
 
       float4 _Albedo;
       float _Glossiness;
       float _Metallic;
       float _VertexColors;
+      float _IDColors;
       float _Brightness;
       //~ float _Alpha;
       float _Range, _LowR, _HighR, _LowG, _HighG, _LowB, _HighB;
@@ -101,6 +106,16 @@ Shader "Custom/Color" {
             (IN.color.b - _LowB * _Range) / ((_HighB - _LowB) * _Range));
           rgb = clamp(rgb, 0, 1);
           rgb = rgb * _VertexColors + 0.5 * (1. - _VertexColors);
+
+          // at vertices the uv.x is an integer nearest sphere number
+          if (_IDColors != 0) {
+              float id = IN.uv_Tex.x;
+              if (frac(id) == 0) {  // don't try to colour ambiguous in-between regions
+                  float3 idcol = float3(frac(id * 0.161), frac(id * 0.197), frac(id * 0.097));
+                  rgb = lerp(rgb, idcol, _IDColors);
+              }
+          }
+
           rgb *= _Brightness;
           rgb *= rgb;		// perceptual range
 

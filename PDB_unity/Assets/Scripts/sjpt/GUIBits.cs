@@ -584,7 +584,7 @@ namespace CSG {  // [ExecuteInEditMode]
         protected bool MSlider(string sliderName, ref int v, int low, int high, int def) {
             int o = v;
             float vv = v;
-            bool changed = MSlider(sliderName, ref vv, low - 0.45f, high + 0.45f, def);
+            bool changed = MSlider(sliderName, ref vv, low - 0.45f, high + 0.45f, def, format: "{0} = {1}");
             v = (int)(vv + 0.5);
 
             changed = o != v;
@@ -593,15 +593,15 @@ namespace CSG {  // [ExecuteInEditMode]
         }
 
         /** make an int slider, y position w.i.p, return true if value changed */
-        protected bool MSlider(string sliderName, ref float v, float low, float high, float def) {
+        protected bool MSlider(string sliderName, ref float v, float low, float high, float def, string format = "{0} = {1:0.00}") {
             GUI.contentColor = Color.white;
-            float o = v;
+            float old = v;
             GUI.SetNextControlName(sliderName);
             v = GUI.HorizontalSlider(new Rect(slidermargin, slidery, sliderWidth, sliderHeight / 2), v, low, high);
-            if (GUI.Button(new Rect(slidermargin / 4, slidery - 15, sliderWidth*2, 20), String.Format("{0} = {1:0.00}", sliderName, v), "Label"))
-            v = def;
+            if (GUI.Button(new Rect(slidermargin / 4, slidery - 15, sliderWidth*2, 20), String.Format(format, sliderName, v), "Label"))
+                v = def;
             slidery += sliderHeight;
-            bool changed = o != v;
+            bool changed = old != v;
             if (changed) lastmouse = Input.mousePosition;
             return changed;
         }

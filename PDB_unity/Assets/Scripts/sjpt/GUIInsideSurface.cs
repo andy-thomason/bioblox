@@ -312,7 +312,7 @@ namespace CSG {
         }
 
         void shrinkA() {
-            shrink(goMolA.transform, csgfmetaA);
+            shrink(goMolA, csgfmetaA);
         }
 
         void shrinkBPrep() {
@@ -321,7 +321,7 @@ namespace CSG {
         }
 
         void shrinkB() {
-            shrink(goMolB.transform, csgfmetaB);
+            shrink(goMolB, csgfmetaB);
         }
 
 
@@ -417,6 +417,7 @@ namespace CSG {
             return new BigMesh(vertices.ToArray(), normals.ToArray(), uvs.ToArray(), colours.ToArray(), indices.ToArray());
         }
 
+        /**
         /// <summary>
         ///  shrink mesh in place
         /// </summary>
@@ -429,11 +430,11 @@ namespace CSG {
             }
             // p -= near.Normal(p) * radShrink; // defer till all combined
         }
+        **/
 
         Dictionary<string, Vector3[]> meshverts = new Dictionary<string, Vector3[]>();
 
-        void bshrink(Mesh mesh, CSGFMETA meta) {
-            if (meta == null || radShrink == 0) return;
+        private void bshrink(Mesh mesh, CSGFMETA meta) {
             Vector3[] vertices = mesh.vertices;
             if (vertices.Length == 0) return;
             Vector2[] uv = mesh.uv;
@@ -449,9 +450,13 @@ namespace CSG {
             // p -= near.Normal(p) * radShrink; // defer till all combined
         }
 
+        void shrink(GameObject go, CSGFMETA meta) {
+            if (meta == null || meta.myRadShrink == radShrink) return;
+            ishrink(go.transform, meta);
+            meta.myRadShrink = radShrink;
+        }
 
-        void shrink(Transform tr, CSGFMETA meta) {
-            if (meta == null || radShrink == 0) return;
+        private void ishrink(Transform tr, CSGFMETA meta) {
             MeshFilter mf = tr.GetComponent<MeshFilter>();
             if (mf != null) {
                 //Vector3[] vertices = mf.mesh.vertices;
@@ -460,7 +465,7 @@ namespace CSG {
                 //mf.mesh.vertices = vertices;
             }
             for (int i = 0; i < tr.childCount; i++)
-                shrink(tr.GetChild(i), meta);
+                ishrink(tr.GetChild(i), meta);
         }
 
         void remap(Transform tr) {
@@ -576,6 +581,9 @@ namespace CSG {
                 if (!float.IsNaN(h.x))
                     lookat = Camera.main.transform.position = h + Camera.main.transform.forward * outsideDist;
             }
+
+            if (Input.GetKey("end")) dock();
+
 
             if (Input.GetKeyDown("/")) {   // go to other side of surface and look back
                 Vector3 h = Hitpoint();
@@ -712,8 +720,9 @@ namespace CSG {
             }
         }
 
+        // properties to copy from material in 'master' MolAH into all slave materials
         readonly string[] floatProps = {
-            "_Glossiness", "_Brightness", "_Metallic", "_VertexColors",
+            "_Glossiness", "_Brightness", "_Metallic", "_VertexColors", "_IDColors",
             "_Range", "_LowR", "_HighR", "_LowG", "_HighG", "_LowB", "_HighB",
             "_P1Step", "_P1Width", "_P2Step", "_P2Width","_PGStep", "_PGWidth","_PMStep", "_PMWidth"
              };
@@ -771,6 +780,7 @@ namespace CSG {
             matref.SetFloat("_LowB", -1000);
             matref.SetFloat("_HighB", 1000);
             matref.SetFloat("_Brightness", 2.5f);
+            matref.SetFloat("_IDColors", 0);
             mrMolA.material = matref;
 
             for (int i = 0; i < N; i++) {
