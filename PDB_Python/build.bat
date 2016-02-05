@@ -1,0 +1,2 @@
+SET VS90COMNTOOLS=%VS140COMNTOOLS%
+setup.py build
