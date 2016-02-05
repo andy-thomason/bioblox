@@ -826,6 +826,11 @@ public class BioBlox : MonoBehaviour
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type);
 
+		//Ioannis
+		PDB_score scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
+		scoring.calcScore ();
+		Debug.Log (scoring.elecScore + "-" + scoring.vdwScore);
+
 		if (init) {
 			molecules = new GameObject[2];
 			molecules [0] = mol1.gameObject;

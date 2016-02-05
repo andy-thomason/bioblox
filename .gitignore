@@ -13,3 +13,7 @@
 *.nvuser
 *.iobj
 *.ipdb
+
+*.meta
+
+*.mat
