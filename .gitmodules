@@ -1,0 +1,3 @@
+[submodule "PDB_Python/glslmath"]
+	path = PDB_Python/glslmath
+	url = https://github.com/andy-thomason/glslmath.git

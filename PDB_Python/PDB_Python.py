@@ -16,6 +16,7 @@ import ssl
 import thumbnail
 
 disable_cache = False
+htdocs = os.path.expanduser('~/htdocs/')
 
 
 """
@@ -198,13 +199,13 @@ names = []
 # the entries.txt file is a tab separated list of names and references of PDB entries.
 def download_entries():
   try:
-    rfile = open('data/names.txt', 'rb')
+    rfile = open(htdocs + '/data/names.txt', 'rb')
   except:
     req = urllib.request.Request('ftp://ftp.wwpdb.org/pub/pdb/derived_data/index/entries.idx')
     with urllib.request.urlopen(req) as req:
       x_pos = 50
       y_pos = 50
-      with open('data/names.txt', 'wb') as wfile:
+      with open(htdocs + '/data/names.txt', 'wb') as wfile:
         for line in req:
           splt = line.split(b'\t')
           if len(splt) >= 2 and splt[1][0:7] == b'COMPLEX':
@@ -214,7 +215,7 @@ def download_entries():
               x_pos -= 1000
             name = splt[0].decode().lower()
             wfile.write(('%s,%f,%f\n' % (name, x_pos, y_pos)).encode())
-    rfile = open('data/names.txt', 'rb')
+    rfile = open(htdocs + '/data/names.txt', 'rb')
 
 
   for line in rfile:
@@ -224,7 +225,7 @@ def download_entries():
   print(names)
   for name, x, y in names:
     name = name.decode()
-    local_name = 'pdb/%s.pdb' % name
+    local_name = htdocs + '/pdb/%s.pdb' % name
     try:
       os.stat(local_name)
     except:
@@ -236,7 +237,7 @@ def download_entries():
         with open(local_name, 'wb') as file:
           file.write(pdb_file)
 
-  map_name = 'data/map.png'
+  map_name = htdocs + '/data/map.png'
   try:
     os.stat(map_name)
   except:
@@ -250,7 +251,7 @@ def download_entries():
     
 def get_mols(name):
   if type(name) is bytes: name = name.decode()
-  local_name = 'pdb/%s.pdb' % name
+  local_name = htdocs + '/pdb/%s.pdb' % name
   print('reading %s' % local_name)
   with open(local_name, 'rb') as file:
     pdb_file = file.read()
@@ -264,13 +265,13 @@ def build_thumbnail(pdb, size):
   for mol in mols:
     i = i + 1
     tot.add(mol, 0, 0)
-  tot.make_thumbnail('thumbnails/%s.%d.png' % (pdb, size), size, size)
+  tot.make_thumbnail(htdocs + '/thumbnails/%s.%d.png' % (pdb, size), size, size)
 
 def build_mesh(pdb, index, resolution):
   print("build_mesh res=%d" % resolution)
   mols = get_mols(pdb)
   if index < len(mols):
-    filename = 'mesh/%s.%d.%d.bin' % (pdb, index, resolution)
+    filename = htdocs + 'mesh/%s.%d.%d.bin' % (pdb, index, resolution)
     mols[index].make_mesh(filename, resolution)
 
 thumbnails_png_re = re.compile('^/thumbnails/(\\w+)\.([0-9]+)\.png$')
@@ -287,6 +288,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
     match_data = data_re.match(self.path)
     match_pdb = pdb_re.match(self.path)
     if self.path == '/':
+      
       self.send_response(200)
       self.send_header(b"Content-type", "text/html")
       self.end_headers()
@@ -304,7 +306,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       make_new = True
       if not disable_cache:
         try:
-          with open(self.path[1:], 'rb') as rf:
+          with open(htdocs + self.path[1:], 'rb') as rf:
             self.wfile.write(rf.read())
             return
           make_new = False
@@ -328,7 +330,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
           self.end_headers()
           return
       try:
-        with open(self.path[1:], 'rb') as rf:
+        with open(htdocs + self.path[1:], 'rb') as rf:
           self.send_response(200)
           if self.path[-4:] == '.bin':
             self.send_header(b"Content-type", "application/octet-stream")
@@ -346,26 +348,18 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       self.send_response(404)
       self.end_headers()
       return
-      
+
+def make_dir(path):
+  try:
+    os.makedirs(path)
+  except:
+    pass
 
 def main(argv):
-  # example of a python class
-  try:
-    os.mkdir('data')
-  except:
-    pass
-  try:
-    os.mkdir('pdb')
-  except:
-    pass
-  try:
-    os.mkdir('thumbnails')
-  except:
-    pass
-  try:
-    os.mkdir('mesh')
-  except:
-    pass
+  make_dir(htdocs + '/data')
+  make_dir(htdocs + '/pdb')
+  make_dir(htdocs + '/thumbnails')
+  make_dir(htdocs + '/mesh')
 
   download_entries()
   
