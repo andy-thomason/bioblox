@@ -171,8 +171,9 @@ namespace CSG {
 
                     float tf1 = Time.realtimeSinceStartup;
                     Log2("pdb prep time=>>>>>>{0}<<<<<<<, vol used {1}", (tf1 - t0), molvol);
-                    Log2("cache total={0}, new={1}, old={2}, new%={3}", CSGFMETA.cacheCallCount, CSGFMETA.cacheNewCount, CSGFMETA.cacheOldCount,
-                        (int)(CSGFMETA.cacheNewCount * 100 / CSGFMETA.cacheCallCount));  // 1.66M, 1.4M
+                    if (CSGFMETA.cacheCallCount != 0)
+                        Log2("cache total={0}, new={1}, old={2}, new%={3}", CSGFMETA.cacheCallCount, CSGFMETA.cacheNewCount, CSGFMETA.cacheOldCount,
+                            (int)(CSGFMETA.cacheNewCount * 100 / CSGFMETA.cacheCallCount));  // 1.66M, 1.4M
 
                     Log("basic mesh saved, triangles=" + tsavemesh.triangles.Length);
                     if (BasicMeshData.CheckWind) {

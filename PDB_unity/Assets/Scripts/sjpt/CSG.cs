@@ -576,7 +576,6 @@ namespace CSG {
 
         public static int nspheres = 20;
         public static int sphereRadx = 25;
-        public static float radInfluence = 1.4f;  // how far sphere influence extends, multiple of radius (default value)
         public static bool doBalance = true;
         public static float fieldThresh = 1;
         /// <summary>

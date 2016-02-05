@@ -9,6 +9,20 @@ using UnityEngine;
 using CSG;
 using CSGNonPlane;
 
+/** class summary
+
+CSGFNODE
+  CSGFBIG
+  CSGFZERO
+  CSGFOP2
+    CSGFPLUS    ? not used
+  MSPHERE
+
+CSGXPrim        defined elsewhere
+  CSGFMETA
+  CSGFSOLID     ? not used
+
+**/
 
 ///
 // This file contains classes for implementing field based CSG objects
@@ -151,9 +165,7 @@ namespace CSGFIELD {
             UpdateRadInfluence(radInfluence);
         }
 
-        public MSPHERE(float px, float py, float pz, float pr) : this(px, py, pz, pr, CSGControl.radInfluence) { }
         public MSPHERE(Vector3 c, float rr, float radInfluence) : this(c.x, c.y, c.z, rr, radInfluence) { }
-        public MSPHERE(Vector3 c, float rr) : this(c, rr, CSGControl.radInfluence) { }
 
         public float strength = 1;
         public float sqrt2 = (float)Math.Sqrt(2);
@@ -358,6 +370,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         readonly int MAXN = 2500;        // max num spheres, just for allocation
         readonly MSPHERE[][] spheres;    // list of spheres for each recursion level
         readonly int[] levspheres;       //number of used spheres at each level
+        public static bool nonMetaSpheres = false;  
 
         public CSGFMETA() {
             spheres = new MSPHERE[MAXD][];
@@ -416,6 +429,15 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public override float Dist(float x, float y, float z) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
+            if (nonMetaSpheres) {
+                Vector3 vv = new Vector3(x, y, z);
+                MSPHERE s = nearest(vv);
+                //s = inspheres[0];
+                //inspheres[0] = s;
+                //levspheres[inlev] = 1;
+                return s.dist(vv);
+            }
+
             int inn = levspheres[inlev];
             int ikk = 0;
 
@@ -430,11 +452,11 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             //    + ((int)((z - S.threadVol.z1) * ires) );
 
             float v = 0;
-            try {
+            //try {
                 v = gridVals[ikk];
-            } catch (IndexOutOfRangeException e) {
-                GUIBits.Log("grid index error {0}", e);
-            }
+            //} catch (IndexOutOfRangeException e) {
+            //    GUIBits.Log("grid index error {0}", e);
+            //}
             if (v != 0) {
                 cacheOldCount++;
                 return v;
@@ -478,8 +500,19 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             normalColor(ref p, out normal, out color, ref uv);                   
             return normal;
         }
-        /**/
+        /* */
 
+            /// <summary>
+            /// compute values for the Hessian matrix 
+            /// </summary>
+            /// <param name="p"></param>
+            /// <param name="dxx"></param>
+            /// <param name="dxy"></param>
+            /// <param name="dxz"></param>
+            /// <param name="dyy"></param>
+            /// <param name="dyz"></param>
+            /// <param name="dzz"></param>
+            /// <param name="grad"></param>
         public override void dd(Vector3 p, out float dxx, out float dxy, out float dxz, out float dyy, out float dyz, out float dzz, out Vector3 grad) {
             dxx = dxy = dxz = dyy = dyz = dzz = 0;
             grad = new Vector3();
@@ -565,12 +598,18 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
 
+
             Vector3 grad = new Vector3();
             col = new Color();
             float ftot = 0;
             if (inn == 0) {  // unexpected
                 grad = normal = Vector3.forward;
-                col.r = 0; col.g = 1; col.b = 1; col.a = 1; 
+                col.r = 0; col.g = 1; col.b = 1; col.a = 1;
+            } else if (nonMetaSpheres) {
+                MSPHERE sp = nearest(p);
+                grad = sp.grad(p);
+                normal = sp.Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
+                col.set(sp.color);
             } else if (inn == 1 && colThresh == -999) {  // partly for efficiency, partly for tight radInfluence
                 grad = inspheres[0].grad(p);
                 normal = inspheres[0].Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
@@ -688,7 +727,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             Volume v = new CSG.Volume(float.MaxValue, float.MinValue, float.MaxValue, float.MinValue, float.MaxValue, float.MinValue);
             for (int i = 0; i < levspheres[0]; i++) {
                 MSPHERE s = spheres[0][i];
-                float rr = s.r * radInfluence;
+                float rr = s.r * s.radInfluence;
                 v = v.union(new Volume(s.cx - rr, s.cx + rr, s.cy - rr, s.cy + rr, s.cz - rr, s.cz + rr));
             }
             return v;
