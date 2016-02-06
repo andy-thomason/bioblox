@@ -463,6 +463,13 @@ namespace CSG {  // [ExecuteInEditMode]
                 CamScript.useWireframe = !CamScript.useWireframe;
             }
 
+            if (Input.GetKey("h")) {
+                if (Input.GetKey("left shift"))
+                    curcam.farClipPlane = 200;
+                else
+                    setFarClip();
+            }
+
             goFiltered.transform.position = -curcam.transform.forward * 0.1f;
 
             //RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
@@ -641,7 +648,16 @@ namespace CSG {  // [ExecuteInEditMode]
 
         private static int simpguid = -1;  // use so we can call Simplify with unique guid
 
-#region Utility functions
+        private void setFarClip() {
+            int triangleNumber;
+            MeshFilter mf;
+            hitpoint = Hitpoint(out triangleNumber, out mf);  //   // sets hitpoint as side effect
+            if (mf == null) return;
+            float d = curcam.transform.position.Distance(hitpoint);
+            curcam.farClipPlane = d;
+        }
+
+        #region Utility functions
         // find the hitpoint on the screen, using savemesh/filtermesh if available, otherwise using meshes in Test game object
         protected Vector3 Hitpoint(out int triangleNumber, out MeshFilter bestmf) {
             triangleNumber = -1;

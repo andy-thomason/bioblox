@@ -176,6 +176,8 @@ namespace CSGFIELD {
         public float radInfluenceNorm3;  	                        // compensate factor
         public bool cubic = true;
 
+        public Vector3 Centre() { return new Vector3(cx, cy, cz); }  // convenience method, may not be efficient
+
         public MSPHERE BCopy(Bakery bk, float sc) {
             // Vector3 nc = bk.invM.MultiplyPoint3x4(c);
             Vector4 c = new Vector4(cx, cy, cz, 1);
@@ -370,7 +372,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         readonly int MAXN = 2500;        // max num spheres, just for allocation
         readonly MSPHERE[][] spheres;    // list of spheres for each recursion level
         readonly int[] levspheres;       //number of used spheres at each level
-        public static bool MetaPureSpheres = false;  
+        public static int MetaStyle = 0;  // style for metaspheres, 0 standard meta, 1 approximation to spheres, 2 SES
 
         public CSGFMETA() {
             spheres = new MSPHERE[MAXD][];
@@ -429,13 +431,15 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public override float Dist(float x, float y, float z) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
-            if (MetaPureSpheres) {
-                Vector3 vv = new Vector3(x, y, z);
-                MSPHERE s = nearest(vv);
-                //s = inspheres[0];
-                //inspheres[0] = s;
-                //levspheres[inlev] = 1;
-                return s.dist(vv);
+            if (MetaStyle != 0) {
+                if (MetaStyle == 1) {
+                    Vector3 vv = new Vector3(x, y, z);
+                    MSPHERE s = nearest(vv);
+                    nearSpheres[0] = s;
+                    return s.dist(vv);
+                } else if (MetaStyle == 2) {
+                    return SESDist(x, y, z, out bestnorm);
+                } else throw new NotImplementedException("MetStyle " + MetaStyle);
             }
 
             int inn = levspheres[inlev];
@@ -568,14 +572,19 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             return bests;
         }
 
-        public MSPHERE[] nearest3(Vector3 p) {
+        public void nearest3(Vector3 p, MSPHERE[] bests, float[] bestd ) {
             int inlev = simplev;
             MSPHERE[] inspheres = spheres[inlev];
             int inn = levspheres[inlev];
 
-            if (inn == 1) return new MSPHERE[] { inspheres[0], null, null };
-            float[] bestd = new float[] { float.MaxValue, float.MaxValue, float.MaxValue };
-            MSPHERE[] bests = new MSPHERE[3];
+            if (inn == 1) {
+                bests[0] = inspheres[0];
+                bests[1] = bests[2] = null;
+                bestd[0] = inspheres[0].dist(p);
+                return;
+            };
+
+            bestd[0] = bestd[1] = bestd[2] = float.MaxValue;
             for (int ini = 0; ini < inn; ini++) {  // iterate the input spheres
                 float myfield = inspheres[ini].dist(p);
                 for (int pos = 2; pos >= 0; pos--) {
@@ -589,8 +598,11 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                     }
                 }
             }
-            return bests;
+            return;
         }
+
+        MSPHERE[] nearSpheres = new MSPHERE[3];  // record neaerest spheres, up to 3
+        float[] nearDist = new float[3];
 
         // ref p allows us to adjust the position at the last moment
         public override void normalColor(ref Vector3 p, out Vector3 normal, out Color col, ref Vector2 uv) {
@@ -605,11 +617,15 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             if (inn == 0) {  // unexpected
                 grad = normal = Vector3.forward;
                 col.r = 0; col.g = 1; col.b = 1; col.a = 1;
-            } else if (MetaPureSpheres) {
-                MSPHERE sp = nearest(p);
-                grad = sp.grad(p);
-                normal = sp.Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
-                col.set(sp.color);
+            } else if (MetaStyle != 0) {
+                if (MetaStyle == 1) {
+                    MSPHERE sp = nearSpheres[0]; //  nearest(p);
+                    grad = sp.grad(p);
+                    normal = sp.Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
+                    col.set(sp.color);
+                } else if (MetaStyle == 2) {
+                    SESNormalColor(ref p, out normal, out col, ref uv);
+                } else throw new Exception("Bad metastyle " + MetaStyle);
             } else if (inn == 1 && colThresh == -999) {  // partly for efficiency, partly for tight radInfluence
                 grad = inspheres[0].grad(p);
                 normal = inspheres[0].Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal
@@ -688,6 +704,71 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
 
         }
         static int graderr = 0;
+
+        Vector3 bestnorm;
+        float SESDist(float x, float y, float z, out Vector3 bestnorm) {
+
+            Vector3 p = new Vector3(x, y, z);
+            nearest3(p, nearSpheres, nearDist);
+            float bestd = nearDist[0];
+            bestnorm = (p - nearSpheres[0].Centre()).Normal();
+            for (int ia=0; ia<2; ia++) {
+                MSPHERE sa = nearSpheres[ia];
+                if (sa == null) continue;
+                Vector3 A = new Vector3(sa.cx, sa.cy, sa.cz);
+                float ra = sa.r;
+                float rc = sa.radInfluence;  // for now.....
+
+                for (int ib = ia + 1; ib < 3; ib++) {
+                    MSPHERE sb = nearSpheres[ib];
+                    if (sb == null) continue;
+                    Vector3 B = new Vector3(sb.cx, sb.cy, sb.cz);
+                    float rb = sb.r;
+
+                    /* we have spheres a and c and probe sphere c
+                    find point centre c C so that dist AC = ra + rc, dist DB = rb + rc, c on plane a,b,p
+                    q is where perp from c drops onto ab
+                    ??? what happens when A is outside A..B
+
+                               C 
+                               |            <-- cqdir is line CQ
+                         A ----Q-----B
+                    */
+                    float dab = A.Distance(B);
+                    float dac = ra + rc;
+                    float dbc = rb + rc;
+                    float cosa = (dab * dab + dac * dac - dbc * dbc) / (2 * dab * dac);  // cos angle at a
+                    if (Math.Abs(cosa) > 1) continue;
+
+                    // q is where perp from c drops onto ab
+                    float dcq = dac * cosa;
+                    float daq = dac * Mathf.Sqrt(1 - cosa * cosa);
+                    // float anga = Mathf.Acos(cosa);
+                    Vector3 perp = (A - B).cross(A - p).Normal();
+                    Vector3 cqdir = perp.cross(A - B).Normal();
+
+                    Vector3 Q = (A - B).Normal() * daq;
+                    Vector3 C = Q + dcq * cqdir;
+
+                    float dist = p.Distance(C) - rc;
+                    if (dist < bestd) {
+                        bestd = dist;
+                        bestnorm = (p - C).Normal();
+                    }
+                }
+            }
+            // temp
+            return bestd;
+        }
+
+        void SESNormalColor(ref Vector3 p, out Vector3 normal, out Color col, ref Vector2 uv) {
+            SESDist(p.x, p.y, p.z, out normal);
+            // temp
+            // p = Vector3.zero;
+            // normal = Vector3.forward;
+            col = Color.white;
+            uv.x = nearest(p).index;
+        }
 
         public MSPHERE sphereAt(int i) {
             return spheres[0][i];

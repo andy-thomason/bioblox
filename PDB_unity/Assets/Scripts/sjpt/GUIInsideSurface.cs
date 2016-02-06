@@ -186,7 +186,7 @@ namespace CSG {
                     prepRadinf = radInfluence;
 
                     // precompute the compacted version (common vertices)
-                    tsavemesh = tsavemesh.RemapMesh();
+                    //  tsavemesh = tsavemesh.RemapMesh();  // now 'compacted' during polygon collection
                     //tsavemesh.unmatched();  // debug
                   //  if (radShrink != 0)
                   //      shrink(tsavemesh.vertices, tsavemesh.uv, (CSGFMETA)csg);
@@ -314,7 +314,7 @@ namespace CSG {
         }
 
         void shrinkAPrep() {
-            remap(goMolA.transform);
+            //remap(goMolA.transform);
             shrinkA();
         }
 
@@ -323,7 +323,7 @@ namespace CSG {
         }
 
         void shrinkBPrep() {
-            remap(goMolB.transform);
+            //remap(goMolB.transform);
             shrinkB();
         }
 
@@ -475,6 +475,7 @@ namespace CSG {
                 ishrink(tr.GetChild(i), meta);
         }
 
+        // remap to find unique vertices, hardly used as initial polygon generation now makes them unique
         void remap(Transform tr) {
             MeshFilter mf = tr.GetComponent<MeshFilter>();
             if (mf != null) {
@@ -687,7 +688,7 @@ namespace CSG {
                 shrinkA();
                 shrinkB();
             };
-            Mcheck("MetaPureSpheres", ref CSGFMETA.MetaPureSpheres) ;
+            MSlider("MetaStyle", ref CSGFMETA.MetaStyle, 0, 2, 0) ;
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50, 20)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250, 20))

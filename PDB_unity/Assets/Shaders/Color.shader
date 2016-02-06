@@ -110,7 +110,7 @@ Shader "Custom/Color" {
           // at vertices the uv.x is an integer nearest sphere number
           if (_IDColors != 0) {
               float id = IN.uv_Tex.x;
-              if (frac(id) == 0) {  // don't try to colour ambiguous in-between regions
+              if (abs(frac(id)) < 0.01) {  // don't try to colour ambiguous in-between regions
                   float3 idcol = float3(frac(id * 0.161), frac(id * 0.197), frac(id * 0.097));
                   rgb = lerp(rgb, idcol, _IDColors);
               }
