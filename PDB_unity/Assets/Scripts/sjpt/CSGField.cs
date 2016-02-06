@@ -707,17 +707,30 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
 
         Vector3 bestnorm;
         float SESDist(float x, float y, float z, out Vector3 bestnorm) {
+            int inlev = simplev; // todo mlevspheres[vol.lev];
+            MSPHERE[] inspheres = spheres[inlev];
+            int inn = levspheres[inlev];
+            float rc = inspheres[0].radInfluence;  // for now.....
 
             Vector3 p = new Vector3(x, y, z);
             nearest3(p, nearSpheres, nearDist);
             float bestd = nearDist[0];
             bestnorm = (p - nearSpheres[0].Centre()).Normal();
+            if (bestd < 0) return bestd;
+            Vector3 bestC = p + bestnorm * rc;
+
+            // check initial bestC valid
+            for (int i = 0; i < inn; i++) {
+                if (inspheres[i].Centre().Distance(bestC) < inspheres[i].r + rc + 0.1f) {
+                    bestd = 1;
+                }
+            }
+
             for (int ia=0; ia<2; ia++) {
                 MSPHERE sa = nearSpheres[ia];
                 if (sa == null) continue;
                 Vector3 A = new Vector3(sa.cx, sa.cy, sa.cz);
                 float ra = sa.r;
-                float rc = sa.radInfluence;  // for now.....
 
                 for (int ib = ia + 1; ib < 3; ib++) {
                     MSPHERE sb = nearSpheres[ib];
@@ -751,12 +764,29 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
                     Vector3 C = Q + dcq * cqdir;
 
                     float dist = p.Distance(C) - rc;
+                    // check C valid
+                    for (int i = 0; i < inn; i++) {
+                        if (inspheres[i].Centre().Distance(C) < inspheres[i].r + rc + 0.1f)
+                            continue;
+                    }
+
+
                     if (dist < bestd) {
                         bestd = dist;
                         bestnorm = (p - C).Normal();
+                        bestC = C;
                     }
                 }
             }
+
+            // check final bestC valid, should already have been checked
+            for (int i = 0; i < inn; i++) {
+                if (inspheres[i].Centre().Distance(bestC) < inspheres[i].r + rc + 0.1f) {
+                    return -1;
+                }
+            }
+
+
             // temp
             return bestd;
         }
