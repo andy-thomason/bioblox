@@ -370,7 +370,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         readonly int MAXN = 2500;        // max num spheres, just for allocation
         readonly MSPHERE[][] spheres;    // list of spheres for each recursion level
         readonly int[] levspheres;       //number of used spheres at each level
-        public static bool nonMetaSpheres = false;  
+        public static bool MetaPureSpheres = false;  
 
         public CSGFMETA() {
             spheres = new MSPHERE[MAXD][];
@@ -429,7 +429,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
         public override float Dist(float x, float y, float z) {
             int inlev = simplev; // todo mlevspheres[vol.lev];
             MSPHERE[] inspheres = spheres[inlev];
-            if (nonMetaSpheres) {
+            if (MetaPureSpheres) {
                 Vector3 vv = new Vector3(x, y, z);
                 MSPHERE s = nearest(vv);
                 //s = inspheres[0];
@@ -605,7 +605,7 @@ grads = ddd * ddd * 6 * radInfluenceNorm3 * strength * ri * ri;
             if (inn == 0) {  // unexpected
                 grad = normal = Vector3.forward;
                 col.r = 0; col.g = 1; col.b = 1; col.a = 1;
-            } else if (nonMetaSpheres) {
+            } else if (MetaPureSpheres) {
                 MSPHERE sp = nearest(p);
                 grad = sp.grad(p);
                 normal = sp.Normal(p);  // don't take from grad, grad might be 0 if out of range, but we can still use normal

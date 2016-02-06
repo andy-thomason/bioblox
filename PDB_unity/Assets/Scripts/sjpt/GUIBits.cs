@@ -606,12 +606,13 @@ namespace CSG {  // [ExecuteInEditMode]
             return changed;
         }
 
+
         /** return IF CHANGED */
         protected bool Mcheck(string checkName, ref bool v) {
             GUI.contentColor = Color.white;
 //            GUI.color = Color.white;
             bool o = v;
-            v = GUI.Toggle(new Rect(20, slidery, sliderWidth, 20), v, checkName);
+            v = GUI.Toggle(new Rect(20, slidery-10, sliderWidth, 20), v, checkName);
             slidery += sliderHeight;
             bool changed = o != v;
             if (changed) lastmouse = Input.mousePosition;

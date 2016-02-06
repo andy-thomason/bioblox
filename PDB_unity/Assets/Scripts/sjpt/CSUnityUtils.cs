@@ -476,6 +476,7 @@ namespace CSG {
             uv = mesh.uv;
             colors = mesh.colors;
             triangles = mesh.triangles;
+            N = vertices.Length;
         }
 
         public Mesh[] ToMeshes() {
@@ -556,8 +557,9 @@ namespace CSG {
         }
 
         /** remp the mesh commoning up the vertices 
-         * This is not always valid as it dopes not take account of normals, etc,
+         * This is not always valid as it does not take account of normals, etc,
          * but is valid for a 'homogeneous' object such as a metaballs.
+         * It is also now largely redundant as vertex commoning is now performed as polygons are generated.
          */
         public BigMesh RemapMesh() {
             int n = vertices.Length;
@@ -577,7 +579,7 @@ namespace CSG {
                     // could verify normals etc equal here, we are assuming this
                 }
             }
-            //GUIBits.Log("vertices=" + n + ", unique vertices=" + nnn);
+            GUIBits.Log("vertices=" + n + ", unique vertices=" + nnn);
 
             // now pack down the structures -----------
             Vector3[] n1vertices = new Vector3[nnn];
@@ -613,10 +615,22 @@ namespace CSG {
 
             }
             return nmesh;
-
         }
 
-    }
+        // remap the normals, replace in place
+        public void RemapNormals() {
+            for (int i = 0; i < N; i++) normals[i].Set(0, 0, 0);
+            for (int t = 0; t < triangles.Length; t += 3) {
+                Vector3 n = (vertices[triangles[t + 1]] - vertices[triangles[t]]).cross(vertices[triangles[t + 2]] - vertices[triangles[t]]);
+                n.Normalize();
+                normals[triangles[t]] += n;
+                normals[triangles[t+1]] += n;
+                normals[triangles[t+2]] += n;
+            }
+            for (int i = 0; i < N; i++) normals[i].Normalize();
+        }
+
+    }  // BigMesh
 
     // temporary class for bridge to other code
     static class CSGXX {
@@ -648,6 +662,30 @@ namespace CSG {
         public static Mesh ToBack(this Mesh mesh) {
             BigMesh bm = new BigMesh(mesh);
             return bm.ToMeshBack();
+        }
+
+        public static void RemapNormals(this Mesh mesh) {
+            if (mesh.vertices.Length == 0) return;
+            BigMesh bm = new BigMesh(mesh);
+            bm.RemapNormals();
+            mesh.normals = bm.normals;
+            GUIBits.Log("remap normals for {0} vertices {1} trianlges", mesh.vertices.Length, mesh.triangles.Length);
+        }
+
+        public static void RemapNormals(this Transform tr) {
+            MeshFilter mf = tr.GetComponent<MeshFilter>();
+            if (mf != null) {
+                //Vector3[] vertices = mf.mesh.vertices;
+                mf.mesh.name = "mesh.." + mf.name;
+                mf.mesh.RemapNormals();
+                //mf.mesh.vertices = vertices;
+            }
+            for (int i = 0; i < tr.childCount; i++)
+                tr.GetChild(i).RemapNormals();
+        }
+
+        public static void RemapNormals(this GameObject go) {
+            go.transform.RemapNormals();
         }
 
     }

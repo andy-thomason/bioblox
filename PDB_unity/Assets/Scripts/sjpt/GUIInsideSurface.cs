@@ -249,6 +249,12 @@ namespace CSG {
             if (testop("unmatched", "show the 'holes' inside mol A usually discarded")) { savemeshA.unmatched(); return true; }
             // if (testop("resetPolyEdges")) { CSGPrim.resetPolyEdges(); return true; }
 
+            if (testop("remapNormals", "Recompute vertex normals from face normals")) {
+                if (goMolA != null) goMolA.RemapNormals();
+                if (goMolB != null) goMolB.RemapNormals();
+                return true;
+            }
+
             if (opdone) showCSGParallel(csg, bounds, goTest);
             return opdone;
 
@@ -681,6 +687,7 @@ namespace CSG {
                 shrinkA();
                 shrinkB();
             };
+            Mcheck("MetaPureSpheres", ref CSGFMETA.MetaPureSpheres) ;
             if (MSlider("MaxNeighbourDist", ref BigMesh.MaxNeighbourDistance, 0, 50, 20)) 
                 filter();
             if (MSlider("MustIncludeDistance", ref BigMesh.MustIncludeDistance, 0, 250, 20))
