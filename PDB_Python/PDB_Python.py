@@ -291,7 +291,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
       self.send_response(200)
       self.send_header(b"Content-type", "text/html")
       self.end_headers()
-      with open('index.html', 'rb') as rf:
+      with open('htdocs/index.html', 'rb') as rf:
         self.wfile.write(rf.read())
         return
     elif match_thumbnail or match_mesh or match_data or match_pdb:
