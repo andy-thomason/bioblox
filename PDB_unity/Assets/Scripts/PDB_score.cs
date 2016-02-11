@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public class PDB_score {
 
@@ -2022,6 +2023,7 @@ public class PDB_score {
 			if (smallAminoAcids.Contains(aaName)) {
 				for (int j = 0; j != ids.Length; ++j) {
 					string atomName = decode(mol.names[ids[j]]);
+					atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
 					//discard hydrogens
 					if (!atomName.StartsWith("H")) {
 						//if backbone nitrogen or backbone oxygen
@@ -2044,6 +2046,7 @@ public class PDB_score {
 			} else if (largeAminoAcids.Contains(aaName)) {
 				for (int j = 0; j != ids.Length; ++j) {
 					string atomName = decode(mol.names[ids[j]]);
+					atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
 					//discard hydrogens
 					if (!atomName.StartsWith("H")) {
 						//if backbone nitrogen or backbone oxygen
@@ -2078,7 +2081,8 @@ public class PDB_score {
 			} else if (aaName == "GLY") {
 				//Debug.Log (threeLetterToOneLetterAminoAcid[name]);
 				for (int j = 0; j != ids.Length; ++j) {
-					string atomName = decode(mol.names[ids[j]]);
+					string atomName = decode(mol.names[ids[j]]);					
+					atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
 					//discard hydrogens
 					if (!atomName.StartsWith("H")) {
 						//if backbone nitrogen or backbone oxygen
