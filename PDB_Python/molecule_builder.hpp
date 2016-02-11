@@ -126,6 +126,8 @@ public:
       pmax = max(pmax, pos[j]);
     }
     
+    std::cout << pmin << pmax << "\n";
+
     float rgs = resolution;
     int irgs = std::ceil(max_r * rgs) + 1;
     int x0 = std::floor(pmin.x() * rgs) - irgs;
@@ -136,6 +138,8 @@ public:
     int z1 = std::ceil(pmax.z() * rgs) + irgs;
 
     int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
+    
+    std::cout << vec3(xdim, ydim, zdim) << "\n";
 
     float threshold = 0.5f;
 

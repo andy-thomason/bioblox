@@ -360,8 +360,10 @@ def main(argv):
   port = int(os.getenv('PORT', '443'))
   print("serving on %s:%d" % (host, port))
   httpd = http.server.HTTPServer((host, port), MyHandler)
-  #httpd.socket = ssl.wrap_socket(httpd.socket)
-  print("serving")
+  
+  # http://pankajmalhotra.com/Simple-HTTPS-Server-In-Python-Using-Self-Signed-Certs/
+  httpd.socket = ssl.wrap_socket(httpd.socket, certfile='server.pem', server_side=True)
+
   httpd.serve_forever()
 
 if __name__ == "__main__":
