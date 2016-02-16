@@ -1,18 +1,24 @@
 <html>
   <head>
     <title>Bioblox data server</title>
+    <script src='shaderfood/gl-matrix.js'></script>
     <script src='shaderfood/shaderfood.js'></script>
     <script>
+      gliEmbedDebug = true;
+      
       function loaded(id) {
-        /* global Canvas Shader BinFile */
-        var canvas = new Canvas(id);
+        /* global Canvas Shader glMatrix mat4 Camera BinFile */
+
+        var canvas = new Canvas("2ptc");
         var shader = new Shader(canvas, 'shaderfood/shaders/shaded.glsl');
+        var camera = new Camera(canvas);
+        camera.translate([0, 0, 70]);
     
         var scene;
     
         BinFile(
           canvas,
-          '/mesh/2ptc.0.100.bin',
+          '/mesh/2ptc.0.200.bin',
           function(s) {
             scene = s;
           }
@@ -20,10 +26,12 @@
     
         setInterval(function() {
           canvas.clear();
-      
+    
           if (scene) {
             for (var m in scene) {
-              shader.draw(scene[m]);
+              var params = scene[m];
+              camera.set_params(params);
+              shader.draw(params);
             }
           }
         }, 500);
@@ -39,6 +47,6 @@
     <p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</p>
     <p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</p>
     <p><a href='/shaderfood/examples/teapot.html'>/shaderfood/teapot.html</p>
-    <p></p><canvas width=200 id="2ptc"></canvas></p>
+    <p></p><canvas width=600 height=600 id="2ptc"></canvas></p>
   </body>
 </html>
