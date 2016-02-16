@@ -170,10 +170,6 @@ def parse_pdb(file):
       mol.pos.append(float(line[46:54]) )
       mol.radii.append(radii[line[76:78]])
 
-      mol.pos.append(float(line[30:38]) )
-      mol.pos.append(float(line[38:46]) )
-      mol.pos.append(float(line[46:54]) )
-
       id = line[13:20]
       colour = atom_colours[id] if id in atom_colours else (1, 1, 1, 1)
       #print(id, colour)
@@ -229,7 +225,7 @@ def download_entries():
     try:
       os.stat(local_name)
     except:
-      print('reading %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % name))
+      print('reading pdb %s' % ('http://www.rcsb.org/pdb/files/%s.pdb' % name))
       req = urllib.request.Request('http://www.rcsb.org/pdb/files/%s.pdb' % name)
       with urllib.request.urlopen(req) as req:
         print(req)
@@ -280,66 +276,67 @@ data_re = re.compile('^/data/(\\w+)\..*$')
 pdb_re = re.compile('^/pdb/(\\w+)\.pdb$')
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
+  def serve_file(self, prefix, path):
+    try:
+      with open(prefix + path, 'rb') as rf:
+        print("serving %s" % (prefix+path));
+        self.send_response(200)
+        if path[-4:] == '.bin':
+          self.send_header(b"Content-type", "application/octet-stream")
+        elif path[-4:] == '.png':
+          self.send_header(b"Content-type", "image/png")
+        else:
+          self.send_header(b"Content-type", "text/plain")
+        self.end_headers()
+        self.wfile.write(rf.read())
+        return True
+    except:
+      print("failed to find %s" % (prefix+path));
+    return False
+
+  def make_on_demand(self, path):
+    print('making ' + path + ' on demand')
+    
+    match_thumbnail = thumbnails_png_re.match(path)
+    match_mesh = mesh_re.match(path)
+    #match_data = data_re.match(path)
+    #match_pdb = pdb_re.match(path)
+
+    if match_thumbnail:
+      pdb = str(match_thumbnail.group(1))
+      size = int(match_thumbnail.group(2))
+      build_thumbnail(pdb, size)
+    elif match_mesh:
+      pdb = str(match_mesh.group(1))
+      index = int(match_mesh.group(2))
+      resolution = int(match_mesh.group(3))
+      build_mesh(pdb, index, resolution)
+
   def do_GET(self):
     print("GET %s" % self.path)
     
-    match_thumbnail = thumbnails_png_re.match(self.path)
-    match_mesh = mesh_re.match(self.path)
-    match_data = data_re.match(self.path)
-    match_pdb = pdb_re.match(self.path)
-    if self.path == '/':
-      self.send_response(200)
-      self.send_header(b"Content-type", "text/html")
-      self.end_headers()
-      with open('index.html', 'rb') as rf:
-        self.wfile.write(rf.read())
-        return
-    elif match_thumbnail or match_mesh or match_data or match_pdb:
-      make_new = True
-      if not disable_cache:
-        try:
-          with open(htdocs + self.path[1:], 'rb') as rf:
-            self.wfile.write(rf.read())
-            return
-          make_new = False
-        except:
-          print("failed to find cached %s" % self.path[1:]);
-          pass
-      
-      # build thumbnails and meshes on demand
-      if make_new:
-        if match_thumbnail:
-          pdb = str(match_thumbnail.group(1))
-          size = int(match_thumbnail.group(2))
-          build_thumbnail(pdb, size)
-        elif match_mesh:
-          pdb = str(match_mesh.group(1))
-          index = int(match_mesh.group(2))
-          resolution = int(match_mesh.group(3))
-          build_mesh(pdb, index, resolution)
-        else:
-          self.send_response(404)
-          self.end_headers()
-          return
-      try:
-        with open(htdocs + self.path[1:], 'rb') as rf:
-          self.send_response(200)
-          if self.path[-4:] == '.bin':
-            self.send_header(b"Content-type", "application/octet-stream")
-          elif self.path[-4:] == '.png':
-            self.send_header(b"Content-type", "image/png")
-          else:
-            self.send_header(b"Content-type", "text/plain")
-          self.end_headers()
-          self.wfile.write(rf.read())
-      except:
-        self.send_response(404)
-        self.end_headers()
-        return
-    else:
+    path = '/index.html' if self.path == '/' else self.path; 
+    
+    if '..' in path:
       self.send_response(404)
       self.end_headers()
       return
+
+    if self.serve_file(htdocs, path):
+      return
+    
+    if self.serve_file('htdocs/', path):
+      return
+
+    self.make_on_demand(path)
+
+    if self.serve_file(htdocs, path):
+      return
+
+    print('failed after make on demand')
+    self.send_response(404)
+    self.end_headers()
+    return
 
 def make_dir(path):
   try:
@@ -359,8 +356,10 @@ def main(argv):
   port = int(os.getenv('PORT', '443'))
   print("serving on %s:%d" % (host, port))
   httpd = http.server.HTTPServer((host, port), MyHandler)
-  #httpd.socket = ssl.wrap_socket(httpd.socket)
-  print("serving")
+  
+  # http://pankajmalhotra.com/Simple-HTTPS-Server-In-Python-Using-Self-Signed-Certs/
+  #httpd.socket = ssl.wrap_socket(httpd.socket, certfile='server.pem', server_side=True)
+
   httpd.serve_forever()
 
 if __name__ == "__main__":

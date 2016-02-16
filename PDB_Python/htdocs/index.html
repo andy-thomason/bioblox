@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Bioblox data server</title>
+    <script src='shaderfood/shaderfood.js'></script>
+    <script>
+      function loaded(id) {
+        /* global Canvas Shader BinFile */
+        var canvas = new Canvas(id);
+        var shader = new Shader(canvas, 'shaderfood/shaders/shaded.glsl');
+    
+        var scene;
+    
+        BinFile(
+          canvas,
+          '/mesh/2ptc.0.100.bin',
+          function(s) {
+            scene = s;
+          }
+        );
+    
+        setInterval(function() {
+          canvas.clear();
+      
+          if (scene) {
+            for (var m in scene) {
+              shader.draw(scene[m]);
+            }
+          }
+        }, 500);
+      }
+    </script>
+  </head>
+  <body onload="loaded('2ptc')">
+    <h1>Bioblox data server!</h1>
+    <h3>Example urls:</h3>
+    <p><a href='/data/names.txt'>/data/names.txt</p>
+    <p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>
+    <p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>
+    <p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</p>
+    <p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</p>
+    <p><a href='/shaderfood/examples/teapot.html'>/shaderfood/teapot.html</p>
+    <p></p><canvas width=200 id="2ptc"></canvas></p>
+  </body>
+</html>
