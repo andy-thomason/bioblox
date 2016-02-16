@@ -170,10 +170,6 @@ def parse_pdb(file):
       mol.pos.append(float(line[46:54]) )
       mol.radii.append(radii[line[76:78]])
 
-      mol.pos.append(float(line[30:38]) )
-      mol.pos.append(float(line[38:46]) )
-      mol.pos.append(float(line[46:54]) )
-
       id = line[13:20]
       colour = atom_colours[id] if id in atom_colours else (1, 1, 1, 1)
       #print(id, colour)
@@ -362,7 +358,7 @@ def main(argv):
   httpd = http.server.HTTPServer((host, port), MyHandler)
   
   # http://pankajmalhotra.com/Simple-HTTPS-Server-In-Python-Using-Self-Signed-Certs/
-  httpd.socket = ssl.wrap_socket(httpd.socket, certfile='server.pem', server_side=True)
+  #httpd.socket = ssl.wrap_socket(httpd.socket, certfile='server.pem', server_side=True)
 
   httpd.serve_forever()
 

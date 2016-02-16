@@ -1,6 +1,6 @@
 
 #include <algorithm>
-#include "marching_cubes.hpp"
+#include "glslmath/include/marching_cubes.hpp"
 
 /*
   static void make_molecule(float grid_spacing) {
@@ -127,7 +127,7 @@ public:
       pmax = max(pmax, pos[j]);
     }
     
-    std::cout << pmin << pmax << "\n";
+    std::cout << pmin << " " << pmax << " " << max_r << "\n";
 
     float rgs = resolution;
     int irgs = std::ceil(max_r * rgs) + 1;
@@ -137,6 +137,9 @@ public:
     int x1 = std::ceil(pmax.x() * rgs) + irgs;
     int y1 = std::ceil(pmax.y() * rgs) + irgs;
     int z1 = std::ceil(pmax.z() * rgs) + irgs;
+    
+    std::cout << "irgs=" << irgs << "\n";
+    std::cout << "rgs=" << rgs << "\n";
 
     int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
     
@@ -169,7 +172,7 @@ public:
       float fk = std::log(threshold) / (r * r);
       float fkk = -fk * 0.5f; // 0.5 is a magic number!
       //bool wcol = atom_colour.r != 1.0f || atom_colour.g != 1.0f || atom_colour.b != 1.0f;
-
+      
       for (int z = zmin; z != zmax; ++z) {
         float fdz = z - cz;
         for (int y = ymin; y != ymax; ++y) {
@@ -195,33 +198,24 @@ public:
     //for (auto &n : normals) n.normalise();
     
     printf("(%d %d %d) (%d %d %d)\n", x0, y0, z0, xdim, ydim, zdim);
+    fflush(stdout);
 
     marching_cubes mc(x0, y0, z0, xdim, ydim, zdim, 1.0f / resolution, values.data(), colours.data());
     
-    std::cout << mc.vertices.size() << " v\n";
-    std::cout << mc.indices.size() << " i\n";
-    
-    image_.push_back((int)mc.indices.size());
-    image_.push_back((int)mc.vertices.size());
-
-    for (auto i : mc.indices) {
-      image_.push_back((int)i);
-    }
-    
-    auto cast = [](float f) { union { int i; float f; } u; u.f = f; return u.i; };
-
-    for (auto v : mc.vertices) {
-      image_.push_back(cast(v.x()));
-      image_.push_back(cast(v.y()));
-      image_.push_back(cast(v.z()));
-    }
+    sizer s;
+    s = mc.get_mesh().write_binary(s);
+    image_.resize(s.size());
+    std::cout << "size=" << s.size() << "\n";
+    std::uint8_t *p = mc.get_mesh().write_binary(image_.data());
+    std::cout << "nsize=" << image_.data() - p << "\n";
+    if((size_t)(p - image_.data()) != image_.size()) throw(std::range_error("ouch"));
   }
   
-  const std::vector<int> &image() const {
+  const std::vector<std::uint8_t> &image() const {
     return image_;
   }
 private:
-  std::vector<int> image_;
+  std::vector<std::uint8_t> image_;
   std::vector<float> values;
   std::vector<glslmath::vec4> colours;
 };

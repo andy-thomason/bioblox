@@ -180,11 +180,11 @@ private:
     int resolution = 0;
     PyArg_ParseTuple(args, "s*s*s*i", &pos_buf, &radii_buf, &atom_colours_buf, &resolution);
 
-    printf("make_mesh %d\n", (int)atom_colours_buf.len);
+    //printf("make_mesh p=%d r=%d c=%d\n", (int)pos_buf.len/sizeof(vec3), (int)radii_buf.len/sizeof(float), (int)atom_colours_buf.len/sizeof(vec4));
 
-    molecule_builder mb(pos_buf.len/12, (const vec3*)pos_buf.buf, (const float*)radii_buf.buf, (vec4*)atom_colours_buf.buf, resolution / 100.0f);
+    molecule_builder mb(pos_buf.len/sizeof(vec3), (const vec3*)pos_buf.buf, (const float*)radii_buf.buf, (vec4*)atom_colours_buf.buf, resolution / 100.0f);
 
-    return PyBytes_FromStringAndSize((const char*)mb.image().data(), mb.image().size()*4);
+    return PyBytes_FromStringAndSize((const char*)mb.image().data(), mb.image().size());
   }
 };
 
