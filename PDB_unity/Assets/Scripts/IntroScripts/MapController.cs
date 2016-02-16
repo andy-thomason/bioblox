@@ -10,10 +10,18 @@ public class MapController : MonoBehaviour, IPointerClickHandler
     public Vector3 zoom_position;
     RectTransform map_panel;
     public GameObject level_description;
+    public GameObject LeftLevelObject;
+    public GameObject RightLevelObject;
+    //get the current level for the next/bacj level
+    public int current_level;
+    float x_frame_border;
+    LevelMapController levelMapController;
 
     // Use this for initialization
     void Awake () {
         map_panel = GetComponent<RectTransform>();
+        levelMapController = FindObjectOfType<LevelMapController>();
+        x_frame_border = Screen.width / 4.0f;
     }
 
     bool clicko = false;
@@ -27,33 +35,25 @@ public class MapController : MonoBehaviour, IPointerClickHandler
     // Update is called once per frame
     void Update ()
     {
-        // float key = Mathf.Lerp(0.0f, 40.0f, Time.time);
-        //Debug.Log(key);
-        //Debug.Log(Input.mousePosition);
-        //Debug.Log(micro_camera.cameraToWorldMatrix);
 
         if (Input.GetAxis("Mouse ScrollWheel") != 0)
         {
             StopAllCoroutines();
-            if (micro_camera.orthographicSize >= 100 && micro_camera.orthographicSize <= 4700)
+            if (micro_camera.orthographicSize >= 80 && micro_camera.orthographicSize <= 4700)
             {
-                /*Vector3 temp = MainCamera.transform.position;
-                temp.z += Input.GetAxis("Mouse ScrollWheel") * 5;
-                MainCamera.transform.position = temp;*/
-
                // current_scroll = Input.GetAxis("Mouse ScrollWheel") / 10;
                 if(Input.GetAxis("Mouse ScrollWheel") < 0)
                 {
                     StopAllCoroutines();
                     StartCoroutine(MoveMapCanvas());
-                    micro_camera.orthographicSize = micro_camera.orthographicSize + 200.0f;
+                    micro_camera.orthographicSize = micro_camera.orthographicSize + 110.0f;
                     //map_panel.anchoredPosition = new Vector2((-zoom_position.x + 400.0f), (-zoom_position.y - 237.0f));
                 }
                 else
                 {
                     StopAllCoroutines();
                     StartCoroutine(MoveMapCanvas());
-                    micro_camera.orthographicSize = micro_camera.orthographicSize - 200.0f;
+                    micro_camera.orthographicSize = micro_camera.orthographicSize - 110.0f;
                     //map_panel.anchoredPosition = new Vector2((-zoom_position.x + 400.0f), (-zoom_position.y - 237.0f));
                 }
 
@@ -62,21 +62,25 @@ public class MapController : MonoBehaviour, IPointerClickHandler
                     micro_camera.orthographicSize = 4700;
                 }
                 
-                if(micro_camera.orthographicSize < 100)
+                if(micro_camera.orthographicSize < 80)
                 {
-                    micro_camera.orthographicSize = 100;
+                    micro_camera.orthographicSize = 80;
                 }
             }
         }
        
         //if maximum zoom, show canvas descrptin
-        if(micro_camera.orthographicSize == 100 && !level_description.activeSelf)
+        if(micro_camera.orthographicSize == 80 && !level_description.activeSelf)
         {
             level_description.SetActive(true);
+            LeftLevelObject.SetActive(true);
+            RightLevelObject.SetActive(true);
         }
-        if (micro_camera.orthographicSize > 100 && level_description.activeSelf)
+        if (micro_camera.orthographicSize > 80 && level_description.activeSelf)
         {
             level_description.SetActive(false);
+            LeftLevelObject.SetActive(false);
+            RightLevelObject.SetActive(false);
         }
     }
 
@@ -110,7 +114,7 @@ public class MapController : MonoBehaviour, IPointerClickHandler
     IEnumerator MoveMapCanvasDoubleClick()
     {
         float timeSinceStarted = 0f;
-        Vector3 newPosition = new Vector2((-zoom_position.x), (-zoom_position.y));
+        Vector3 newPosition = new Vector2((-zoom_position.x - x_frame_border + 150.0f), (-zoom_position.y));
         while (true)
         {
             timeSinceStarted += Time.deltaTime;
@@ -120,14 +124,47 @@ public class MapController : MonoBehaviour, IPointerClickHandler
                 map_panel.anchoredPosition = Vector3.Lerp(map_panel.anchoredPosition, newPosition, timeSinceStarted);
             }
 
-            if (micro_camera.orthographicSize > 100.0f)
+            if (micro_camera.orthographicSize > 80.0f)
             {
-                micro_camera.orthographicSize = micro_camera.orthographicSize - 100.0f;
+                micro_camera.orthographicSize = micro_camera.orthographicSize - 110.0f;
             }
             
 
             // If the object has arrived, stop the coroutine
-            if (timeSinceStarted > 1.0f && micro_camera.orthographicSize == 100.0f)
+            if (timeSinceStarted > 1.0f && micro_camera.orthographicSize == 80.0f)
+            {
+                yield break;
+            }
+
+            // Otherwise, continue next frame
+            yield return null;
+        }
+    }
+
+    IEnumerator MoveNextLevel(Vector3 newPosition, bool direction)
+    {
+        float timeSinceStarted = 0f;
+
+        if (direction)
+        {
+            newPosition = new Vector3((-newPosition.x - x_frame_border + 150.0f), (-newPosition.y));
+        }
+        else
+        {
+            newPosition = new Vector3((-newPosition.x - x_frame_border - 150.0f), (-newPosition.y));
+        }
+
+        while (true)
+        {
+            timeSinceStarted += Time.deltaTime;
+
+            if (timeSinceStarted <= 1.0f)
+            {
+                map_panel.anchoredPosition = Vector3.Lerp(map_panel.anchoredPosition, newPosition, timeSinceStarted);
+            }
+
+            // If the object has arrived, stop the coroutine
+            if (timeSinceStarted > 1.0f)
             {
                 yield break;
             }
@@ -142,6 +179,26 @@ public class MapController : MonoBehaviour, IPointerClickHandler
         StopAllCoroutines();
         StartCoroutine(MoveMapCanvas());
         micro_camera.orthographicSize = micro_camera.orthographicSize - 1000.0f;
+    }
+
+    //navigation right
+    public void NextLevelRight()
+    {
+        StopAllCoroutines();
+        Debug.Log("current level: " + current_level);
+        current_level++;
+        StartCoroutine(MoveNextLevel(levelMapController.level_position[current_level], true));
+        Debug.Log("next level: " + current_level);
+    }
+
+    //navigation right
+    public void NextLevelLeftt()
+    {
+        StopAllCoroutines();
+        Debug.Log("current level: " + current_level);
+        current_level--;
+        StartCoroutine(MoveNextLevel(levelMapController.level_position[current_level], false));
+        Debug.Log("next level: " + current_level);
     }
 
 }

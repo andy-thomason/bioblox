@@ -7,10 +7,11 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
 {
 
     public string level_name;
+    public string level_description;
     public Vector3 coordinates;
     public int level_id;
     //Transform map_canvas;
-    LevelMapController levelMapController;
+   // public LevelMapController levelMapController;
     public MapController mapController;
     //thumbs
     public Sprite thumb_32;
@@ -24,6 +25,7 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     float y_frame_min;
     float x_frame_max;
     float y_frame_max;
+    float x_frame_max_description;
     //WWWW
     string url_image;
     Sprite thumb_temp;
@@ -32,6 +34,8 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     WWW DataConnection32;
     WWW DataConnection128;
     WWW DataConnection512;
+    WWW DataDescription;
+    string url_description;
 
     bool download_128 = false;
     bool download_512 = false;
@@ -65,13 +69,15 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
         x_frame_min = Screen.width / 8.0f;
         y_frame_min = Screen.height / 8.0f;
         x_frame_max = Screen.width - x_frame_min;
+        x_frame_max_description = Screen.width / 2.0f;
         y_frame_max = Screen.height - y_frame_min;
         //Debug.Log(Screen.width / 2.0f + "/" + Screen.height / 2.0f);
 
     }
 
-    public void init(string name_level, Vector3 position)
+    public void init(string name_level, Vector3 position, int level_index)
     {
+        level_id = level_index;
         level_name = name_level;
         text_level.text = level_name;
         coordinates = position;
@@ -102,7 +108,7 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     public void OnPointerEnter(PointerEventData data)
     {
         mapController.zoom_position = coordinates;
-
+        mapController.current_level = level_id;
     }
 
     void Update()
@@ -178,8 +184,30 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
                 current_thumb = thumb_32;
             }
         }
+
+        //download description
+        if (micro_camera.WorldToScreenPoint(transform.position).x > x_frame_min && micro_camera.WorldToScreenPoint(transform.position).x < x_frame_max_description && micro_camera.WorldToScreenPoint(transform.position).y > y_frame_min && micro_camera.WorldToScreenPoint(transform.position).y < y_frame_max && micro_camera.orthographicSize == 80.0f && level_description == "")
+        {
+            //StartCoroutine(DownloadDescription());
+            level_description = "caca";
+        }
     }
-    
+
+    //couritine download thimb
+    IEnumerator DownloadDescription()
+    {
+        url_description = "http://www.rcsb.org/pdb/explore/explore.do?structureId=" + level_name;
+        //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + "." + thumb_size + ".png";
+        do//wait for the server to get the image
+        {
+            DataDescription = new WWW(url_description);
+            yield return DataDescription;
+            Debug.Log(DataDescription.error);
+        } while (!string.IsNullOrEmpty(DataDescription.error));
+        Debug.Log(DataDescription.text);
+
+    }
+
     //couritine download thimb
     IEnumerator DownloadThumb128()
     {
@@ -209,11 +237,13 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     IEnumerator DownloadThumbInit()
     {
         url_image = "http://quiley.com/BB/BB32/" + level_name + ".png";
-        //url_image = "http://158.223.59.221:8080/thumbnails/" + level_name + ".32.png";
+        //url_image = "https://158.223.59.221/thumbnails/" + level_name + ".32.png";
+        //Debug.Log(url_image);
         do//wait for the server to get the image
         {
             DataConnection32 = new WWW(url_image);
             yield return DataConnection32;
+            //Debug.Log(DataConnection32.error);
         } while (!string.IsNullOrEmpty(DataConnection32.error));
         thumb_32 = Sprite.Create(DataConnection32.texture, new Rect(0, 0, 32, 32), thumb_pivot);
         thumb_image.sprite = current_thumb = thumb_32;

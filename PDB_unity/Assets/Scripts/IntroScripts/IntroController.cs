@@ -11,6 +11,7 @@ public class IntroController : MonoBehaviour {
     public Transform Poster;
     public Scrollbar PosterScrollBar;
     public GameObject PosterScrollBarCanvas;
+    public GameObject IntroLabModel;
 
 
     public void CameraStart()
@@ -38,6 +39,7 @@ public class IntroController : MonoBehaviour {
     {
         GetComponent<Camera>().enabled = false;
         MicroscopeView.SetActive(true);
+        IntroLabModel.SetActive(false);
     }
 
     public void ScrollPoster()

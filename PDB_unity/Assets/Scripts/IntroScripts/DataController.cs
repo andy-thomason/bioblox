@@ -15,10 +15,13 @@ public class DataController : MonoBehaviour {
 
     IEnumerator DownloadData()
     {
-        WWW DataConnection = new WWW("http://quiley.com/BB/names3.txt");
-        //WWW DataConnection = new WWW("http://158.223.59.221:8080/data/names.txt"); 
+        WWW DataConnection = new WWW("http://quiley.com/BB/names4.txt");
+        //WWW DataConnection = new WWW("https://158.223.59.221/data/names.txt");
         yield return DataConnection;
+        Debug.Log(DataConnection.isDone);
+        Debug.Log(DataConnection.size);
         Debug.Log(DataConnection.text);
+        Debug.Log(DataConnection.error);
         level_index = DataConnection.text.Split('\n');
         /*foreach(string caca in level_index)
         {
