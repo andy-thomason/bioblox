@@ -4,7 +4,7 @@
     <script src='shaderfood/gl-matrix.js'></script>
     <script src='shaderfood/shaderfood.js'></script>
     <script>
-      gliEmbedDebug = true;
+      //gliEmbedDebug = true;
       
       function loaded(id) {
         /* global Canvas Shader glMatrix mat4 Camera BinFile */
@@ -12,7 +12,7 @@
         var canvas = new Canvas("2ptc");
         var shader = new Shader(canvas, 'shaderfood/shaders/shaded.glsl');
         var camera = new Camera(canvas);
-        camera.translate([0, 0, 70]);
+        camera.translate([0, 30, 70]);
     
         var scene;
     
