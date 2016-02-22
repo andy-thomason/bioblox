@@ -357,8 +357,9 @@ def main(argv):
   print("serving on %s:%d" % (host, port))
   httpd = http.server.HTTPServer((host, port), MyHandler)
   
-  # http://pankajmalhotra.com/Simple-HTTPS-Server-In-Python-Using-Self-Signed-Certs/
-  #httpd.socket = ssl.wrap_socket(httpd.socket, certfile='server.pem', server_side=True)
+  #http://pankajmalhotra.com/Simple-HTTPS-Server-In-Python-Using-Self-Signed-Certs/
+  if port == 443:
+    httpd.socket = ssl.wrap_socket(httpd.socket, certfile='bioblox.key', server_side=True)
 
   httpd.serve_forever()
 

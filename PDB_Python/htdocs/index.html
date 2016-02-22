@@ -5,6 +5,7 @@
     <script src='shaderfood/shaderfood.js'></script>
     <script>
       //gliEmbedDebug = true;
+      var keys = {};
       
       function loaded(id) {
         /* global Canvas Shader glMatrix mat4 Camera BinFile */
@@ -18,14 +19,19 @@
     
         BinFile(
           canvas,
-          '/mesh/2ptc.0.200.bin',
+          '/mesh/2ptc.0.50.bin',
           function(s) {
             scene = s;
           }
         );
-    
+        
         setInterval(function() {
           canvas.clear();
+          if (keys[37]) camera.rotate(5*3.14159/180, [0, 1, 0]);
+          if (keys[38]) camera.translate([0, 0, -1]);
+          if (keys[39]) camera.rotate(-5*3.14159/180, [0, 1, 0]);
+          if (keys[40]) camera.translate([0, 0, 1]);
+      
     
           if (scene) {
             for (var m in scene) {
@@ -34,19 +40,20 @@
               shader.draw(params);
             }
           }
-        }, 500);
+        }, 30);
       }
+      
     </script>
   </head>
-  <body onload="loaded('2ptc')">
+  <body onload="loaded('2ptc')" onkeydown="keys[event.keyCode] = true" onkeyup="delete keys[event.keyCode]">
     <h1>Bioblox data server!</h1>
     <h3>Example urls:</h3>
-    <p><a href='/data/names.txt'>/data/names.txt</p>
-    <p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</p>
-    <p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</p>
-    <p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</p>
-    <p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</p>
-    <p><a href='/shaderfood/examples/teapot.html'>/shaderfood/teapot.html</p>
-    <p></p><canvas width=600 height=600 id="2ptc"></canvas></p>
+    <p><a href='/data/names.txt'>/data/names.txt</a></p>
+    <p><a href='/thumbnails/2ptc.32.png'>/thumbnails/2ptc.32.png</a></p>
+    <p><a href='/thumbnails/2ptc.1024.png'>/thumbnails/2ptc.1024.png</a></p>
+    <p><a href='/mesh/2ptc.0.100.bin'>/mesh/2ptc.0.100.bin</a></p>
+    <p><a href='/mesh/2ptc.0.200.bin'>/mesh/2ptc.0.200.bin</a></p>
+    <p><a href='/shaderfood/examples/teapot.html'>/shaderfood/teapot.html</a></p>
+    <p><canvas width=300 height=300 id="2ptc"></canvas></a></p>
   </body>
 </html>
