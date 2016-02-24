@@ -118,8 +118,7 @@ public class PDB_parser {
 					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
 						col = new Color(1, 0, 0, 1);
-					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
-					{
+					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
 						col = new Color(0, 0, 1, 1);
 					} else if (id == "SG  CYS") {
 						col = new Color(1, 1, 0, 1);
