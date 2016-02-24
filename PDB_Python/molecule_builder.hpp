@@ -202,11 +202,15 @@ public:
 
     marching_cubes mc(x0, y0, z0, xdim, ydim, zdim, 1.0f / resolution, values.data(), colours.data());
     
+    const mesh &msh = mc.get_mesh();
+    multi_mesh mm = multi_mesh::split(msh);
+    //multi_mesh mm = msh;
+
     sizer s;
-    s = mc.get_mesh().write_binary(s);
+    s = mm.write_binary(s);
     image_.resize(s.size());
     std::cout << "size=" << s.size() << "\n";
-    std::uint8_t *p = mc.get_mesh().write_binary(image_.data());
+    std::uint8_t *p = mm.write_binary(image_.data());
     std::cout << "nsize=" << image_.data() - p << "\n";
     if((size_t)(p - image_.data()) != image_.size()) throw(std::range_error("ouch"));
   }

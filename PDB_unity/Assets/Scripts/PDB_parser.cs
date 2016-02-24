@@ -126,15 +126,14 @@ public class PDB_parser {
 					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG") {
 						col = new Color(1, 0, 0, 1);
-					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP")
-					{
+					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
 						col = new Color(0, 0, 1, 1);
 					} else if (id == "SG  CYS") {
 						col = new Color(1, 1, 0, 1);
 					} else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
 						col = new Color(0, 1, 1, 1);
 					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
-						col = new Color(0, 0, 0, 1);
+						col = new Color(0, 0.5f, 0.5f, 1);
 					}
 
 					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
