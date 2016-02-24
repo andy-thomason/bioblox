@@ -212,9 +212,9 @@ public class PDB_molecule
 			int xmin = Mathf.Max(x0, cix-irgs);
 			int ymin = Mathf.Max(y0, ciy-irgs);
 			int zmin = Mathf.Max(z0, ciz-irgs);
-			int xmax = Mathf.Max(x1, cix+irgs);
-			int ymax = Mathf.Max(y1, ciy+irgs);
-			int zmax = Mathf.Max(z1, ciz+irgs);
+			int xmax = Mathf.Min(x1, cix+irgs);
+			int ymax = Mathf.Min(y1, ciy+irgs);
+			int zmax = Mathf.Min(z1, ciz+irgs);
 			float fk = Mathf.Log(0.5f) / (r * r);
 			float fkk = -fk * 0.5f; // 0.5 is a magic number!
 			bool wcol = colour != Color.white;
