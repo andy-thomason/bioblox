@@ -156,7 +156,7 @@ public class PDB_molecule
 
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
-		const float grid_spacing = 0.5f; // set this to 0.5f for final game and 2.0f for rough builds.
+		const float grid_spacing = 0.25f; // set this to 0.5f for final game and 2.0f for rough builds.
 		const float rgs = 1.0f / grid_spacing;
 
 		// Create a 3D array for each molecule
@@ -213,9 +213,9 @@ public class PDB_molecule
 			int xmin = Mathf.Max(x0, cix-irgs);
 			int ymin = Mathf.Max(y0, ciy-irgs);
 			int zmin = Mathf.Max(z0, ciz-irgs);
-			int xmax = Mathf.Max(x1, cix+irgs);
-			int ymax = Mathf.Max(y1, ciy+irgs);
-			int zmax = Mathf.Max(z1, ciz+irgs);
+			int xmax = Mathf.Min(x1, cix+irgs);
+			int ymax = Mathf.Min(y1, ciy+irgs);
+			int zmax = Mathf.Min(z1, ciz+irgs);
 			float fk = Mathf.Log(0.5f) / (r * r);
 			float fkk = -fk * 0.5f; // 0.5 is a magic number!
 			bool wcol = colour != Color.white;
