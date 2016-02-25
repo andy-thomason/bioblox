@@ -5,6 +5,10 @@ using UnityEngine.UI;
 public class AminoButtonController : MonoBehaviour {
 
 	public int AminoButtonID;
+	public bool Linked = false;
+    public string name_amino;
+	public Color32 NormalColor;
+	public Color32 FunctionColor;
 
 	public void HighLight()
 	{

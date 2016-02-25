@@ -195,11 +195,25 @@ public class PDB_mesh : MonoBehaviour {
 	Vector3 lastMousePos;
 	bool rotating = false;
 	bool has_rotated = false;
+    Camera cam;
+    Ray ray;
+    BioBlox bb;
+    ButtonStructure buttonStructure;
+    UIController uIController;
+    MeshRenderer[] meshes;
+    Vector3 light_pos;
+
+    void Awake()
+    {
+       cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
+        buttonStructure = FindObjectOfType<ButtonStructure>();
+        uIController = FindObjectOfType<UIController>();
+    }
 
 	// Update is called once per frame
 	void Update () {
-		Camera cam = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
-		Ray ray = cam.ScreenPointToRay (Input.mousePosition);
+		ray = cam.ScreenPointToRay (Input.mousePosition);
 		//create a ray to the cursor and cast it, if it hits at all
 		int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
 		Vector3 mousePos = Input.mousePosition;
@@ -245,10 +259,10 @@ public class PDB_mesh : MonoBehaviour {
 		}
 		lastMousePos = mousePos;
 
-		BioBlox bb = (BioBlox)GameObject.FindObjectOfType (typeof(BioBlox));
-		MeshRenderer[] meshes = GetComponentsInChildren<MeshRenderer> ();
-		Vector3 light_pos = cam.transform.TransformPoint(new Vector3(-50,0,0));
-		foreach (MeshRenderer r in meshes) {
+        meshes = GetComponentsInChildren<MeshRenderer>();
+        light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
+
+        foreach (MeshRenderer r in meshes) {
 			r.material.SetVector ("_LightPos", light_pos);
 			if (bb.cutawaySlider) {
 				Vector4 plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
@@ -307,9 +321,43 @@ public class PDB_mesh : MonoBehaviour {
 				if (ids[j] == atom) {
 					SelectAminoAcid(i);					
 					aminoSliderController.HighLight3DMesh(i,protein_id);
-					return;
+                    if(uIController.auto_filter) FunctionTypeHighlight(i, protein_id);
+                    return;
 				}
 			}
 		}
 	}
+
+    int function_type;
+
+    public void FunctionTypeHighlight(int index, int protein_id)
+    {
+        //Debug.Log(buttonStructure.FunctionType[aminoSliderController.A1Buttons[index].GetComponent<AminoButtonController>().name_amino]);
+        if (protein_id == 0) function_type = buttonStructure.FunctionType[aminoSliderController.A1Buttons[index].GetComponent<AminoButtonController>().name_amino];
+        else function_type = buttonStructure.FunctionType[aminoSliderController.A2Buttons[index].GetComponent<AminoButtonController>().name_amino];
+        switch (function_type)
+        {//hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
+            case 0:
+                uIController.ToggleHydroA1();
+                break;
+            case 1:
+                if(protein_id == 0) uIController.TogglePositiveA1();
+                else uIController.TogglePositiveA2();
+                break;
+            case 2:
+                uIController.TogglePolarA1();
+                break;
+            case 3:
+                if (protein_id == 0) uIController.ToggleNegativeA1();
+                else uIController.ToggleNegativeA2();
+                break;
+            case 4:
+                uIController.ToggleOtherA1();
+                break;
+            default:
+                break;
+        }
+        
+        //highlight for function mode
+    }
 }

@@ -65,24 +65,21 @@ public class BioBlox : MonoBehaviour
 	public float seperationForce = 10000.0f;
 	//  force applied by string
 	public float stringForce = 20000.0f;
-	private float ScoreScaleSize;
 	private float ScoreScaleValue;
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
 	public Image heuristicScore;
 	public Text GameScoreValue;
-	public Image GameScore;
-	//public Slider overrideSlider;
-	public Slider cutawaySlider;
+	public Text ElectricScore;
+    public Text LennardScore;
+    //public Slider overrideSlider;
+    public Slider cutawaySlider;
 	public GameObject invalidDockText;
 	public GameObject InvalidDockScore;
 	//public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
 	//Animator of the tools menu
-	public Animator ToolMenuAnimator;
-	public GameObject OpenToolImage;
-	public GameObject CloseToolImage;
 	public GameObject EndLevelMenu;
 
 	// colors of the labels and an offset that is randomly decided randomize colours
@@ -112,8 +109,11 @@ public class BioBlox : MonoBehaviour
 
 	public GameState game_state;
 
-	// Use this for initialization
-	void Start ()
+    //scoring
+    PDB_score scoring;
+
+    // Use this for initialization
+    void Start ()
 	{
 		//winSplash.SetActive (false);
 		//looseSplash.SetActive (false);
@@ -555,19 +555,19 @@ public class BioBlox : MonoBehaviour
 		}
 	}
 	
-	public void SolidClicked()
+	public void SolidClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Triangles);
+		make_moleculesT (false, MeshTopology.Triangles, molecules[molecule_id].name,molecule_id);
 	}
 	
-	public void PointClicked()
+	public void PointClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Points);
+		make_moleculesT (false, MeshTopology.Points, molecules[molecule_id].name,molecule_id);
 	}
 	
-	public void WireClicked()
+	public void WireClicked(int molecule_id)
 	{
-		make_molecules (false, MeshTopology.Lines);
+		make_moleculesT (false, MeshTopology.Lines, molecules[molecule_id].name,molecule_id);
 	}
 
 
@@ -585,12 +585,13 @@ public class BioBlox : MonoBehaviour
 		game_state = GameState.Picking;
 
 		//Clear score
-		GameScore.fillAmount = 0;
-		heuristicScore.fillAmount = 0;
-		GameScoreValue.text = "0";
-		MainCamera.fieldOfView = 60;
-		
-		GetComponent<AminoSliderController> ().init ();
+		LennardScore.text = "0";
+        ElectricScore.text = "0";
+        //heuristicScore.fillAmount = 0;
+        //GameScoreValue.text = "0";
+        //MainCamera.fieldOfView = 60;
+
+        GetComponent<AminoSliderController> ().init ();
 	}
 
 	//since a molecule may be too large for one mesh we may have to make several
@@ -715,7 +716,10 @@ public class BioBlox : MonoBehaviour
 		GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
 		GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
 
-		if (init) {
+        //Ioannis
+        scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
+
+        if (init) {
 			molecules = new GameObject[2];
 			molecules [0] = mol1.gameObject;
 			molecules [1] = mol2.gameObject;
@@ -728,6 +732,16 @@ public class BioBlox : MonoBehaviour
 				offset += 2;
 			}
 		}
+	}
+
+	// create both molecules
+	void make_moleculesT(bool init, MeshTopology mesh_type, string name, int index) {
+		//Debug.Log ("make_molecules");
+		//string file = filenames [current_level];
+		//Debug.Log (file);
+		
+		GameObject mol1 = make_molecule (name, "Proto1", 7, mesh_type,index);
+		//GameObject mol2 = make_molecule (name, "Proto2", 7, mesh_type,1);
 	}
 
 	//main meat of the initilisation logic and level completion logic
@@ -819,7 +833,7 @@ public class BioBlox : MonoBehaviour
 				float rms_distance_score = ScoreRMSD ();
 				if (rmsScoreSlider) {
 					rmsScoreSlider.value = rms_distance_score * 0.1f;
-					float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+					/*float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
 					if(scaleGameScore <= 1.0f && scaleGameScore > 0)
 					{
 						GameScore.fillAmount = scaleGameScore;						
@@ -829,7 +843,7 @@ public class BioBlox : MonoBehaviour
 					{
 						GameScore.fillAmount = 0;
 						GameScoreValue.text = "0";
-					}
+					}*/
 				}
 
 				if (lockButton) {
@@ -898,13 +912,20 @@ public class BioBlox : MonoBehaviour
 
 	// Physics simulation
 	void FixedUpdate() {
-		num_touching_0 = 0;
+
+        num_touching_0 = 0;
 		num_touching_1 = 0;
 		num_invalid = 0;
 		num_connections = 0;
-		//Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length);
-		
-		if (molecules.Length >= 2) {
+        //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
+
+        //score system display
+        scoring.calcScore();
+        if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
+        if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+
+
+        if (molecules.Length >= 2) {
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
 			GameObject obj1 = molecules[1];
@@ -948,11 +969,14 @@ public class BioBlox : MonoBehaviour
 
 			//heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 			
-			ScoreScaleSize = (num_touching_0 + num_touching_1) * 0.013f;
+            //num_invalid = when the physics fails
+           // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
 
-			heuristicScore.fillAmount = num_invalid != 0 ? 0 : ScoreScaleSize;
+            //LennardScore.text = num_invalid != 0 ? LennardScore.text = (scoring.vdwScore).ToString("F2") : "0";
+            //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
+            //Debug.Log ("num_invalid: "+num_invalid);
 
-		}
+        }
 
 		invalidDockText.SetActive(num_invalid != 0);
 		InvalidDockScore.SetActive(num_invalid != 0);
@@ -961,13 +985,6 @@ public class BioBlox : MonoBehaviour
 		if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
-	}
-
-	public void ToogleToolMenu(bool Status)
-	{
-		ToolMenuAnimator.SetBool ("Open", Status);
-		OpenToolImage.SetActive (!Status);
-		CloseToolImage.SetActive (Status);
 	}
 
 }
