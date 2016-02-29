@@ -4,4 +4,6 @@ Temp
 *.suo
 *.sln
 *.csproj
+PDB_Unity\build
+
 

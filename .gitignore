@@ -16,3 +16,5 @@
 *.pyd
 PDB_Python/build/temp.win-amd64-3.5/Release/thumbnail.cp35-win_amd64.exp
 PDB_Python/build/temp.win-amd64-3.5/Release/thumbnail.cp35-win_amd64.lib
+PDB_Unity/build
+
