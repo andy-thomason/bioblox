@@ -43,6 +43,14 @@ public class AminoSliderController : MonoBehaviour {
 	GameObject LinkedGameObjectReference;
 	ButtonStructure buttonStructure;
     UIController uIController;
+    //local score
+    List<Vector2> score_aminolinks_holder_max = new List<Vector2>();
+    List<Vector2> score_aminolinks_holder_elec = new List<Vector2>();
+    List<Vector2> score_aminolinks_holder_len = new List<Vector2>();
+    //max scores
+    float score_total_max = 0;
+    float score_len_max = 0;
+    float score_elec_max = 0;
 
     Text[] ButtonText;
 
@@ -162,8 +170,23 @@ public class AminoSliderController : MonoBehaviour {
 		}
 	}
 
+    public void HighLight3DMeshAll(int index_protein1, int index_protein2)
+    {
+        A1Buttons[CurrentButtonA1].transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        CurrentButtonA1 = index_protein1;
+        A1Buttons[CurrentButtonA1].transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
+        ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol1.transform.childCount - 1);
+        A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+        
+        A2Buttons[CurrentButtonA2].transform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+        CurrentButtonA2 = index_protein2;
+        A2Buttons[CurrentButtonA2].transform.localScale = new Vector3(1.3f, 1.3f, 1.3f);
+        ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol2.transform.childCount - 1);
+        A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
+    }
 
-	public void init () {
+
+    public void init () {
 
 		EmptyAminoSliders ();
 		BioBloxReference = GameObject.Find ("BioBlox").GetComponent<BioBlox> ();
@@ -194,7 +217,10 @@ public class AminoSliderController : MonoBehaviour {
 		//ButtonText.Initialize ();
 		//Debug.Log (currentAmino);
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
-		A1Buttons.Add (AminoButtonReference.GetComponent<Button>());
+        //update the gameobejct name to grab later
+        AminoButtonReference.name = index.ToString();
+
+        A1Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol1.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
@@ -218,7 +244,9 @@ public class AminoSliderController : MonoBehaviour {
 	{		
 		//ButtonText.Initialize ();
 		AminoButtonReference = Instantiate<GameObject>(AminoButton);
-		A2Buttons.Add (AminoButtonReference.GetComponent<Button>());
+        //update the gameobejct name to grab later
+        AminoButtonReference.name = index.ToString();
+        A2Buttons.Add (AminoButtonReference.GetComponent<Button>());
 		AminoButtonReference.transform.SetParent (SliderMol2.transform,false);
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
@@ -461,4 +489,56 @@ public class AminoSliderController : MonoBehaviour {
 	{
 		ButtonA2RDown = false;
 	}
+
+    public void RegisterScore()
+    {
+        //first time
+        if(score_elec_max == 0 && score_len_max == 0 && score_total_max == 0)
+        {
+            foreach (Transform childLinks in AminoLinkPanelParent.transform)
+            {
+                score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_total_max = BioBloxReference.electric_score + BioBloxReference.lennard_score;
+                score_len_max = BioBloxReference.lennard_score;
+                score_elec_max = BioBloxReference.electric_score;
+            }
+        }
+        //new higuest lennars score
+        if(BioBloxReference.lennard_score > score_len_max)
+        {
+            foreach (Transform childLinks in AminoLinkPanelParent.transform)
+            {
+                score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+            }
+        }
+        else if(BioBloxReference.electric_score > score_elec_max)
+        {
+            foreach (Transform childLinks in AminoLinkPanelParent.transform)
+            {
+                score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+            }
+        }
+        else if (BioBloxReference.electric_score + BioBloxReference.lennard_score > score_total_max)
+        {
+            foreach (Transform childLinks in AminoLinkPanelParent.transform)
+            {
+                score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+            }
+        }
+        else
+        {
+            Debug.Log("no higer score achieved");
+        }
+    }
+
+    public void LoadScore()
+    {
+        for(int i = 0; i< score_aminolinks_holder_max.Count; i++)
+        {
+            AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_max[i].x, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_max[i].y), SliderMol1.transform.Find(((int)score_aminolinks_holder_max[i].x).ToString()).gameObject, SliderMol2.transform.Find(((int)score_aminolinks_holder_max[i].y).ToString()).gameObject);
+            FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
+        }
+    }
 }

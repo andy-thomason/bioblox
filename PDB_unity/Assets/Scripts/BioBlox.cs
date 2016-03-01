@@ -73,6 +73,9 @@ public class BioBlox : MonoBehaviour
 	public Text GameScoreValue;
 	public Text ElectricScore;
     public Text LennardScore;
+    //values for external reference
+    public int electric_score;
+    public int lennard_score;
     //public Slider overrideSlider;
     public Slider cutawaySlider;
 	public GameObject invalidDockText;
@@ -759,7 +762,7 @@ public class BioBlox : MonoBehaviour
 
 			if (lockButton) {
 				//lockButton.gameObject.SetActive(false);
-				lockButton.interactable = false;
+				//lockButton.interactable = false;
 			}
 
 			make_molecules (true, MeshTopology.Triangles);
@@ -848,7 +851,7 @@ public class BioBlox : MonoBehaviour
 
 				if (lockButton) {
 					//lockButton.gameObject.SetActive (rms_distance_score < winScore);
-					lockButton.interactable = (rms_distance_score < winScore);
+					//lockButton.interactable = (rms_distance_score < winScore);
 				}
 			}
 
@@ -869,7 +872,7 @@ public class BioBlox : MonoBehaviour
 				}
 
 				//lockButton.gameObject.SetActive(false);
-				lockButton.interactable = false;
+				//lockButton.interactable = false;
 					
 				Debug.Log ("Docked");
 
@@ -921,6 +924,9 @@ public class BioBlox : MonoBehaviour
 
         //score system display
         scoring.calcScore();
+        //set values for refence
+        lennard_score = (int)scoring.vdwScore;
+        electric_score = (int)scoring.elecScore;
         if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
         if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
 

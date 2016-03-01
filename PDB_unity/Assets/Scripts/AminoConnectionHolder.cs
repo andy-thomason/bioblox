@@ -18,7 +18,16 @@ public class AminoConnectionHolder : MonoBehaviour {
 		Destroy (gameObject);
 	}
 
-	void Awake()
+    public void HighlightClick()
+    {
+        FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button2);
+        FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA2(ID_button2);			
+		FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button1);
+        FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(ID_button1);
+        FindObjectOfType<AminoSliderController>().HighLight3DMeshAll(ID_button1, ID_button2);
+    }
+
+    void Awake()
 	{
 		distancia = GetComponentInChildren<Text> ();
 	}
