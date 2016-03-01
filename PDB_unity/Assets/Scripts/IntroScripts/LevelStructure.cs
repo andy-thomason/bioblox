@@ -10,7 +10,7 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
     public Vector3 coordinates;
     public int level_id;
     //Transform map_canvas;
-    LevelMapController levelMapController;
+    //LevelMapController levelMapController;
     MapController mapController;
     //thumbs
     public Sprite thumb_32;
@@ -33,16 +33,16 @@ public class LevelStructure : MonoBehaviour, IPointerClickHandler, IPointerEnter
     bool download_128 = false;
     bool download_512 = false;
     //on focus
-    bool is_on_screen = false;
+    //bool is_on_screen = false;
     //the sprite to replace
     Image thumb_image;
 
     //camera new
     Camera micro_camera;
 
-    float lastClickTime;
+    //float lastClickTime;
 
-    float catchTime = 0.25f;
+    //float catchTime = 0.25f;
 
     void Awake()
     {

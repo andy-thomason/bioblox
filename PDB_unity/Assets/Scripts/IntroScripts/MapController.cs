@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class MapController : MonoBehaviour, IPointerClickHandler
 {
     
-    float current_scroll;
+    //float current_scroll;
     public Camera micro_camera;
     public Vector3 zoom_position;
     RectTransform map_panel;
@@ -24,7 +24,7 @@ public class MapController : MonoBehaviour, IPointerClickHandler
         x_frame_border = Screen.width / 4.0f;
     }
 
-    bool clicko = false;
+    //bool clicko = false;
     public void OnPointerClick(PointerEventData data)
     {
         //Debug.Log("position mapa : "+map_panel.position);

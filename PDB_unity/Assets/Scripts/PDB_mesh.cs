@@ -8,11 +8,11 @@ public class PDB_mesh : MonoBehaviour {
     public GameObject other;
 	public int protein_id;
 
-	bool allowInteraction=true;
+	//bool allowInteraction=true;
 
-	Quaternion start;
-	Quaternion end;
-	bool startRotation=false;
+	//Quaternion start;
+	//Quaternion end;
+	//bool startRotation=false;
 	public bool shouldCollide = false;
 	float t=0;
 	AminoSliderController aminoSliderController;
@@ -31,17 +31,17 @@ public class PDB_mesh : MonoBehaviour {
 
 	public void AlignPointToVector(Vector3 point, Vector3 targetDir)
 	{
-		Vector3 localPos = point;
-		Vector3 startDir = localPos;
+		//Vector3 localPos = point;
+		//Vector3 startDir = localPos;
 		
-		Quaternion targetQ=Quaternion.LookRotation(targetDir);
-		Quaternion startQ=Quaternion.LookRotation(startDir);
-		start=transform.rotation;
+		//Quaternion targetQ=Quaternion.LookRotation(targetDir);
+		//Quaternion startQ=Quaternion.LookRotation(startDir);
+		//start=transform.rotation;
 		
-		Quaternion toFront = targetQ * Quaternion.Inverse (startQ);
+		//Quaternion toFront = targetQ * Quaternion.Inverse (startQ);
 
-		end=toFront;
-		startRotation=true;
+		//end=toFront;
+		//startRotation=true;
 		t=0;
 	}
 
@@ -66,21 +66,21 @@ public class PDB_mesh : MonoBehaviour {
 		
 		Quaternion targetQ=Quaternion.LookRotation(targetDir);
 		Quaternion startQ=Quaternion.LookRotation(startDir);
-		start=transform.rotation;
+		//start=transform.rotation;
 		
 		Quaternion toFront = targetQ * Quaternion.Inverse (startQ);
 		
 		
-		end=toFront;
-		startRotation=true;
+		//end=toFront;
+		//startRotation=true;
 		t=0;
 	}
 
 	public void OneAxisDock()
 	{
 		shouldCollide = true;
-		allowInteraction = false;
-		startRotation = false;
+		//allowInteraction = false;
+		//startRotation = false;
 
 		Rigidbody rigidBody1 = gameObject.GetComponent<Rigidbody> ();
 		Rigidbody rigidBody2 = other.GetComponent<Rigidbody> ();
@@ -111,8 +111,8 @@ public class PDB_mesh : MonoBehaviour {
 	public void AutoDock(int[] thisAtomIndicies, int[] otherAtomIndicies)
 	{
 		shouldCollide = true;
-		allowInteraction = false;
-		startRotation = false;
+		//allowInteraction = false;
+		//startRotation = false;
 		PDB_molecule otherMol = other.GetComponent<PDB_mesh> ().mol;
 		Rigidbody r1 = gameObject.GetComponent<Rigidbody> ();
 		Rigidbody r2 = other.GetComponent<Rigidbody> ();
@@ -230,7 +230,7 @@ public class PDB_mesh : MonoBehaviour {
 					//if there is no recent input reset previous position
 					lastMousePos = Input.mousePosition;
 				}
-				t = 0.0f;
+				//t = 0.0f;
 				Vector3 mouseDelta = mousePos - lastMousePos;
 				
 				if (mouseDelta.magnitude != 0) {
@@ -269,7 +269,7 @@ public class PDB_mesh : MonoBehaviour {
 				r.material.SetVector ("_CutawayPlane", plane);
 			}
 			Vector4[] uniforms = GetSelectedAtomUniforms(cam);
-			int len = uniforms.Length;
+			//int len = uniforms.Length;
 			r.material.SetVector ("_Atom0", uniforms[0]);
 			r.material.SetVector ("_Atom1", uniforms[1]);
 			r.material.SetVector ("_Atom2", uniforms[2]);

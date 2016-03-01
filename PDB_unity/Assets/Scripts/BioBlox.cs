@@ -8,13 +8,13 @@ using UnityEngine.UI;
 public class BioBlox : MonoBehaviour
 {
 	// dictaing which gametype, puzzle or museum
-	bool simpleGame = true;
+	//bool simpleGame = true;
 
 	// controls whether the win state should attempt to fade out the molecules
 	public bool winShouldFadeMol = false;
 
 	// score card for saving scores. 
-	ScoreSheet scoreCard;
+	//ScoreSheet scoreCard;
 
 	// filenames for the levels, without the .txt
 	public List<string> filenames = new List<string> ();
@@ -65,7 +65,7 @@ public class BioBlox : MonoBehaviour
 	public float seperationForce = 10000.0f;
 	//  force applied by string
 	public float stringForce = 20000.0f;
-	private float ScoreScaleValue;
+	//private float ScoreScaleValue;
 
 	public Slider rmsScoreSlider;
 	public Slider heuristicScoreSlider;
@@ -84,7 +84,7 @@ public class BioBlox : MonoBehaviour
 
 	// colors of the labels and an offset that is randomly decided randomize colours
 	List<Color> colorPool = new List<Color>();
-	int randomColorPoolOffset;
+	//int randomColorPoolOffset;
 
 	public Button lockButton;
 
@@ -132,7 +132,7 @@ public class BioBlox : MonoBehaviour
 		colorPool.Add (Color.white);
 		colorPool.Add (Color.gray);
 		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
-		randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
+		//randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		Debug.Log ("Start");
 		//filenames.Add ("jigsawBlue");
 
@@ -575,7 +575,7 @@ public class BioBlox : MonoBehaviour
 	void Reset ()
 	{
 		//clears the molecules and re-randomizes the colour range
-		randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
+		//randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		GameObject.Destroy (molecules [0].gameObject);
 		GameObject.Destroy (molecules [1].gameObject);
 
@@ -740,7 +740,7 @@ public class BioBlox : MonoBehaviour
 		//string file = filenames [current_level];
 		//Debug.Log (file);
 		
-		GameObject mol1 = make_molecule (name, "Proto1", 7, mesh_type,index);
+		make_molecule (name, "Proto1", 7, mesh_type,index);
 		//GameObject mol2 = make_molecule (name, "Proto2", 7, mesh_type,1);
 	}
 

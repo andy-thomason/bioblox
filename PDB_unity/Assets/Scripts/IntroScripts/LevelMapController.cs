@@ -9,7 +9,7 @@ public class LevelMapController : MonoBehaviour
 
     public GameObject LevelMap;
     public GameObject LevelPrefab;
-    GameObject LevelPrefabReference;
+    //GameObject LevelPrefabReference;
     //posicion inicial
     //Vector3 initial_position = new Vector3(2000.0f, -1200.0f, 0.0f);
 
@@ -17,7 +17,7 @@ public class LevelMapController : MonoBehaviour
     Sprite thumb_sprite;
     Rect thumb_rect_SD = new Rect(0, 0, 32, 32);
     Vector2 thumb_pivot = new Vector2(0.5f, 0.5f);
-    Rect thumb_rect_HD = new Rect(0, 0, 1024, 1024);
+    //Rect thumb_rect_HD = new Rect(0, 0, 1024, 1024);
     //canvas of levelselection and leveldescriptin
     public GameObject LevelSelectionCanvas;
     public GameObject LevelDescriptionCanvas;
@@ -25,7 +25,7 @@ public class LevelMapController : MonoBehaviour
     DataController dataController;
     string url_image;
     int level_index = 0;
-    WWW DataConnection;
+    //WWW DataConnection;
 
     // Use this for initialization
     void Start()

@@ -243,7 +243,7 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    bool amino_status;
+    //bool amino_status;
 
     public void TogglePositiveA1()
 	{

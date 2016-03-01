@@ -40,16 +40,16 @@ public class LevelStructureV2 : MonoBehaviour, IPointerClickHandler, IPointerEnt
     bool download_128 = false;
     bool download_512 = false;
     //on focus
-    bool is_on_screen = false;
+    //bool is_on_screen = false;
     //the sprite to replace
     Image thumb_image;
 
     //camera micro
     public Camera micro_camera;
 
-    float lastClickTime;
+    //float lastClickTime;
 
-    float catchTime = 0.25f;
+    //float catchTime = 0.25f;
     int number_clicks = 0;
     float time_double_clicks = 0;
 

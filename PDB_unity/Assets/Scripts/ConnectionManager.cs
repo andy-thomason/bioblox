@@ -8,7 +8,7 @@ public class ConnectionManager : MonoBehaviour {
 
 	int numChainClicks = 0;
 
-	int contractionKVal;
+	//int contractionKVal;
 
 	public float dampingFactor = 1.0f;
 	//public float force = 10.0f;
@@ -172,7 +172,7 @@ public class ConnectionManager : MonoBehaviour {
 		LineRenderer line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
 		//if (line_renderer) line_renderer.clear ();
 
-		if (numChainClicks > 0) {
+		/*if (numChainClicks > 0) {
 			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
 			AtomConnection con = connections[connections.Count-1];
 			Vector3 atomCenter = con.molecules[0].mol.atom_centres[con.atomIds[0]];
@@ -180,10 +180,10 @@ public class ConnectionManager : MonoBehaviour {
 			Vector3 to = new Vector3(Input.mousePosition.x,
 			                         Input.mousePosition.y,
 			                        -c.transform.position.z);
-			to=c.ScreenToWorldPoint(to);
-			Vector3 from = con.molecules[0].transform.TransformPoint(atomCenter);
+			//to=c.ScreenToWorldPoint(to);
+			//Vector3 from = con.molecules[0].transform.TransformPoint(atomCenter);
 			//Debug.DrawLine(from, to);
-		}
+		}*/
 
 		/*if (line_renderer) {
 			Debug.Log("zzz");
