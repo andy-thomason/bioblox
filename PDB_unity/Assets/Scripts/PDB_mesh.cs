@@ -61,11 +61,11 @@ public class PDB_mesh : MonoBehaviour {
     //rotates this object to bring that point closest to the camera
     void BringPointToFocus(Vector3 localPoint,Camera c)
     {
-        Vector3 startDir = localPoint;
-        Vector3 targetDir=c.transform.position-this.transform.position;
+        //Vector3 startDir = localPoint;
+        //Vector3 targetDir=c.transform.position-this.transform.position;
         
-        Quaternion targetQ=Quaternion.LookRotation(targetDir);
-        Quaternion startQ=Quaternion.LookRotation(startDir);
+        //Quaternion targetQ=Quaternion.LookRotation(targetDir);
+        //Quaternion startQ=Quaternion.LookRotation(startDir);
         //start=transform.rotation;
         
         //Quaternion toFront = targetQ * Quaternion.Inverse (startQ);

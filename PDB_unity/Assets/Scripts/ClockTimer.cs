@@ -16,7 +16,7 @@ public class ClockTimer : MonoBehaviour {
 
 	public List<float> playerLevelTimes = new List<float>();
 
-	GameObject playerTimeZone;
+	GameObject playerTimeZone = null;
 	bool shouldAddLevelTimes=false;
 
 

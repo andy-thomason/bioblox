@@ -49,6 +49,7 @@ using AssemblyCSharp;
 
 
 public class PDB_parser {
+
     /*static private Dictionary<string, int> colour = new Dictionary<string, int> {
         {" H", 0xcccccc},{" C", 0xaaaaaa},{" O", 0xcc0000},{" N", 0x0000cc},{" S", 0xcccc00},
         {" P", 0x6622cc},{" F", 0x00cc00},{"CL", 0x00cc00},{"BR", 0x882200},{" I", 0x6600aa},
@@ -85,6 +86,7 @@ public class PDB_parser {
         using (StringReader reader = new StringReader(pdbTA.text)) {
             string line;
 			int index = 0;
+      ButtonStructure buttons = GameObject.FindObjectOfType<ButtonStructure>();
 			while ((line = reader.ReadLine()) != null) {
 
                 string kind = line.Substring(0, Mathf.Min(6, line.Length));
@@ -124,16 +126,16 @@ public class PDB_parser {
 					aminoAcidAtomIDs[chainNumber - 1].Add(index++);
 
 					Color col = Color.white;
-					if (id == "NZ  LYS" || id == "NH2 ARG") {
-						col = new Color(1, 0, 0, 1);
+					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
+             col = buttons.POSITIVEColor;
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
-						col = new Color(0, 0, 1, 1);
+            col = buttons.NEGATIVEColor;
 					} else if (id == "SG  CYS") {
-						col = new Color(1, 1, 0, 1);
-					} else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
-						col = new Color(0, 1, 1, 1);
+            col = buttons.SULPHURColor;
+          } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+            col = buttons.POLARColor;
 					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
-						col = new Color(0, 0.5f, 0.5f, 1);
+            col = buttons.HYDROColor;
 					}
 
 					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
