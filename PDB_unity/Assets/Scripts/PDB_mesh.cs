@@ -270,7 +270,7 @@ public class PDB_mesh : MonoBehaviour {
                 r.material.SetVector ("_CutawayPlane", plane);
             }
 
-            Vector4[] uniforms = GetSelectedAtomUniforms(cam);
+            /*Vector4[] uniforms = GetSelectedAtomUniforms(cam);
             //int len = uniforms.Length;
             r.material.SetVector ("_Atom0", uniforms[0]);
             r.material.SetVector ("_Atom1", uniforms[1]);
@@ -282,7 +282,7 @@ public class PDB_mesh : MonoBehaviour {
             r.material.SetVector ("_Atom7", uniforms[7]);
             r.material.SetVector ("_Atom8", uniforms[8]);
             r.material.SetVector ("_Atom9", uniforms[9]);
-            r.material.SetVector ("_Atom10", uniforms[10]);
+            r.material.SetVector ("_Atom10", uniforms[10]);*/
         }
     }
 

@@ -127,23 +127,18 @@ public class PDB_parser {
 
 					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
-             col = buttons.POSITIVEColor;
+                        col = buttons.POSITIVEColor;
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
-            col = buttons.NEGATIVEColor;
+                        col = buttons.NEGATIVEColor;
 					} else if (id == "SG  CYS") {
-            col = buttons.SULPHURColor;
-          } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
-            col = buttons.POLARColor;
+                        col = buttons.SULPHURColor;
+                    } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+                        col = buttons.POLARColor;
 					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
-            col = buttons.HYDROColor;
+                        col = buttons.HYDROColor;
 					}
 
-					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
-					/*if (name == PDB_molecule.atom_N) {
-						residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
-						residues.Add(names.Count);
-					}*/
-					
+					int name = PDB_molecule.encode(line[76], line[77]);
 					names.Add(name);
 
 					if (serial >= 0) {

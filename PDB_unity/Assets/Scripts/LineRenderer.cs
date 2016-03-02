@@ -15,8 +15,8 @@ public class LineRenderer : MonoBehaviour {
 			this.start = start;
 			this.end = end;
 			this.width = 0.1f;
-			Vector2 uv0=new Vector2(0,0);
-			Vector2 uv1=new Vector2(0,0);
+			Vector2 uv0 = new Vector2(0,0);
+			Vector2 uv1 = new Vector2(0,0);
 			this.uv0 = uv0;
 			this.uv1 = uv1;
 		}

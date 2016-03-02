@@ -41,12 +41,13 @@ public class BioBlox : MonoBehaviour
 	// a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 
-	// the molecules in the scene
-	public GameObject[] molecules;
+    // the molecules in the scene
+    public GameObject[] molecules;
+    public BitArray[] atoms_touching;
 
-	//  NOT CURRENTLY IN USE
-	//  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
-	GameObject[] sites = new GameObject[2];
+    //  NOT CURRENTLY IN USE
+    //  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
+    GameObject[] sites = new GameObject[2];
 	//  wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
 	bool[] playerIsMoving = new bool[2]{false,false};
 	// the original positions of the molecules, used to provide a returning force during the puzzle mode
@@ -285,7 +286,7 @@ public class BioBlox : MonoBehaviour
 			}
 		}
 
-		/*
+        /*
 		//camera zoom roll mouse
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
 		{
@@ -306,7 +307,8 @@ public class BioBlox : MonoBehaviour
 				MainCamera.fieldOfView = 60;
 			}
 		}*/
-	}
+
+    }
 
 	void PopInSound (GameObject g)
 	{
@@ -948,6 +950,7 @@ public class BioBlox : MonoBehaviour
 
 			BitArray ba0 = new BitArray (mol0.atom_centres.Length);
 			BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+            atoms_touching = new BitArray[] { ba0, ba1 };
 
 			// Apply forces to the rigid bodies.
 			foreach (GridCollider.Result r in b.results) {
@@ -973,10 +976,12 @@ public class BioBlox : MonoBehaviour
 				
 			}
 
-			//heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
-			
+
+
+            //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+
             //num_invalid = when the physics fails
-           // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
+            // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
 
             //LennardScore.text = num_invalid != 0 ? LennardScore.text = (scoring.vdwScore).ToString("F2") : "0";
             //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
