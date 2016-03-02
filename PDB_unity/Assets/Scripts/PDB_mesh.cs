@@ -317,7 +317,6 @@ public class PDB_mesh : MonoBehaviour {
     }
 
     public void SelectAtom(int atom) {
-        Debug.Log("aca entro");
         for (int i = 0; i != mol.aminoAcidsAtomIds.Count; ++i) {
             int[] ids = mol.aminoAcidsAtomIds[i];
             for (int j = 0; j != ids.Length; ++j) {

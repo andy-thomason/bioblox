@@ -987,11 +987,28 @@ public class BioBlox : MonoBehaviour
 		invalidDockText.SetActive(num_invalid != 0);
 		InvalidDockScore.SetActive(num_invalid != 0);
 
+        //lock button
+        if (num_invalid == 0 && (lennard_score != 0 || electric_score !=0))
+        {
+            StartCoroutine(WaitForSeconds());
+            lockButton.interactable = true;
+        }
+        else
+        {
+            lockButton.interactable = false;
+        }
 
-		if (eventSystem != null && eventSystem.IsActive ()) {
+
+
+        if (eventSystem != null && eventSystem.IsActive ()) {
 			ApplyReturnToOriginForce ();
 		}
 	}
+
+    IEnumerator WaitForSeconds()
+    {
+        yield return new WaitForSeconds(2);
+    }
 
 }
 
