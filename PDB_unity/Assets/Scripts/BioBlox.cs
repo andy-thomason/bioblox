@@ -73,6 +73,7 @@ public class BioBlox : MonoBehaviour
 	public Text GameScoreValue;
 	public Text ElectricScore;
     public Text LennardScore;
+    public Text NumberOfAtoms;
     //values for external reference
     public int electric_score;
     public int lennard_score;
@@ -913,13 +914,13 @@ public class BioBlox : MonoBehaviour
 
 	public int work_done = 0;
 
-	// Physics simulation
-	void FixedUpdate() {
+    // Physics simulation
+    void FixedUpdate() {
 
         num_touching_0 = 0;
-		num_touching_1 = 0;
-		num_invalid = 0;
-		num_connections = 0;
+        num_touching_1 = 0;
+        num_invalid = 0;
+        num_connections = 0;
         //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
 
         //score system display
@@ -932,51 +933,51 @@ public class BioBlox : MonoBehaviour
 
 
         if (molecules.Length >= 2) {
-			// Get a list of atoms that collide.
-			GameObject obj0 = molecules[0];
-			GameObject obj1 = molecules[1];
-			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
-			PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
-			Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-			Rigidbody r1 = obj1.GetComponent<Rigidbody>();
-			Transform t0 = obj0.transform;
-			Transform t1 = obj1.transform;
-			PDB_molecule mol0 = mesh0.mol;
-			PDB_molecule mol1 = mesh1.mol;
-			GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
-			work_done = b.work_done;
+            // Get a list of atoms that collide.
+            GameObject obj0 = molecules[0];
+            GameObject obj1 = molecules[1];
+            PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
+            PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
+            Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+            Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+            Transform t0 = obj0.transform;
+            Transform t1 = obj1.transform;
+            PDB_molecule mol0 = mesh0.mol;
+            PDB_molecule mol1 = mesh1.mol;
+            GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
+            work_done = b.work_done;
 
-			BitArray ba0 = new BitArray (mol0.atom_centres.Length);
-			BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+            BitArray ba0 = new BitArray(mol0.atom_centres.Length);
+            BitArray ba1 = new BitArray(mol1.atom_centres.Length);
 
-			// Apply forces to the rigid bodies.
-			foreach (GridCollider.Result r in b.results) {
-				Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-				Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
-				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
-				float distance = (c1 - c0).magnitude;
-				
-				num_connections++;
+            // Apply forces to the rigid bodies.
+            foreach (GridCollider.Result r in b.results) {
+                Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+                Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+                float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+                float distance = (c1 - c0).magnitude;
 
-				if (distance < min_d) {
-					Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-					normal *= seperationForce;
-					r0.AddForceAtPosition(normal,c0);
-					r1.AddForceAtPosition(-normal, c1);
+                num_connections++;
 
-					if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-					if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-					if (distance < min_d * 0.5) {
-						num_invalid++;
-					}
-				}
-				
-			}
+                if (distance < min_d) {
+                    Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+                    normal *= seperationForce;
+                    r0.AddForceAtPosition(normal, c0);
+                    r1.AddForceAtPosition(-normal, c1);
 
-			//heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
-			
+                    if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+                    if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+                    if (distance < min_d * 0.5) {
+                        num_invalid++;
+                    }
+                }
+
+            }
+
+            //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
             //num_invalid = when the physics fails
-           // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
+            // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
 
             //LennardScore.text = num_invalid != 0 ? LennardScore.text = (scoring.vdwScore).ToString("F2") : "0";
             //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
@@ -984,13 +985,12 @@ public class BioBlox : MonoBehaviour
 
         }
 
-		invalidDockText.SetActive(num_invalid != 0);
-		InvalidDockScore.SetActive(num_invalid != 0);
+        invalidDockText.SetActive(num_invalid != 0);
+        InvalidDockScore.SetActive(num_invalid != 0);
 
         //lock button
-        if (num_invalid == 0 && (lennard_score != 0 || electric_score !=0))
+        if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
         {
-            StartCoroutine(WaitForSeconds());
             lockButton.interactable = true;
         }
         else
@@ -1000,15 +1000,9 @@ public class BioBlox : MonoBehaviour
 
 
 
-        if (eventSystem != null && eventSystem.IsActive ()) {
-			ApplyReturnToOriginForce ();
-		}
-	}
-
-    IEnumerator WaitForSeconds()
-    {
-        yield return new WaitForSeconds(2);
+        if (eventSystem != null && eventSystem.IsActive()) {
+            ApplyReturnToOriginForce();
+        }
     }
-
 }
 
