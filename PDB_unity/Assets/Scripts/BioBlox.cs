@@ -44,6 +44,7 @@ public class BioBlox : MonoBehaviour
     // the molecules in the scene
     public GameObject[] molecules;
     public BitArray[] atoms_touching;
+    public BitArray[] atoms_bad;
 
     //  NOT CURRENTLY IN USE
     //  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
@@ -948,12 +949,15 @@ public class BioBlox : MonoBehaviour
 			GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
 			work_done = b.work_done;
 
-			BitArray ba0 = new BitArray (mol0.atom_centres.Length);
-			BitArray ba1 = new BitArray (mol1.atom_centres.Length);
+            BitArray ba0 = new BitArray(mol0.atom_centres.Length);
+            BitArray ba1 = new BitArray(mol1.atom_centres.Length);
+            BitArray bab0 = new BitArray(mol0.atom_centres.Length);
+            BitArray bab1 = new BitArray(mol1.atom_centres.Length);
             atoms_touching = new BitArray[] { ba0, ba1 };
+            atoms_bad = new BitArray[] { bab0, bab1 };
 
-			// Apply forces to the rigid bodies.
-			foreach (GridCollider.Result r in b.results) {
+            // Apply forces to the rigid bodies.
+            foreach (GridCollider.Result r in b.results) {
 				Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
 				Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
 				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
@@ -971,8 +975,10 @@ public class BioBlox : MonoBehaviour
 					if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
 					if (distance < min_d * 0.5) {
 						num_invalid++;
-					}
-				}
+                        bab0.Set(r.i0, true);
+                        bab1.Set(r.i1, true);
+                    }
+                }
 				
 			}
 

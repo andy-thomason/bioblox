@@ -31,10 +31,12 @@ public class OverlayRenderer : MonoBehaviour {
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
-	}
+        MeshRenderer mr = GetComponent<MeshRenderer>();
+        mr.material.renderQueue = 4000;
+    }
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update () {
         BioBlox bb = GameObject.FindObjectsOfType<BioBlox>()[0];
         if (bb)
         {
@@ -49,14 +51,18 @@ public class OverlayRenderer : MonoBehaviour {
                 BitArray sel = new BitArray(mol.names.Length);
                 foreach (int a in msh.selected_atoms) sel.Set(a, true);
 
-                Color32 selected = new Color32(255, 255,   0, 255);
-                Color32 touching = new Color32(128, 128, 128, 128);
+                float c10 = Mathf.Cos(Time.time * 10.0f) * 0.5f + 0.5f;
+                float c20 = Mathf.Cos(Time.time * 20.0f) * 0.5f + 0.5f;
+                Color32 selected = new Color32(255, 255, (byte)(255.0f*c10), 255);
+                Color32 touching = new Color32(128, (byte)(128 - 128.0f * c10), 128, 255);
+                Color32 bad = new Color32((byte)(255.0f * c20), 0, 0, 255);
 
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
                     bool is_selected = j < sel.Length && sel[j];
                     bool is_touching = bb.atoms_touching != null && bb.atoms_touching[i][j];
-                    if (is_selected || is_touching)
+                    bool is_bad = bb.atoms_bad != null && bb.atoms_bad[i][j];
+                    if (is_selected || is_touching || is_bad)
                     {
                         int name = mol.names[j];
                         int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
@@ -66,7 +72,7 @@ public class OverlayRenderer : MonoBehaviour {
                             new Icon(
                                 t.TransformPoint(mol.atom_centres[j]),
                                 mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f),
-                                is_selected ? selected : touching
+                                is_bad ? bad : is_touching ? touching : selected
                             )
                         );
                     }
@@ -85,8 +91,8 @@ public class OverlayRenderer : MonoBehaviour {
         int[] indices = new int[icons.Count * 6];
 
 		Vector3 camera_pos = lookat_camera.transform.position;
-        Vector3 up = lookat_camera.transform.up;
-        Vector3 right = lookat_camera.transform.right;
+        Vector3 up = Vector3.up; // lookat_camera.transform.up;
+        Vector3 right = Vector3.right; // lookat_camera.transform.right;
         float plane_distance = lookat_camera.nearClipPlane + 1.0f;
         for (int i = 0; i != icons.Count; ++i) {
             Icon icon = icons[i];
@@ -96,7 +102,6 @@ public class OverlayRenderer : MonoBehaviour {
             centre.y = centre.y * scale;
             centre.z = plane_distance;
             float r = icon.r * scale;
-            centre = lookat_camera.transform.TransformPoint(centre);
             vertices[i*4+0] = centre + (  up - right) * r;
 			vertices[i*4+1] = centre + (- up - right) * r;
             vertices[i*4+2] = centre + (- up + right) * r;
