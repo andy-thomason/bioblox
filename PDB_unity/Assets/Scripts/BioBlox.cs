@@ -941,7 +941,6 @@ public class BioBlox : MonoBehaviour
 
 
         if (molecules != null && molecules.Length >= 2) {
-            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
 
 			// Get a list of atoms that collide.
 			GameObject obj0 = molecules[0];
@@ -989,8 +988,8 @@ public class BioBlox : MonoBehaviour
                 }
 				
 			}
-
-
+            
+            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
 
             //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 
