@@ -101,10 +101,10 @@ public class PDB_parser {
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
-					string id = line.Substring(13, 7);
-					string aminoAcid = id.Substring(3);
-					//int atom = int.Parse(line.Substring(6, 5));
-					string aatag = line.Substring (21, 5);
+                    string aminoAcid = line.Substring(17, 3);
+                    string id = line.Substring(13, 3) + ' ' + aminoAcid;
+                    //int atom = int.Parse(line.Substring(6, 5));
+                    string aatag = line.Substring (21, 5);
 
 					while(aminoAcidName.Count < chainNumber)
 					{
@@ -236,7 +236,7 @@ public class PDB_parser {
         }
 
         cofg = cofg * (1.0f / result.Count);
-        Debug.Log(cofg);
+        //Debug.Log(cofg);
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];

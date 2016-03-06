@@ -139,12 +139,14 @@ public class BioBlox : MonoBehaviour
 		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
 		//randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		Debug.Log ("Start");
-		//filenames.Add ("jigsawBlue");
+    //filenames.Add ("jigsawBlue");
 
-		//filenames.Add ("2W9G");
+    //filenames.Add ("2W9G");
 
-		//filenames.Add ("betabarrel_b");
-		filenames.Add ("pdb2ptcWithTags");
+    //filenames.Add ("betabarrel_b");
+    filenames.Add("2ptc_u_new_edited");
+
+    filenames.Add ("pdb2ptcWithTags");
 
 		filenames.Add ("1GCQ_bWithTags");
 
@@ -926,6 +928,9 @@ public class BioBlox : MonoBehaviour
         //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
 
         //score system display
+        if (scoring == null) {
+      return;
+        }
         scoring.calcScore();
         //set values for refence
         lennard_score = (int)scoring.vdwScore;

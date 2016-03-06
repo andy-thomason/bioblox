@@ -68,10 +68,10 @@ public class AminoSliderController : MonoBehaviour {
 	public List<GameObject> A2Polar = new List<GameObject>();
 	public List<GameObject> A2Other = new List<GameObject>();
 	public Dictionary<string, string> FunctionTypes = new Dictionary<string, string>{
-		{" ALA",  "Hydro"}, {" ARG",  "Positive"}, {" ASN",  "Polar"}, {" ASP",  "Negative"}, {" CYS",  "Other"}, {" GLU",  "Negative"},
-		{" GLY",  "Other"}, {" HIS",  "Positive"}, {" ILE",  "Hydro"}, {" LEU",  "Hydro"}, {" LYS",  "Positive"}, {" MET",  "Hydro"},
-		{" PHE",  "Hydro"},	{" PRO",  "Other"}, {" SER",  "Polar"}, {" THR",  "Polar"}, {" GLN", "Polar"}, {" TRP",  "Hydro"},
-		{" TYR",  "Hydro"}, {" VAL",  "Hydro"},
+		{"ALA",  "Hydro"}, {"ARG",  "Positive"}, {"ASN",  "Polar"}, {"ASP",  "Negative"}, {"CYS",  "Other"}, {"GLU",  "Negative"},
+		{"GLY",  "Other"}, {"HIS",  "Positive"}, {"ILE",  "Hydro"}, {"LEU",  "Hydro"}, {"LYS",  "Positive"}, {"MET",  "Hydro"},
+		{"PHE",  "Hydro"},	{"PRO",  "Other"}, {"SER",  "Polar"}, {"THR",  "Polar"}, {"GLN", "Polar"}, {"TRP",  "Hydro"},
+		{"TYR",  "Hydro"}, {"VAL",  "Hydro"},
 	};
 
 	void Awake()
@@ -231,7 +231,7 @@ public class AminoSliderController : MonoBehaviour {
 
 		//Debug.Log (AminoColor [currentAmino]);
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
-		ButtonText [0].text = currentAmino.Replace (" ", "");
+        ButtonText[0].text = currentAmino; // currentAmino.Replace (" ", "");
 		ButtonText [1].text = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
 

@@ -2011,6 +2011,11 @@ public class PDB_score {
 		// and find the ones to be considered and/or calculate pseudo atoms 
 		for (int i = 0; i != mol.aminoAcidsAtomIds.Count; ++i) {
 			string aaName = mol.aminoAcidsNames[i].Trim ();
+            if (!threeLetterToOneLetterAminoAcid.ContainsKey(aaName)) {
+                Debug.Log("unknown amino acid " + aaName);
+                continue;
+            }
+
 			string oneletterAAName = threeLetterToOneLetterAminoAcid[aaName];
 			int[] ids = mol.aminoAcidsAtomIds [i];
 			// The two pseudo atoms (geometric centres)
