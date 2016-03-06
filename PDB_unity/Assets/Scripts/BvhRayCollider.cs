@@ -24,6 +24,10 @@ public class BvhRayCollider
 
 	public void collide_recursive(int bvh)
 	{
+    if (mol == null || bvh >= mol.bvh_centres.Length) {
+      return;
+    }
+
 		if (work_done++ > 100000) {
 			return;
 		}

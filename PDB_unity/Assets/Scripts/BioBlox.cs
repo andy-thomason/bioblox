@@ -41,12 +41,14 @@ public class BioBlox : MonoBehaviour
 	// a list of win conditions where two atoms must be paired
 	List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
 
-	// the molecules in the scene
-	public GameObject[] molecules;
+    // the molecules in the scene
+    public GameObject[] molecules;
+    public BitArray[] atoms_touching;
+    public BitArray[] atoms_bad;
 
-	//  NOT CURRENTLY IN USE
-	//  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
-	GameObject[] sites = new GameObject[2];
+    //  NOT CURRENTLY IN USE
+    //  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
+    GameObject[] sites = new GameObject[2];
 	//  wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
 	bool[] playerIsMoving = new bool[2]{false,false};
 	// the original positions of the molecules, used to provide a returning force during the puzzle mode
@@ -138,12 +140,14 @@ public class BioBlox : MonoBehaviour
 		colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
 		//randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
 		Debug.Log ("Start");
-		//filenames.Add ("jigsawBlue");
+    //filenames.Add ("jigsawBlue");
 
-		//filenames.Add ("2W9G");
+    //filenames.Add ("2W9G");
 
-		//filenames.Add ("betabarrel_b");
-		filenames.Add ("pdb2ptcWithTags");
+    //filenames.Add ("betabarrel_b");
+    filenames.Add("2ptc_u_new_edited");
+
+    filenames.Add ("pdb2ptcWithTags");
 
 		filenames.Add ("1GCQ_bWithTags");
 
@@ -286,7 +290,7 @@ public class BioBlox : MonoBehaviour
 			}
 		}
 
-		/*
+        /*
 		//camera zoom roll mouse
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0)
 		{
@@ -307,7 +311,8 @@ public class BioBlox : MonoBehaviour
 				MainCamera.fieldOfView = 60;
 			}
 		}*/
-	}
+
+    }
 
 	void PopInSound (GameObject g)
 	{
@@ -924,6 +929,9 @@ public class BioBlox : MonoBehaviour
         //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
 
         //score system display
+        if (scoring == null) {
+      return;
+        }
         scoring.calcScore();
         //set values for refence
         lennard_score = (int)scoring.vdwScore;
@@ -932,50 +940,60 @@ public class BioBlox : MonoBehaviour
         if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
 
 
-        if (molecules.Length >= 2) {
-            // Get a list of atoms that collide.
-            GameObject obj0 = molecules[0];
-            GameObject obj1 = molecules[1];
-            PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
-            PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
-            Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-            Rigidbody r1 = obj1.GetComponent<Rigidbody>();
-            Transform t0 = obj0.transform;
-            Transform t1 = obj1.transform;
-            PDB_molecule mol0 = mesh0.mol;
-            PDB_molecule mol1 = mesh1.mol;
-            GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
-            work_done = b.work_done;
+        if (molecules != null && molecules.Length >= 2) {
+            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+
+			// Get a list of atoms that collide.
+			GameObject obj0 = molecules[0];
+			GameObject obj1 = molecules[1];
+			PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
+			PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
+			Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+			Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+			Transform t0 = obj0.transform;
+			Transform t1 = obj1.transform;
+			PDB_molecule mol0 = mesh0.mol;
+			PDB_molecule mol1 = mesh1.mol;
+			GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
+			work_done = b.work_done;
 
             BitArray ba0 = new BitArray(mol0.atom_centres.Length);
             BitArray ba1 = new BitArray(mol1.atom_centres.Length);
+            BitArray bab0 = new BitArray(mol0.atom_centres.Length);
+            BitArray bab1 = new BitArray(mol1.atom_centres.Length);
+            atoms_touching = new BitArray[] { ba0, ba1 };
+            atoms_bad = new BitArray[] { bab0, bab1 };
 
             // Apply forces to the rigid bodies.
             foreach (GridCollider.Result r in b.results) {
-                Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-                Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
-                float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
-                float distance = (c1 - c0).magnitude;
+				Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+				Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+				float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+				float distance = (c1 - c0).magnitude;
+				
+				num_connections++;
 
-                num_connections++;
+				if (distance < min_d) {
+					Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+					normal *= seperationForce;
+					r0.AddForceAtPosition(normal,c0);
+					r1.AddForceAtPosition(-normal, c1);
 
-                if (distance < min_d) {
-                    Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-                    normal *= seperationForce;
-                    r0.AddForceAtPosition(normal, c0);
-                    r1.AddForceAtPosition(-normal, c1);
-
-                    if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-                    if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                    if (distance < min_d * 0.5) {
-                        num_invalid++;
+					if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+					if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+					if (distance < min_d * 0.5) {
+						num_invalid++;
+                        bab0.Set(r.i0, true);
+                        bab1.Set(r.i1, true);
                     }
                 }
+				
+			}
 
-            }
+
 
             //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
-            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+
             //num_invalid = when the physics fails
             // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
 

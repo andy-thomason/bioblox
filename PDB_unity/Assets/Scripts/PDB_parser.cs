@@ -101,10 +101,10 @@ public class PDB_parser {
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
                     float r = radii[line.Substring(77 - 1, 2)];
-					string id = line.Substring(13, 7);
-					string aminoAcid = id.Substring(3);
-					//int atom = int.Parse(line.Substring(6, 5));
-					string aatag = line.Substring (21, 5);
+                    string aminoAcid = line.Substring(17, 3);
+                    string id = line.Substring(13, 3) + ' ' + aminoAcid;
+                    //int atom = int.Parse(line.Substring(6, 5));
+                    string aatag = line.Substring (21, 5);
 
 					while(aminoAcidName.Count < chainNumber)
 					{
@@ -127,23 +127,18 @@ public class PDB_parser {
 
 					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
-             col = buttons.POSITIVEColor;
+                        col = buttons.POSITIVEColor;
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
-            col = buttons.NEGATIVEColor;
+                        col = buttons.NEGATIVEColor;
 					} else if (id == "SG  CYS") {
-            col = buttons.SULPHURColor;
-          } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
-            col = buttons.POLARColor;
+                        col = buttons.SULPHURColor;
+                    } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+                        col = buttons.POLARColor;
 					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
-            col = buttons.HYDROColor;
+                        col = buttons.HYDROColor;
 					}
 
-					int name = PDB_molecule.encode(line[12], line[13], line[14], line[15]);
-					/*if (name == PDB_molecule.atom_N) {
-						residues.Add(PDB_molecule.encode(line[17], line[18], line[19], ' '));
-						residues.Add(names.Count);
-					}*/
-					
+					int name = PDB_molecule.encode(line[76], line[77]);
 					names.Add(name);
 
 					if (serial >= 0) {
@@ -241,7 +236,7 @@ public class PDB_parser {
         }
 
         cofg = cofg * (1.0f / result.Count);
-        Debug.Log(cofg);
+        //Debug.Log(cofg);
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];

@@ -444,13 +444,15 @@ public class PDB_molecule
 		mesh = meshes.ToArray ();
 	}
 
-    static public int encode(char a, char b, char c, char d) {
-        return a*0x1000000+b*0x10000+c*0x100+d;
+    static public int encode(char a, char b)
+    {
+        return a * 0x100 + b;
     }
 
-    public static int atom_N = encode(' ', 'N', ' ', ' ');
-    public static int atom_O = encode(' ', 'O', ' ', ' ');
-    public static int atom_C = encode(' ', 'C', ' ', ' ');
+    public static int atom_N = encode(' ', 'N');
+    public static int atom_O = encode(' ', 'O');
+    public static int atom_C = encode(' ', 'C');
+    public static int atom_S = encode(' ', 'S');
 
     void build_ribbon_mesh() {
 		/*

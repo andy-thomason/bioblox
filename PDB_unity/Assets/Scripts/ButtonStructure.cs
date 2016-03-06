@@ -27,28 +27,28 @@ public class ButtonStructure : MonoBehaviour {
 	void Awake () {
 
 		NormalColor = new Dictionary<string, Color32>{
-      {" ALA",  HYDROColor}, {" ARG",  POSITIVEColor}, {" ASN",  POLARColor}, {" ASP",  NEGATIVEColor}, {" CYS",  SPECIALColor}, {" GLU",  NEGATIVEColor},
-      {" GLY",  SPECIALColor}, {" HIS",  POSITIVEColor}, {" ILE",  HYDROColor}, {" LEU",  HYDROColor}, {" LYS",  POSITIVEColor}, {" MET",  HYDROColor},
-      {" PHE",  HYDROColor},  {" PRO",  SPECIALColor}, {" SER",  POLARColor}, {" THR",  POLARColor}, {" GLN", POLARColor}, {" TRP",  HYDROColor},
-      {" TYR",  HYDROColor}, {" VAL",  HYDROColor},
-      /*{" ALA",  ALAColor}, {" ARG",  ARGColor}, {" ASN",  ASNColor}, {" ASP",  ASPColor}, {" CYS",  CYSColor}, {" GLU", GLUColor},
-			{" GLY",  GLYColor},{" HIS",  HISColor}, {" ILE",  ILEColor}, {" LEU",  LEUColor}, {" LYS",  LYSColor}, {" MET",  METColor},
-			{" PHE",  PHEColor},{" PRO",  PROColor}, {" SER",  SERColor}, {" THR",  THRColor}, {" GLN", GLNColor}, {" TRP",  TRPColor},
-			{" TYR",  TYRColor}, {" VAL",  VALColor},*/
+      {"ALA",  HYDROColor}, {"ARG",  POSITIVEColor}, {"ASN",  POLARColor}, {"ASP",  NEGATIVEColor}, {"CYS",  SPECIALColor}, {"GLU",  NEGATIVEColor},
+      {"GLY",  SPECIALColor}, {"HIS",  POSITIVEColor}, {"ILE",  HYDROColor}, {"LEU",  HYDROColor}, {"LYS",  POSITIVEColor}, {"MET",  HYDROColor},
+      {"PHE",  HYDROColor},  {"PRO",  SPECIALColor}, {"SER",  POLARColor}, {"THR",  POLARColor}, {"GLN", POLARColor}, {"TRP",  HYDROColor},
+      {"TYR",  HYDROColor}, {"VAL",  HYDROColor},
+      /*{"ALA",  ALAColor}, {"ARG",  ARGColor}, {"ASN",  ASNColor}, {"ASP",  ASPColor}, {"CYS",  CYSColor}, {"GLU", GLUColor},
+			{"GLY",  GLYColor},{"HIS",  HISColor}, {"ILE",  ILEColor}, {"LEU",  LEUColor}, {"LYS",  LYSColor}, {"MET",  METColor},
+			{"PHE",  PHEColor},{"PRO",  PROColor}, {"SER",  SERColor}, {"THR",  THRColor}, {"GLN", GLNColor}, {"TRP",  TRPColor},
+			{"TYR",  TYRColor}, {"VAL",  VALColor},*/
 		};
 
 		FunctionColor = new Dictionary<string, Color32>{
-			{" ALA",  HYDROColor}, {" ARG",  POSITIVEColor}, {" ASN",  POLARColor}, {" ASP",  NEGATIVEColor}, {" CYS",  SPECIALColor}, {" GLU",  NEGATIVEColor},
-			{" GLY",  SPECIALColor}, {" HIS",  POSITIVEColor}, {" ILE",  HYDROColor}, {" LEU",  HYDROColor}, {" LYS",  POSITIVEColor}, {" MET",  HYDROColor},
-			{" PHE",  HYDROColor},	{" PRO",  SPECIALColor}, {" SER",  POLARColor}, {" THR",  POLARColor}, {" GLN", POLARColor}, {" TRP",  HYDROColor},
-			{" TYR",  HYDROColor}, {" VAL",  HYDROColor},
+			{"ALA",  HYDROColor}, {"ARG",  POSITIVEColor}, {"ASN",  POLARColor}, {"ASP",  NEGATIVEColor}, {"CYS",  SPECIALColor}, {"GLU",  NEGATIVEColor},
+			{"GLY",  SPECIALColor}, {"HIS",  POSITIVEColor}, {"ILE",  HYDROColor}, {"LEU",  HYDROColor}, {"LYS",  POSITIVEColor}, {"MET",  HYDROColor},
+			{"PHE",  HYDROColor},	{"PRO",  SPECIALColor}, {"SER",  POLARColor}, {"THR",  POLARColor}, {"GLN", POLARColor}, {"TRP",  HYDROColor},
+			{"TYR",  HYDROColor}, {"VAL",  HYDROColor},
 		};
         //hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
         FunctionType = new Dictionary<string, int>{
-            {" ALA",  0}, {" ARG",  1}, {" ASN",  2}, {" ASP",  3}, {" CYS",  4}, {" GLU",  3},
-            {" GLY",  4}, {" HIS",  1}, {" ILE",  0}, {" LEU",  0}, {" LYS",  1}, {" MET",  0},
-            {" PHE",  0},  {" PRO",  4}, {" SER",  2}, {" THR",  2}, {" GLN", 2}, {" TRP",  0},
-            {" TYR",  0}, {" VAL",  0},
+            {"ALA",  0}, {"ARG",  1}, {"ASN",  2}, {"ASP",  3}, {"CYS",  4}, {"GLU",  3},
+            {"GLY",  4}, {"HIS",  1}, {"ILE",  0}, {"LEU",  0}, {"LYS",  1}, {"MET",  0},
+            {"PHE",  0},  {"PRO",  4}, {"SER",  2}, {"THR",  2}, {"GLN", 2}, {"TRP",  0},
+            {"TYR",  0}, {"VAL",  0},
         };
     }
 }
