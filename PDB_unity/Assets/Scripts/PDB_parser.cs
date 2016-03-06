@@ -103,27 +103,8 @@ public class PDB_parser {
                     float r = radii[line.Substring(77 - 1, 2)];
                     string aminoAcid = line.Substring(17, 3);
                     string id = line.Substring(13, 3) + ' ' + aminoAcid;
-                    //int atom = int.Parse(line.Substring(6, 5));
                     string aatag = line.Substring (21, 5);
-
-					while(aminoAcidName.Count < chainNumber)
-					{
-						aminoAcidName.Add(null);
-					}
-
-					while(aminoAcidTag.Count < chainNumber)
-					{
-						aminoAcidTag.Add(null);
-					}
-
-					while(aminoAcidAtomIDs.Count < chainNumber)
-					{
-						aminoAcidAtomIDs.Add(new List<int>());
-					}
-
-					aminoAcidName[chainNumber - 1] = aminoAcid;
-					aminoAcidTag[chainNumber - 1] = aatag;
-					aminoAcidAtomIDs[chainNumber - 1].Add(index++);
+                    char aa_version = line[16];
 
 					Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
@@ -138,19 +119,43 @@ public class PDB_parser {
                         col = buttons.HYDROColor;
 					}
 
-					int name = PDB_molecule.encode(line[76], line[77]);
-					names.Add(name);
+                    if (aa_version == ' ' || aa_version == 'A')
+                    {
+                        while (aminoAcidName.Count < chainNumber)
+                        {
+                            aminoAcidName.Add(null);
+                        }
 
-					if (serial >= 0) {
-						while (serial >= serial_to_atom.Count) serial_to_atom.Add (-1);
-						serial_to_atom[serial] = atom_centres.Count;
-					}
+                        while (aminoAcidTag.Count < chainNumber)
+                        {
+                            aminoAcidTag.Add(null);
+                        }
 
-                    atom_centres.Add(new Vector3(x, y, z));
-					atom_radii.Add(r);
-					atom_colours.Add(col);
-					minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
-                    maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
+                        while (aminoAcidAtomIDs.Count < chainNumber)
+                        {
+                            aminoAcidAtomIDs.Add(new List<int>());
+                        }
+
+                        aminoAcidName[chainNumber - 1] = aminoAcid;
+                        aminoAcidTag[chainNumber - 1] = aatag;
+                        aminoAcidAtomIDs[chainNumber - 1].Add(index++);
+
+
+                        int name = PDB_molecule.encode(line[76], line[77]);
+                        names.Add(name);
+
+                        if (serial >= 0)
+                        {
+                            while (serial >= serial_to_atom.Count) serial_to_atom.Add(-1);
+                            serial_to_atom[serial] = atom_centres.Count;
+                        }
+
+                        atom_centres.Add(new Vector3(x, y, z));
+                        atom_radii.Add(r);
+                        atom_colours.Add(col);
+                        minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
+                        maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
+                    }
                 } else if (kind == "CONECT") {
                     /*int len = line.Length;
                     int idx = int.Parse(line.Substring(7 - 1, 5));
