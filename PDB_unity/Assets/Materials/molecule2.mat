@@ -52,7 +52,7 @@ Material:
       data:
         first:
           name: _DarkK
-        second: -.00999999978
+        second: -0.01
       data:
         first:
           name: _GlowRadius1
@@ -77,19 +77,19 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .501960814, g: .501960814, b: .501960814, a: 1}
+        second: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
       data:
         first:
           name: _SpecColor
-        second: {r: .992647052, g: .992647052, b: .992647052, a: 0}
+        second: {r: 0.99264705, g: 0.99264705, b: 0.99264705, a: 0}
       data:
         first:
           name: _Specular
-        second: {r: .0627451017, g: .0627451017, b: .0627451017, a: 1}
+        second: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
       data:
         first:
           name: _Ambient
-        second: {r: .250980407, g: .250980407, b: .250980407, a: 1}
+        second: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
       data:
         first:
           name: _CameraPos
@@ -121,4 +121,52 @@ Material:
       data:
         first:
           name: _CutawayColor
-        second: {r: .566176474, g: .31639272, b: .31639272, a: 1}
+        second: {r: 0.5661765, g: 0.31639272, b: 0.31639272, a: 1}
+      data:
+        first:
+          name: _CutawayPlane
+        second: {r: 0, g: 0, b: 1, a: 0}
+      data:
+        first:
+          name: _Atom0
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom1
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom2
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom3
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom4
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom5
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom6
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom7
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom8
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom9
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Atom10
+        second: {r: 0, g: 0, b: 0, a: 0}

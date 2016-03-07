@@ -269,6 +269,10 @@ public class PDB_mesh : MonoBehaviour {
                 Vector4 plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
                 r.material.SetVector ("_CutawayPlane", plane);
             }
+            if (bb.thicknessSlider)
+            {
+                r.material.SetFloat("_Thickness", bb.thicknessSlider.value);
+            }
 
             /*Vector4[] uniforms = GetSelectedAtomUniforms(cam);
             //int len = uniforms.Length;

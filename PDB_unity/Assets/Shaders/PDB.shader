@@ -17,6 +17,7 @@
     _GlowRadius3("GlowRadius3" , Float) = 0
     _DarkPoint ("DarkPointLoca3" , Vector) = (0,0,0,0)
     _DarkK("DarkK" , Float) = -0.01
+    _Thickness("Thickness" , Float) = 0
     _CutawayPlane("CutawayPlane", Vector) = (0,0,1,0)
     _CutawayColor("CutawayColor", Color) = (1,1,1,1)
     _Atom0 ("Atom0" , Vector) = (0,0,0,0)
@@ -105,11 +106,13 @@
       
       uniform float4 _CutawayPlane;
       uniform float4 _CutawayColor;
+      uniform float _Thickness;
 
       varying_t vert(appdata_full v) {
         varying_t o;
-        o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
-        o.world_pos = mul (_Object2World, v.vertex);
+        float4 vertex = float4(v.vertex + v.normal * _Thickness, 1);
+        o.projection_pos = mul (UNITY_MATRIX_MVP, vertex);
+        o.world_pos = mul (_Object2World, vertex);
         return o;
       }
 
@@ -181,13 +184,15 @@
       uniform float3 _CameraPos;
       uniform float4 _CutawayPlane;
       uniform float _CutawayDepth;
+      uniform float _Thickness;
 
       varying_t vert(appdata_full v) {
         varying_t o;
-        o.projection_pos = mul (UNITY_MATRIX_MVP, v.vertex);
+        float4 vertex = float4(v.vertex + v.normal * _Thickness, 1);
+        o.projection_pos = mul (UNITY_MATRIX_MVP, vertex);
         o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
-        o.model_pos = v.vertex;
-        o.world_pos = mul (_Object2World, v.vertex);
+        o.model_pos = vertex;
+        o.world_pos = mul (_Object2World, vertex);
         o.color = v.color;
         o.scrPos = ComputeScreenPos(o.projection_pos);
         return o;

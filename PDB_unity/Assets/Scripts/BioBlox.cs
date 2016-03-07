@@ -81,7 +81,8 @@ public class BioBlox : MonoBehaviour
     public int lennard_score;
     //public Slider overrideSlider;
     public Slider cutawaySlider;
-	public GameObject invalidDockText;
+    public Slider thicknessSlider;
+    public GameObject invalidDockText;
 	public GameObject InvalidDockScore;
 	//public List<Slider> dockSliders = new List<Slider> ();
 	public float dockOverrideOffset = 0.0f;
