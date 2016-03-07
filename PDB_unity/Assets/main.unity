@@ -8138,6 +8138,7 @@ MonoBehaviour:
   electric_score: 0
   lennard_score: 0
   cutawaySlider: {fileID: 209063048}
+  thicknessSlider: {fileID: 1161387687}
   invalidDockText: {fileID: 1016471154}
   InvalidDockScore: {fileID: 2022634303}
   dockOverrideOffset: 0
