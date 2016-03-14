@@ -46,6 +46,8 @@ public class UIController : MonoBehaviour {
 
 	public Toggle[] ToggleButtonFunctionsView;
 
+    public Animator FirstPersonFade;
+
 	void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -67,13 +69,14 @@ public class UIController : MonoBehaviour {
 	public void ToggleFreeCamera()
 	{
 		MainCamera.GetComponent<CameraMovement> ().enabled = ToggleFreeCameraStatus;
-		FreeCameraKeysFreeze.SetActive (ToggleFreeCameraStatus);
+		//FreeCameraKeysFreeze.SetActive (ToggleFreeCameraStatus);
         CameraSlider.SetActive(!ToggleFreeCameraStatus);
 
-        FreeCameraKeysUnfreeze.SetActive (false);
-		ToogleToolMenu (false);
-		AddConnectionText.SetActive (false);
-		ToggleFreeCameraStatus = !ToggleFreeCameraStatus;
+        //FreeCameraKeysUnfreeze.SetActive (false);
+        //ToogleToolMenu (false);
+        //AddConnectionText.SetActive (false);
+        FirstPersonFade.SetBool("Start", ToggleFreeCameraStatus);
+        ToggleFreeCameraStatus = !ToggleFreeCameraStatus;
 	}
 
 	//tool panel
