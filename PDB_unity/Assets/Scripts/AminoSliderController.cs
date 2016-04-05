@@ -71,6 +71,8 @@ public class AminoSliderController : MonoBehaviour {
 
     Text[] ButtonText;
 
+    public GameObject AminoHolderConnection;
+
 	//dictionary for the function types of aunoacids
 	//protein 1
 	public List<GameObject> A1Positive = new List<GameObject>();
@@ -409,14 +411,14 @@ public class AminoSliderController : MonoBehaviour {
 		//ButtonPickedA2.GetComponent<AminoButtonController> ().activateLinkedImage ();
 		AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
 		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
-		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().connection = connection;
-		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
-		AminoLinkPanelReference.GetComponent<AminoConnectionHolder> ().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID;
+		AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().connection = connection;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID;
 
 		//UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount);
 
-		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0);
-		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1);
+		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform);
+		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1, AminoLinkPanelReference.transform.GetChild(0).transform);
 	}
 
 	bool CheckIfConnectionExist(GameObject A1, GameObject A2)
@@ -427,7 +429,7 @@ public class AminoSliderController : MonoBehaviour {
 
 		foreach (Transform childLinks in AminoLinkPanelParent.transform)
 		{
-			if(childLinks.GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
+			if(childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
 			{
 				existe = true;
 			}
@@ -445,7 +447,7 @@ public class AminoSliderController : MonoBehaviour {
 		}
 	}
 
-	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i)
+	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i, Transform PanelParent)
 	{
 		GameObject AminoButtonReference = Instantiate<GameObject>(AminoButton);
 		AminoButtonReference.SetActive (true);
@@ -456,7 +458,7 @@ public class AminoSliderController : MonoBehaviour {
 		//deactivate the linked image
 		Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
 
-		AminoButtonReference.transform.SetParent(AminoLinkPanelReference.transform,false);
+		AminoButtonReference.transform.SetParent(PanelParent, false);
 		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
 		AminoButtonRect.anchorMin = new Vector2(0.5f,0.5f);
 		AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
@@ -629,7 +631,7 @@ public class AminoSliderController : MonoBehaviour {
 
     void DeleteAllAminoConnections()
     {
-        foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponent<AminoConnectionHolder>().DeleteAminoLink();
+        foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponent<AminoConnectionHolder>().DeleteLink();
     }
 
     public void DeselectAmino()
@@ -646,5 +648,30 @@ public class AminoSliderController : MonoBehaviour {
             //AddConnectionText.SetActive(false);
             DeactivateAddConnectionButton();
         }
+    }
+
+    public void ModifyConnectionHolder(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2,Transform HolderPanelFather)
+    {
+        ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
+        ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
+        //normal size for link manger
+        ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
+        ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
+        //activate the linked image
+        LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform, false);
+        LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform, false);
+        //connection mpdifi
+        GameObject AminoHolderReference = Instantiate<GameObject>(AminoHolderConnection);
+        AminoHolderReference.transform.SetParent(HolderPanelFather, false);
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().connection = connection;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID;
+
+        //UpdateBackGroundSize (AminoLinkPanelParent.transform.childCount);
+
+        FixButton(ButtonPickedA1, AminoHolderReference, 0, AminoHolderReference.transform);
+        FixButton(ButtonPickedA2, AminoHolderReference, 1, AminoHolderReference.transform);
     }
 }
