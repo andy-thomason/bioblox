@@ -154,6 +154,81 @@ public class PDB_molecule
 		return (1 - ((occlusion) / aoccRays.Length));
 	}
 
+    /*
+ply
+format ascii 1.0
+element vertex 8
+property float x
+property float y
+property float z
+property uchar red                   { start of vertex color }
+property uchar green
+property uchar blue
+element face 7
+property list uchar int vertex_index { number of vertices for each face }
+end_header
+0 0 0 255 0 0                         { start of vertex list }
+0 0 1 255 0 0
+0 1 1 255 0 0
+0 1 0 255 0 0
+1 0 0 0 0 255
+1 0 1 0 0 255
+1 1 1 0 0 255
+1 1 0 0 0 255
+3 0 1 2                           { start of face list, begin with a triangle }
+3 0 2 3                           { another triangle }
+4 7 6 5 4                         { now some quadrilaterals }
+4 0 4 5 1
+4 1 5 6 2
+4 2 6 7 3
+4 3 7 4 0
+*/
+
+    void write_str(FileStream fs, string str) {
+        Byte[] bytes = new UTF8Encoding(true).GetBytes(str);
+        fs.Write(bytes, 0, bytes.Length);
+    }
+
+    void write_ply(Vector3[] vertices, Color[] colours, int[] indices)
+    {
+        using (FileStream fs = File.Create("/tmp/" + name + ".ply"))
+        {
+            write_str(fs, "ply\n");
+            write_str(fs, "comment Created by bioblox\n");
+            write_str(fs, "format ascii 1.0\n");
+            write_str(fs, string.Format("element vertex {0}\n", vertices.Length));
+            write_str(fs, "property float x\n");
+            write_str(fs, "property float y\n");
+            write_str(fs, "property float z\n");
+            write_str(fs, "property uchar red\n");
+            write_str(fs, "property uchar green\n");
+            write_str(fs, "property uchar blue\n");
+            write_str(fs, string.Format("element face {0}\n", indices.Length / 3));
+            write_str(fs, "property list uchar int vertex_index { number of vertices for each face }\n");
+            write_str(fs, "end_header\n");
+            for (int i = 0; i != vertices.Length; ++i)
+            {
+                write_str(fs,
+                    string.Format(
+                        "{0} {1} {2} {3} {4} {5}\n",
+                        vertices[i].x, vertices[i].y, vertices[i].z,
+                        (int)(colours[i].r * 255), (int)(colours[i].g * 255), (int)(colours[i].b * 255)
+                    )
+                );
+            }
+            for (int i = 0; i != indices.Length / 3; ++i)
+            {
+                write_str(fs,
+                    string.Format(
+                        "3 {0} {1} {2}\n",
+                        indices[i * 3 + 0], indices[i * 3 + 1], indices[i * 3 + 2]
+                    )
+                );
+            }
+        }
+    }
+
+
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
 		const float grid_spacing = 0.25f; // set this to 0.5f for final game and 2.0f for rough builds.
@@ -256,7 +331,8 @@ public class PDB_molecule
 		uvs = mc.uvs;
 		colours = mc.colours;
 		indices = mc.indices;
-	}
+
+    }
 	
 	void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
         //debug.WriteLine("building mesh");
@@ -619,7 +695,8 @@ public class PDB_molecule
 		} else if (mode == Mode.Metasphere) {
 			build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
 			construct_unity_meshes (verts, normals, uvs, color, index);
-			/*
+            //write_ply(verts, color, index);
+            /*
 			mesh = new Mesh[1];
 			mesh [0]= new Mesh();
 			mesh [0].Clear ();
@@ -630,7 +707,8 @@ public class PDB_molecule
             mesh [0].colors = color;
 			mesh [0].triangles = index;
 			*/
-		} else if (mode == Mode.Ribbon) {
+        }
+        else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
         }
 

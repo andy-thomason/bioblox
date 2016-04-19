@@ -146,7 +146,7 @@ public class BioBlox : MonoBehaviour
     //filenames.Add ("2W9G");
 
     //filenames.Add ("betabarrel_b");
-    filenames.Add("2ptc_u_new_edited");
+    //filenames.Add("2ptc_u_new_edited");
 
     filenames.Add ("pdb2ptcWithTags");
 
