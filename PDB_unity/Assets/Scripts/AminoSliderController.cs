@@ -99,33 +99,64 @@ public class AminoSliderController : MonoBehaviour {
         uIController = FindObjectOfType<UIController>();
     }
 
+    int currentValueSlider1 = 0;
+
 	void Update()
 	{
 
 		if (ButtonA1LDown)
 		{
-			if(CurrentButtonA1>0)
+
+            int hijos = 0;
+            foreach (Transform child in SliderMol1.transform)
+            {
+                if (child.gameObject.activeSelf)
+                    hijos++;
+            }
+            Debug.Log(CurrentButtonA1);
+
+            if (CurrentButtonA1>1)
             {
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-                CurrentButtonA1 --;
+                do
+                {
+                    CurrentButtonA1--;
+
+                } while (!A1Buttons[CurrentButtonA1].IsActive());
+                currentValueSlider1--;
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol1.transform.childCount-1);
+                ScrollbarAmino1.value = (float)currentValueSlider1 / ((float)hijos - 1);
 				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+                Debug.Log("slider value: " + ScrollbarAmino1.value + " - boton: " + CurrentButtonA1 + " - hijo numero: " + hijos);
 			}
 		}
 		
 		if (ButtonA1RDown)
 		{
-			if(CurrentButtonA1<SliderMol1.transform.childCount-1)
+			if(CurrentButtonA1<SliderMol1.transform.childCount-2)
 			{
-				//A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.0f, 1.0f, 1.0f);
+                int hijos = 0;
+                foreach (Transform child in SliderMol1.transform)
+                {
+                    if (child.gameObject.activeSelf)
+                        hijos++;
+                }
+                Debug.Log(CurrentButtonA1);
+
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-                CurrentButtonA1 ++;
-				//A1Buttons[CurrentButtonA1].transform.localScale = new Vector3 (1.3f, 1.3f, 1.3f);
+
+                do
+                {
+                    CurrentButtonA1++;
+
+                } while (!A1Buttons[CurrentButtonA1].IsActive());
+                currentValueSlider1++;
+
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol1.transform.childCount-1);
+                ScrollbarAmino1.value = (float)currentValueSlider1 / ((float)hijos - 1);
 				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-			}
+                Debug.Log("slider value: " + ScrollbarAmino1.value + " - boton: " + CurrentButtonA1 + " - hijo numero: " + hijos);
+            }
 		}
 		
 		if (ButtonA2LDown)
@@ -327,12 +358,24 @@ public class AminoSliderController : MonoBehaviour {
 		foreach (Transform childTransform in AminoLinkPanelParent.transform) Destroy(childTransform.gameObject);
 	}
 
+    public void UpdateCurrentButtonSlider1()
+    {
+        float hijos_test = 0;
+        foreach (Transform child in SliderMol1.transform)
+        {
+            if (child.gameObject.activeSelf)
+                hijos_test++;
+        }
+        currentValueSlider1 = (int)(ScrollbarAmino1.value * (hijos_test - 1));
+        Debug.Log(currentValueSlider1);
+    }
+
 	public void AminoAcidsSelection(GameObject ButtonSelected)
 	{
 		if (ButtonSelected.transform.parent.name == "ContentPanelA1")
 		{
 			ButtonPickedA1 = ButtonSelected;
-		}
+        }
 		else
 		{
 			ButtonPickedA2 = ButtonSelected;
@@ -530,7 +573,7 @@ public class AminoSliderController : MonoBehaviour {
             LPJMessage.SetBool("Play", true);
             foreach (Transform childLinks in AminoLinkPanelParent.transform)
             {
-                score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
             }
             //set the new high score to compare
             score_len_max = BioBloxReference.lennard_score;
@@ -546,7 +589,7 @@ public class AminoSliderController : MonoBehaviour {
             ElecMessage.SetBool("Play", true);
             foreach (Transform childLinks in AminoLinkPanelParent.transform)
             {
-                score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
             }
             //set the new high score to compare
             score_elec_max = BioBloxReference.electric_score;
@@ -562,7 +605,7 @@ public class AminoSliderController : MonoBehaviour {
             MaxMessage.SetBool("Play", true);
             foreach (Transform childLinks in AminoLinkPanelParent.transform)
             {
-                score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponent<AminoConnectionHolder>().ID_button1, childLinks.GetComponent<AminoConnectionHolder>().ID_button2));
+                score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
             }
             //set the new high score to compare
             score_total_max = BioBloxReference.electric_score + BioBloxReference.lennard_score;
@@ -631,7 +674,7 @@ public class AminoSliderController : MonoBehaviour {
 
     void DeleteAllAminoConnections()
     {
-        foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponent<AminoConnectionHolder>().DeleteLink();
+        foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponentInChildren<AminoConnectionHolder>().DeleteLink();
     }
 
     public void DeselectAmino()
@@ -673,5 +716,10 @@ public class AminoSliderController : MonoBehaviour {
 
         FixButton(ButtonPickedA1, AminoHolderReference, 0, AminoHolderReference.transform);
         FixButton(ButtonPickedA2, AminoHolderReference, 1, AminoHolderReference.transform);
+    }
+
+    public void testslider()
+    {
+        //SliderMol2.GetComponent<HorizontalLayoutGroup>().
     }
 }

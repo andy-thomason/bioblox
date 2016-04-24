@@ -36,5 +36,6 @@ public class AminoButtonController : MonoBehaviour {
 			FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(AminoButtonID);
 		}
 		FindObjectOfType<AminoSliderController> ().AminoAcidsSelection (gameObject);
-	}
+        FindObjectOfType<AminoSliderController>().UpdateCurrentButtonSlider1();
+    }
 }
