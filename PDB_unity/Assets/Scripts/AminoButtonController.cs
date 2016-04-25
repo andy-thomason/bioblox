@@ -9,6 +9,7 @@ public class AminoButtonController : MonoBehaviour {
     public string name_amino;
 	public Color32 NormalColor;
 	public Color32 FunctionColor;
+    public int temp_AminoButtonID;
 
 	public void HighLight()
 	{
@@ -36,6 +37,5 @@ public class AminoButtonController : MonoBehaviour {
 			FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(AminoButtonID);
 		}
 		FindObjectOfType<AminoSliderController> ().AminoAcidsSelection (gameObject);
-        FindObjectOfType<AminoSliderController>().UpdateCurrentButtonSlider1();
     }
 }

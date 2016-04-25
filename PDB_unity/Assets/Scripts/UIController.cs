@@ -270,6 +270,8 @@ public class UIController : MonoBehaviour {
             }
 
         }
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
 	}
 
 	public void ToggleNegativeA1()
@@ -295,7 +297,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 
 	public void TogglePolarA1()
 	{
@@ -320,7 +324,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[3].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 
 	public void ToggleOtherA1()
 	{
@@ -345,7 +351,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[4].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 
 	public void ToggleHydroA1()
 	{
@@ -370,7 +378,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[2].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 
 	//AMINO ACIDS 2
 
@@ -397,7 +407,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 	
 	public void ToggleNegativeA2()
 	{
@@ -423,7 +435,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 	
 	public void TogglePolarA2()
 	{
@@ -448,7 +462,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[8].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 	
 	public void ToggleOtherA2()
 	{
@@ -473,7 +489,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[9].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 	
 	public void ToggleHydroA2()
 	{
@@ -498,7 +516,9 @@ public class UIController : MonoBehaviour {
                 AminoButton.SetActive(ToggleButtonFunctionsView[7].isOn);
             }
         }
-	}
+        //set id_s
+        aminoSliderController.UpdateButtonTempID();
+    }
 
 	void ToggleAllButtonsSlider(List<GameObject> CurrentList, bool status)
 	{
