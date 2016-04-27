@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using AssemblyCSharp;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class BioBlox : MonoBehaviour
 {
@@ -1021,6 +1022,11 @@ public class BioBlox : MonoBehaviour
         if (eventSystem != null && eventSystem.IsActive()) {
             ApplyReturnToOriginForce();
         }
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
     }
 }
 

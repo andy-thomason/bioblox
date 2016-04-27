@@ -179,7 +179,7 @@ public class AminoSliderController : MonoBehaviour {
 		}
 
 		if(Input.GetKeyDown (KeyCode.L) && AddConnectionText.activeSelf) {
-			AddConnectionButton();
+            AddConnectionButton();
 		}
 
 	}
@@ -364,11 +364,12 @@ public class AminoSliderController : MonoBehaviour {
 		}
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
-			AddConnection.GetComponent<Animator> ().enabled = true;
-			AddConnectionText.SetActive(!BioBloxReference.GetComponent<UIController>().ToggleFreeCameraStatus);
+            //AddConnection.GetComponent<Animator> ().enabled = true;
+            AddConnection.SetActive(true);
+            AddConnectionText.SetActive(!BioBloxReference.GetComponent<UIController>().ToggleFreeCameraStatus);
 		} else {
 			AddConnectionText.SetActive(false);
-			DeactivateAddConnectionButton ();
+			//DeactivateAddConnectionButton ();
 		}
 /*
         //if function type activated
@@ -396,16 +397,16 @@ public class AminoSliderController : MonoBehaviour {
 		//ButtonPickedA2.GetComponent<Button>().interactable = false;
 		if (!CheckIfConnectionExist (ButtonPickedA1, ButtonPickedA2))
         {
-            ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
-            ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
+            //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
+            //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
             ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
 			ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
 			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
-			ButtonPickedA1 = ButtonPickedA2 = null;
+			//ButtonPickedA1 = ButtonPickedA2 = null;
 			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
 			AddConnectionText.SetActive (false);
-			DeactivateAddConnectionButton ();
+			//DeactivateAddConnectionButton ();
 		}
 		else
 		{
@@ -659,7 +660,7 @@ public class AminoSliderController : MonoBehaviour {
         foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponentInChildren<AminoConnectionHolder>().DeleteLink();
     }
 
-    public void DeselectAmino()
+    /*public void DeselectAmino()
     {
         if(ButtonPickedA1 && ButtonPickedA2)
         {
@@ -673,12 +674,12 @@ public class AminoSliderController : MonoBehaviour {
             //AddConnectionText.SetActive(false);
             DeactivateAddConnectionButton();
         }
-    }
+    }*/
 
     public void ModifyConnectionHolder(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2,Transform HolderPanelFather)
     {
-        ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
-        ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
+        //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
+        //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
         //normal size for link manger
         ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
         ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
@@ -698,6 +699,10 @@ public class AminoSliderController : MonoBehaviour {
 
         FixButton(ButtonPickedA1, AminoHolderReference, 0, AminoHolderReference.transform);
         FixButton(ButtonPickedA2, AminoHolderReference, 1, AminoHolderReference.transform);
+
+        //hightlight th mesh
+        FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID);
+        FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID);
     }
 
 

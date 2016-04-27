@@ -69,8 +69,12 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void ModifyConnection(int A1, int A2)
     {
+        AminoPanel2.transform.GetChild(ID_button2).GetComponent<Animator>().SetBool("High", false);
+        AminoPanel1.transform.GetChild(ID_button1).GetComponent<Animator>().SetBool("High", false);
         FindObjectOfType<AminoSliderController>().ModifyConnectionHolder(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1+A1, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2+A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject,transform.parent);
         FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
+        AminoPanel2.transform.GetChild(ID_button2 + A2).GetComponent<Animator>().SetBool("High", true);
+        AminoPanel1.transform.GetChild(ID_button1 + A1).GetComponent<Animator>().SetBool("High", true);
         UpdateLink();
     }
 
