@@ -2271,7 +2271,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.00012207031, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &255602935
@@ -8280,6 +8280,8 @@ MonoBehaviour:
   LPJLoadMessage: {fileID: 1736424600}
   ElecLoadMessage: {fileID: 116548478}
   MaxLoadMessage: {fileID: 714297083}
+  AminoHolderConnection: {fileID: 158294, guid: 3c541536793b2d54ca5cebf2a14c929a,
+    type: 2}
   A1Positive: []
   A1Negative: []
   A1Hydro: []
@@ -21294,7 +21296,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.00012207031, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408
