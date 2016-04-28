@@ -271,7 +271,7 @@ public class UIController : MonoBehaviour {
 
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA1();
 	}
 
 	public void ToggleNegativeA1()
@@ -298,7 +298,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA1();
     }
 
 	public void TogglePolarA1()
@@ -325,7 +325,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA1();
     }
 
 	public void ToggleOtherA1()
@@ -352,7 +352,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA1();
     }
 
 	public void ToggleHydroA1()
@@ -379,7 +379,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA1();
     }
 
 	//AMINO ACIDS 2
@@ -408,7 +408,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA2();
     }
 	
 	public void ToggleNegativeA2()
@@ -436,7 +436,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA2();
     }
 	
 	public void TogglePolarA2()
@@ -463,7 +463,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA2();
     }
 	
 	public void ToggleOtherA2()
@@ -490,7 +490,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA2();
     }
 	
 	public void ToggleHydroA2()
@@ -517,7 +517,7 @@ public class UIController : MonoBehaviour {
             }
         }
         //set id_s
-        aminoSliderController.UpdateButtonTempID();
+        aminoSliderController.UpdateButtonTempIDA2();
     }
 
 	void ToggleAllButtonsSlider(List<GameObject> CurrentList, bool status)

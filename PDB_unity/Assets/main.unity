@@ -8551,6 +8551,8 @@ MonoBehaviour:
   A2Buttons: []
   CurrentButtonA1: 0
   CurrentButtonA2: 0
+  LastButtonA1: 0
+  LastButtonA2: 0
   AddConnectionText: {fileID: 1773703114}
   ConnectionExistMessage: {fileID: 691617512}
   LinkedGameObject: {fileID: 119010, guid: 861a0cf065eebbe43b6a176787b1f889, type: 2}

@@ -34,7 +34,7 @@ public class AminoSliderController : MonoBehaviour {
 	public List<Button> A1Buttons = new List<Button> ();
 	public List<Button> A2Buttons = new List<Button> ();
 	//current button
-	public int CurrentButtonA1, CurrentButtonA2 = 0;
+	public int CurrentButtonA1, CurrentButtonA2, LastButtonA1, LastButtonA2 = 0;
 	//text to link when there is the free camera
 	public GameObject AddConnectionText;
 	public Animator ConnectionExistMessage;
@@ -110,17 +110,28 @@ public class AminoSliderController : MonoBehaviour {
             if (ScrollbarAmino1.value > 0.0f)
             {
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+                //save the last active one
+                LastButtonA1 = CurrentButtonA1;
                 //pass over non-active
                 do
                 {
-                    CurrentButtonA1--;
-
+                    if (CurrentButtonA1 == 0)
+                    {
+                        CurrentButtonA1 = LastButtonA1;
+                        break;
+                    }
+                    else
+                    {
+                        CurrentButtonA1--;
+                    }
                 } while (!A1Buttons[CurrentButtonA1].IsActive());
 
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                 ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
 				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-			}
+                Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
+
+            }
 		}
 		
 		if (ButtonA1RDown)
@@ -128,16 +139,27 @@ public class AminoSliderController : MonoBehaviour {
 			if(ScrollbarAmino1.value < 1.0f)
 			{
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+                //save the last active one
+                LastButtonA1 = CurrentButtonA1;
                 //pass over non-active
                 do
                 {
-                    CurrentButtonA1++;
-
+                    if (CurrentButtonA1 == A1Buttons.Count - 1)
+                    {
+                        CurrentButtonA1= LastButtonA1;
+                        break;
+                    }
+                    else
+                    {
+                        CurrentButtonA1++;
+                    }
                 } while (!A1Buttons[CurrentButtonA1].IsActive());
+                
 
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                 ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
 				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+               // Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
             }
 		}
         
@@ -146,10 +168,20 @@ public class AminoSliderController : MonoBehaviour {
 			if(ScrollbarAmino2.value > 0.0f)
 			{
                 A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+                //save the last active one
+                LastButtonA2 = CurrentButtonA2;
                 //pass over non-active
                 do
                 {
-                    CurrentButtonA2--;
+                    if (CurrentButtonA2 == 0)
+                    {
+                        CurrentButtonA2 = LastButtonA2;
+                        break;
+                    }
+                    else
+                    {
+                        CurrentButtonA2--;
+                    }
 
                 } while (!A2Buttons[CurrentButtonA2].IsActive());
 
@@ -165,10 +197,20 @@ public class AminoSliderController : MonoBehaviour {
 			{
 
                 A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+                //save the last active one
+                LastButtonA2 = CurrentButtonA2;
                 //pass over non-active
                 do
                 {
-                    CurrentButtonA2++;
+                    if (CurrentButtonA2 == A2Buttons.Count - 1)
+                    {
+                        CurrentButtonA2 = LastButtonA2;
+                        break;
+                    }
+                    else
+                    {
+                        CurrentButtonA2++;
+                    }
 
                 } while (!A2Buttons[CurrentButtonA2].IsActive());
 
@@ -258,7 +300,8 @@ public class AminoSliderController : MonoBehaviour {
 			}
 		}
 
-        UpdateButtonTempID();
+        UpdateButtonTempIDA1();
+        UpdateButtonTempIDA2();
     }
 	
 	public void GeneratesAminoButtons1(string currentAmino, string tag, int index)
@@ -357,11 +400,15 @@ public class AminoSliderController : MonoBehaviour {
 		if (ButtonSelected.transform.parent.name == "ContentPanelA1")
 		{
 			ButtonPickedA1 = ButtonSelected;
+            //udate the slider value
+            //ScrollbarAmino1.value = (float)ButtonSelected.GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
         }
 		else
 		{
 			ButtonPickedA2 = ButtonSelected;
-		}
+            //udate the slider value
+            //ScrollbarAmino2.value = (float)ButtonSelected.GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
+        }
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
@@ -371,6 +418,8 @@ public class AminoSliderController : MonoBehaviour {
 			AddConnectionText.SetActive(false);
 			//DeactivateAddConnectionButton ();
 		}
+
+
 /*
         //if function type activated
         if (uIController.auto_filter)
@@ -609,9 +658,12 @@ public class AminoSliderController : MonoBehaviour {
                 {
                     for (int i = 0; i < score_aminolinks_holder_max.Count; i++)
                     {
+                        //turn to normal
+                        SliderMol1.transform.Find(((int)score_aminolinks_holder_elec[i].x).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
+                        SliderMol2.transform.Find(((int)score_aminolinks_holder_elec[i].y).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
                         AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_max[i].x, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_max[i].y), SliderMol1.transform.Find(((int)score_aminolinks_holder_max[i].x).ToString()).gameObject, SliderMol2.transform.Find(((int)score_aminolinks_holder_max[i].y).ToString()).gameObject);
-                        FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     }
+                    FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     //set the rotation of the molecuels
                     BioBloxReference.molecules[0].transform.localEulerAngles = max_protein0;
                     BioBloxReference.molecules[1].transform.localEulerAngles = max_protein1;
@@ -624,9 +676,12 @@ public class AminoSliderController : MonoBehaviour {
                 {
                     for (int i = 0; i < score_aminolinks_holder_elec.Count; i++)
                     {
+                        //turn to normal
+                        SliderMol1.transform.Find(((int)score_aminolinks_holder_elec[i].x).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
+                        SliderMol2.transform.Find(((int)score_aminolinks_holder_elec[i].y).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
                         AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_elec[i].x, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_elec[i].y), SliderMol1.transform.Find(((int)score_aminolinks_holder_elec[i].x).ToString()).gameObject, SliderMol2.transform.Find(((int)score_aminolinks_holder_elec[i].y).ToString()).gameObject);
-                        FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     }
+                    FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     //set the rotation of the molecuels
                     BioBloxReference.molecules[0].transform.localEulerAngles = elec_protein0;
                     BioBloxReference.molecules[1].transform.localEulerAngles = elec_protein0;
@@ -639,9 +694,12 @@ public class AminoSliderController : MonoBehaviour {
                 {
                     for (int i = 0; i < score_aminolinks_holder_len.Count; i++)
                     {
+                        //turn to normal
+                        SliderMol1.transform.Find(((int)score_aminolinks_holder_elec[i].x).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
+                        SliderMol2.transform.Find(((int)score_aminolinks_holder_elec[i].y).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
                         AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_len[i].x, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), (int)score_aminolinks_holder_len[i].y), SliderMol1.transform.Find(((int)score_aminolinks_holder_len[i].x).ToString()).gameObject, SliderMol2.transform.Find(((int)score_aminolinks_holder_len[i].y).ToString()).gameObject);
-                        FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     }
+                    FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
                     //set the rotation of the molecuels
                     BioBloxReference.molecules[0].transform.localEulerAngles = len_protein0;
                     BioBloxReference.molecules[1].transform.localEulerAngles = len_protein1;
@@ -707,26 +765,34 @@ public class AminoSliderController : MonoBehaviour {
 
 
 
-    public void UpdateButtonTempID()
+    public void UpdateButtonTempIDA1()
     {
         number_childs_A1 = 0;
         foreach (Transform child in SliderMol1.transform)
         {
             if (child.gameObject.activeSelf)
             {
+                if (number_childs_A1 == 0) CurrentButtonA1 = child.GetComponent<AminoButtonController>().AminoButtonID;
                 child.GetComponent<AminoButtonController>().temp_AminoButtonID = number_childs_A1;
                 number_childs_A1++;
             }
         }
+        ScrollbarAmino1.value = 0;
+        Debug.Log(ScrollbarAmino1.value);
+    }
 
+    public void UpdateButtonTempIDA2()
+    {
         number_childs_A2 = 0;
         foreach (Transform child in SliderMol2.transform)
         {
             if (child.gameObject.activeSelf)
             {
+                if (number_childs_A2 == 0) CurrentButtonA2 = child.GetComponent<AminoButtonController>().AminoButtonID;
                 child.GetComponent<AminoButtonController>().temp_AminoButtonID = number_childs_A2;
                 number_childs_A2++;
             }
         }
+        ScrollbarAmino2.value = 0;
     }
 }
