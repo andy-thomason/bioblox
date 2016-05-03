@@ -117,6 +117,8 @@ public class BioBlox : MonoBehaviour
 
 	public GameState game_state;
 
+    public int hint_stage = 0;
+
     //scoring
     PDB_score scoring;
 
@@ -1027,6 +1029,26 @@ public class BioBlox : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene(0);
+        hint_stage = 0;
+    }
+
+    public void Hint()
+    {
+        AminoSliderController sliders = GetComponent<AminoSliderController>();
+        GameObject hobj = GameObject.Find("HintText");
+        Text hintText = hobj.GetComponent<Text>();
+
+        Debug.Log(string.Format("hint {0}", hint_stage));
+
+        switch (hint_stage++)
+        {
+            case 0:
+                hintText.text = "next step 0";
+                break;
+            case 1:
+                hintText.text = "next step 1";
+                break;
+        }
     }
 }
 

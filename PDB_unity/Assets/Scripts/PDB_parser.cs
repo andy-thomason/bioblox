@@ -106,14 +106,25 @@ public class PDB_parser {
                     string aatag = line.Substring (21, 5);
                     char aa_version = line[16];
 
-					Color col = Color.white;
+/*                    +Ve: Blue His, Arg, Lys  (3)
+                    - ve:  Dark red: Glu, Asp(2)
+Polar: light red: Ser, Thr, Tyr, Asn, Gln(5)
+Non polar: grey: Ala, Val, Leu, Ile, Met, Phe, Trp, Pro, Gly, Cys(10)
+For atoms
+N - Blue
+O – Red
+C and S -grey*/
+
+                    Color col = Color.white;
 					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
                         col = buttons.POSITIVEColor;
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
                         col = buttons.NEGATIVEColor;
 					} else if (id == "SG  CYS") {
                         col = buttons.SULPHURColor;
-                    } else if (id == "OG  SER" || id == "OG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+                    } else if (id == "OG  SER" || id == "CG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
+                    //else if (aminoAcid == "SER" || aminoAcid == "THR" || aminoAcid == "ASN" || aminoAcid == "GLN")
+                    //{
                         col = buttons.POLARColor;
 					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
                         col = buttons.HYDROColor;
