@@ -21,7 +21,7 @@ public class AminoButtonController : MonoBehaviour {
 		{			
 			FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
 		}
-		FindObjectOfType<AminoSliderController> ().AminoAcidsSelection (gameObject);
+		FindObjectOfType<AminoSliderController> ().ChangeAminoAcidSelection (gameObject);
 	}
 
 	public void HighLightOnClick()
@@ -36,6 +36,6 @@ public class AminoButtonController : MonoBehaviour {
 			FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
 			FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(AminoButtonID);
 		}
-		FindObjectOfType<AminoSliderController> ().AminoAcidsSelection (gameObject);
+		FindObjectOfType<AminoSliderController> ().ChangeAminoAcidSelection (gameObject);
     }
 }

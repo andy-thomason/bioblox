@@ -45,6 +45,7 @@ public class AminoConnectionHolder : MonoBehaviour {
 
 	void Update()
 	{
+        if (distancia == null) return;
 		distancia.text = (connection.distance).ToString ("F1");
 	}
 

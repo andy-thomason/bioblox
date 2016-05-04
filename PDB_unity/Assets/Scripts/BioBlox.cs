@@ -316,6 +316,7 @@ public class BioBlox : MonoBehaviour
             }
         }*/
 
+        UpdateHint();
     }
 
     void PopInSound (GameObject g)
@@ -934,7 +935,7 @@ public class BioBlox : MonoBehaviour
 
         //score system display
         if (scoring == null) {
-      return;
+            return;
         }
         scoring.calcScore();
         //set values for refence
@@ -1032,22 +1033,93 @@ public class BioBlox : MonoBehaviour
         hint_stage = 0;
     }
 
-    public void Hint()
+
+    void UpdateHint()
     {
         AminoSliderController sliders = GetComponent<AminoSliderController>();
         GameObject hobj = GameObject.Find("HintText");
         Text hintText = hobj.GetComponent<Text>();
+        ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
-        Debug.Log(string.Format("hint {0}", hint_stage));
+        string[] aas = { "LYS I  15", "ASP E 189", "ILE E  73", "ARG I  17", "GLN E 175", "ARG I  39" };
 
-        switch (hint_stage++)
-        {
-            case 0:
-                hintText.text = "next step 0";
-                break;
-            case 1:
-                hintText.text = "next step 1";
-                break;
+        // state machine for hints.
+        // todo: turn this into a JSON file.
+        switch (hint_stage) {
+            case 0: {
+                hintText.text = "On the right molecule, select the blue finger marked LYS I 15.";
+                if (sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 5;
+                } else if (sliders.IsSelected(1, aas[0])) {
+                    hint_stage = 1;
+                }
+            } break;
+            case 1: {
+                hintText.text = "On the left molecule, select the red atoms at the bottom of the hole marked ASP E 189. You can also select using the top bar on the bottom left. They are quite difficult to find and you must spin the molecule to see them.";
+                if (!sliders.IsSelected(1, aas[0])) {
+                    hint_stage =  0;
+                } else if (sliders.IsSelected(0, aas[1])) {
+                    hint_stage =  2;
+                }
+            } break;
+            case 2: {
+                hintText.text = "Good. Now press the '+' button to add a connection.";
+                if (!sliders.IsSelected(1, aas[0])) {
+                    hint_stage =  0;
+                } else if (!sliders.IsSelected(0, aas[1])) {
+                    hint_stage =  1;
+                } else if (sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage =  3;
+                }
+            } break;
+            case 3: {
+                hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
+                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 0;
+                } else if (conMan.SliderStrings.value < 0.5) {
+                    hint_stage = 4;
+                }
+            } break;
+            case 4: {
+                hintText.text = "Good. Now we can let the slider out and make some more connections.";
+                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 0;
+                } else if (conMan.SliderStrings.value > 0.95) {
+                    hint_stage = 5;
+                }
+            } break;
+            case 5: {
+                hintText.text = "Now we can make two more connections. First try connecting ARG I 17 to ILE E 73.";
+                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 0;
+                } else if (sliders.IsConnectionMade(aas[2], aas[3])) {
+                    hint_stage = 6;
+                }
+            } break;
+            case 6: {
+                hintText.text = "Now connect ARG I 39 to GLN E 175";
+                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 5;
+                } else if (!sliders.IsConnectionMade(aas[2], aas[3])) {
+                    hint_stage = 5;
+                } else if (sliders.IsConnectionMade(aas[4], aas[5])) {
+                    hint_stage = 7;
+                }
+            } break;
+            case 7: {
+                hintText.text = "Gently pull in the strings all the way using the left hand slider.";
+                if (!sliders.IsConnectionMade(aas[1], aas[0]) || !sliders.IsConnectionMade(aas[2], aas[3]) || !sliders.IsConnectionMade(aas[4], aas[5])) {
+                    hint_stage = 5;
+                } else if (conMan.SliderStrings.value == 0) {
+                    hint_stage = 8;
+                }
+            } break;
+            case 8: {
+                hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct.";
+                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                    hint_stage = 5;
+                }
+            } break;
         }
     }
 }

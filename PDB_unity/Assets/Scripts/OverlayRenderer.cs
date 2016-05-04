@@ -47,6 +47,8 @@ public class OverlayRenderer : MonoBehaviour {
                 PDB_mesh msh = obj.GetComponent<PDB_mesh>();
                 PDB_molecule mol = msh.mol;
                 Transform t = msh.transform;
+                if (msh == null) return;
+                if (mol == null) return;
 
                 BitArray sel = new BitArray(mol.names.Length);
                 foreach (int a in msh.selected_atoms) sel.Set(a, true);

@@ -21,7 +21,7 @@ public class GridCollider
 	// List of results returned by the collider.
 	public List<Result> results = new List<Result>();
 
-	public bool show_grid = false;
+	public bool show_grid = true;
 
 	// Constructor: generate a list of collision pairs.
 	public GridCollider(PDB_molecule mol0, Transform t0, PDB_molecule mol1, Transform t1, float inflation)
