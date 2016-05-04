@@ -9,82 +9,82 @@ using AssemblyCSharp;
 /// Class containing the description of a single molecule.
 public class PDB_molecule
 {
-	// the molecule data itself.
+    // the molecule data itself.
     public Vector3[] atom_centres;
     public float[] atom_radii;
-	public Color[] atom_colours;
+    public Color[] atom_colours;
 
-	public Tuple<int,int>[] pairedLabels=new Tuple<int, int>[0];
+    public Tuple<int,int>[] pairedLabels=new Tuple<int, int>[0];
     public int[] names;
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;
-	public List<string> aminoAcidsNames;
-	public List<string> aminoAcidsTags;
-	public List<int[]> aminoAcidsAtomIds;
-	public Mesh[] mesh;
+    public List<string> aminoAcidsNames;
+    public List<string> aminoAcidsTags;
+    public List<int[]> aminoAcidsAtomIds;
+    public Mesh[] mesh;
 
-	// bounding volume heirachy to accelerate collisions
+    // bounding volume heirachy to accelerate collisions
     public Vector3[] bvh_centres;
     public float[] bvh_radii;
     public int[] bvh_terminals;
 
 
-	public PDB_molecule.Label[] labels = new PDB_molecule.Label[0];
-	public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
-	public int[] serial_to_atom;
+    public PDB_molecule.Label[] labels = new PDB_molecule.Label[0];
+    public Tuple<int,int>[] spring_pairs = new Tuple<int,int>[0];
+    public int[] serial_to_atom;
 
     //const float c = 1.618033988749895f;
     const float e = 0.52573111f;
     const float d = 0.8506508f;
     // icosphere (http://en.wikipedia.org/wiki/Icosahedron#Cartesian_coordinates)
     readonly float[] vproto = {-e,d,0,e,d,0,-e,-d,0,e,-d,0,0,-e,d,0,e,d,0,-e,-d,0,e,-d,d,0,-e,d,0,e,-d,0,-e,-d,0,e};
-	readonly int[] iproto = {0,11,5,0,5,1,0,1,7,0,7,10,0,10,11,1,5,9,5,11,4,11,10,2,10,7,6,7,1,8,3,9,4,3,4,2,3,2,6,3,6,8,3,8,9,4,9,5,2,4,11,6,2,10,8,6,7,9,8,1};
+    readonly int[] iproto = {0,11,5,0,5,1,0,1,7,0,7,10,0,10,11,1,5,9,5,11,4,11,10,2,10,7,6,7,1,8,3,9,4,3,4,2,3,2,6,3,6,8,3,8,9,4,9,5,2,4,11,6,2,10,8,6,7,9,8,1};
     Vector3 [] vsphere;
     int [] isphere;
 
-	Vector3[] aoccRays = {
-		new Vector3 (0, 1, 0),
-		new Vector3 (0, -1, 0),
-		new Vector3 (1, 0, 0),
-		new Vector3 (-1, 0, 0),
-		new Vector3 (0, 0, 1),
-		new Vector3 (0, 0, -1),
+    Vector3[] aoccRays = {
+        new Vector3 (0, 1, 0),
+        new Vector3 (0, -1, 0),
+        new Vector3 (1, 0, 0),
+        new Vector3 (-1, 0, 0),
+        new Vector3 (0, 0, 1),
+        new Vector3 (0, 0, -1),
     };
 
-	public enum Mode { Ball, Ribbon, Metasphere };
-	public static Mode mode = Mode.Metasphere;
+    public enum Mode { Ball, Ribbon, Metasphere };
+    public static Mode mode = Mode.Metasphere;
     
     public string name;
 
 
-	public struct Label
-	{
-		public Label(int id){
-			uniqueLabelID = id;
-			atomIds = new List<int>();
-		}
-		public int uniqueLabelID;
-		public List<int> atomIds;
-	}
+    public struct Label
+    {
+        public Label(int id){
+            uniqueLabelID = id;
+            atomIds = new List<int>();
+        }
+        public int uniqueLabelID;
+        public List<int> atomIds;
+    }
     
     //static System.IO.StreamWriter debug = new System.IO.StreamWriter(@"C:\tmp\PDB_molecule.csv");
     
     Vector3 get_v(int i) { return new Vector3(vproto[i*3+0], vproto[i*3+1], vproto[i*3+2]); }
 
 
-	List<int> GetAminoIndexes(string aminoName)
-	{
-		List<int> returnList = new List<int> ();
-		for(int i = 0; i < aminoAcidsNames.Count; ++i)
-		{
-			if(aminoName == aminoAcidsNames[i])
-			{
-				returnList.Add(i);
-			}
-		}
-		return returnList;
-	}
+    List<int> GetAminoIndexes(string aminoName)
+    {
+        List<int> returnList = new List<int> ();
+        for(int i = 0; i < aminoAcidsNames.Count; ++i)
+        {
+            if(aminoName == aminoAcidsNames[i])
+            {
+                returnList.Add(i);
+            }
+        }
+        return returnList;
+    }
 
     void build_sphere() {
         int num_tris = iproto.Length / 3;
@@ -95,7 +95,7 @@ public class PDB_molecule
             vsphere[i].x = vproto[i*3+0];
             vsphere[i].y = vproto[i*3+1];
             vsphere[i].z = vproto[i*3+2];
-			vsphere[i] = vsphere[i].normalized;
+            vsphere[i] = vsphere[i].normalized;
         }
         for (int i = 0; i != num_tris; ++i) {
             int i0 = iproto[i*3+0];
@@ -132,27 +132,27 @@ public class PDB_molecule
         //debug.WriteLine(isphere.Length);
     }
 
-	float CalcAmbientOcclusion(Vector3 pos, Vector3 norm, float radius)
-	{
-		float occlusion = 0;
-		float maxDist = 7;
-		for(int i=0;i<aoccRays.Length;++i)
-		{
-			Vector3 posOffset = pos + aoccRays[i] * radius;
-			Ray r = new Ray (posOffset, aoccRays[i]);
-			BvhRayCollider b = new BvhRayCollider (this, r);
-			float minDist = maxDist;
-			for (int j=0; j< b.results.Count; ++j) {
-				float dist=(pos-atom_centres[b.results[j].index]).sqrMagnitude;
-				if(dist<maxDist&&dist!=0)
-				{
-					minDist=Math.Min(minDist,dist);
-				}
-			}
-		occlusion += (1 - (minDist / maxDist));
-		}
-		return (1 - ((occlusion) / aoccRays.Length));
-	}
+    float CalcAmbientOcclusion(Vector3 pos, Vector3 norm, float radius)
+    {
+        float occlusion = 0;
+        float maxDist = 7;
+        for(int i=0;i<aoccRays.Length;++i)
+        {
+            Vector3 posOffset = pos + aoccRays[i] * radius;
+            Ray r = new Ray (posOffset, aoccRays[i]);
+            BvhRayCollider b = new BvhRayCollider (this, r);
+            float minDist = maxDist;
+            for (int j=0; j< b.results.Count; ++j) {
+                float dist=(pos-atom_centres[b.results[j].index]).sqrMagnitude;
+                if(dist<maxDist&&dist!=0)
+                {
+                    minDist=Math.Min(minDist,dist);
+                }
+            }
+        occlusion += (1 - (minDist / maxDist));
+        }
+        return (1 - ((occlusion) / aoccRays.Length));
+    }
 
     /*
 ply
@@ -231,129 +231,129 @@ end_header
 
     // https://en.wikipedia.org/wiki/Marching_cubes
     void build_metasphere_mesh(out Vector3[] vertices, out Vector3[] normals, out Vector2[] uvs, out Color[] colours, out int[] indices) {
-		const float grid_spacing = 0.25f; // set this to 0.5f for final game and 2.0f for rough builds.
-		const float rgs = 1.0f / grid_spacing;
+        const float grid_spacing = 0.25f; // set this to 0.5f for final game and 2.0f for rough builds.
+        const float rgs = 1.0f / grid_spacing;
 
-		// Create a 3D array for each molecule
-		Vector3 min = atom_centres[0];
-		Vector3 max = min;
-		float max_r = 0.0f;
-		for (int j = 0; j != atom_centres.Length; ++j)
-		{
-			//Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]) + 1.0f;
-			float r = atom_radii[j];
-			max_r = Mathf.Max(max_r, r);
-			min = Vector3.Min(min, atom_centres[j]);
-			max = Vector3.Max(max, atom_centres[j]);
-		}
+        // Create a 3D array for each molecule
+        Vector3 min = atom_centres[0];
+        Vector3 max = min;
+        float max_r = 0.0f;
+        for (int j = 0; j != atom_centres.Length; ++j)
+        {
+            //Vector3 r = new Vector3(atom_radii[j], atom_radii[j], atom_radii[j]) + 1.0f;
+            float r = atom_radii[j];
+            max_r = Mathf.Max(max_r, r);
+            min = Vector3.Min(min, atom_centres[j]);
+            max = Vector3.Max(max, atom_centres[j]);
+        }
 
-		int irgs = Mathf.CeilToInt (max_r * rgs) + 1;
-		int x0 = Mathf.FloorToInt (min.x * rgs) - irgs;
-		int y0 = Mathf.FloorToInt (min.y * rgs) - irgs;
-		int z0 = Mathf.FloorToInt (min.z * rgs) - irgs;
-		int x1 = Mathf.CeilToInt (max.x * rgs) + irgs;
-		int y1 = Mathf.CeilToInt (max.y * rgs) + irgs;
-		int z1 = Mathf.CeilToInt (max.z * rgs) + irgs;
+        int irgs = Mathf.CeilToInt (max_r * rgs) + 1;
+        int x0 = Mathf.FloorToInt (min.x * rgs) - irgs;
+        int y0 = Mathf.FloorToInt (min.y * rgs) - irgs;
+        int z0 = Mathf.FloorToInt (min.z * rgs) - irgs;
+        int x1 = Mathf.CeilToInt (max.x * rgs) + irgs;
+        int y1 = Mathf.CeilToInt (max.y * rgs) + irgs;
+        int z1 = Mathf.CeilToInt (max.z * rgs) + irgs;
 
-		int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
+        int xdim = x1-x0+1, ydim = y1-y0+1, zdim = z1-z0+1;
 
-		// Array contains values (-0.5..>1) positive means inside molecule.
-		// Normals are drived from values.
-		// Colours shaded by ambient occlusion (TODO). 
-		float[] mc_values = new float[xdim * ydim * zdim];
-		Vector3[] mc_normals = new Vector3[xdim * ydim * zdim];
-		Color[] mc_colours = new Color[xdim * ydim * zdim];
-		//float diff = 0.125f, rec = 2.0f / diff;
-		for (int i = 0; i != xdim * ydim * zdim; ++i) {
-			mc_values[i] = -0.5f;
-			mc_colours[i] = new Color(1, 1, 1, 1);
-		}
+        // Array contains values (-0.5..>1) positive means inside molecule.
+        // Normals are drived from values.
+        // Colours shaded by ambient occlusion (TODO). 
+        float[] mc_values = new float[xdim * ydim * zdim];
+        Vector3[] mc_normals = new Vector3[xdim * ydim * zdim];
+        Color[] mc_colours = new Color[xdim * ydim * zdim];
+        //float diff = 0.125f, rec = 2.0f / diff;
+        for (int i = 0; i != xdim * ydim * zdim; ++i) {
+            mc_values[i] = -0.5f;
+            mc_colours[i] = new Color(1, 1, 1, 1);
+        }
 
-		// For each atom add in the values and normals surrounding
-		// the centre up to a reasonable radius.
-		int acmax = atom_centres.Length;
-		DateTime start_time = DateTime.Now;
-		for (int ac = 0; ac != acmax; ++ac) {
-			Vector3 c = atom_centres[ac];
-			float r = atom_radii[ac] * 0.8f * rgs;
-			Color colour = atom_colours[ac];
-			float cx = c.x * rgs;
-			float cy = c.y * rgs;
-			float cz = c.z * rgs;
+        // For each atom add in the values and normals surrounding
+        // the centre up to a reasonable radius.
+        int acmax = atom_centres.Length;
+        DateTime start_time = DateTime.Now;
+        for (int ac = 0; ac != acmax; ++ac) {
+            Vector3 c = atom_centres[ac];
+            float r = atom_radii[ac] * 0.8f * rgs;
+            Color colour = atom_colours[ac];
+            float cx = c.x * rgs;
+            float cy = c.y * rgs;
+            float cz = c.z * rgs;
 
-			// define a box around the atom.
-			int cix = Mathf.FloorToInt(c.x * rgs);
-			int ciy = Mathf.FloorToInt(c.y * rgs);
-			int ciz = Mathf.FloorToInt(c.z * rgs);
-			int xmin = Mathf.Max(x0, cix-irgs);
-			int ymin = Mathf.Max(y0, ciy-irgs);
-			int zmin = Mathf.Max(z0, ciz-irgs);
-			int xmax = Mathf.Min(x1, cix+irgs);
-			int ymax = Mathf.Min(y1, ciy+irgs);
-			int zmax = Mathf.Min(z1, ciz+irgs);
-			float fk = Mathf.Log(0.5f) / (r * r);
-			float fkk = -fk * 0.5f; // 0.5 is a magic number!
-			bool wcol = colour != Color.white;
+            // define a box around the atom.
+            int cix = Mathf.FloorToInt(c.x * rgs);
+            int ciy = Mathf.FloorToInt(c.y * rgs);
+            int ciz = Mathf.FloorToInt(c.z * rgs);
+            int xmin = Mathf.Max(x0, cix-irgs);
+            int ymin = Mathf.Max(y0, ciy-irgs);
+            int zmin = Mathf.Max(z0, ciz-irgs);
+            int xmax = Mathf.Min(x1, cix+irgs);
+            int ymax = Mathf.Min(y1, ciy+irgs);
+            int zmax = Mathf.Min(z1, ciz+irgs);
+            float fk = Mathf.Log(0.5f) / (r * r);
+            float fkk = -fk * 0.5f; // 0.5 is a magic number!
+            bool wcol = colour != Color.white;
 
-			for (int z = zmin; z != zmax; ++z) {
-				float fdz = z - cz;
-				for (int y = ymin; y != ymax; ++y) {
-					float fdy = y - cy;
-					int idx = ((z-z0) * ydim + (y-y0)) * xdim + (xmin-x0);
-					float d2_base = fdy*fdy + fdz*fdz;
-					for (int x = xmin; x != xmax; ++x) {
-						float fdx = x - cx;
-						float d2 = fdx*fdx + d2_base;
-						float v = fkk * d2;
-						if (v < 1) {
-							// a little like exp(-v)
-							float val = (2 * v - 3) * v * v + 1;
-							mc_values[idx] += val;
-							float rcp = val / Mathf.Sqrt(d2);
-							mc_normals[idx].x += fdx * rcp;
-							mc_normals[idx].y += fdy * rcp;
-							mc_normals[idx].z += fdz * rcp;
-							if (wcol) mc_colours[idx] = Color.Lerp(mc_colours[idx], colour, val*2);
-						}
-						idx++;
-					}
-				}
-			}
-		}
-		Debug.Log (DateTime.Now - start_time + "s to make values");
+            for (int z = zmin; z != zmax; ++z) {
+                float fdz = z - cz;
+                for (int y = ymin; y != ymax; ++y) {
+                    float fdy = y - cy;
+                    int idx = ((z-z0) * ydim + (y-y0)) * xdim + (xmin-x0);
+                    float d2_base = fdy*fdy + fdz*fdz;
+                    for (int x = xmin; x != xmax; ++x) {
+                        float fdx = x - cx;
+                        float d2 = fdx*fdx + d2_base;
+                        float v = fkk * d2;
+                        if (v < 1) {
+                            // a little like exp(-v)
+                            float val = (2 * v - 3) * v * v + 1;
+                            mc_values[idx] += val;
+                            float rcp = val / Mathf.Sqrt(d2);
+                            mc_normals[idx].x += fdx * rcp;
+                            mc_normals[idx].y += fdy * rcp;
+                            mc_normals[idx].z += fdz * rcp;
+                            if (wcol) mc_colours[idx] = Color.Lerp(mc_colours[idx], colour, val*2);
+                        }
+                        idx++;
+                    }
+                }
+            }
+        }
+        Debug.Log (DateTime.Now - start_time + "s to make values");
 
-		//MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
-		MarchingCubes mc = new MarchingCubes(x0, y0, z0, xdim, ydim, zdim, grid_spacing, mc_values, mc_normals, mc_colours);
-		start_time = DateTime.Now;
+        //MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
+        MarchingCubes mc = new MarchingCubes(x0, y0, z0, xdim, ydim, zdim, grid_spacing, mc_values, mc_normals, mc_colours);
+        start_time = DateTime.Now;
 
-		vertices = mc.vertices;
-		normals = mc.normals;
-		uvs = mc.uvs;
-		colours = mc.colours;
-		indices = mc.indices;
+        vertices = mc.vertices;
+        normals = mc.normals;
+        uvs = mc.uvs;
+        colours = mc.colours;
+        indices = mc.indices;
 
     }
-	
-	void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
+    
+    void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
         //debug.WriteLine("building mesh");
  
         int num_atoms = atom_centres.Length;
         int vlen = vsphere.Length;
         int ilen = isphere.Length;
         vertices = new Vector3[vlen*num_atoms];
-       	normals = new Vector3[vlen*num_atoms];
+           normals = new Vector3[vlen*num_atoms];
         uvs = new Vector2[vlen*num_atoms];
-		colors = new Color[vlen * num_atoms];
+        colors = new Color[vlen * num_atoms];
         indices = new int[ilen*num_atoms];
         int v = 0;
         int idx = 0;
         for (int j = 0; j != num_atoms; ++j) {
             Vector3 pos = atom_centres[j];
-			/*Color col=new 
-				Color(0.1f,0.1f,0.1f,
-			    CalcAmbientOcclusion(pos,pos.normalized,atom_radii[j]));
-			*/
-			Color col = atom_colours[j];
+            /*Color col=new 
+                Color(0.1f,0.1f,0.1f,
+                CalcAmbientOcclusion(pos,pos.normalized,atom_radii[j]));
+            */
+            Color col = atom_colours[j];
             //if (j < 10) debug.WriteLine(pos);
             float r = atom_radii[j];
             for (int i = 0; i != vlen; ++i) {
@@ -361,7 +361,7 @@ end_header
                 normals[v] = vsphere[i];
                 uvs[v].x = normals[v].x;
                 uvs[v].y = normals[v].y;
-				colors[v] = col;
+                colors[v] = col;
                 ++v;
             }
             for (int i = 0; i != ilen; ++i) {
@@ -373,152 +373,152 @@ end_header
         //mesh.RecalculateNormals();
     }
 
-	public Mesh build_section_mesh(int[] atom_indicies)
-	{
-		Mesh meshy = new Mesh ();
-		meshy.Clear ();
+    public Mesh build_section_mesh(int[] atom_indicies)
+    {
+        Mesh meshy = new Mesh ();
+        meshy.Clear ();
 
-		int vlen = vsphere.Length;
-		int ilen = isphere.Length;
+        int vlen = vsphere.Length;
+        int ilen = isphere.Length;
 
-		Vector3[] verts = new Vector3[atom_indicies.Length * vlen];
-		Vector3[] normals = new Vector3[atom_indicies.Length * vlen];
-		Vector2[] uvs = new Vector2[atom_indicies.Length * vlen];
-		Color[] colors = new Color[atom_indicies.Length * vlen];
-		int[] indices = new int[atom_indicies.Length * ilen];
+        Vector3[] verts = new Vector3[atom_indicies.Length * vlen];
+        Vector3[] normals = new Vector3[atom_indicies.Length * vlen];
+        Vector2[] uvs = new Vector2[atom_indicies.Length * vlen];
+        Color[] colors = new Color[atom_indicies.Length * vlen];
+        int[] indices = new int[atom_indicies.Length * ilen];
 
-		Vector3 offset = new Vector3 ();
-		for(int i=0;i<atom_indicies.Length;++i)
-		{
-			offset+=atom_centres[atom_indicies[i]];
-		}
-		offset /= atom_indicies.Length;
+        Vector3 offset = new Vector3 ();
+        for(int i=0;i<atom_indicies.Length;++i)
+        {
+            offset+=atom_centres[atom_indicies[i]];
+        }
+        offset /= atom_indicies.Length;
 
-		int idx = 0;
-		for (int i=0; i<atom_indicies.Length; ++i) {
-			int index = atom_indicies[i];
-			Vector3 pos = atom_centres[index];
-			Color col= Color.green;
-			float rad = atom_radii[index];
+        int idx = 0;
+        for (int i=0; i<atom_indicies.Length; ++i) {
+            int index = atom_indicies[i];
+            Vector3 pos = atom_centres[index];
+            Color col= Color.green;
+            float rad = atom_radii[index];
 
-			for(int j=0; j!= vlen; ++j)
-			{
-				int v=j+i*vlen;
-				verts[v] = vsphere[j]*rad + pos - offset;
-				normals[v] = vsphere[j];
-				uvs[v].x = normals[v].x;
-				uvs[v].y = normals[v].y;
-				colors[v] = col;
-			}
-			for (int j = 0; j != ilen; ++j) {
-				indices[idx++] = isphere[j]+ i*vlen;
-			}
-		}
+            for(int j=0; j!= vlen; ++j)
+            {
+                int v=j+i*vlen;
+                verts[v] = vsphere[j]*rad + pos - offset;
+                normals[v] = vsphere[j];
+                uvs[v].x = normals[v].x;
+                uvs[v].y = normals[v].y;
+                colors[v] = col;
+            }
+            for (int j = 0; j != ilen; ++j) {
+                indices[idx++] = isphere[j]+ i*vlen;
+            }
+        }
 
-		meshy.vertices = verts;
-		meshy.normals = normals;
-		meshy.uv = uvs;
-		meshy.colors = colors;
-		meshy.triangles = indices;
+        meshy.vertices = verts;
+        meshy.normals = normals;
+        meshy.uv = uvs;
+        meshy.colors = colors;
+        meshy.triangles = indices;
 
-		return meshy;
-	}
-	
-	void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
-	{
-		int numMesh = 1;
+        return meshy;
+    }
+    
+    void construct_unity_meshes (Vector3[] vertices, Vector3[] normals, Vector2[] uvs, Color[] colors, int[] indices)
+    {
+        int numMesh = 1;
 
-		while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
-			numMesh += 1;
-		}
+        while ((atom_centres.Length*vsphere.Length / numMesh) > 65000) {
+            numMesh += 1;
+        }
 
-		List<Mesh> meshes = new List<Mesh> ();
+        List<Mesh> meshes = new List<Mesh> ();
 
-		int indexOffset = 0;
-		while(indexOffset < indices.Length) {
-			int[] vertexCounter = new int[vertices.Length];
-			List<Vector3> vtx = new List<Vector3>();
-			List<Vector3> nrm = new List<Vector3>();
-			List<Vector2> uv = new List<Vector2>();
-			List<Color> col = new List<Color>();
-			List<int> idx = new List<int>();
+        int indexOffset = 0;
+        while(indexOffset < indices.Length) {
+            int[] vertexCounter = new int[vertices.Length];
+            List<Vector3> vtx = new List<Vector3>();
+            List<Vector3> nrm = new List<Vector3>();
+            List<Vector2> uv = new List<Vector2>();
+            List<Color> col = new List<Color>();
+            List<int> idx = new List<int>();
 
-			for(int i = 0; i < vertexCounter.Length; ++i)
-			{
-				vertexCounter[i] = -1;
-			}
+            for(int i = 0; i < vertexCounter.Length; ++i)
+            {
+                vertexCounter[i] = -1;
+            }
 
-			int numVertices = 0;
-			for (int i = indexOffset; i < indices.Length; indexOffset=(i+=3)) {
+            int numVertices = 0;
+            for (int i = indexOffset; i < indices.Length; indexOffset=(i+=3)) {
 
-				int index1 = indices [i];
-				int index2 = indices [i + 1];
-				int index3 = indices [i + 2];
+                int index1 = indices [i];
+                int index2 = indices [i + 1];
+                int index3 = indices [i + 2];
 
-				if (vertexCounter [index1]==-1) {
-					vtx.Add(vertices[index1]);
-					nrm.Add(normals[index1]);
-					uv.Add(uvs[index1]);
-					col.Add(colors[index1]);
+                if (vertexCounter [index1]==-1) {
+                    vtx.Add(vertices[index1]);
+                    nrm.Add(normals[index1]);
+                    uv.Add(uvs[index1]);
+                    col.Add(colors[index1]);
 
-					vertexCounter[index1] = vtx.Count-1;
-					index1 = vertexCounter[index1];
-					numVertices += 1;
-				}
-				else
-				{
-					index1 = vertexCounter[index1];
-				}
+                    vertexCounter[index1] = vtx.Count-1;
+                    index1 = vertexCounter[index1];
+                    numVertices += 1;
+                }
+                else
+                {
+                    index1 = vertexCounter[index1];
+                }
 
-				if (vertexCounter [index2]==-1) {
-					vtx.Add(vertices[index2]);
-					nrm.Add(normals[index2]);
-					uv.Add(uvs[index2]);
-					col.Add(colors[index2]);
-					
-					vertexCounter[index2] = vtx.Count-1;
-					index2 = vertexCounter[index2];
-					numVertices += 1;
-				}
-				else
-				{
-					index2 = vertexCounter[index2];
-				}
+                if (vertexCounter [index2]==-1) {
+                    vtx.Add(vertices[index2]);
+                    nrm.Add(normals[index2]);
+                    uv.Add(uvs[index2]);
+                    col.Add(colors[index2]);
+                    
+                    vertexCounter[index2] = vtx.Count-1;
+                    index2 = vertexCounter[index2];
+                    numVertices += 1;
+                }
+                else
+                {
+                    index2 = vertexCounter[index2];
+                }
 
-				if (vertexCounter [index3]==-1) {
-					vtx.Add(vertices[index3]);
-					nrm.Add(normals[index3]);
-					uv.Add(uvs[index3]);
-					col.Add(colors[index3]);
-					
-					vertexCounter[index3] = vtx.Count-1;
-					index3 = vertexCounter[index3];
-					numVertices += 1;
-				}
-				else
-				{
-					index3 = vertexCounter[index3];
-				}
-				idx.Add(index1);
-				idx.Add(index2);
-				idx.Add(index3);
+                if (vertexCounter [index3]==-1) {
+                    vtx.Add(vertices[index3]);
+                    nrm.Add(normals[index3]);
+                    uv.Add(uvs[index3]);
+                    col.Add(colors[index3]);
+                    
+                    vertexCounter[index3] = vtx.Count-1;
+                    index3 = vertexCounter[index3];
+                    numVertices += 1;
+                }
+                else
+                {
+                    index3 = vertexCounter[index3];
+                }
+                idx.Add(index1);
+                idx.Add(index2);
+                idx.Add(index3);
 
-				if (numVertices >= 64996) {
-					break;
-				}
-			}
-			Mesh m = new Mesh();
-			m.Clear();
-			m.name = "Mesh" + meshes.Count;
-			m.vertices = vtx.ToArray();
-			m.normals = nrm.ToArray();
-			m.colors = col.ToArray();
-			m.uv = uv.ToArray();
-			m.triangles = idx.ToArray();
-			meshes.Add(m);
-		}
-		mesh = meshes.ToArray ();
-	}
+                if (numVertices >= 64996) {
+                    break;
+                }
+            }
+            Mesh m = new Mesh();
+            m.Clear();
+            m.name = "Mesh" + meshes.Count;
+            m.vertices = vtx.ToArray();
+            m.normals = nrm.ToArray();
+            m.colors = col.ToArray();
+            m.uv = uv.ToArray();
+            m.triangles = idx.ToArray();
+            meshes.Add(m);
+        }
+        mesh = meshes.ToArray ();
+    }
 
     static public int encode(char a, char b)
     {
@@ -531,7 +531,7 @@ end_header
     public static int atom_S = encode(' ', 'S');
 
     void build_ribbon_mesh() {
-		/*
+        /*
         debug.WriteLine("building mesh");
         mesh = new Mesh();
         mesh.name = "ribbon view";
@@ -601,9 +601,9 @@ end_header
 
     private void partition(int[] index, int b, int e, int addr) {
         if (e == b + 1) {
-			int bi = index[b];
-			Vector3 centre = atom_centres[bi];
-			float radius = atom_radii[bi];
+            int bi = index[b];
+            Vector3 centre = atom_centres[bi];
+            float radius = atom_radii[bi];
             //debug.WriteLine("[" + addr + "] [T] centre=" + centre + " r=" + radius);
             bvh_terminals[addr] = bi;
             bvh_centres[addr] = centre;
@@ -615,7 +615,7 @@ end_header
             Vector3 max = min;
             for (int j = b; j != e; ++j)
             {
-				int ji = index[j];
+                int ji = index[j];
                 Vector3 r = new Vector3(atom_radii[ji], atom_radii[ji], atom_radii[ji]);
                 min = Vector3.Min(min, atom_centres[ji] - r);
                 max = Vector3.Max(max, atom_centres[ji] + r);
@@ -631,7 +631,7 @@ end_header
             float radius = 0;
             for (int j = b; j != e; ++j)
             {
-				int ji = index[j];
+                int ji = index[j];
                 Vector3 pos = atom_centres[ji] - centre;
                 float r = atom_radii[ji] + pos.magnitude;
                 radius = Mathf.Max(radius, r);
@@ -667,14 +667,14 @@ end_header
         bvh_terminals = new int[num_bvh];
 
         partition(index, 0, num_atoms, 0);
-		/*
-		for (int i=0; i<num_bvh; ++i) {
-			debug.WriteLine("B,"+i+",\""+ bvh_centres[i]+"\","+bvh_terminals[i]+","+bvh_radii[i]);
-		}
-		for(int i=0; i<num_atoms; ++i)
-		{
-			debug.WriteLine("A,"+i+",\""+ atom_centres[i]+"\",,"+atom_radii[i]);
-		}
+        /*
+        for (int i=0; i<num_bvh; ++i) {
+            debug.WriteLine("B,"+i+",\""+ bvh_centres[i]+"\","+bvh_terminals[i]+","+bvh_radii[i]);
+        }
+        for(int i=0; i<num_atoms; ++i)
+        {
+            debug.WriteLine("A,"+i+",\""+ atom_centres[i]+"\",,"+atom_radii[i]);
+        }
         debug.Flush();*/
     }
 
@@ -684,29 +684,29 @@ end_header
         }
         build_bvh();
 
-		Vector3[] verts = new Vector3[0];
-		Vector3[] normals = new Vector3[0];
-		Vector2[] uvs = new Vector2[0];
-		Color[] color = new Color[0];
-		int[] index = new int[0];
-		if (mode == Mode.Ball) {
-			build_ball_mesh (out verts, out normals, out uvs, out color, out index);
-			construct_unity_meshes (verts, normals, uvs, color, index);
-		} else if (mode == Mode.Metasphere) {
-			build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
-			construct_unity_meshes (verts, normals, uvs, color, index);
+        Vector3[] verts = new Vector3[0];
+        Vector3[] normals = new Vector3[0];
+        Vector2[] uvs = new Vector2[0];
+        Color[] color = new Color[0];
+        int[] index = new int[0];
+        if (mode == Mode.Ball) {
+            build_ball_mesh (out verts, out normals, out uvs, out color, out index);
+            construct_unity_meshes (verts, normals, uvs, color, index);
+        } else if (mode == Mode.Metasphere) {
+            build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
+            construct_unity_meshes (verts, normals, uvs, color, index);
             //write_ply(verts, color, index);
             /*
-			mesh = new Mesh[1];
-			mesh [0]= new Mesh();
-			mesh [0].Clear ();
-			mesh [0].name = "metasphere view" + 0;
-			mesh [0].vertices = verts;
-			mesh [0].normals = normals;
-			mesh [0].uv = uvs;
+            mesh = new Mesh[1];
+            mesh [0]= new Mesh();
+            mesh [0].Clear ();
+            mesh [0].name = "metasphere view" + 0;
+            mesh [0].vertices = verts;
+            mesh [0].normals = normals;
+            mesh [0].uv = uvs;
             mesh [0].colors = color;
-			mesh [0].triangles = index;
-			*/
+            mesh [0].triangles = index;
+            */
         }
         else if (mode == Mode.Ribbon) {
             build_ribbon_mesh();
@@ -714,72 +714,72 @@ end_header
 
     }
 
-	static public int collide_ray(
-		GameObject obj, PDB_molecule mol, Transform t,
-		Ray ray)
-	{
-		BvhRayCollider b = new BvhRayCollider (mol, t, ray);
-		int closestIndex = -1;
-		float closestDistance = float.MaxValue;
-		for (int i=0; i<b.results.Count; i++) {
-			BvhRayCollider.Result result = b.results[i];
-			Vector3 c = t.TransformPoint(mol.atom_centres[result.index]);
-			//float dist = (ray.origin-c).sqrMagnitude;
-			float dist = Vector3.Dot(c, ray.direction);
-			if (closestDistance > dist)
-			{
-				closestDistance = dist;
-				closestIndex = result.index;
-			}
-		}
-		return closestIndex;
-	}
+    static public int collide_ray(
+        GameObject obj, PDB_molecule mol, Transform t,
+        Ray ray)
+    {
+        BvhRayCollider b = new BvhRayCollider (mol, t, ray);
+        int closestIndex = -1;
+        float closestDistance = float.MaxValue;
+        for (int i=0; i<b.results.Count; i++) {
+            BvhRayCollider.Result result = b.results[i];
+            Vector3 c = t.TransformPoint(mol.atom_centres[result.index]);
+            //float dist = (ray.origin-c).sqrMagnitude;
+            float dist = Vector3.Dot(c, ray.direction);
+            if (closestDistance > dist)
+            {
+                closestDistance = dist;
+                closestIndex = result.index;
+            }
+        }
+        return closestIndex;
+    }
 
-	static public bool collide_ray_quick(
-		GameObject obj, PDB_molecule mol, Transform t,
-		Ray ray)
-	{
-		
-		Vector3 c = mol.bvh_centres[0];
-		float r = mol.bvh_radii[0];
+    static public bool collide_ray_quick(
+        GameObject obj, PDB_molecule mol, Transform t,
+        Ray ray)
+    {
+        
+        Vector3 c = mol.bvh_centres[0];
+        float r = mol.bvh_radii[0];
 
-		c = t.TransformPoint (c);
-		
-		Vector3 q = c - ray.origin;
-		float f = Vector3.Dot (q, ray.direction);
-		
-		float d = 0;
-		
-		if (f < 0) {
-			d = q.sqrMagnitude;
-		} else {
-			d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
-		}
-		
-		if (d < r * r) {
-			return true;
-		}
-		return false;
-	}
+        c = t.TransformPoint (c);
+        
+        Vector3 q = c - ray.origin;
+        float f = Vector3.Dot (q, ray.direction);
+        
+        float d = 0;
+        
+        if (f < 0) {
+            d = q.sqrMagnitude;
+        } else {
+            d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
+        }
+        
+        if (d < r * r) {
+            return true;
+        }
+        return false;
+    }
 
-	static public bool collide(
-		GameObject obj0, PDB_molecule mol0, Transform t0,
-		GameObject obj1, PDB_molecule mol1, Transform t1
-		)
-	{
-		BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, 0);
-		foreach (BvhCollider.Result r in b.results) {
-			Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-			Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
-			float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
-			float distance = (c1 - c0).magnitude;
-			//Debug.Log("distance=" + distance
-			if (distance < min_d) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+    static public bool collide(
+        GameObject obj0, PDB_molecule mol0, Transform t0,
+        GameObject obj1, PDB_molecule mol1, Transform t1
+        )
+    {
+        BvhCollider b = new BvhCollider(mol0, t0, mol1, t1, 0);
+        foreach (BvhCollider.Result r in b.results) {
+            Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+            Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+            float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+            float distance = (c1 - c0).magnitude;
+            //Debug.Log("distance=" + distance
+            if (distance < min_d) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 };
 

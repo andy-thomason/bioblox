@@ -33,18 +33,18 @@ using AssemblyCSharp;
 //27 - 31       Integer         serial        Serial number of bonded atom
 //------------------------------------------------------
 //1 -6          BioBlox name    "BBPAIR"
-//7 -11			Integer			index		Index of the first label
-//13-16			Integer			index		Index of second label
+//7 -11            Integer            index        Index of the first label
+//13-16            Integer            index        Index of second label
 //------------------------------------------------------
-//1 -6			BioBlox name	"BBSPNG"
-//7 -11			Integer			index		Index of first atom in spring
-//13-16			Integer			index		Index of second atom in spring
+//1 -6            BioBlox name    "BBSPNG"
+//7 -11            Integer            index        Index of first atom in spring
+//13-16            Integer            index        Index of second atom in spring
 //------------------------------------------------------
-//1-6			BioBlox name    "BIOB"
-//7-11			Integer			index		Label Index
-//12-16			Integer			index		Atom seriel
-//17-21			Integer			index		Molecule Index
-//22-26			LString(8)      string		Tag for the atom
+//1-6            BioBlox name    "BIOB"
+//7-11            Integer            index        Label Index
+//12-16            Integer            index        Atom seriel
+//17-21            Integer            index        Molecule Index
+//22-26            LString(8)      string        Tag for the atom
 
 
 
@@ -55,7 +55,7 @@ public class PDB_parser {
         {" P", 0x6622cc},{" F", 0x00cc00},{"CL", 0x00cc00},{"BR", 0x882200},{" I", 0x6600aa},
         {"FE", 0xcc6600},{"CA", 0x8888aa},
     };*/
-	//AminoSliderController aminoButtonController = GameObject.Find("BioBlox").GetComponent<AminoSliderController>();
+    //AminoSliderController aminoButtonController = GameObject.Find("BioBlox").GetComponent<AminoSliderController>();
 
     // Reference: glMol / A. Bondi, J. Phys. Chem., 1964, 68, 441.
     static private Dictionary<string, float> radii = new Dictionary<string, float> {
@@ -65,16 +65,16 @@ public class PDB_parser {
     };
 
     static public List<PDB_molecule> parse(string asset_name) {
-		List<Vector3> atom_centres = new List<Vector3>();
-		List<float> atom_radii = new List<float>();
-		List<Color> atom_colours = new List<Color>();
-		List<int> names = new List<int>();
-		List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
-		List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
-		List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
-		List<string> aminoAcidName = new List<string>();
-		List<string> aminoAcidTag = new List<string>();
-		List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
+        List<Vector3> atom_centres = new List<Vector3>();
+        List<float> atom_radii = new List<float>();
+        List<Color> atom_colours = new List<Color>();
+        List<int> names = new List<int>();
+        List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
+        List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
+        List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
+        List<string> aminoAcidName = new List<string>();
+        List<string> aminoAcidTag = new List<string>();
+        List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
 
         TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
@@ -82,21 +82,21 @@ public class PDB_parser {
         float minx = 1e37f, miny = 1e37f, minz = 1e37f;
         float maxx = -1e37f, maxy = -1e37f, maxz = -1e37f;
         Vector3 cofg = new Vector3();
-		List<int> serial_to_atom = new List<int>();
+        List<int> serial_to_atom = new List<int>();
         using (StringReader reader = new StringReader(pdbTA.text)) {
             string line;
-			int index = 0;
+            int index = 0;
       ButtonStructure buttons = GameObject.FindObjectOfType<ButtonStructure>();
-			while ((line = reader.ReadLine()) != null) {
+            while ((line = reader.ReadLine()) != null) {
 
                 string kind = line.Substring(0, Mathf.Min(6, line.Length));
-				if(line.Length < 5)
-				{Debug.Log("(" + kind + ")");}
+                if(line.Length < 5)
+                {Debug.Log("(" + kind + ")");}
 
-				if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
+                if (kind == "ATOM  ") // && line.Substring(13 - 1, 4) == " N  ")
                 {
                     int serial = int.Parse(line.Substring(7 - 1, 5));
-					int chainNumber = int.Parse(line.Substring(23, 3));
+                    int chainNumber = int.Parse(line.Substring(23, 3));
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
@@ -116,21 +116,21 @@ O – Red
 C and S -grey*/
 
                     Color col = Color.white;
-					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
+                    if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
                         // +Ve: Blue His, Arg, Lys
                         col = buttons.POSITIVEColor;
-					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
+                    } else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
                         // - ve:  Dark red: Glu, Asp(2)
                         col = buttons.NEGATIVEColor;
-					//} else if (id == "SG  CYS") {
+                    //} else if (id == "SG  CYS") {
                     //    col = buttons.SULPHURColor;
                     } else if (id == "OG  SER" || id == "CG2 THR" || id == "OD1 ASN" || id == "OE1 GLN" || id == "OH  TYR") {
                         // Polar: light red: Ser, Thr, Tyr, Asn, Gln(5)
                         col = buttons.POLARColor;
-					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "CH2 TRP" || id == "CD  PRO" || id == "SG  CYS") {
+                    } else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "CH2 TRP" || id == "CD  PRO" || id == "SG  CYS") {
                         // Non polar: grey: Ala, Val, Leu, Ile, Met, Phe, Trp, Pro, Gly, Cys(10)
                         col = buttons.HYDROColor;
-					}
+                    }
 
                     if (aa_version == ' ' || aa_version == 'A')
                     {
@@ -184,56 +184,56 @@ C and S -grey*/
                         int c = int.Parse(sc);
                         pairs.Add((idx << 16) | c);
                     }*/
-				} else if(kind == "BBSPNG"){
-					int firstLabel = int.Parse(line.Substring(7, 4));
-					int secondLabel = int.Parse(line.Substring(13, 4));
-					springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
-				} else if (kind == "BBPAIR") {
-					int firstLabel = int.Parse(line.Substring(7, 4));
-					int secondLabel = int.Parse(line.Substring(13, 4));
-					pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
-				} else if (kind == "BIOB  ") {
-					int labelIndex = int.Parse(line.Substring(7, 4));
-					int atomSerial = int.Parse(line.Substring(12, 4));
-					int molNumber = int.Parse(line.Substring(17, 4));
-					//string tag = line.Substring(22, 4);
-					while(labels.Count < molNumber + 1)
-					{
-						labels.Add(new List<PDB_molecule.Label>());
-					}
-					while(labels[molNumber].Count < labelIndex + 1)
-					{
-						labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
-					}
-					//Debug.Log( atomSerial + " added to " + labelIndex);
-					labels[molNumber][labelIndex].atomIds.Add(atomSerial);
-				} else if (kind == "TER   " || kind == "TER") {
-					index = 0;
+                } else if(kind == "BBSPNG"){
+                    int firstLabel = int.Parse(line.Substring(7, 4));
+                    int secondLabel = int.Parse(line.Substring(13, 4));
+                    springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
+                } else if (kind == "BBPAIR") {
+                    int firstLabel = int.Parse(line.Substring(7, 4));
+                    int secondLabel = int.Parse(line.Substring(13, 4));
+                    pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
+                } else if (kind == "BIOB  ") {
+                    int labelIndex = int.Parse(line.Substring(7, 4));
+                    int atomSerial = int.Parse(line.Substring(12, 4));
+                    int molNumber = int.Parse(line.Substring(17, 4));
+                    //string tag = line.Substring(22, 4);
+                    while(labels.Count < molNumber + 1)
+                    {
+                        labels.Add(new List<PDB_molecule.Label>());
+                    }
+                    while(labels[molNumber].Count < labelIndex + 1)
+                    {
+                        labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
+                    }
+                    //Debug.Log( atomSerial + " added to " + labelIndex);
+                    labels[molNumber][labelIndex].atomIds.Add(atomSerial);
+                } else if (kind == "TER   " || kind == "TER") {
+                    index = 0;
                     cur = new PDB_molecule();
                     cur.names = names.ToArray();
                     cur.pos.x = (maxx + minx) * 0.5f;
                     cur.pos.y = (maxy + miny) * 0.5f;
                     cur.pos.z = (maxz + minz) * 0.5f;
                     cofg += cur.pos;
-					cur.aminoAcidsNames = new List<string>();
-					cur.aminoAcidsAtomIds = new List<int[]>();
-					cur.aminoAcidsTags = new List<string>();
-					for(int i = 0; i < aminoAcidName.Count; ++i)
-					{
-						if(aminoAcidName[i] != null)
-						{
-							cur.aminoAcidsNames.Add(aminoAcidName[i]);
-							cur.aminoAcidsTags.Add(aminoAcidTag[i]);
-							cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
-							//Debug.Log ("aminoAcidName[i]: "+aminoAcidName[i]);
-						}
-					}
-					//Debug.Log ("amino");
-				
+                    cur.aminoAcidsNames = new List<string>();
+                    cur.aminoAcidsAtomIds = new List<int[]>();
+                    cur.aminoAcidsTags = new List<string>();
+                    for(int i = 0; i < aminoAcidName.Count; ++i)
+                    {
+                        if(aminoAcidName[i] != null)
+                        {
+                            cur.aminoAcidsNames.Add(aminoAcidName[i]);
+                            cur.aminoAcidsTags.Add(aminoAcidTag[i]);
+                            cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
+                            //Debug.Log ("aminoAcidName[i]: "+aminoAcidName[i]);
+                        }
+                    }
+                    //Debug.Log ("amino");
+                
                     cur.atom_centres = new Vector3[atom_centres.Count];
-					cur.atom_colours = atom_colours.ToArray();
+                    cur.atom_colours = atom_colours.ToArray();
                     cur.atom_radii = atom_radii.ToArray(); //new float[atom_radii.Count];
-					cur.serial_to_atom = serial_to_atom.ToArray();
+                    cur.serial_to_atom = serial_to_atom.ToArray();
                     for (int j = 0; j != names.Count; ++j) {
                         cur.atom_centres[j] = atom_centres[j] - cur.pos;
                         //cur.atom_radii[j] = atom_radii[j];
@@ -244,11 +244,11 @@ C and S -grey*/
                     names.Clear();
                     atom_centres.Clear();
                     atom_radii.Clear();
-					atom_colours.Clear();
-					serial_to_atom.Clear();
-					aminoAcidName.Clear();
-					aminoAcidAtomIDs.Clear();
-					aminoAcidTag.Clear();
+                    atom_colours.Clear();
+                    serial_to_atom.Clear();
+                    aminoAcidName.Clear();
+                    aminoAcidAtomIDs.Clear();
+                    aminoAcidTag.Clear();
                 } 
             }
         }
@@ -258,13 +258,13 @@ C and S -grey*/
 
         for (int i = 0; i != result.Count; ++i) {
             PDB_molecule m = result[i];
-			m.pairedLabels = pairs.ToArray();
-			m.spring_pairs = springPairs.ToArray();
-			if(labels.Count>i)
-			{
-				Debug.Log("Num labels = " + labels.Count);
-				m.labels=labels[i].ToArray();
-			}
+            m.pairedLabels = pairs.ToArray();
+            m.spring_pairs = springPairs.ToArray();
+            if(labels.Count>i)
+            {
+                Debug.Log("Num labels = " + labels.Count);
+                m.labels=labels[i].ToArray();
+            }
             m.name = asset_name + "." + (i+1);
             m.build_mesh();
             m.pos -= cofg;
