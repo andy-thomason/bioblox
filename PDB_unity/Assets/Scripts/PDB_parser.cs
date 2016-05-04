@@ -106,15 +106,6 @@ public class PDB_parser {
                     string aatag = line.Substring (21, 5);
                     char aa_version = line[16];
 
-/*                    +Ve: Blue His, Arg, Lys  (3)
-                    - ve:  Dark red: Glu, Asp(2)
-Polar: light red: Ser, Thr, Tyr, Asn, Gln(5)
-Non polar: grey: Ala, Val, Leu, Ile, Met, Phe, Trp, Pro, Gly, Cys(10)
-For atoms
-N - Blue
-O – Red
-C and S -grey*/
-
                     Color col = Color.white;
                     if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
                         // +Ve: Blue His, Arg, Lys
