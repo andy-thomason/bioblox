@@ -208,8 +208,8 @@ MonoBehaviour:
   m_FillRect: {fileID: 192754132}
   m_HandleRect: {fileID: 1594636027}
   m_Direction: 2
-  m_MinValue: -2
-  m_MaxValue: 2
+  m_MinValue: -0.5
+  m_MaxValue: 0.5
   m_WholeNumbers: 0
   m_Value: 0
   m_OnValueChanged:
@@ -4510,7 +4510,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Click Start to begin
+  m_Text: 
 --- !u!222 &483533160
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8660,66 +8660,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89ccb6a0ae75f4b439a1b994c95b1849, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ALAColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  ARGColor:
-    serializedVersion: 2
-    rgba: 4286414333
-  ASNColor:
-    serializedVersion: 2
-    rgba: 4289584632
-  ASPColor:
-    serializedVersion: 2
-    rgba: 4278241021
-  CYSColor:
-    serializedVersion: 2
-    rgba: 4288277212
-  GLUColor:
-    serializedVersion: 2
-    rgba: 4284019928
-  GLYColor:
-    serializedVersion: 2
-    rgba: 4287949215
-  HISColor:
-    serializedVersion: 2
-    rgba: 4279687733
-  ILEColor:
-    serializedVersion: 2
-    rgba: 4290960780
-  LEUColor:
-    serializedVersion: 2
-    rgba: 4292139820
-  LYSColor:
-    serializedVersion: 2
-    rgba: 4292583724
-  METColor:
-    serializedVersion: 2
-    rgba: 4288741120
-  PHEColor:
-    serializedVersion: 2
-    rgba: 4292846753
-  PROColor:
-    serializedVersion: 2
-    rgba: 4292846018
-  SERColor:
-    serializedVersion: 2
-    rgba: 4292846047
-  THRColor:
-    serializedVersion: 2
-    rgba: 4292714975
-  GLNColor:
-    serializedVersion: 2
-    rgba: 4288965106
-  TRPColor:
-    serializedVersion: 2
-    rgba: 4289175472
-  TYRColor:
-    serializedVersion: 2
-    rgba: 4289307370
-  VALColor:
-    serializedVersion: 2
-    rgba: 4285818361
   NEGATIVEColor:
     serializedVersion: 2
     rgba: 4280164095
@@ -11945,7 +11885,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Start
+  m_Text: Hint
 --- !u!222 &1189206913
 CanvasRenderer:
   m_ObjectHideFlags: 0

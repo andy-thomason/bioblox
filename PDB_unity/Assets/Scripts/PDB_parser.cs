@@ -116,17 +116,19 @@ O – Red
 C and S -grey*/
 
                     Color col = Color.white;
-					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "ND1 HIS") {
+					if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
+                        // +Ve: Blue His, Arg, Lys
                         col = buttons.POSITIVEColor;
 					} else if (id == "OE1 GLU" || id == "OE2 GLU" || id == "OD1 ASP" || id == "OD2 ASP") {
+                        // - ve:  Dark red: Glu, Asp(2)
                         col = buttons.NEGATIVEColor;
-					} else if (id == "SG  CYS") {
-                        col = buttons.SULPHURColor;
-                    } else if (id == "OG  SER" || id == "CG2 THR" || id == "OD1 ASN" || id == "OE1 GLN") {
-                    //else if (aminoAcid == "SER" || aminoAcid == "THR" || aminoAcid == "ASN" || aminoAcid == "GLN")
-                    //{
+					//} else if (id == "SG  CYS") {
+                    //    col = buttons.SULPHURColor;
+                    } else if (id == "OG  SER" || id == "CG2 THR" || id == "OD1 ASN" || id == "OE1 GLN" || id == "OH  TYR") {
+                        // Polar: light red: Ser, Thr, Tyr, Asn, Gln(5)
                         col = buttons.POLARColor;
-					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "OH  TYR" || id == "CH2 TRP") {
+					} else if (id == "CB  ALA" || id == "CG2 VAL" || id == "CD1 ILE" || id == "CD2 LEU" || id == "CE  MET" || id == "CZ  PHE" || id == "CH2 TRP" || id == "CD  PRO" || id == "SG  CYS") {
+                        // Non polar: grey: Ala, Val, Leu, Ile, Met, Phe, Trp, Pro, Gly, Cys(10)
                         col = buttons.HYDROColor;
 					}
 
