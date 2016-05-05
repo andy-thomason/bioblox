@@ -1,6 +1,3 @@
-[submodule "PDB_Python/glslmath"]
-	path = PDB_Python/glslmath
-	url = https://github.com/andy-thomason/glslmath.git
 [submodule "PDB_Python/htdocs/shaderfood"]
 	path = PDB_Python/htdocs/shaderfood
 	url = https://github.com/andy-thomason/shaderfood.git
