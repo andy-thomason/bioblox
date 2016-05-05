@@ -51,7 +51,7 @@ public class BioBlox : MonoBehaviour
     //  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
     GameObject[] sites = new GameObject[2];
     //  wheter the player is moving the molecules, playerIsMoving[0] being molecule[0]
-    bool[] playerIsMoving = new bool[2]{false,false};
+    //bool[] playerIsMoving = new bool[2]{false,false};
     // the original positions of the molecules, used to provide a returning force during the puzzle mode
     Vector3[] originPosition = new Vector3[2];
     // game object target of the "popping" co-routines to shrink and grow the object out of and into the scene
@@ -77,6 +77,7 @@ public class BioBlox : MonoBehaviour
     public Text ElectricScore;
     public Text LennardScore;
     public Text NumberOfAtoms;
+    public Text SimpleScore;
     //values for external reference
     public int electric_score;
     public int lennard_score;
@@ -96,8 +97,8 @@ public class BioBlox : MonoBehaviour
 
     public Button lockButton;
 
-    public float triangleOffset = 10.0f;
-    GameObject[] featureTriangle =new GameObject[2];
+    //public float triangleOffset = 10.0f;
+    //GameObject[] featureTriangle =new GameObject[2];
 
     // shape scoring
     public int num_touching_0 = 0;
@@ -151,7 +152,7 @@ public class BioBlox : MonoBehaviour
     //filenames.Add ("betabarrel_b");
     //filenames.Add("2ptc_u_new_edited");
 
-    filenames.Add ("pdb2ptcWithTags");
+        filenames.Add ("pdb2ptcWithTags");
 
         filenames.Add ("1GCQ_bWithTags");
 
@@ -994,7 +995,8 @@ public class BioBlox : MonoBehaviour
                 
             }
             
-            NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+            if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+            if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
 
             //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 

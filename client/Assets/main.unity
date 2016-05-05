@@ -6627,7 +6627,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &749217814
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8489,6 +8489,7 @@ MonoBehaviour:
   ElectricScore: {fileID: 1499027984}
   LennardScore: {fileID: 1406971355}
   NumberOfAtoms: {fileID: 844548106}
+  SimpleScore: {fileID: 1912775393}
   electric_score: 0
   lennard_score: 0
   cutawaySlider: {fileID: 209063048}
@@ -8498,7 +8499,6 @@ MonoBehaviour:
   dockOverrideOffset: 0
   EndLevelMenu: {fileID: 1669977368}
   lockButton: {fileID: 536369448}
-  triangleOffset: 30
   num_touching_0: 0
   num_touching_1: 0
   num_invalid: 0
@@ -8613,8 +8613,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AminoButton: {fileID: 194254, guid: 13411f25b29bf4d4ea9c804940d8b805, type: 2}
+  AminoButtonReference: {fileID: 0}
   SliderMol1: {fileID: 255602933}
   SliderMol2: {fileID: 2113111406}
+  aminoAcidsNames1: []
+  aminoAcidsNames2: []
+  aminoAcidsTags1: []
+  aminoAcidsTags2: []
+  ButtonPickedA1: {fileID: 0}
+  ButtonPickedA2: {fileID: 0}
   AminoLinkPanel: {fileID: 153430, guid: 3909505c497e0d84e84f0613a55772ef, type: 2}
   AminoLinkPanelParent: {fileID: 413003055}
   AminoLinkBackground: {fileID: 1050879743}
@@ -10555,7 +10562,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1098499929
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10884,7 +10891,7 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1114070645}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
@@ -13549,7 +13556,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 33
   orthographic: 0
   orthographic size: 5
   m_Depth: 1
@@ -13572,7 +13579,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1348893745}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -75}
+  m_LocalPosition: {x: 0, y: 0, z: -150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1222502914}
@@ -14598,6 +14605,7 @@ RectTransform:
   - {fileID: 220829587}
   - {fileID: 536853868}
   - {fileID: 483533158}
+  - {fileID: 1912775392}
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_AnchorMin: {x: 0, y: 0}
@@ -16895,7 +16903,7 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1654800771}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
@@ -19597,6 +19605,79 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
+--- !u!1 &1912775391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1912775392}
+  - 222: {fileID: 1912775394}
+  - 114: {fileID: 1912775393}
+  m_Layer: 5
+  m_Name: SimpleScore
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1912775392
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1912775391}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1464341408}
+  m_RootOrder: 20
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -342, y: 199.3}
+  m_SizeDelta: {x: 100, y: 50}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1912775393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1912775391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 14
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Score: 0 atoms touching'
+--- !u!222 &1912775394
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1912775391}
 --- !u!1 &1915841675
 GameObject:
   m_ObjectHideFlags: 0
