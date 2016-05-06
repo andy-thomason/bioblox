@@ -144,7 +144,7 @@ public class AminoSliderController : MonoBehaviour {
                 A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                 ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
 				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-                Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
+                //Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
 
             }
 		}
@@ -793,7 +793,7 @@ public class AminoSliderController : MonoBehaviour {
             }
         }
         ScrollbarAmino1.value = 0;
-        Debug.Log(ScrollbarAmino1.value);
+        //Debug.Log(ScrollbarAmino1.value);
     }
 
     public void UpdateButtonTempIDA2()
@@ -836,6 +836,33 @@ public class AminoSliderController : MonoBehaviour {
 			}
 		}
         return false;
+    }
+
+    public void FilterButtons(string[] aas) {
+        foreach (Button button in A1Buttons) {
+            int bid = button.GetComponent<AminoButtonController> ().AminoButtonID;
+            string tag = aminoAcidsNames[0][bid] + " " + aminoAcidsTags[0][bid];
+            bool active = false;
+            foreach (string aa in aas) {
+                if (tag == aa) {
+                    active = true;
+                    break;
+                }
+            }
+            button.gameObject.SetActive(active);
+        }
+        foreach (Button button in A2Buttons) {
+            int bid = button.GetComponent<AminoButtonController> ().AminoButtonID;
+            string tag = aminoAcidsNames[1][bid] + " " + aminoAcidsTags[1][bid];
+            bool active = false;
+            foreach (string aa in aas) {
+                if (tag == aa) {
+                    active = true;
+                    break;
+                }
+            }
+            button.gameObject.SetActive(active);
+        }
     }
 
 }

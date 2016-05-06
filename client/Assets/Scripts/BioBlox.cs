@@ -1044,12 +1044,13 @@ public class BioBlox : MonoBehaviour
         ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
 
         string[] aas = { "LYS I  15", "ASP E 189", "ILE E  73", "ARG I  17", "GLN E 175", "ARG I  39" };
+        sliders.FilterButtons(aas);
 
         // state machine for hints.
         // todo: turn this into a JSON file.
         switch (hint_stage) {
             case 0: {
-                hintText.text = "On the right molecule, select the blue finger marked LYS I 15.";
+                hintText.text = "In the panel on the bottom left, select the blue finger marked LYS I 15.";
                 if (sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
                 } else if (sliders.IsSelected(1, aas[0])) {
@@ -1057,7 +1058,7 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 1: {
-                hintText.text = "On the left molecule, select the red atoms at the bottom of the hole marked ASP E 189. You can also select using the top bar on the bottom left. They are quite difficult to find and you must spin the molecule to see them.";
+                hintText.text = "In the panel on the bottom left, select the red atoms at the bottom of the hole marked ASP E 189.";
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
                 } else if (sliders.IsSelected(0, aas[1])) {
@@ -1065,7 +1066,7 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 2: {
-                hintText.text = "Good. Now press the '+' button to add a connection.";
+                hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole.";
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
                 } else if (!sliders.IsSelected(0, aas[1])) {
