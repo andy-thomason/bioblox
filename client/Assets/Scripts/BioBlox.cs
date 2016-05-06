@@ -1066,7 +1066,7 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 2: {
-                hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole.";
+                hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole. You can spin the molecules to see the atoms in the hole.";
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
                 } else if (!sliders.IsSelected(0, aas[1])) {
