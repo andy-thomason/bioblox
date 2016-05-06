@@ -13,10 +13,8 @@ public class AminoSliderController : MonoBehaviour {
 	public GameObject[] SliderMol = new GameObject[2];
 
     // todo: put these in an array	
-	public List<string> aminoAcidsNames1;
-	public List<string> aminoAcidsNames2;
-	public List<string> aminoAcidsTags1;
-	public List<string> aminoAcidsTags2;
+	public List<string>[] aminoAcidsNames = new List<string>[2];
+	public List<string>[] aminoAcidsTags = new List<string>[2];
 
 	// Currently selected buttons.
     // todo: put these in an array	
@@ -296,24 +294,24 @@ public class AminoSliderController : MonoBehaviour {
 
 		EmptyAminoSliders ();
 		BioBloxReference = GameObject.Find ("BioBlox").GetComponent<BioBlox> ();
-		aminoAcidsNames1 = BioBloxReference.molecules [0].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;
-		aminoAcidsNames2 = BioBloxReference.molecules [1].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;
-		aminoAcidsTags1 = BioBloxReference.molecules [0].GetComponent<PDB_mesh> ().mol.aminoAcidsTags;
-		aminoAcidsTags2 = BioBloxReference.molecules [1].GetComponent<PDB_mesh> ().mol.aminoAcidsTags;
+		aminoAcidsNames[0] = BioBloxReference.molecules [0].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;
+		aminoAcidsNames[1] = BioBloxReference.molecules [1].GetComponent<PDB_mesh> ().mol.aminoAcidsNames;
+		aminoAcidsTags[0] = BioBloxReference.molecules [0].GetComponent<PDB_mesh> ().mol.aminoAcidsTags;
+		aminoAcidsTags[1] = BioBloxReference.molecules [1].GetComponent<PDB_mesh> ().mol.aminoAcidsTags;
 
-		for(int i = 0; i < aminoAcidsNames1.Count; ++i)
+		for(int i = 0; i < aminoAcidsNames[0].Count; ++i)
 		{
-			if(aminoAcidsNames1[i] != null)
+			if(aminoAcidsNames[0][i] != null)
 			{
-				GenerateAminoButtons1(aminoAcidsNames1[i],aminoAcidsTags1[i], i);
+				GenerateAminoButtons1(aminoAcidsNames[0][i],aminoAcidsTags[0][i], i);
 			}
 		}
 
-		for(int i = 0; i < aminoAcidsNames2.Count; ++i)
+		for(int i = 0; i < aminoAcidsNames[1].Count; ++i)
 		{
-			if(aminoAcidsNames2[i] != null)
+			if(aminoAcidsNames[1][i] != null)
 			{
-				GenerateAminoButtons2(aminoAcidsNames2[i],aminoAcidsTags2[i], i);
+				GenerateAminoButtons2(aminoAcidsNames[1][i],aminoAcidsTags[1][i], i);
 			}
 		}
 
@@ -815,8 +813,8 @@ public class AminoSliderController : MonoBehaviour {
 
     public bool IsSelected(int slider, string id) {
         GameObject button = slider == 1 ? ButtonPickedA2 : ButtonPickedA1;
-        List<string> names = slider == 1 ? aminoAcidsNames2 : aminoAcidsNames1;
-        List<string> tags = slider == 1 ? aminoAcidsTags2 : aminoAcidsTags1;
+        List<string> names = slider == 1 ? aminoAcidsNames[1] : aminoAcidsNames[0];
+        List<string> tags = slider == 1 ? aminoAcidsTags[1] : aminoAcidsTags[0];
         if (button == null) return false;
         int bid = button.GetComponent<AminoButtonController> ().AminoButtonID;
         string val = names[bid] + " " + tags[bid];
@@ -830,8 +828,8 @@ public class AminoSliderController : MonoBehaviour {
 		{
             int b1 = childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1;
             int b2 = childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2;
-            string val1 = aminoAcidsNames1[b1] + " " + aminoAcidsTags1[b1];
-            string val2 = aminoAcidsNames2[b2] + " " + aminoAcidsTags2[b2];
+            string val1 = aminoAcidsNames[0][b1] + " " + aminoAcidsTags[0][b1];
+            string val2 = aminoAcidsNames[1][b2] + " " + aminoAcidsTags[1][b2];
             //Debug.Log("val1=[" + val1 + "] val2=[" + val2 + "]" + (val1 == id1 && val2 == id2));
 			if (val1 == id1 && val2 == id2) {
                 return true;
