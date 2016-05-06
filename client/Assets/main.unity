@@ -2497,7 +2497,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000061035156, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &255602935
@@ -8614,8 +8614,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AminoButton: {fileID: 194254, guid: 13411f25b29bf4d4ea9c804940d8b805, type: 2}
   AminoButtonReference: {fileID: 0}
-  SliderMol1: {fileID: 255602933}
-  SliderMol2: {fileID: 2113111406}
+  SliderMol:
+  - {fileID: 255602933}
+  - {fileID: 2113111406}
   aminoAcidsNames1: []
   aminoAcidsNames2: []
   aminoAcidsTags1: []
@@ -21584,7 +21585,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000061035156, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408
