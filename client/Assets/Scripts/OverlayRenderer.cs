@@ -53,11 +53,11 @@ public class OverlayRenderer : MonoBehaviour {
                 BitArray sel = new BitArray(mol.names.Length);
                 foreach (int a in msh.selected_atoms) sel.Set(a, true);
 
-                float c10 = Mathf.Cos(Time.time * 10.0f) * 0.5f + 0.5f;
+                float c10 = Mathf.Cos(Time.time * 5.0f) * 0.5f + 0.5f;
                 float c20 = Mathf.Cos(Time.time * 20.0f) * 0.5f + 0.5f;
-                Color32 selected = new Color32(255, 255, (byte)(255.0f*c10), 255);
-                Color32 touching = new Color32(128, (byte)(128 - 128.0f * c10), 128, 255);
-                Color32 bad = new Color32((byte)(255.0f * c20), 0, 0, 255);
+                Color32 selected = new Color32(128, 128, 0, (byte)(63.0f*c10+192));
+                Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
+                Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
 
                 for (int j = 0; j != mol.names.Length; ++j)
                 {

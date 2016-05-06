@@ -33,7 +33,7 @@
 
       fixed4 frag(varying_t i) : COLOR {
         fixed4 tex = tex2D(_MainTex, i.uv);
-        return fixed4(tex.xyz * i.colour.xyz, tex.w);
+        return fixed4(tex.xyz * i.colour.xyz, tex.w * i.colour.w);
       }
 
       ENDCG

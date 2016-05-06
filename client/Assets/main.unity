@@ -4948,7 +4948,7 @@ RectTransform:
   m_RootOrder: 18
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -35.9, y: -21.1}
+  m_AnchoredPosition: {x: -66, y: -16}
   m_SizeDelta: {x: 63.05, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &536853869
@@ -8617,10 +8617,6 @@ MonoBehaviour:
   SliderMol:
   - {fileID: 255602933}
   - {fileID: 2113111406}
-  aminoAcidsNames1: []
-  aminoAcidsNames2: []
-  aminoAcidsTags1: []
-  aminoAcidsTags2: []
   ButtonPickedA1: {fileID: 0}
   ButtonPickedA2: {fileID: 0}
   AminoLinkPanel: {fileID: 153430, guid: 3909505c497e0d84e84f0613a55772ef, type: 2}
@@ -19637,7 +19633,7 @@ RectTransform:
   m_RootOrder: 20
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -342, y: 199.3}
+  m_AnchoredPosition: {x: -321, y: 153}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1912775393
