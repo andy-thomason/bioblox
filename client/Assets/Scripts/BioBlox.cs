@@ -316,8 +316,8 @@ public class BioBlox : MonoBehaviour
                 MainCamera.fieldOfView = 60;
             }
         }*/
-
-        UpdateHint();
+        if (ToggleMode.isOn)
+            UpdateHint();
     }
 
     void PopInSound (GameObject g)
@@ -1125,5 +1125,39 @@ public class BioBlox : MonoBehaviour
             } break;
         }
     }
+
+    //TEMP
+    public Toggle ToggleMode;
+    public GameObject ScorePanel;
+    public GameObject SimpleScoretemp;
+    public GameObject Filter;
+    public GameObject HintText;
+
+    public void ToggleGameMode()
+    {
+        bool status = ToggleMode.isOn;
+        Debug.Log(status);
+        ScorePanel.SetActive(!status);
+        Filter.SetActive(!status);
+        SimpleScoretemp.SetActive(status);
+        HintText.SetActive(status);
+
+        Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
+        Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
+
+        if (!status)
+        {
+            //actgive all amino
+            foreach (Transform childTransform in Amino1)
+            {
+                childTransform.gameObject.SetActive(true);
+            }
+            foreach (Transform childTransform in Amino2)
+            {
+                childTransform.gameObject.SetActive(true);
+            }
+        }
+    }
+
 }
 
