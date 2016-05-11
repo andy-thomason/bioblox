@@ -58,6 +58,9 @@ public class AminoSliderController : MonoBehaviour {
     List<Vector2> score_aminolinks_holder_elec = new List<Vector2>();
     List<Vector2> score_aminolinks_holder_len = new List<Vector2>();
 
+    //gamestate
+    public CanvasGroup GameState;
+
     //max scores
     float score_total_max = 0;
     float score_len_max = 0;
@@ -728,7 +731,7 @@ public class AminoSliderController : MonoBehaviour {
         //UpdateBackgroundSize(AminoLinkPanelParent.transform.childCount-1);
     }
 
-    void DeleteAllAminoConnections()
+    public void DeleteAllAminoConnections()
     {
         foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponentInChildren<AminoConnectionHolder>().DeleteLink();
     }
@@ -863,6 +866,13 @@ public class AminoSliderController : MonoBehaviour {
             }
             button.gameObject.SetActive(active);
         }
+    }
+
+    public void LoadSaveButtonScore(bool status)
+    {
+        GameState.alpha = status ? 1 : 0;
+        GameState.interactable = status;
+        GameState.blocksRaycasts = status;
     }
 
 }
