@@ -8,9 +8,11 @@ public class ConnectionManager : MonoBehaviour {
 
 	int numChainClicks = 0;
 
-	//int contractionKVal;
+    //int contractionKVal;
+    BioBlox bb;
+    LineRenderer line_renderer;
 
-	public float dampingFactor = 1.0f;
+    public float dampingFactor = 1.0f;
 	//public float force = 10.0f;
 	public float minDistance = 0.0f;
 	public float maxDistance = 60.0f;
@@ -152,13 +154,13 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
-	}
+        bb = FindObjectOfType<BioBlox>();
+        line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+    }
 
 
 	void FixedUpdate()
 	{
-		BioBlox bb = (BioBlox)GameObject.FindObjectOfType (typeof(BioBlox));
 		if (shouldContract) {
 			for(int i=0; i < connections.Count; ++i)
 			{
@@ -169,7 +171,6 @@ public class ConnectionManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		LineRenderer line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
 		//if (line_renderer) line_renderer.clear ();
 
 		/*if (numChainClicks > 0) {

@@ -26,6 +26,7 @@ public class PDB_mesh : MonoBehaviour {
     void Start () {
         mol = PDB_parser.get_molecule(this.name);
         aminoSliderController = FindObjectOfType<AminoSliderController> ();
+        meshes = GetComponentsInChildren<MeshRenderer>();
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)
@@ -259,8 +260,6 @@ public class PDB_mesh : MonoBehaviour {
             rotating = false;
         }
         lastMousePos = mousePos;
-
-        meshes = GetComponentsInChildren<MeshRenderer>();
         light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
 
         foreach (MeshRenderer r in meshes) {

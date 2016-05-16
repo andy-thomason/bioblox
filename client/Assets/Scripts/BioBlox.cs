@@ -78,6 +78,7 @@ public class BioBlox : MonoBehaviour
     public Text LennardScore;
     public Text NumberOfAtoms;
     public Text SimpleScore;
+    public RectTransform HintTextPanel;
     //values for external reference
     public int electric_score;
     public int lennard_score;
@@ -107,6 +108,8 @@ public class BioBlox : MonoBehaviour
     public int num_connections = 0;
 
     public Camera MainCamera;
+    LineRenderer line_renderer;
+    Camera camera;
 
     public enum GameState {
         Setup,
@@ -167,6 +170,10 @@ public class BioBlox : MonoBehaviour
 
         StartCoroutine (game_loop ());
         GetComponent<AminoSliderController> ().init ();
+
+        //update
+        line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+        camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
     }
 
     public string GetCurrentLevelName ()
@@ -273,8 +280,6 @@ public class BioBlox : MonoBehaviour
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
     {
-        LineRenderer line_renderer = GameObject.FindObjectOfType<LineRenderer> () as LineRenderer;
-        Camera camera = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera> ();
         if (line_renderer && camera) {
             line_renderer.clear ();
             if (cutawaySlider && cutawaySlider.value > cutawaySlider.minValue) {
@@ -938,12 +943,6 @@ public class BioBlox : MonoBehaviour
         if (scoring == null) {
             return;
         }
-        scoring.calcScore();
-        //set values for refence
-        lennard_score = (int)scoring.vdwScore;
-        electric_score = (int)scoring.elecScore;
-        if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
-        if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
 
 
         if (molecules != null && molecules.Length >= 2) {
@@ -994,9 +993,24 @@ public class BioBlox : MonoBehaviour
                 }
                 
             }
-            
-            if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
-            if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
+
+            if (num_touching_0 + num_touching_1 != 0)
+            {
+                scoring.calcScore();
+                //set values for refence
+                lennard_score = (int)scoring.vdwScore;
+                electric_score = (int)scoring.elecScore;
+                if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
+                if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+
+                if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+                if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
+            }
+            else
+            {
+                ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0";
+                SimpleScore.text = "Score: 0 atoms touching.";
+            }
 
             //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
 
@@ -1012,6 +1026,7 @@ public class BioBlox : MonoBehaviour
         invalidDockText.SetActive(num_invalid != 0);
         InvalidDockScore.SetActive(num_invalid != 0);
 
+        /*
         //lock button
         if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
         {
@@ -1020,7 +1035,7 @@ public class BioBlox : MonoBehaviour
         else
         {
             lockButton.interactable = false;
-        }
+        }*/
 
 
 
@@ -1051,6 +1066,7 @@ public class BioBlox : MonoBehaviour
         switch (hint_stage) {
             case 0: {
                 hintText.text = "In the panel on the bottom left, select the blue finger marked LYS I 15.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
                 } else if (sliders.IsSelected(1, aas[0])) {
@@ -1059,7 +1075,8 @@ public class BioBlox : MonoBehaviour
             } break;
             case 1: {
                 hintText.text = "In the panel on the bottom left, select the red atoms at the bottom of the hole marked ASP E 189.";
-                if (!sliders.IsSelected(1, aas[0])) {
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
                 } else if (sliders.IsSelected(0, aas[1])) {
                     hint_stage =  2;
@@ -1067,6 +1084,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 2: {
                 hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole. You can spin the molecules to see the atoms in the hole.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
                 } else if (!sliders.IsSelected(0, aas[1])) {
@@ -1077,6 +1095,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 3: {
                 hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
                 } else if (conMan.SliderStrings.value < 0.5) {
@@ -1085,6 +1104,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 4: {
                 hintText.text = "Good. Now we can let the slider out and make some more connections.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
                 } else if (conMan.SliderStrings.value > 0.95) {
@@ -1093,6 +1113,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 5: {
                 hintText.text = "Now we can make two more connections. First try connecting ARG I 17 to ILE E 73.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
                 } else if (sliders.IsConnectionMade(aas[2], aas[3])) {
@@ -1101,6 +1122,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 6: {
                 hintText.text = "Now connect ARG I 39 to GLN E 175";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
                 } else if (!sliders.IsConnectionMade(aas[2], aas[3])) {
@@ -1111,6 +1133,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 7: {
                 hintText.text = "Gently pull in the strings all the way using the left hand slider.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0]) || !sliders.IsConnectionMade(aas[2], aas[3]) || !sliders.IsConnectionMade(aas[4], aas[5])) {
                     hint_stage = 5;
                 } else if (conMan.SliderStrings.value == 0) {
@@ -1119,6 +1142,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 8: {
                 hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct.";
+                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
                 }
@@ -1139,8 +1163,9 @@ public class BioBlox : MonoBehaviour
         Debug.Log(status);
         ScorePanel.SetActive(!status);
         Filter.SetActive(!status);
-        SimpleScoretemp.SetActive(status);
+        //SimpleScoretemp.SetActive(status);
         HintText.SetActive(status);
+        HintTextPanel.gameObject.SetActive(status);
 
         Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
         Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
