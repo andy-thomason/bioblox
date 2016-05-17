@@ -110,6 +110,7 @@ public class BioBlox : MonoBehaviour
     public Camera MainCamera;
     LineRenderer line_renderer;
     Camera camera;
+    public GameObject IntroCamera;
 
     public enum GameState {
         Setup,
@@ -174,6 +175,10 @@ public class BioBlox : MonoBehaviour
         //update
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+
+        //intro set
+        camera.gameObject.SetActive(false);
+        IntroCamera.SetActive(true);
     }
 
     public string GetCurrentLevelName ()
@@ -327,7 +332,7 @@ public class BioBlox : MonoBehaviour
 
     void PopInSound (GameObject g)
     {
-        this.GetComponent<AudioManager> ().Play ("Blip");
+       // this.GetComponent<AudioManager> ().Play ("Blip");
         PopIn (g);
     }
 

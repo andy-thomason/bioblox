@@ -12,6 +12,8 @@ public class IntroController : MonoBehaviour {
     public Scrollbar PosterScrollBar;
     public GameObject PosterScrollBarCanvas;
     public GameObject IntroLabModel;
+    public GameObject GameCamera;
+    public CanvasGroup GameCanvas;
 
 
     public void CameraStart()
@@ -42,9 +44,16 @@ public class IntroController : MonoBehaviour {
         IntroLabModel.SetActive(false);
     }
 
+    public void MainToGame()
+    {
+        GetComponent<Camera>().enabled = false;
+        GameCamera.SetActive(true);
+        GameCanvas.alpha = 1;
+    }
+
     public void ScrollPoster()
     {
-        Poster.position = new Vector3(5.7f,2.0f + (PosterScrollBar.value * 1.88f),-0.1f);
+        Poster.position = new Vector3(5.7f,(2.0f + (PosterScrollBar.value * 1.88f)) - 600.0f,-0.1f);
     }
 
     public void EnableScrollBarCanvas()
