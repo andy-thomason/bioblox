@@ -40,6 +40,14 @@ public class UIController : MonoBehaviour {
     //autofilter
     public bool auto_filter = false;
     public Toggle AutoFilterToggle;
+    //first person
+    public bool first_person = false;
+    public Toggle first_person_toggle;
+    public GameObject score_panel;
+    public Image cctv_overlay;
+    public Sprite cctv_start;
+    public Sprite cctv_loading;
+
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
@@ -581,5 +589,23 @@ public class UIController : MonoBehaviour {
             default:
                 break;
         }
+    }
+
+    public void FirstPersonToggle()
+    {
+        first_person = !first_person;
+        MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
+        if (first_person)
+        {
+            cctv_overlay.sprite = cctv_start;
+            //only 1 active
+            GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
+            if (check_new) Destroy(check_new);
+        }
+    }
+
+    public void ChangeCCTVLoading()
+    {
+        cctv_overlay.sprite = cctv_loading;
     }
 }

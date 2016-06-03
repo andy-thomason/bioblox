@@ -205,12 +205,16 @@ public class PDB_mesh : MonoBehaviour {
     MeshRenderer[] meshes;
     Vector3 light_pos;
 
+    //test
+    GameObject camera_first_person;
+
     void Awake()
     {
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         bb = (BioBlox)GameObject.FindObjectOfType(typeof(BioBlox));
         buttonStructure = FindObjectOfType<ButtonStructure>();
         uIController = FindObjectOfType<UIController>();
+        camera_first_person = GameObject.Find("CameraFirstPerson");
     }
 
     // Update is called once per frame
@@ -242,15 +246,55 @@ public class PDB_mesh : MonoBehaviour {
                 Vector3 dirUp = Vector3.up;
 
                 transform.RotateAround (transform.position, dirRight, mouseDelta.y);
-                transform.RotateAround (transform.position, dirUp, -mouseDelta.x);                       
+                transform.RotateAround (transform.position, dirUp, -mouseDelta.x);
+                //first person only
+                if (uIController.first_person)
+                {
+                    if (transform.GetComponentInChildren<Camera>())
+                    {
+                        GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
+                        //point the camera to the other protein
+                        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
+                        temp_camera.transform.LookAt(temp_pos);
+                    }
+                }
             }
         } else if (Input.GetMouseButtonUp (0)) {
             // click without movement selects an atom/amino acid.
             if (rotating && !has_rotated) {
                 Ray r = cam.ScreenPointToRay (Input.mousePosition);
                 int atom = PDB_molecule.collide_ray (gameObject, mol, transform, r);
-                if (atom != -1) {
-                    SelectAtom (atom);
+                if (atom != -1)
+                {
+                    SelectAtom(atom);
+
+                    //first person only
+                    if (uIController.first_person)
+                    {
+                        uIController.ChangeCCTVLoading();
+                        //only 1 active
+                        GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
+                        if (check_new) Destroy(check_new);
+                        GameObject temp = Instantiate(camera_first_person);
+                        temp.tag = "FirstPerson";
+                        temp.transform.SetParent(transform, false);
+                        temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
+                        temp.GetComponent<Animator>().enabled = true;
+                        temp.GetComponentInChildren<MeshRenderer>().enabled = true;
+                        temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
+                        //point the camera to the other protein
+                        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
+                        temp.transform.LookAt(temp_pos);
+
+                        Ray r_temp;
+                        do
+                        {
+                            temp.transform.position = temp.transform.position + temp.transform.forward * 2;
+                            r_temp = cam.ScreenPointToRay(temp.transform.forward);
+
+                        } while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
+                        temp.transform.position = temp.transform.position + temp.transform.forward * 2;
+                    }
                 }
             }
             has_rotated = false;

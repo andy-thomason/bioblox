@@ -664,7 +664,11 @@ public class BioBlox : MonoBehaviour
 
         //just the one PDB_mesh component should be sufficient...
         PDB_mesh p = obj.GetComponent<PDB_mesh>();
-        if (!p) p = obj.AddComponent<PDB_mesh>();
+        if (!p)
+        {
+            p = obj.AddComponent<PDB_mesh>();
+            obj.AddComponent<FirstPerson>();
+        }
 
         PDB_molecule mol = PDB_parser.get_molecule (name);
         p.mol = mol;
@@ -711,15 +715,16 @@ public class BioBlox : MonoBehaviour
 
 
     //applies forces to both molecules to return them to their respective origins
+    //aca se mueve
     void ApplyReturnToOriginForce ()
     {
-        for (int i = 0; i < molecules.Length; ++i) {
+        /*for (int i = 0; i < molecules.Length; ++i) {
             Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
             if (molToOrigin.sqrMagnitude > 1.0f) {
                 Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
                 rb.AddForce (molToOrigin.normalized * repulsiveForce);
             }
-        }
+        }*/
     }
 
     public void DebugDock()
@@ -973,6 +978,7 @@ public class BioBlox : MonoBehaviour
             atoms_touching = new BitArray[] { ba0, ba1 };
             atoms_bad = new BitArray[] { bab0, bab1 };
 
+            
             // Apply forces to the rigid bodies.
             foreach (GridCollider.Result r in b.results) {
                 Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
