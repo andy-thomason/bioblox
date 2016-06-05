@@ -7772,7 +7772,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966783
   m_Lightmapping: 4
   m_BounceIntensity: 1
   m_ShadowRadius: 0
@@ -14900,7 +14900,12 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 10814058, guid: e3282dfd2ccdc2d408065789344960e7, type: 2}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4294967039
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 11411140, guid: e3282dfd2ccdc2d408065789344960e7, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: e3282dfd2ccdc2d408065789344960e7, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &1230660381
@@ -16544,6 +16549,7 @@ GameObject:
   - 81: {fileID: 1348893746}
   - 114: {fileID: 1348893752}
   - 95: {fileID: 1348893751}
+  - 114: {fileID: 1348893753}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -16659,6 +16665,17 @@ MonoBehaviour:
   maximumX: 360
   minimumY: -90
   maximumY: 90
+--- !u!114 &1348893753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1348893745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7f5dddbe25a61b4f8d2f9b4bf57ffb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1349247674
 GameObject:
   m_ObjectHideFlags: 0

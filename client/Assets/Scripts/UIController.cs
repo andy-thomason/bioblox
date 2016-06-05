@@ -595,13 +595,7 @@ public class UIController : MonoBehaviour {
     {
         first_person = !first_person;
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
-        if (first_person)
-        {
-            cctv_overlay.sprite = cctv_start;
-            //only 1 active
-            GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
-            if (check_new) Destroy(check_new);
-        }
+        if (first_person) cctv_overlay.sprite = cctv_start;
     }
 
     public void ChangeCCTVLoading()

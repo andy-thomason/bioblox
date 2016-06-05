@@ -111,6 +111,7 @@ public class BioBlox : MonoBehaviour
     LineRenderer line_renderer;
     Camera camera;
     public GameObject IntroCamera;
+    UIController uiController;
 
     public enum GameState {
         Setup,
@@ -175,6 +176,8 @@ public class BioBlox : MonoBehaviour
         //update
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        //first eprson
+        uiController = FindObjectOfType<UIController>();
 
         //intro set
         camera.gameObject.SetActive(false);
@@ -718,13 +721,13 @@ public class BioBlox : MonoBehaviour
     //aca se mueve
     void ApplyReturnToOriginForce ()
     {
-        /*for (int i = 0; i < molecules.Length; ++i) {
+        for (int i = 0; i < molecules.Length; ++i) {
             Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
             if (molToOrigin.sqrMagnitude > 1.0f) {
                 Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
                 rb.AddForce (molToOrigin.normalized * repulsiveForce);
             }
-        }*/
+        }
     }
 
     public void DebugDock()
@@ -1050,7 +1053,7 @@ public class BioBlox : MonoBehaviour
 
 
 
-        if (eventSystem != null && eventSystem.IsActive()) {
+        if (eventSystem != null && eventSystem.IsActive() && !uiController.first_person) {
             ApplyReturnToOriginForce();
         }
     }
