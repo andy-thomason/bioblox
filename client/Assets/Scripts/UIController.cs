@@ -94,7 +94,7 @@ public class UIController : MonoBehaviour {
 
 	public void RestartCamera()
 	{
-		MainCamera.transform.position = new Vector3 (0, 0, -75);
+		MainCamera.transform.position = new Vector3 (0, 0, -150);
 		MainCamera.transform.rotation = Quaternion.identity;
 	}
 
@@ -594,8 +594,18 @@ public class UIController : MonoBehaviour {
     public void FirstPersonToggle()
     {
         first_person = !first_person;
+		FreeCameraToggle.interactable = !first_person;
+		
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
-        if (first_person) cctv_overlay.sprite = cctv_start;
+        if (first_person)
+		{
+			cctv_overlay.sprite = cctv_start;
+			MainCamera.transform.position = new Vector3 (0, 0, -150);
+			MainCamera.transform.rotation = Quaternion.identity;
+		}
+		
+		//if(ToggleFreeCameraStatus)
+			//ToggleFreeCamera();
     }
 
     public void ChangeCCTVLoading()
