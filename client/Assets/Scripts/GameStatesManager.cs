@@ -12,12 +12,14 @@ public class GameStatesManager : MonoBehaviour {
 
     public void Load()
     {
-        StateSelected.GetComponent<ButtonGameState>().Load();
+        if(StateSelected)
+            StateSelected.GetComponent<ButtonGameState>().Load();
     }
 
     public void Save()
     {
-        StateSelected.GetComponent<ButtonGameState>().Save();
+        if (StateSelected)
+            StateSelected.GetComponent<ButtonGameState>().Save();
     }
 
 }

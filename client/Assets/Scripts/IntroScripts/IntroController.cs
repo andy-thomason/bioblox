@@ -49,6 +49,8 @@ public class IntroController : MonoBehaviour {
         GetComponent<Camera>().enabled = false;
         GameCamera.SetActive(true);
         GameCanvas.alpha = 1;
+        GameCanvas.blocksRaycasts = true;
+		
     }
 
     public void ScrollPoster()
