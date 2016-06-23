@@ -309,7 +309,11 @@ public class PDB_mesh : MonoBehaviour {
         foreach (MeshRenderer r in meshes) {
             r.material.SetVector ("_LightPos", light_pos);
             if (bb.cutawaySlider) {
-                Vector4 plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
+                Vector4 plane;
+                if (bb.cutawaySlider.value == -30)
+                    plane = new Vector4(0, 0, 1, 130);
+                else
+                    plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
                 r.material.SetVector ("_CutawayPlane", plane);
             }
             if (bb.thicknessSlider)
