@@ -649,7 +649,6 @@ public class BioBlox : MonoBehaviour
             obj.transform.SetParent (mesh.transform);
             obj.transform.localPosition = Vector3.zero;
             obj.transform.localRotation = Quaternion.identity;
-            MeshCollider m = obj.AddComponent<MeshCollider>();
         }
     }
 
@@ -700,7 +699,6 @@ public class BioBlox : MonoBehaviour
         ri.useGravity = false;
         ri.mass = mass;
         ri.inertiaTensor = new Vector3 (val, val, val);
-        ri.isKinematic = true;
 
         obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
         //obj.transform.Translate (xoffset * 30, 0, 0);

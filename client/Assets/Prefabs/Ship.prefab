@@ -35,6 +35,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &142832
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 412868}
+  - 33: {fileID: 3393332}
+  - 23: {fileID: 2316594}
+  m_Layer: 0
+  m_Name: space_frigate_6
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &181502
 GameObject:
   m_ObjectHideFlags: 0
@@ -43,9 +60,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 448018}
-  - 33: {fileID: 3367944}
-  - 23: {fileID: 2386354}
-  - 136: {fileID: 13637530}
   - 114: {fileID: 11431292}
   m_Layer: 0
   m_Name: Ship
@@ -67,6 +81,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 448018}
   m_RootOrder: 0
+--- !u!4 &412868
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142832}
+  m_LocalRotation: {x: -0.5, y: -0.5, z: -0.49999976, w: 0.5000003}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 4.733072, y: 4.7330723, z: 4.7330723}
+  m_LocalEulerAnglesHint: {x: 270, y: 270, z: 0}
+  m_Children: []
+  m_Father: {fileID: 448018}
+  m_RootOrder: 2
 --- !u!4 &417216
 Transform:
   m_ObjectHideFlags: 1
@@ -87,12 +114,13 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 181502}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3.93}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 408174}
   - {fileID: 417216}
+  - {fileID: 412868}
   m_Father: {fileID: 0}
   m_RootOrder: 0
 --- !u!20 &2061588
@@ -129,24 +157,24 @@ Camera:
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
   m_StereoMirrorMode: 0
---- !u!23 &2386354
+--- !u!23 &2316594
 MeshRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 181502}
+  m_GameObject: {fileID: 142832}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: cd7510c42a9fe814888ec0af7374bba0, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
   m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_PreserveUVs: 1
+  m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_MinimumChartSize: 4
@@ -155,13 +183,13 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!33 &3367944
+--- !u!33 &3393332
 MeshFilter:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 181502}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_GameObject: {fileID: 142832}
+  m_Mesh: {fileID: 4300000, guid: 64eed16a899474844a20be1b683def88, type: 3}
 --- !u!81 &8196842
 AudioListener:
   m_ObjectHideFlags: 1
@@ -227,19 +255,6 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 132272}
   m_Enabled: 1
---- !u!136 &13637530
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 181502}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.77
-  m_Height: 2.27
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

@@ -735,6 +735,28 @@ end_header
         return closestIndex;
     }
 
+    static public float collide_ray_distance_object(
+        GameObject obj, PDB_molecule mol, Transform t,
+        Ray ray, GameObject other_obj)
+    {
+        BvhRayCollider b = new BvhRayCollider(mol, t, ray);
+        int closestIndex = -1;
+        float closestDistance = float.MaxValue;
+        for (int i = 0; i < b.results.Count; i++)
+        {
+            BvhRayCollider.Result result = b.results[i];
+            Vector3 c = t.TransformPoint(mol.atom_centres[result.index]);
+            //float dist = (ray.origin-c).sqrMagnitude;
+            float dist = Vector3.Dot(c, ray.direction);
+            if (closestDistance > dist)
+            {
+                closestDistance = dist;
+                closestIndex = result.index;
+            }
+        }
+        return Vector3.Distance(other_obj.transform.position, t.TransformPoint(mol.atom_centres[closestIndex]));
+    }
+
     static public bool collide_ray_quick(
         GameObject obj, PDB_molecule mol, Transform t,
         Ray ray)
@@ -755,7 +777,7 @@ end_header
         } else {
             d=(c-(ray.origin+(ray.direction*f))).sqrMagnitude;
         }
-        
+
         if (d < r * r) {
             return true;
         }

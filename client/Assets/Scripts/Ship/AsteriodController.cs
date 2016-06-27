@@ -11,10 +11,14 @@ public class AsteriodController : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 
+        if (Input.GetKey(KeyCode.S))
+        {
+            GetComponent<Rigidbody>().AddRelativeTorque(transform.up * Time.deltaTime * 1000000);
+        }
+
         if (Input.GetKey(KeyCode.W))
         {
-            Debug.Log("si");
-            GetComponent<Rigidbody>().AddTorque(transform.up * Time.deltaTime * 1000000);
+            GetComponent<Rigidbody>().AddRelativeTorque(-transform.up * Time.deltaTime * 1000000);
         }
     }
 }
