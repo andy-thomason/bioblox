@@ -36,9 +36,10 @@ public class ExploreController : MonoBehaviour {
         temp.transform.position = temp.transform.position + temp.transform.forward * 2;
 
         temp.GetComponent<ShipController>().enabled = true;
+        temp.transform.LookAt(bb.molecules[0].transform.position);
         temp.AddComponent<Rigidbody>();
-        temp.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        temp.GetComponent<Rigidbody>().drag = 1;
+        //temp.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        temp.GetComponent<Rigidbody>().drag = 25;
         temp.GetComponent<Rigidbody>().useGravity = false;
     }
 }

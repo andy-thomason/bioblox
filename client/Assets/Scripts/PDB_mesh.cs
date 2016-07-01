@@ -264,6 +264,7 @@ public class PDB_mesh : MonoBehaviour {
             if (rotating && !has_rotated) {
                 Ray r = cam.ScreenPointToRay (Input.mousePosition);
                 int atom = PDB_molecule.collide_ray (gameObject, mol, transform, r);
+                Debug.Log(atom);
                 if (atom != -1)
                 {
                     SelectAtom(atom);
@@ -379,6 +380,23 @@ public class PDB_mesh : MonoBehaviour {
                 }
             }
         }
+    }
+
+    public int return_atom_id(int atom)
+    {
+        int id_atom = -1;
+        for (int i = 0; i != mol.aminoAcidsAtomIds.Count; ++i)
+        {
+            int[] ids = mol.aminoAcidsAtomIds[i];
+            for (int j = 0; j != ids.Length; ++j)
+            {
+                if (ids[j] == atom)
+                {
+                    id_atom = i;
+                }
+            }
+        }
+        return id_atom;
     }
 
     int function_type;

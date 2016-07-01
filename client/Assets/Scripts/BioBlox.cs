@@ -688,7 +688,7 @@ public class BioBlox : MonoBehaviour
         PDB_mesh p = obj.GetComponent<PDB_mesh> ();
         Rigidbody ri = obj.AddComponent<Rigidbody> ();
         PDB_molecule mol = p.mol;
-        obj.AddComponent<AsteriodController>();
+        //obj.AddComponent<AsteriodController>();
 
         float mass = 1000;
         float r = mol.bvh_radii [0] * 0.5f;
@@ -1177,7 +1177,7 @@ public class BioBlox : MonoBehaviour
         bool status = ToggleMode.isOn;
         Debug.Log(status);
         ScorePanel.SetActive(!status);
-        Filter.SetActive(!status);
+        //Filter.SetActive(!status);
         //SimpleScoretemp.SetActive(status);
         HintText.SetActive(status);
         HintTextPanel.gameObject.SetActive(status);

@@ -110,7 +110,7 @@ public class UIController : MonoBehaviour {
 		Protein2.SetActive (true);
 	}
 
-	void ChangeSliderViewToFunction()
+	/*void ChangeSliderViewToFunction()
 	{
 		foreach (Transform AminoButton in SliderProtein1.transform)
 		{
@@ -161,7 +161,7 @@ public class UIController : MonoBehaviour {
 		//set the color of the buttons of the connections tonormal
 		ChangeAminoLinkPanelButtonColorToNormal ();
 			 
-	}
+	}*/
 
 	void ChangeAminoLinkPanelButtonColorToNormal()
 	{
@@ -574,7 +574,7 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public void DropDownSliderView()
+    /*public void DropDownSliderView()
     {
         switch (DropDownSlider.value)
         {
@@ -589,7 +589,7 @@ public class UIController : MonoBehaviour {
             default:
                 break;
         }
-    }
+    }*/
 
     public void FirstPersonToggle()
     {
