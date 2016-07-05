@@ -7,9 +7,10 @@ public class ExploreController : MonoBehaviour {
     public GameObject Ship;
     public GameObject MainCamera;
     public GameObject MainCanvas;
+    public bool exploration_status = false;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         bb = FindObjectOfType<BioBlox>();
 	}
 	
@@ -20,11 +21,12 @@ public class ExploreController : MonoBehaviour {
 
     public void StartExplore()
     {
-        MainCamera.SetActive(false);
-        MainCanvas.SetActive(false);
+        MainCamera.SetActive(exploration_status);
+        MainCanvas.SetActive(exploration_status);
         GameObject temp = Instantiate(Ship);
-        temp.transform.position = bb.molecules[0].transform.position;
-        Ray r_temp = new Ray(temp.transform.position, -transform.up);
+        temp.tag = "active_ship";
+        temp.transform.position = new Vector3(0,70,5);
+        /*Ray r_temp = new Ray(temp.transform.position, -transform.up);
         do
         {
             temp.transform.position = temp.transform.position + temp.transform.up * 2;
@@ -34,12 +36,22 @@ public class ExploreController : MonoBehaviour {
         } while (PDB_molecule.collide_ray_distance_object(bb.molecules[0].gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, r_temp, temp) < 15.0f);
         Debug.Log("salio");
         temp.transform.position = temp.transform.position + temp.transform.forward * 2;
-
+        */
         temp.GetComponent<ShipController>().enabled = true;
-        temp.transform.LookAt(bb.molecules[0].transform.position);
+        temp.transform.LookAt(new Vector3(0,0,5));
         temp.AddComponent<Rigidbody>();
         //temp.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         temp.GetComponent<Rigidbody>().drag = 25;
         temp.GetComponent<Rigidbody>().useGravity = false;
+        exploration_status = !exploration_status;
+    }
+
+    public void EndExplore()
+    {
+        MainCamera.SetActive(exploration_status);
+        MainCanvas.SetActive(exploration_status);
+        GameObject temp = GameObject.FindGameObjectWithTag("active_ship").gameObject;
+        Destroy(temp);
+        exploration_status = !exploration_status;
     }
 }

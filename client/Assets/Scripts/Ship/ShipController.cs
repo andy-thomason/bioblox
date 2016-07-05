@@ -11,20 +11,34 @@ public class ShipController : MonoBehaviour {
     int cruiseSpeed = 0;
     float deltaSpeed;//(speed - cruisespeed)
     public int minSpeed = 0;
-    public int maxSpeed = 2;
+    public int maxSpeed = 1;
     float accel, decel;
 
     //turning stuff
     Vector3 angVel;
     Vector3 shipRot;
-    int sensitivity = 800;
+    int sensitivity = 100;
 
     public GameObject press_to_scan;
     public GameObject atom_name;
     public GameObject scanning;
     public GameObject aim;
+    public GameObject exit_button;
+    public Camera camera_out;
+    public Camera camera_in;
+    public Canvas canvas;
+    public GameObject cabine;
+    public MeshRenderer ship;
+    public Texture2D cursor_aim;
+    bool view_status = false;
+    Camera RayCastingCamera;
 
     public Vector3 cameraOffset = new Vector3(0, 1, -3); //I use (0,1,-3)
+
+    float time_rotation = 1;
+    float time_rotation_acu = 0;
+
+    ExploreController explorerController;
 
     // Use this for initialization
     void Start()
@@ -32,14 +46,24 @@ public class ShipController : MonoBehaviour {
         speed = cruiseSpeed;
         //rb = GetComponent<Rigidbody>();
         bb = FindObjectOfType<BioBlox>();
-        Debug.Log(bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsNames[1]);
-
-        Debug.Log(bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsTags[1]);
+        explorerController = FindObjectOfType<ExploreController>();
+        RayCastingCamera = camera_out;
+        SwitchCameraInside();
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 
+       /* time_rotation_acu += Time.fixedDeltaTime;
+
+        if(Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetKey(KeyCode.I) || Input.GetKey(KeyCode.O) || Input.GetKey(KeyCode.LeftShift))
+        {
+            time_rotation_acu = 0;
+            time_rotation = 1;
+        }
+        if (time_rotation_acu > 4)
+            time_rotation = 10;
+            */
         /*if (Physics.Raycast(transform.position, Vector3.down, 3))
             GetComponent<Rigidbody>().AddForce(Vector3.up * 2);*/
 
@@ -54,25 +78,31 @@ public class ShipController : MonoBehaviour {
          }*/
 
 
-        BvhSphereCollider space_ship = new BvhSphereCollider(bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, transform.position, 1.3f);
+        BvhSphereCollider molecule_1 = new BvhSphereCollider(bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, transform.position, 2.0f);
+        BvhSphereCollider molecule_2 = new BvhSphereCollider(bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, transform.position, 2.0f);
 
-        if (space_ship.results.Count != 0)
-            Debug.Log("colision");
-
-        /*for(int i=0; i< space_ship.results.Count; i++)
+        if (molecule_1.results.Count > 0)
         {
-            Debug.Log(space_ship.results[i].index);
-        }*/
-        if (space_ship.results.Count > 0)
-        {
-            for (int i = 0; i < space_ship.results.Count; i++)
+            for (int i = 0; i < molecule_1.results.Count; i++)
             {
-                Vector3 dir = transform.position - bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[space_ship.results[i].index]);
+                Vector3 dir = transform.position - bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]);
+                //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
                 dir = dir.normalized;
-                GetComponent<Rigidbody>().AddForce(dir * 250);
+                GetComponent<Rigidbody>().AddForce((dir * 250));
             }
         }
-            //Debug.Log(bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[space_ship.results[0].index]));
+
+        if (molecule_2.results.Count > 0)
+        {
+            for (int i = 0; i < molecule_2.results.Count; i++)
+            {
+                Vector3 dir = transform.position - bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[molecule_2.results[i].index]);
+                //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
+                dir = dir.normalized;
+                GetComponent<Rigidbody>().AddForce((dir * 250));
+            }
+        }
+        //Debug.Log(bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[0].index]));
 
         /*float altitude = PDB_molecule.collide_ray_distance_object(bb.molecules[0].gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, new Ray(transform.position, -transform.up), gameObject);
         if (altitude < 3.0f)
@@ -87,7 +117,12 @@ public class ShipController : MonoBehaviour {
 
         //ANGULAR DYNAMICS//
 
-        shipRot = transform.GetChild(2).localEulerAngles; //make sure you're getting the right child (the ship).  I don't know how they're numbered in general.
+        shipRot = transform.GetChild(1).localEulerAngles; //make sure you're getting the right child (the ship).  I don't know how they're numbered in general.
+       // Debug.Log("antes: " + shipRot.x + "-" + shipRot.y + "-" + shipRot.z);
+        //if ((shipRot.x < 1.0f || shipRot.x < -358 || shipRot.x > 358) && (shipRot.y < 1.0f || shipRot.y < -358 || shipRot.y > 358) && (shipRot.z < 1.0f || shipRot.z < -358 || shipRot.z > 358))
+           // shipRot = Vector3.zero;
+
+       // Debug.Log("despues: " + shipRot.x + "-" + shipRot.y + "-" + shipRot.z);
 
         //since angles are only stored (0,360), convert to +- 180
         if (shipRot.x > 180) shipRot.x -= 360;
@@ -130,12 +165,13 @@ public class ShipController : MonoBehaviour {
 
 
         //and finally rotate.  
-        transform.GetChild(2).Rotate(angVel * Time.fixedDeltaTime);
+        transform.GetChild(1).Rotate(angVel * Time.fixedDeltaTime);
 
         //this limits your rotation, as well as gradually realigns you.  It's a little convoluted, but it's
         //got the same square magnitude functionality as the angular velocity, plus a constant since x^2
         //is very small when x is small.  Also realigns faster based on speed.  feel free to tweak
-        transform.GetChild(2).Rotate(-shipRot.normalized * .015f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
+        //aca el problema
+        transform.GetChild(1).Rotate(-shipRot.normalized * .006f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
 
 
         //LINEAR DYNAMICS//
@@ -166,42 +202,96 @@ public class ShipController : MonoBehaviour {
         transform.GetChild(0).localPosition = cameraOffset + new Vector3(0, 0, -deltaSpeed * .02f);
 
 
-        float sqrOffset = transform.GetChild(2).localPosition.sqrMagnitude;
-        Vector3 offsetDir = transform.GetChild(2).localPosition.normalized;
+        float sqrOffset = transform.GetChild(1).localPosition.sqrMagnitude;
+        Vector3 offsetDir = transform.GetChild(1).localPosition.normalized;
 
 
         //this takes care of realigning after collisions, where the ship gets displaced due to its rigidbody.
         //I'm pretty sure this is the best way to do it (have the ship and the rig move toward their mutual center)
-        //transform.GetChild(2).Translate(-offsetDir * sqrOffset * 20 * Time.fixedDeltaTime);
+        //transform.GetChild(1).Translate(-offsetDir * sqrOffset * 20 * Time.fixedDeltaTime);
         //(**************** this ***************) is what actually makes the whole ship move through the world!
-        transform.Translate((offsetDir * sqrOffset * 50 + transform.GetChild(2).forward * speed) * Time.fixedDeltaTime, Space.World);
+        transform.Translate((offsetDir * sqrOffset * 50 + transform.GetChild(1).forward * speed) * Time.fixedDeltaTime, Space.World);
 
+        //Debug.Log(shipRot.x+"-"+shipRot.y+"-"+shipRot.z);
         //comment this out for starfox, remove the x and z components for shadows of the empire, and leave the whole thing for free roam
         transform.Rotate(shipRot.x * Time.fixedDeltaTime, (shipRot.y * Mathf.Abs(shipRot.y) * .02f) * Time.fixedDeltaTime, shipRot.z * Time.fixedDeltaTime);
+    }
 
+    void Update()
+    {
         //LASER
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetMouseButton(0))
         {
+            Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
             press_to_scan.SetActive(false);
-            aim.SetActive(true);
             atom_name.SetActive(true);
             scanning.SetActive(true);
 
-            Ray ray = new Ray(transform.position, transform.forward);
-            int atomID = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
-            int atom_id = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID);
-            if (atom_id >= 0)
-                atom_name.GetComponent<Text>().text = bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID)] + " - " + bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID)];
+            Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
+            //MOLECULE 1 ATOM ID UI
+            int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
+            int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
+            //MOLECULE 2 ATOM ID UI
+            int atomID_molecule_2 = PDB_molecule.collide_ray(gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, ray);
+            int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
+            //change the text in the UI depending which atom is being raycasted
+            if (atom_id_molecule_1 >= 0)
+                atom_name.GetComponent<Text>().text = bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_1)] + " - " + bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_1)];
+            else if (atom_id_molecule_2 >= 0)
+                atom_name.GetComponent<Text>().text = bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_2)] + " - " + bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_2)];
             else
                 atom_name.GetComponent<Text>().text = "";
         }
         else
         {
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             press_to_scan.SetActive(true);
-            aim.SetActive(false);
             atom_name.SetActive(false);
             scanning.SetActive(false);
         }
 
+        if (Input.GetKeyDown(KeyCode.V))
+            SwitchCameraInside();
+
+        if (Input.GetKeyDown(KeyCode.Home))
+        {
+            transform.position = new Vector3(0, -600, -8);
+            transform.LookAt(new Vector3(5, -600, -4));
+        }
+        if (Input.GetKeyDown(KeyCode.Insert))
+        {
+            transform.position = new Vector3(0, 70, 5);
+            transform.LookAt(new Vector3(0, 0, 5));
+        }
+    }
+
+    void SwitchCameraInside()
+    {
+        camera_in.enabled = !view_status;
+        camera_out.enabled = view_status;
+        cabine.SetActive(!view_status);
+        ship.enabled = view_status;
+        if (!view_status)
+        {
+            RayCastingCamera = camera_in;
+            canvas.worldCamera = camera_in;
+            exit_button.SetActive(true);
+        }
+        else
+        {
+            RayCastingCamera = camera_out;
+            canvas.worldCamera = camera_out;
+            exit_button.SetActive(false);
+        }
+        view_status = !view_status;
+    }
+
+    public void EndExplore()
+    {
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        press_to_scan.SetActive(true);
+        atom_name.SetActive(false);
+        scanning.SetActive(false);
+        explorerController.EndExplore();
     }
 }
