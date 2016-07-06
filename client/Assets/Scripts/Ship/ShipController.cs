@@ -17,7 +17,8 @@ public class ShipController : MonoBehaviour {
     //turning stuff
     Vector3 angVel;
     Vector3 shipRot;
-    int sensitivity = 100;
+    int sensitivity = 200;
+    int sensitivity_xy = 20;
 
     public GameObject press_to_scan;
     public GameObject atom_name;
@@ -30,10 +31,17 @@ public class ShipController : MonoBehaviour {
     public GameObject cabine;
     public MeshRenderer ship;
     public Texture2D cursor_aim;
+    public GameObject ColorPanel;
     bool view_status = false;
     Camera RayCastingCamera;
 
-    public Vector3 cameraOffset = new Vector3(0, 1, -3); //I use (0,1,-3)
+    //color panel
+    bool InsideUI = false;
+    Color[] beacon_colors = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.white, Color.black };
+
+    public GameObject beacon;
+
+    public Vector3 cameraOffset = new Vector3(0, 1, -3); 
 
     float time_rotation = 1;
     float time_rotation_acu = 0;
@@ -49,6 +57,7 @@ public class ShipController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         RayCastingCamera = camera_out;
         SwitchCameraInside();
+        Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
     }
 	
 	// Update is called once per frame
@@ -131,10 +140,10 @@ public class ShipController : MonoBehaviour {
 
         //vertical stick adds to the pitch velocity
         //         (*************************** this *******************************) is a nice way to get the square without losing the sign of the value
-        angVel.x += Input.GetAxis("Vertical") * Mathf.Abs(Input.GetAxis("Vertical")) * sensitivity * Time.fixedDeltaTime;
+        angVel.x += Input.GetAxis("Vertical") * Mathf.Abs(Input.GetAxis("Vertical")) * sensitivity_xy * Time.fixedDeltaTime;
 
         //horizontal stick adds to the roll and yaw velocity... also thanks to the .5 you can't turn as fast/far sideways as you can pull up/down
-        float turn = Input.GetAxis("Horizontal") * Mathf.Abs(Input.GetAxis("Horizontal")) * sensitivity * Time.fixedDeltaTime;
+        float turn = Input.GetAxis("Horizontal") * Mathf.Abs(Input.GetAxis("Horizontal")) * sensitivity_xy * Time.fixedDeltaTime;
         angVel.y += turn * .5f;
         angVel.z -= turn * .5f;
 
@@ -171,7 +180,7 @@ public class ShipController : MonoBehaviour {
         //got the same square magnitude functionality as the angular velocity, plus a constant since x^2
         //is very small when x is small.  Also realigns faster based on speed.  feel free to tweak
         //aca el problema
-        transform.GetChild(1).Rotate(-shipRot.normalized * .006f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
+        transform.GetChild(1).Rotate(-shipRot.normalized * .005f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
 
 
         //LINEAR DYNAMICS//
@@ -188,8 +197,8 @@ public class ShipController : MonoBehaviour {
             speed += accel * Time.fixedDeltaTime;
         else if (Input.GetKey(KeyCode.LeftControl))
             speed -= accel * Time.fixedDeltaTime;
-        else if (Input.GetKey(KeyCode.Joystick1Button0) || Input.GetKey(KeyCode.Space))
-            speed -= decel * Time.fixedDeltaTime;
+        //else if (Input.GetKey(KeyCode.Joystick1Button0) || Input.GetKey(KeyCode.Space))
+           // speed -= decel * Time.fixedDeltaTime;
 
         //if not accelerating or decelerating, tend toward cruise, using a similar principle to the accelerations above
         //(added clamping since it's more of a gradual slowdown/speedup)
@@ -217,12 +226,13 @@ public class ShipController : MonoBehaviour {
         transform.Rotate(shipRot.x * Time.fixedDeltaTime, (shipRot.y * Mathf.Abs(shipRot.y) * .02f) * Time.fixedDeltaTime, shipRot.z * Time.fixedDeltaTime);
     }
 
+    GameObject temp_beacon;
+
     void Update()
     {
         //LASER
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !InsideUI)
         {
-            Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
             press_to_scan.SetActive(false);
             atom_name.SetActive(true);
             scanning.SetActive(true);
@@ -244,7 +254,7 @@ public class ShipController : MonoBehaviour {
         }
         else
         {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             press_to_scan.SetActive(true);
             atom_name.SetActive(false);
             scanning.SetActive(false);
@@ -262,6 +272,36 @@ public class ShipController : MonoBehaviour {
         {
             transform.position = new Vector3(0, 70, 5);
             transform.LookAt(new Vector3(0, 0, 5));
+        }
+        
+        //place beacon
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
+            //MOLECULE 1 ATOM ID UI
+            int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
+            int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
+            //MOLECULE 2 ATOM ID UI
+            int atomID_molecule_2 = PDB_molecule.collide_ray(gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, ray);
+            int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
+            //change the text in the UI depending which atom is being raycasted
+            if (atom_id_molecule_1 >= 0)
+            {
+                temp_beacon = Instantiate(beacon);
+                temp_beacon.transform.SetParent(bb.molecules[0].transform, false);
+                temp_beacon.transform.position = bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_1]);
+                temp_beacon.transform.LookAt((bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_1] - transform.position).normalized));
+
+            }
+            else if (atom_id_molecule_2 >= 0)
+            {
+                temp_beacon = Instantiate(beacon);
+                temp_beacon.transform.SetParent(bb.molecules[1].transform, false);
+                temp_beacon.transform.position = bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2]);
+                temp_beacon.transform.LookAt((bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2] - transform.position).normalized));
+            }
+            //show the color panel
+            ColorPanel.SetActive(true);
         }
     }
 
@@ -293,5 +333,35 @@ public class ShipController : MonoBehaviour {
         atom_name.SetActive(false);
         scanning.SetActive(false);
         explorerController.EndExplore();
+    }
+
+    public void BeaconColor(int index)
+    {
+        temp_beacon.transform.GetChild(3).GetComponent<Light>().color = beacon_colors[index];
+    }
+
+    public void CloseColorPanel()
+    {
+        ColorPanel.SetActive(false);
+        Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+        InsideUI = false;
+    }
+
+    public void DeleteBeacon()
+    {
+        Destroy(temp_beacon);
+        CloseColorPanel();
+    }
+
+    public void MouseUIEnter()
+    {
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        InsideUI = true;
+    }
+
+    public void MouseUIExit()
+    {
+        Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+        InsideUI = false;
     }
 }

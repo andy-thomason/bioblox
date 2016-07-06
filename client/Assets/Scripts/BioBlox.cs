@@ -1171,6 +1171,7 @@ public class BioBlox : MonoBehaviour
     public GameObject SimpleScoretemp;
     public GameObject Filter;
     public GameObject HintText;
+    public GameObject ExitTutorialButton;
 
     public void ToggleGameMode()
     {
@@ -1181,6 +1182,7 @@ public class BioBlox : MonoBehaviour
         //SimpleScoretemp.SetActive(status);
         HintText.SetActive(status);
         HintTextPanel.gameObject.SetActive(status);
+        ExitTutorialButton.SetActive(status);
 
         Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
         Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
@@ -1197,6 +1199,12 @@ public class BioBlox : MonoBehaviour
                 childTransform.gameObject.SetActive(true);
             }
         }
+    }
+
+    public void ExitTutorial()
+    {
+        ToggleMode.isOn = false;
+        ToggleGameMode();
     }
 
 }
