@@ -92,6 +92,10 @@ public class BioBlox : MonoBehaviour
     //Animator of the tools menu
     public GameObject EndLevelMenu;
 
+    //block flares prefabs
+    public GameObject FlareBlock1;
+    public GameObject FlareBlock2;
+
     // colors of the labels and an offset that is randomly decided randomize colours
     List<Color> colorPool = new List<Color>();
     //int randomColorPoolOffset;
@@ -679,6 +683,20 @@ public class BioBlox : MonoBehaviour
         GameObject pdb = GameObject.Find (proto);
         MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
         make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
+
+        //block flare
+        if (index == 0)
+        {
+            GameObject temp = Instantiate(FlareBlock1);
+            temp.transform.SetParent(obj.transform);
+
+        }
+        else
+        {
+            GameObject temp = Instantiate(FlareBlock2);
+            temp.transform.SetParent(obj.transform);
+        }
+
         return obj;
     }
 

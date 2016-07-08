@@ -6,6 +6,8 @@ TagManager:
   tags:
   - FirstPerson
   - active_ship
+  - flare_sun
+  - fade_explorer
   layers:
   - Default
   - TransparentFX

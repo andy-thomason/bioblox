@@ -17,16 +17,13 @@ public class ShipController : MonoBehaviour {
     //turning stuff
     Vector3 angVel;
     Vector3 shipRot;
-    int sensitivity = 200;
-    int sensitivity_xy = 20;
-
-    public GameObject press_to_scan;
+    int sensitivity = 800;
+    int sensitivity_xy = 200;
+    
     public GameObject atom_name;
     public GameObject scanning;
     public GameObject aim;
     public GameObject exit_button;
-    public Camera camera_out;
-    public Camera camera_in;
     public Canvas canvas;
     public GameObject cabine;
     public MeshRenderer ship;
@@ -55,7 +52,7 @@ public class ShipController : MonoBehaviour {
         //rb = GetComponent<Rigidbody>();
         bb = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
-        RayCastingCamera = camera_out;
+        RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
         SwitchCameraInside();
         Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
     }
@@ -143,7 +140,7 @@ public class ShipController : MonoBehaviour {
         angVel.x += Input.GetAxis("Vertical") * Mathf.Abs(Input.GetAxis("Vertical")) * sensitivity_xy * Time.fixedDeltaTime;
 
         //horizontal stick adds to the roll and yaw velocity... also thanks to the .5 you can't turn as fast/far sideways as you can pull up/down
-        float turn = Input.GetAxis("Horizontal") * Mathf.Abs(Input.GetAxis("Horizontal")) * sensitivity_xy * Time.fixedDeltaTime;
+        float turn = Input.GetAxis("Horizontal") * Mathf.Abs(Input.GetAxis("Horizontal")) * sensitivity * Time.fixedDeltaTime;
         angVel.y += turn * .5f;
         angVel.z -= turn * .5f;
 
@@ -180,7 +177,7 @@ public class ShipController : MonoBehaviour {
         //got the same square magnitude functionality as the angular velocity, plus a constant since x^2
         //is very small when x is small.  Also realigns faster based on speed.  feel free to tweak
         //aca el problema
-        transform.GetChild(1).Rotate(-shipRot.normalized * .005f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
+        transform.GetChild(1).Rotate(-shipRot.normalized * .025f * (shipRot.sqrMagnitude + 500) * (1 + speed / maxSpeed) * Time.fixedDeltaTime);
 
 
         //LINEAR DYNAMICS//
@@ -233,7 +230,6 @@ public class ShipController : MonoBehaviour {
         //LASER
         if (Input.GetMouseButton(0) && !InsideUI)
         {
-            press_to_scan.SetActive(false);
             atom_name.SetActive(true);
             scanning.SetActive(true);
 
@@ -255,7 +251,6 @@ public class ShipController : MonoBehaviour {
         else
         {
             //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            press_to_scan.SetActive(true);
             atom_name.SetActive(false);
             scanning.SetActive(false);
         }
@@ -277,6 +272,10 @@ public class ShipController : MonoBehaviour {
         //place beacon
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            //save the current beacon before creating one
+            if (temp_beacon)
+                explorerController.StoreBeacons(temp_beacon);
+
             Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
             //MOLECULE 1 ATOM ID UI
             int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
@@ -307,21 +306,19 @@ public class ShipController : MonoBehaviour {
 
     void SwitchCameraInside()
     {
-        camera_in.enabled = !view_status;
-        camera_out.enabled = view_status;
+        //camera_in.enabled = !view_status;
+        //camera_out.enabled = view_status;
         cabine.SetActive(!view_status);
+        exit_button.SetActive(!view_status);
         ship.enabled = view_status;
-        if (!view_status)
+        if (view_status)
         {
-            RayCastingCamera = camera_in;
-            canvas.worldCamera = camera_in;
-            exit_button.SetActive(true);
+            cameraOffset = new Vector3(0, 1, -3);
         }
         else
         {
-            RayCastingCamera = camera_out;
-            canvas.worldCamera = camera_out;
-            exit_button.SetActive(false);
+
+            cameraOffset = new Vector3(0, 0, 0);
         }
         view_status = !view_status;
     }
@@ -329,10 +326,13 @@ public class ShipController : MonoBehaviour {
     public void EndExplore()
     {
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-        press_to_scan.SetActive(true);
         atom_name.SetActive(false);
         scanning.SetActive(false);
         explorerController.EndExplore();
+        if(temp_beacon)
+            explorerController.StoreBeacons(temp_beacon);
+
+        GameObject.Find("ToolPanel").GetComponent<Animator>().SetBool("Open", true);
     }
 
     public void BeaconColor(int index)
@@ -350,6 +350,7 @@ public class ShipController : MonoBehaviour {
     public void DeleteBeacon()
     {
         Destroy(temp_beacon);
+        temp_beacon = null;
         CloseColorPanel();
     }
 

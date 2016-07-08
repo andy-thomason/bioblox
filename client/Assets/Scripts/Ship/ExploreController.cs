@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class ExploreController : MonoBehaviour {
 
@@ -8,6 +10,9 @@ public class ExploreController : MonoBehaviour {
     public GameObject MainCamera;
     public GameObject MainCanvas;
     public bool exploration_status = false;
+    public List<GameObject> beacon_holder;
+    public Toggle toggle_beacons;
+    public GameObject Flare;
 
     // Use this for initialization
     void Start () {
@@ -53,5 +58,29 @@ public class ExploreController : MonoBehaviour {
         GameObject temp = GameObject.FindGameObjectWithTag("active_ship").gameObject;
         Destroy(temp);
         exploration_status = !exploration_status;
+        GameObject.FindGameObjectWithTag("flare_sun").SetActive(false);
+
+    }
+
+    public void StoreBeacons(GameObject temp_beacon)
+    {
+        toggle_beacons.interactable = true;
+        beacon_holder.Add(temp_beacon);
+    }
+
+    public void EmptyBeacons()
+    {
+        toggle_beacons.interactable = false;
+        beacon_holder.Clear();
+    }
+
+    bool toggle_beacon = false;
+    public void ToggleBeacon()
+    {
+        foreach(GameObject temp_beacon in beacon_holder)
+        {
+            temp_beacon.SetActive(toggle_beacon);
+        }
+        toggle_beacon = !toggle_beacon;
     }
 }
