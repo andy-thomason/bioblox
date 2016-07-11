@@ -24,13 +24,13 @@ public class ExploreController : MonoBehaviour {
 	
 	}
 
-    public void StartExplore()
+    public void StartExplore(GameObject temp)
     {
-        MainCamera.SetActive(exploration_status);
-        MainCanvas.SetActive(exploration_status);
-        GameObject temp = Instantiate(Ship);
-        temp.tag = "active_ship";
-        temp.transform.position = new Vector3(0,70,5);
+        //MainCamera.SetActive(exploration_status);
+        //MainCanvas.SetActive(exploration_status);
+        //GameObject temp = Instantiate(Ship);
+       // temp.tag = "active_ship";
+        //temp.transform.position = new Vector3(0,70,5);
         /*Ray r_temp = new Ray(temp.transform.position, -transform.up);
         do
         {
@@ -43,26 +43,26 @@ public class ExploreController : MonoBehaviour {
         temp.transform.position = temp.transform.position + temp.transform.forward * 2;
         */
         temp.GetComponent<ShipController>().enabled = true;
-        temp.transform.LookAt(new Vector3(0,0,5));
+        //temp.transform.LookAt(new Vector3(0,0,5));
         temp.AddComponent<Rigidbody>();
         //temp.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionZ | RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         temp.GetComponent<Rigidbody>().drag = 25;
         temp.GetComponent<Rigidbody>().useGravity = false;
-        exploration_status = !exploration_status;
+        //exploration_status = !exploration_status;
         //if beacons, hide sphere
-        if (beacon_holder.Count != 0)
-            ToggleSphere();
+        //if (beacon_holder.Count != 0)
+            //ToggleSphere();
     }
 
     public void EndExplore()
     {
-        ToggleSphere();
-        MainCamera.SetActive(exploration_status);
+        //ToggleSphere();
+        //MainCamera.SetActive(exploration_status);
         MainCanvas.SetActive(exploration_status);
         GameObject temp = GameObject.FindGameObjectWithTag("active_ship").gameObject;
         Destroy(temp);
-        exploration_status = !exploration_status;
-        GameObject.FindGameObjectWithTag("flare_sun").SetActive(false);
+       // exploration_status = !exploration_status;
+        //GameObject.FindGameObjectWithTag("flare_sun").SetActive(false);
         GameObject.Find("ToolPanel").GetComponent<Animator>().SetBool("Open", true);
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }

@@ -47,6 +47,9 @@ public class UIController : MonoBehaviour {
     public Image cctv_overlay;
     public Sprite cctv_start;
     public Sprite cctv_loading;
+    //explore
+    public bool explore_view = false;
+    public GameObject MainCanvas;
 
 
     AminoSliderController aminoSliderController;
@@ -606,6 +609,24 @@ public class UIController : MonoBehaviour {
 		
 		//if(ToggleFreeCameraStatus)
 			//ToggleFreeCamera();
+    }
+
+    public void ExploreToggle()
+    {
+        explore_view = !explore_view;
+        FreeCameraToggle.interactable = !explore_view;
+        MainCanvas.SetActive(false);
+
+        MainCamera.GetComponent<Animator>().SetBool("Start", explore_view);
+        if (explore_view)
+        {
+            cctv_overlay.sprite = cctv_start;
+            MainCamera.transform.position = new Vector3(0, 0, -150);
+            MainCamera.transform.rotation = Quaternion.identity;
+        }
+
+        //if(ToggleFreeCameraStatus)
+        //ToggleFreeCamera();
     }
 
     public void ChangeCCTVLoading()

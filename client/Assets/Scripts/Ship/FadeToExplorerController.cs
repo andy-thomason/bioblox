@@ -13,12 +13,12 @@ public class FadeToExplorerController : MonoBehaviour {
 	
 	void ChangeToExplorer()
     {
-        ex.StartExplore();
+        //ex.StartExplore();
     }
 
     void TurnOnSun()
     {
-        Flare.SetActive(true);
+        //Flare.SetActive(true);
     }
 
     public void StartFading()

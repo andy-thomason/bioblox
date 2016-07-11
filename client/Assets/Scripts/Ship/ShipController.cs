@@ -56,8 +56,8 @@ public class ShipController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         fadePanel = FindObjectOfType<FadeToExplorerController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
-        SwitchCameraInside();
-        Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+        //SwitchCameraInside();
+        //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
     }
 	
 	// Update is called once per frame
@@ -231,8 +231,9 @@ public class ShipController : MonoBehaviour {
     void Update()
     {
         //LASER
-        if (Input.GetMouseButton(0) && !InsideUI)
+        if (Input.GetMouseButton(1))
         {
+            Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
             atom_name.SetActive(true);
             scanning.SetActive(true);
 
@@ -253,7 +254,7 @@ public class ShipController : MonoBehaviour {
         }
         else
         {
-            //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             atom_name.SetActive(false);
             scanning.SetActive(false);
         }
@@ -303,7 +304,7 @@ public class ShipController : MonoBehaviour {
                 temp_beacon.transform.LookAt((bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2] - transform.position).normalized));
             }
             //show the color panel
-            ColorPanel.SetActive(true);
+            //ColorPanel.SetActive(true);
         }
     }
 

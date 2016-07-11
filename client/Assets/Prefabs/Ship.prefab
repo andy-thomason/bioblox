@@ -81,9 +81,10 @@ GameObject:
   - 124: {fileID: 12473560}
   - 92: {fileID: 9290874}
   - 81: {fileID: 8196842}
+  - 95: {fileID: 9589928}
   m_Layer: 0
   m_Name: Camera_out
-  m_TagString: Untagged
+  m_TagString: camera_ship
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -404,7 +405,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 181502}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1000, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -432,7 +433,7 @@ Camera:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 132272}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0.019607844}
@@ -450,7 +451,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966527
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -507,6 +508,23 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 132272}
   m_Enabled: 1
+--- !u!95 &9589928
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 132272}
+  m_Enabled: 0
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: be3d11dd9669cd74dad3d1717c4973f3, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &11401636
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -737,8 +755,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: f9b9ef87223444348a10dd430420f882, type: 2}
   - {fileID: 2100000, guid: da558d6e27b69214ea3c051fdb059aad, type: 2}
   - {fileID: 2100000, guid: d22880538795ab64e9d3f2994cb3e62e, type: 2}
-  beacon: {fileID: 144674, guid: 299fb4030f286ab41b2babaf56e33c4b, type: 2}
-  cameraOffset: {x: 0, y: 1, z: -3}
+  beacon: {fileID: 0}
+  cameraOffset: {x: 1, y: 1, z: -3}
 --- !u!114 &11432454
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1585,7 +1603,7 @@ RectTransform:
   m_GameObject: {fileID: 150262}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.62815815, y: 0.62815815, z: 0.62815815}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 22472582}
@@ -1596,7 +1614,7 @@ RectTransform:
   m_RootOrder: 5
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -132, y: 175}
+  m_AnchoredPosition: {x: -95.5, y: 175}
   m_SizeDelta: {x: 200.33, y: 93.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22417108

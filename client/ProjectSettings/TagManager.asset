@@ -8,6 +8,8 @@ TagManager:
   - active_ship
   - flare_sun
   - fade_explorer
+  - camera_ship
+  - space_ship
   layers:
   - Default
   - TransparentFX
