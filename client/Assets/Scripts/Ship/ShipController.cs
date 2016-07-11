@@ -35,6 +35,7 @@ public class ShipController : MonoBehaviour {
     //color panel
     bool InsideUI = false;
     Color[] beacon_colors = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.white, Color.black };
+    public Material[] material_colors;
 
     public GameObject beacon;
 
@@ -44,6 +45,7 @@ public class ShipController : MonoBehaviour {
     float time_rotation_acu = 0;
 
     ExploreController explorerController;
+    FadeToExplorerController fadePanel;
 
     // Use this for initialization
     void Start()
@@ -52,6 +54,7 @@ public class ShipController : MonoBehaviour {
         //rb = GetComponent<Rigidbody>();
         bb = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
+        fadePanel = FindObjectOfType<FadeToExplorerController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
         SwitchCameraInside();
         Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
@@ -325,19 +328,18 @@ public class ShipController : MonoBehaviour {
 
     public void EndExplore()
     {
-        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         atom_name.SetActive(false);
         scanning.SetActive(false);
-        explorerController.EndExplore();
         if(temp_beacon)
             explorerController.StoreBeacons(temp_beacon);
-
-        GameObject.Find("ToolPanel").GetComponent<Animator>().SetBool("Open", true);
+        fadePanel.BackToStart();
+        //explorerController.EndExplore();
     }
 
     public void BeaconColor(int index)
     {
-        temp_beacon.transform.GetChild(3).GetComponent<Light>().color = beacon_colors[index];
+        temp_beacon.transform.GetChild(0).transform.GetChild(0).GetComponent<Light>().color = beacon_colors[index];
+        temp_beacon.transform.GetChild(1).GetComponent<MeshRenderer>().material = material_colors[index];
     }
 
     public void CloseColorPanel()

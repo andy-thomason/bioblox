@@ -49,17 +49,22 @@ public class ExploreController : MonoBehaviour {
         temp.GetComponent<Rigidbody>().drag = 25;
         temp.GetComponent<Rigidbody>().useGravity = false;
         exploration_status = !exploration_status;
+        //if beacons, hide sphere
+        if (beacon_holder.Count != 0)
+            ToggleSphere();
     }
 
     public void EndExplore()
     {
+        ToggleSphere();
         MainCamera.SetActive(exploration_status);
         MainCanvas.SetActive(exploration_status);
         GameObject temp = GameObject.FindGameObjectWithTag("active_ship").gameObject;
         Destroy(temp);
         exploration_status = !exploration_status;
         GameObject.FindGameObjectWithTag("flare_sun").SetActive(false);
-
+        GameObject.Find("ToolPanel").GetComponent<Animator>().SetBool("Open", true);
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
 
     public void StoreBeacons(GameObject temp_beacon)
@@ -75,6 +80,7 @@ public class ExploreController : MonoBehaviour {
     }
 
     bool toggle_beacon = false;
+
     public void ToggleBeacon()
     {
         foreach(GameObject temp_beacon in beacon_holder)
@@ -82,5 +88,16 @@ public class ExploreController : MonoBehaviour {
             temp_beacon.SetActive(toggle_beacon);
         }
         toggle_beacon = !toggle_beacon;
+    }
+
+    bool toggle_beacon_sphere = true;
+
+    public void ToggleSphere()
+    {
+        foreach (GameObject temp_beacon in beacon_holder)
+        {
+            temp_beacon.transform.GetChild(1).gameObject.SetActive(toggle_beacon_sphere);
+        }
+        toggle_beacon_sphere = !toggle_beacon_sphere;
     }
 }

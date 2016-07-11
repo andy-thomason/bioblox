@@ -730,6 +730,13 @@ MonoBehaviour:
   ship: {fileID: 2300198}
   cursor_aim: {fileID: 2800000, guid: 551abf41ab238eb46824e6379ffd0db1, type: 3}
   ColorPanel: {fileID: 150262}
+  material_colors:
+  - {fileID: 2100000, guid: a3437033b0b4d5b418f760a738a0abf4, type: 2}
+  - {fileID: 2100000, guid: 88665f573c6b33743bcd44a3878a84f3, type: 2}
+  - {fileID: 2100000, guid: 712e633d1d0b9ce4aa7d1fac91d776ed, type: 2}
+  - {fileID: 2100000, guid: f9b9ef87223444348a10dd430420f882, type: 2}
+  - {fileID: 2100000, guid: da558d6e27b69214ea3c051fdb059aad, type: 2}
+  - {fileID: 2100000, guid: d22880538795ab64e9d3f2994cb3e62e, type: 2}
   beacon: {fileID: 144674, guid: 299fb4030f286ab41b2babaf56e33c4b, type: 2}
   cameraOffset: {x: 0, y: 1, z: -3}
 --- !u!114 &11432454

@@ -30,4 +30,9 @@ public class FadeToExplorerController : MonoBehaviour {
     {
         GetComponent<Animator>().SetBool("Start", false);
     }
+
+    public void EndExplorerFade()
+    {
+        ex.EndExplore();
+    }
 }
