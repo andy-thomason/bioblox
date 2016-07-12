@@ -10,6 +10,7 @@ TagManager:
   - fade_explorer
   - camera_ship
   - space_ship
+  - main_canvas
   layers:
   - Default
   - TransparentFX

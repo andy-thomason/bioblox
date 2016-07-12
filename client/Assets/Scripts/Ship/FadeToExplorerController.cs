@@ -33,6 +33,6 @@ public class FadeToExplorerController : MonoBehaviour {
 
     public void EndExplorerFade()
     {
-        ex.EndExplore();
+        //ex.EndExplore();
     }
 }

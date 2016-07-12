@@ -8,6 +8,7 @@ public class UIController : MonoBehaviour {
 	public GameObject FreeCameraKeysFreeze;
 	public GameObject FreeCameraKeysUnfreeze;
 	public Toggle FreeCameraToggle;
+    public Button ExplorerButton;
 	public GameObject MainCamera;
 	public Animator ToolPanel;
 	public GameObject OpenToolImage;
@@ -47,6 +48,7 @@ public class UIController : MonoBehaviour {
     public Image cctv_overlay;
     public Sprite cctv_start;
     public Sprite cctv_loading;
+    public Sprite cctv_ship;
     //explore
     public bool explore_view = false;
     public GameObject MainCanvas;
@@ -54,6 +56,7 @@ public class UIController : MonoBehaviour {
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
+    ExploreController explorerController;
 
 	public Toggle[] ToggleButtonFunctionsView;
 
@@ -61,6 +64,7 @@ public class UIController : MonoBehaviour {
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
+        explorerController = FindObjectOfType<ExploreController>();
     }
 
 	// Update is called once per frame
@@ -598,7 +602,8 @@ public class UIController : MonoBehaviour {
     {
         first_person = !first_person;
 		FreeCameraToggle.interactable = !first_person;
-		
+        ExplorerButton.interactable = !first_person;
+
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
         if (first_person)
 		{
@@ -611,26 +616,35 @@ public class UIController : MonoBehaviour {
 			//ToggleFreeCamera();
     }
 
-    public void ExploreToggle()
+    public void StartExplore()
     {
-        explore_view = !explore_view;
-        FreeCameraToggle.interactable = !explore_view;
+        explore_view = true;
+        MainCamera.GetComponent<Animator>().SetBool("Start", true);
         MainCanvas.SetActive(false);
+        ChangeCCTVShip();
+        MainCamera.transform.position = new Vector3(0, 0, -150);
+        MainCamera.transform.rotation = Quaternion.identity;
+    }
 
-        MainCamera.GetComponent<Animator>().SetBool("Start", explore_view);
-        if (explore_view)
-        {
-            cctv_overlay.sprite = cctv_start;
-            MainCamera.transform.position = new Vector3(0, 0, -150);
-            MainCamera.transform.rotation = Quaternion.identity;
-        }
+    public void EndExplore()
+    {
+        explore_view = false;
+        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        MainCamera.GetComponent<Animator>().SetBool("Start", false);
+    }
 
-        //if(ToggleFreeCameraStatus)
-        //ToggleFreeCamera();
+    public void ExplorerBackToDefault()
+    {
+        ToolPanel.SetBool("Open", true);
     }
 
     public void ChangeCCTVLoading()
     {
         cctv_overlay.sprite = cctv_loading;
+    }
+
+    public void ChangeCCTVShip()
+    {
+        cctv_overlay.sprite = cctv_ship;
     }
 }

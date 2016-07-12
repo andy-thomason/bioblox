@@ -6,18 +6,21 @@ using UnityEngine.UI;
 public class ExploreController : MonoBehaviour {
 
     BioBlox bb;
+    UIController uI;
     public GameObject Ship;
     public GameObject MainCamera;
     public GameObject MainCanvas;
     public bool exploration_status = false;
     public List<GameObject> beacon_holder;
     public Toggle toggle_beacons;
-    public GameObject Flare;
+    public Animator ToolPanel;
 
     // Use this for initialization
     void Start () {
         bb = FindObjectOfType<BioBlox>();
-	}
+        uI = FindObjectOfType<UIController>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -52,19 +55,6 @@ public class ExploreController : MonoBehaviour {
         //if beacons, hide sphere
         //if (beacon_holder.Count != 0)
             //ToggleSphere();
-    }
-
-    public void EndExplore()
-    {
-        //ToggleSphere();
-        //MainCamera.SetActive(exploration_status);
-        MainCanvas.SetActive(exploration_status);
-        GameObject temp = GameObject.FindGameObjectWithTag("active_ship").gameObject;
-        Destroy(temp);
-       // exploration_status = !exploration_status;
-        //GameObject.FindGameObjectWithTag("flare_sun").SetActive(false);
-        GameObject.Find("ToolPanel").GetComponent<Animator>().SetBool("Open", true);
-        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
 
     public void StoreBeacons(GameObject temp_beacon)

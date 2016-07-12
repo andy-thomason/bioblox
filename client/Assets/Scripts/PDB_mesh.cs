@@ -322,9 +322,6 @@ public class PDB_mesh : MonoBehaviour {
                         temp.tag = "space_ship";
                         //temp.transform.SetParent(transform, false);
                         temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
-                        //temp.GetComponentInChildren<MeshRenderer>().enabled = true;
-                        // temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
-                        //point the camera to the other protein
 
                         Ray r_temp;
                         do

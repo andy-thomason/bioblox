@@ -34,8 +34,8 @@ public class ShipController : MonoBehaviour {
 
     //color panel
     bool InsideUI = false;
-    Color[] beacon_colors = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.white, Color.black };
-    public Material[] material_colors;
+    //Color[] beacon_colors = new Color[] { Color.red, Color.blue, Color.green, Color.yellow, Color.magenta, Color.white, Color.black };
+    //public Material[] material_colors;
 
     public GameObject beacon;
 
@@ -46,6 +46,7 @@ public class ShipController : MonoBehaviour {
 
     ExploreController explorerController;
     FadeToExplorerController fadePanel;
+    UIController uI;
 
     // Use this for initialization
     void Start()
@@ -55,7 +56,9 @@ public class ShipController : MonoBehaviour {
         bb = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
         fadePanel = FindObjectOfType<FadeToExplorerController>();
+        uI = FindObjectOfType<UIController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
+        exit_button.SetActive(true);
         //SwitchCameraInside();
         //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
     }
@@ -283,25 +286,46 @@ public class ShipController : MonoBehaviour {
             Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
             //MOLECULE 1 ATOM ID UI
             int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
-            int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
+            //int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
             //MOLECULE 2 ATOM ID UI
             int atomID_molecule_2 = PDB_molecule.collide_ray(gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, ray);
-            int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
+            //int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
             //change the text in the UI depending which atom is being raycasted
-            if (atom_id_molecule_1 >= 0)
+            if (atomID_molecule_1 >= 0)
             {
-                temp_beacon = Instantiate(beacon);
-                temp_beacon.transform.SetParent(bb.molecules[0].transform, false);
-                temp_beacon.transform.position = bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_1]);
-                temp_beacon.transform.LookAt((bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_1] - transform.position).normalized));
+                GameObject temp = Instantiate(beacon);
+                temp.transform.position = bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_1]);
+
+                Ray r_temp;
+                do
+                {
+                    temp.transform.position -= temp.transform.forward * 5;
+                    r_temp = RayCastingCamera.ScreenPointToRay(temp.transform.forward);
+
+                } while (PDB_molecule.collide_ray(bb.molecules[0].gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, r_temp) != -1);
+                temp.transform.position -= temp.transform.forward * 20;
+                temp.transform.LookAt(bb.molecules[0].transform.position);
+                temp.transform.SetParent(bb.molecules[0].transform);
+                explorerController.StoreBeacons(temp);
 
             }
-            else if (atom_id_molecule_2 >= 0)
+            else if (atomID_molecule_2 >= 0)
             {
-                temp_beacon = Instantiate(beacon);
-                temp_beacon.transform.SetParent(bb.molecules[1].transform, false);
-                temp_beacon.transform.position = bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2]);
-                temp_beacon.transform.LookAt((bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2] - transform.position).normalized));
+                GameObject temp = Instantiate(beacon);
+                temp.transform.position = bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule_2]);
+
+                Ray r_temp;
+                do
+                {
+                    temp.transform.position -= temp.transform.forward * 5;
+                    r_temp = RayCastingCamera.ScreenPointToRay(temp.transform.forward);
+
+                } while (PDB_molecule.collide_ray(bb.molecules[1].gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, r_temp) != -1);
+                temp.transform.position -= temp.transform.forward * 20;
+                //temp.transform.GetChild(0).GetComponent<Animator>().enabled = true;
+                temp.transform.LookAt(bb.molecules[1].transform.position);
+                temp.transform.SetParent(bb.molecules[1].transform);
+                explorerController.StoreBeacons(temp);
             }
             //show the color panel
             //ColorPanel.SetActive(true);
@@ -331,16 +355,14 @@ public class ShipController : MonoBehaviour {
     {
         atom_name.SetActive(false);
         scanning.SetActive(false);
-        if(temp_beacon)
-            explorerController.StoreBeacons(temp_beacon);
-        fadePanel.BackToStart();
-        //explorerController.EndExplore();
+        exit_button.SetActive(false);
+        FindObjectOfType<UIController>().EndExplore();
     }
 
     public void BeaconColor(int index)
     {
-        temp_beacon.transform.GetChild(0).transform.GetChild(0).GetComponent<Light>().color = beacon_colors[index];
-        temp_beacon.transform.GetChild(1).GetComponent<MeshRenderer>().material = material_colors[index];
+       // temp_beacon.transform.GetChild(0).transform.GetChild(0).GetComponent<Light>().color = beacon_colors[index];
+       // temp_beacon.transform.GetChild(1).GetComponent<MeshRenderer>().material = material_colors[index];
     }
 
     public void CloseColorPanel()
