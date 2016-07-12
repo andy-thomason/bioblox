@@ -9706,6 +9706,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 781166427}
+  - 225: {fileID: 781166428}
   m_Layer: 5
   m_Name: Aminoacids
   m_TagString: Untagged
@@ -9735,6 +9736,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &781166428
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 781166426}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &782155681
 GameObject:
   m_ObjectHideFlags: 0
@@ -11675,6 +11687,9 @@ MonoBehaviour:
   - {fileID: 1183058965}
   - {fileID: 1230660382}
   - {fileID: 1777090642}
+  AminoAcids: {fileID: 781166428}
+  ConnectionButton: {fileID: 2086812396}
+  AminoLinks: {fileID: 1864286206}
 --- !u!114 &913013349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25055,6 +25070,7 @@ GameObject:
   - 224: {fileID: 1864286203}
   - 222: {fileID: 1864286205}
   - 114: {fileID: 1864286204}
+  - 225: {fileID: 1864286206}
   m_Layer: 5
   m_Name: AminoLinks
   m_TagString: Untagged
@@ -25115,6 +25131,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1864286202}
+--- !u!225 &1864286206
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1864286202}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1876790915
 GameObject:
   m_ObjectHideFlags: 0
@@ -27499,6 +27526,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 224: {fileID: 2086812395}
+  - 225: {fileID: 2086812396}
   m_Layer: 5
   m_Name: AddConnection
   m_TagString: Untagged
@@ -27526,6 +27554,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &2086812396
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2086812394}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2088686495
 GameObject:
   m_ObjectHideFlags: 0

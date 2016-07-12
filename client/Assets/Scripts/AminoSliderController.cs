@@ -875,4 +875,9 @@ public class AminoSliderController : MonoBehaviour {
         GameState.blocksRaycasts = status;
     }
 
+    public int ReturnNumberOfConnection()
+    {
+        return AminoLinkPanelParent.transform.childCount;
+    }
+
 }

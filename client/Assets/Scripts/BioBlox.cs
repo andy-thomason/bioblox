@@ -116,6 +116,7 @@ public class BioBlox : MonoBehaviour
     Camera camera;
     public GameObject IntroCamera;
     UIController uiController;
+    AminoSliderController aminoSlider;
 
     public enum GameState {
         Setup,
@@ -182,6 +183,7 @@ public class BioBlox : MonoBehaviour
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         //first eprson
         uiController = FindObjectOfType<UIController>();
+        aminoSlider = FindObjectOfType<AminoSliderController>();
 
         //intro set
         camera.gameObject.SetActive(false);
@@ -1072,7 +1074,7 @@ public class BioBlox : MonoBehaviour
 
 
 
-        if (eventSystem != null && eventSystem.IsActive() && !uiController.first_person) {
+        if (eventSystem != null && eventSystem.IsActive() && (!uiController.first_person || aminoSlider.ReturnNumberOfConnection() != 0)) {
             ApplyReturnToOriginForce();
         }
     }

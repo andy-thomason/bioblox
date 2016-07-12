@@ -64,6 +64,7 @@ Transform:
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071067}
   m_LocalPosition: {x: 0, y: 0, z: 312.70447}
   m_LocalScale: {x: 174.52727, y: 95.429016, z: 95.429016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22494512}
   m_RootOrder: 0
@@ -76,6 +77,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 22494512}
   m_RootOrder: 1
@@ -238,6 +240,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7f5dddbe25a61b4f8d2f9b4bf57ffb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CameraFrame: {fileID: 0}
+  MainCanvas: {fileID: 0}
 --- !u!124 &12452082
 Behaviour:
   m_ObjectHideFlags: 1
@@ -254,6 +258,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.43491545, y: 0.43491545, z: 0.43491545}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 428246}
   - {fileID: 491518}

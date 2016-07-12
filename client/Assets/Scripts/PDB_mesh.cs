@@ -220,17 +220,27 @@ public class PDB_mesh : MonoBehaviour {
         exploreController = FindObjectOfType<ExploreController>();
     }
 
+    Camera main_camera;
+    Ray ray_first_person;
+    int atom_first_person = -1;
     // Update is called once per frame
     void Update () {
+
+        if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
+        {
+            ray_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        }
+
         ray = cam.ScreenPointToRay (Input.mousePosition);
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
+        int atomID_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, ray_first_person);
         Vector3 mousePos = Input.mousePosition;
 
         
         if (Input.GetMouseButtonDown(0))
         {
-            if (atomID != -1)
+            if (atomID != -1 || atomID_first_person != -1)
             {
                 // "rotating" only gets set if we first click on an atom.
                 rotating = true;
@@ -278,8 +288,14 @@ public class PDB_mesh : MonoBehaviour {
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
                 int atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
+                {
+                    Ray r_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
+                }
+
                 Debug.Log(atom);
-                if (atom != -1)
+                if (atom != -1 || atom_first_person != -1)
                 {
                     SelectAtom(atom);
 
@@ -293,7 +309,11 @@ public class PDB_mesh : MonoBehaviour {
                         GameObject temp = Instantiate(camera_first_person);
                         temp.tag = "FirstPerson";
                         temp.transform.SetParent(transform, false);
-                        temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
+                        if(atom != -1)
+                            temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
+                        else if(atom_first_person != -1)
+                            temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
+
                         temp.GetComponent<Animator>().enabled = true;
                         temp.GetComponentInChildren<MeshRenderer>().enabled = true;
                         temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
@@ -341,6 +361,25 @@ public class PDB_mesh : MonoBehaviour {
             }
             has_rotated = false;
             rotating = false;
+        }
+        else if (uIController.first_person && Input.GetMouseButtonDown(1))
+        {
+            Debug.Log("entr");
+            // click without movement selects an atom/amino acid.
+                Ray r_first_person_link;
+                int atom_first_person_link = -1;
+                if (GameObject.FindGameObjectWithTag("FirstPerson"))
+                {
+                    r_first_person_link = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                    atom_first_person_link = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person_link);
+                }
+                
+                if (atom_first_person_link != -1)
+                {
+                    Debug.Log("lazo");
+                    SelectAtom(atom_first_person_link);
+                    aminoSliderController.AddConnectionButton();
+                }
         }
         else {
             has_rotated = false;

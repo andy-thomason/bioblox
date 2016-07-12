@@ -598,6 +598,10 @@ public class UIController : MonoBehaviour {
         }
     }*/
 
+    public CanvasGroup AminoAcids;
+    public CanvasGroup ConnectionButton;
+    public CanvasGroup AminoLinks;
+
     public void FirstPersonToggle()
     {
         first_person = !first_person;
@@ -611,9 +615,14 @@ public class UIController : MonoBehaviour {
 			MainCamera.transform.position = new Vector3 (0, 0, -150);
 			MainCamera.transform.rotation = Quaternion.identity;
 		}
-		
-		//if(ToggleFreeCameraStatus)
-			//ToggleFreeCamera();
+
+        //hide elements
+        AminoAcids.alpha = !first_person ? 1 : 0;
+        ConnectionButton.alpha = !first_person ? 1 : 0;
+        AminoLinks.alpha = !first_person ? 1 : 0;
+
+        //if(ToggleFreeCameraStatus)
+        //ToggleFreeCamera();
     }
 
     public void StartExplore()
