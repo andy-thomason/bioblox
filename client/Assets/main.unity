@@ -11690,6 +11690,7 @@ MonoBehaviour:
   AminoAcids: {fileID: 781166428}
   ConnectionButton: {fileID: 2086812396}
   AminoLinks: {fileID: 1864286206}
+  Tutorial: {fileID: 1971862419}
 --- !u!114 &913013349
 MonoBehaviour:
   m_ObjectHideFlags: 0

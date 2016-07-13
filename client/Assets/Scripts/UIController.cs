@@ -53,7 +53,6 @@ public class UIController : MonoBehaviour {
     public bool explore_view = false;
     public GameObject MainCanvas;
 
-
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
     ExploreController explorerController;
@@ -601,9 +600,11 @@ public class UIController : MonoBehaviour {
     public CanvasGroup AminoAcids;
     public CanvasGroup ConnectionButton;
     public CanvasGroup AminoLinks;
+    public Toggle Tutorial;
 
     public void FirstPersonToggle()
     {
+        Tutorial.isOn = false;
         first_person = !first_person;
 		FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;
@@ -627,6 +628,7 @@ public class UIController : MonoBehaviour {
 
     public void StartExplore()
     {
+        Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
         MainCanvas.SetActive(false);
