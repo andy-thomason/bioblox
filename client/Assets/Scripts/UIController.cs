@@ -75,8 +75,22 @@ public class UIController : MonoBehaviour {
 			FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
 			CameraFreeze = !CameraFreeze;
 		}
-	
-	}
+
+        if (first_person && Input.GetMouseButtonDown(1))
+        {
+            //SHOOTING THE ARPON
+            Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
+            position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
+            GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+            GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
+            //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+            arpon_reference.transform.LookAt(position);
+            Debug.Log(position);
+            arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+        }
+
+
+    }
 
 	public void ToggleFreeCamera()
 	{
@@ -601,9 +615,12 @@ public class UIController : MonoBehaviour {
     public CanvasGroup ConnectionButton;
     public CanvasGroup AminoLinks;
     public Toggle Tutorial;
+    public Slider CutAway;
+    public Toggle ToggleBeacon;
 
     public void FirstPersonToggle()
     {
+        CutAway.value = -30;
         Tutorial.isOn = false;
         first_person = !first_person;
 		FreeCameraToggle.interactable = !first_person;
@@ -628,6 +645,7 @@ public class UIController : MonoBehaviour {
 
     public void StartExplore()
     {
+        CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
@@ -642,6 +660,8 @@ public class UIController : MonoBehaviour {
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
+        if (explorerController.beacon_holder.Count > 0)
+            ToggleBeacon.isOn = true;
     }
 
     public void ExplorerBackToDefault()

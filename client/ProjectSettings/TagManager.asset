@@ -11,6 +11,8 @@ TagManager:
   - camera_ship
   - space_ship
   - main_canvas
+  - data_1
+  - arpon
   layers:
   - Default
   - TransparentFX

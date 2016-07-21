@@ -80,4 +80,20 @@ public class ButtonGameState : MonoBehaviour, IPointerClickHandler {
             bb.molecules[1].transform.localEulerAngles = protein2_position;
         }
     }
+
+    public void SaveCustom()
+    {
+        n_atoms = "Good dock";
+        ele_score = "Good dock";
+        ljp_score = "Good dock";
+        amino_acids = new List<Vector2>();
+        amino_acids.Add(new Vector2(168, 14));
+        amino_acids.Add(new Vector2(54, 16));
+        amino_acids.Add(new Vector2(154, 38));
+
+        protein1_position = bb.molecules[0].transform.localEulerAngles;
+        protein2_position = bb.molecules[1].transform.localEulerAngles;
+
+        GameState = new GameStates(n_atoms, ele_score, ljp_score, protein1_position, protein2_position, amino_acids);
+    }
 }

@@ -226,6 +226,19 @@ public class PDB_mesh : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+        //look at the other protein when first eprson
+        //first person only - updaate
+        if (uIController.first_person)
+        {
+            if (transform.GetComponentInChildren<Camera>())
+            {
+                GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
+                //point the camera to the other protein
+                Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
+                temp_camera.transform.LookAt(temp_pos);
+            }
+        }
+
         if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
         {
             ray_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
@@ -268,17 +281,6 @@ public class PDB_mesh : MonoBehaviour {
 
                 transform.RotateAround(transform.position, dirRight, mouseDelta.y);
                 transform.RotateAround(transform.position, dirUp, -mouseDelta.x);
-                //first person only - updaate
-                if (uIController.first_person)
-                {
-                    if (transform.GetComponentInChildren<Camera>())
-                    {
-                        GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
-                        //point the camera to the other protein
-                        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                        temp_camera.transform.LookAt(temp_pos);
-                    }
-                }
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -319,7 +321,7 @@ public class PDB_mesh : MonoBehaviour {
                         temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
                         //point the camera to the other protein
                         Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                        temp.transform.LookAt(temp_pos);
+                       // temp.transform.LookAt(temp_pos);
 
                         Ray r_temp;
                         do
@@ -362,25 +364,32 @@ public class PDB_mesh : MonoBehaviour {
             has_rotated = false;
             rotating = false;
         }
-        else if (uIController.first_person && Input.GetMouseButtonDown(1))
-        {
-            Debug.Log("entr");
-            // click without movement selects an atom/amino acid.
-                Ray r_first_person_link;
-                int atom_first_person_link = -1;
-                if (GameObject.FindGameObjectWithTag("FirstPerson"))
-                {
-                    r_first_person_link = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-                    atom_first_person_link = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person_link);
-                }
+        //else if (uIController.first_person && Input.GetMouseButtonDown(1))
+        //{
+        //    Ray r_first_person_link;
+        //    int atom_first_person_link = -1;
+        //    if (GameObject.FindGameObjectWithTag("FirstPerson"))
+        //    {
+        //        r_first_person_link = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        //        atom_first_person_link = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person_link);
+        //    }
                 
-                if (atom_first_person_link != -1)
-                {
-                    Debug.Log("lazo");
-                    SelectAtom(atom_first_person_link);
-                    aminoSliderController.AddConnectionButton();
-                }
-        }
+        //    if (atom_first_person_link != -1)
+        //    {
+        //        //CRETING THE LAZO
+        //        //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+        //        //GameObject arpon_reference = Instantiate(ArponObject);
+        //        //arpon_reference.transform.position = GameObject.FindGameObjectWithTag("FirstPerson").transform.position;
+        //        //arpon_reference.GetComponent<Rigidbody>().AddForce(Input.mousePosition.normalized * -100);
+        //        //Debug.Log("lazo");
+
+               
+
+
+        //        //SelectAtom(atom_first_person_link);
+        //        //aminoSliderController.AddConnectionButton();
+        //    }
+        //}
         else {
             has_rotated = false;
             rotating = false;

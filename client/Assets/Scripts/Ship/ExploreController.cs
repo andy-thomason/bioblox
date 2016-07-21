@@ -69,7 +69,7 @@ public class ExploreController : MonoBehaviour {
         beacon_holder.Clear();
     }
 
-    bool toggle_beacon = false;
+    bool toggle_beacon = true;
 
     public void ToggleBeacon()
     {

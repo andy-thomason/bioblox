@@ -1176,7 +1176,7 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 8: {
-                hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct.";
+                hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct. Now press the 'Exit Tutorial' button and start playing!";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
@@ -1225,6 +1225,7 @@ public class BioBlox : MonoBehaviour
     {
         ToggleMode.isOn = false;
         ToggleGameMode();
+        aminoSlider.DeleteAllAminoConnections();
     }
 
 }

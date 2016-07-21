@@ -25,9 +25,10 @@ public class LineRenderer : MonoBehaviour {
 	List<Line> lines = new List<Line>();
 
 	public Camera lookat_camera;
+    Camera lookat_camera_renderer;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		MeshFilter mf = GetComponent<MeshFilter> ();
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
@@ -36,7 +37,12 @@ public class LineRenderer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		if (lookat_camera == null) {
+        if (GameObject.FindGameObjectWithTag("FirstPerson") != null)
+            lookat_camera_renderer = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>();
+        else
+            lookat_camera_renderer = lookat_camera;
+
+        if (lookat_camera_renderer == null) {
 			Debug.Log("warning: lookat_camera missing");
 			return;
 		}
@@ -45,12 +51,12 @@ public class LineRenderer : MonoBehaviour {
 		Vector2[] uvs = new Vector2[lines.Count * 4];
 		int[] indices = new int[lines.Count * 6];
 
-		Vector3 camera_pos = lookat_camera.transform.position;
+		Vector3 camera_pos = lookat_camera_renderer.transform.position;
 		for (int i = 0; i != lines.Count; ++i) {
 			Line line = lines[i];
 			Vector3 to_end = line.end - line.start;
 			Vector3 to_cam = camera_pos - line.start;
-			Vector3 up = Vector3.Cross(to_end, to_cam).normalized * (line.width * 0.5f);
+			Vector3 up = Vector3.Cross(to_end, to_cam).normalized * (line.width * 2.0f);
 			vertices[i*4+0] = line.start + up;
 			vertices[i*4+1] = line.start - up;
 			vertices[i*4+2] = line.end - up;

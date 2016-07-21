@@ -192,14 +192,22 @@ public class ShipController : MonoBehaviour {
 
         //This, I think, is a nice way of limiting your speed.  Your acceleration goes to zero as you approach the min/max speeds, and you initially
         //brake and accelerate a lot faster.  Could potentially do the same thing with the angular stuff.
-        decel = speed - minSpeed;
+        decel = -(maxSpeed + speed);
         accel = maxSpeed - speed;
+
+        Debug.Log("decel: " + decel);
+
 
         //simple accelerations
         if (Input.GetKey(KeyCode.Joystick1Button1) || Input.GetKey(KeyCode.LeftShift))
+        {
             speed += accel * Time.fixedDeltaTime;
+
+        }
         else if (Input.GetKey(KeyCode.LeftControl))
-            speed -= accel * Time.fixedDeltaTime;
+        {
+            speed += decel * Time.fixedDeltaTime;
+        }
         //else if (Input.GetKey(KeyCode.Joystick1Button0) || Input.GetKey(KeyCode.Space))
            // speed -= decel * Time.fixedDeltaTime;
 

@@ -320,6 +320,8 @@ public class AminoSliderController : MonoBehaviour {
 
         UpdateButtonTempIDA1();
         UpdateButtonTempIDA2();
+        //create a custom state
+        GameObject.FindGameObjectWithTag("data_1").GetComponent<ButtonGameState>().SaveCustom();
     }
 	
 	public void GenerateAminoButtons1(string currentAmino, string tag, int index)
