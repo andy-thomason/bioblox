@@ -678,4 +678,17 @@ public class UIController : MonoBehaviour {
     {
         cctv_overlay.sprite = cctv_ship;
     }
+
+    bool toggle_score = true;
+    public CanvasGroup score_panel_alpha;
+    public CanvasGroup close_score_panel;
+    public CanvasGroup open_score_panel;
+
+    public void ToggleScore()
+    {
+        score_panel_alpha.alpha = toggle_score ? 0 : 1;
+        close_score_panel.alpha = toggle_score ? 0 : 1;
+        open_score_panel.alpha = toggle_score ? 1 : 0;
+        toggle_score = !toggle_score;
+    }
 }
