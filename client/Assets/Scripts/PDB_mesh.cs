@@ -317,8 +317,8 @@ public class PDB_mesh : MonoBehaviour {
                             temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
 
                         temp.GetComponent<Animator>().enabled = true;
-                        temp.GetComponentInChildren<MeshRenderer>().enabled = true;
-                        temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
+                        //temp.GetComponentInChildren<MeshRenderer>().enabled = true;
+                        //temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
                         //point the camera to the other protein
                         Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
                        // temp.transform.LookAt(temp_pos);

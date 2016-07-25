@@ -643,8 +643,13 @@ public class UIController : MonoBehaviour {
         //ToggleFreeCamera();
     }
 
+    public Material space_skybox;
+    public Material normal_skybox;
+
     public void StartExplore()
     {
+
+        RenderSettings.skybox = space_skybox;
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -657,6 +662,7 @@ public class UIController : MonoBehaviour {
 
     public void EndExplore()
     {
+        RenderSettings.skybox = normal_skybox;
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
