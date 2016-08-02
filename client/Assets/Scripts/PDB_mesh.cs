@@ -223,6 +223,7 @@ public class PDB_mesh : MonoBehaviour {
     Camera main_camera;
     Ray ray_first_person;
     int atom_first_person = -1;
+    bool testi = false;
     // Update is called once per frame
     void Update () {
 
@@ -250,10 +251,9 @@ public class PDB_mesh : MonoBehaviour {
         int atomID_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, ray_first_person);
         Vector3 mousePos = Input.mousePosition;
 
-        
         if (Input.GetMouseButtonDown(0))
         {
-            if (atomID != -1 || atomID_first_person != -1)
+            if (atomID != -1 || (uIController.first_person && atomID_first_person != -1))
             {
                 // "rotating" only gets set if we first click on an atom.
                 rotating = true;
@@ -396,7 +396,7 @@ public class PDB_mesh : MonoBehaviour {
         }
         
         lastMousePos = mousePos;
-        light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
+        //light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
 
         foreach (MeshRenderer r in meshes) {
             r.material.SetVector ("_LightPos", light_pos);

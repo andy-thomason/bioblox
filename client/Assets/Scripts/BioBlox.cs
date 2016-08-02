@@ -41,7 +41,8 @@ public class BioBlox : MonoBehaviour
     
     // a list of win conditions where two atoms must be paired
     List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
-
+    // the molecules in the scene
+    public GameObject[] prefab_molecules;
     // the molecules in the scene
     public GameObject[] molecules;
     public BitArray[] atoms_touching;
@@ -136,6 +137,10 @@ public class BioBlox : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+    }
+
+    public void StartGame()
+    {
         //winSplash.SetActive (false);
         //looseSplash.SetActive (false);
         //goSplash.SetActive (false);
@@ -144,39 +149,39 @@ public class BioBlox : MonoBehaviour
 
         Time.fixedDeltaTime = 0.033f;
 
-        colorPool.Add (Color.red);
-        colorPool.Add (Color.blue);
-        colorPool.Add (Color.cyan);
-        colorPool.Add (Color.green);
-        colorPool.Add (Color.magenta);
-        colorPool.Add (Color.yellow);
-        colorPool.Add (Color.white);
-        colorPool.Add (Color.gray);
-        colorPool.Add (new Color (1.0f, 0.5f, 0.1f));
+        colorPool.Add(Color.red);
+        colorPool.Add(Color.blue);
+        colorPool.Add(Color.cyan);
+        colorPool.Add(Color.green);
+        colorPool.Add(Color.magenta);
+        colorPool.Add(Color.yellow);
+        colorPool.Add(Color.white);
+        colorPool.Add(Color.gray);
+        colorPool.Add(new Color(1.0f, 0.5f, 0.1f));
         //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
-        Debug.Log ("Start");
-    //filenames.Add ("jigsawBlue");
+        Debug.Log("Start");
+        //filenames.Add ("jigsawBlue");
 
-    //filenames.Add ("2W9G");
+        //filenames.Add ("2W9G");
 
-    //filenames.Add ("betabarrel_b");
-    //filenames.Add("2ptc_u_new_edited");
+        //filenames.Add ("betabarrel_b");
+        //filenames.Add("2ptc_u_new_edited");
 
-        filenames.Add ("pdb2ptcWithTags");
+        filenames.Add("pdb2ptcWithTags");
 
-        filenames.Add ("1GCQ_bWithTags");
+        //filenames.Add("1GCQ_bWithTags");
 
 
-        filenames.Add ("pdb2ptcWithTags");
+        //filenames.Add("pdb2ptcWithTags");
 
-//        scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
+        //        scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
         //scoreCard.gameObject.SetActive (false);
 
         //game_loop loads the file at filenames[current_level]
         eventSystem = EventSystem.current;
 
-        StartCoroutine (game_loop ());
-        GetComponent<AminoSliderController> ().init ();
+        StartCoroutine(game_loop());
+        GetComponent<AminoSliderController>().init();
 
         //update
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
@@ -185,11 +190,7 @@ public class BioBlox : MonoBehaviour
         uiController = FindObjectOfType<UIController>();
         aminoSlider = FindObjectOfType<AminoSliderController>();
 
-        //intro set
-        camera.gameObject.SetActive(false);
-        IntroCamera.SetActive(true);
     }
-
     public string GetCurrentLevelName ()
     {
         return filenames [current_level];
@@ -682,23 +683,27 @@ public class BioBlox : MonoBehaviour
         PDB_molecule mol = PDB_parser.get_molecule (name);
         p.mol = mol;
         p.protein_id = index;
-        GameObject pdb = GameObject.Find (proto);
-        MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
-        make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
-/*
-        //block flare
-        if (index == 0)
-        {
-            GameObject temp = Instantiate(FlareBlock1);
-            temp.transform.SetParent(obj.transform);
 
-        }
-        else
-        {
-            GameObject temp = Instantiate(FlareBlock2);
-            temp.transform.SetParent(obj.transform);
-        }
-        */
+        //making mesh
+        //GameObject pdb = GameObject.Find (proto);
+        //MeshRenderer pdbr = pdb.GetComponent<MeshRenderer> ();
+        // make_molecule_mesh (p, pdbr.material, layerNum, mesh_type);
+        //making mesh
+
+        /*
+                //block flare
+                if (index == 0)
+                {
+                    GameObject temp = Instantiate(FlareBlock1);
+                    temp.transform.SetParent(obj.transform);
+
+                }
+                else
+                {
+                    GameObject temp = Instantiate(FlareBlock2);
+                    temp.transform.SetParent(obj.transform);
+                }
+                */
         return obj;
     }
 
@@ -770,6 +775,12 @@ public class BioBlox : MonoBehaviour
         GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
         GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
 
+        GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
+        mol1_mesh.transform.SetParent(mol1.transform);
+
+        GameObject mol2_mesh = Instantiate(prefab_molecules[1]);
+        mol2_mesh.transform.SetParent(mol2.transform);
+
         //Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
@@ -815,7 +826,7 @@ public class BioBlox : MonoBehaviour
                 //lockButton.gameObject.SetActive(false);
                 //lockButton.interactable = false;
             }
-
+            Debug.Log ("ento");
             make_molecules (true, MeshTopology.Triangles);
 
             // This is very grubby, must generalise.

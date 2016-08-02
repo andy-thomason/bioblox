@@ -361,6 +361,7 @@ public class ShipController : MonoBehaviour {
 
     public void EndExplore()
     {
+        Debug.Log("si clickeado");
         atom_name.SetActive(false);
         scanning.SetActive(false);
         exit_button.SetActive(false);

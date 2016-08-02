@@ -14,7 +14,16 @@ public class IntroController : MonoBehaviour {
     public GameObject IntroLabModel;
     public GameObject GameCamera;
     public CanvasGroup GameCanvas;
+    public GameObject IntroCamera;
+    public Canvas AboutButton;
+    public Canvas PlayButton;
 
+    void Awake()
+    {
+        IntroCamera.SetActive(true);
+        //PlayButton.worldCamera = IntroCamera.GetComponent<Camera>();
+       // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
+    }
 
     public void CameraStart()
 	{
@@ -39,18 +48,17 @@ public class IntroController : MonoBehaviour {
 
     public void MainToMicroscopeCamera()
     {
-        GetComponent<Camera>().enabled = false;
-        MicroscopeView.SetActive(true);
-        IntroLabModel.SetActive(false);
+       gameObject.SetActive(false);
+        //MicroscopeView.SetActive(true);
+        //IntroLabModel.SetActive(false);
     }
 
     public void MainToGame()
     {
-        GetComponent<Camera>().enabled = false;
         GameCamera.SetActive(true);
         GameCanvas.alpha = 1;
         GameCanvas.blocksRaycasts = true;
-		
+        gameObject.SetActive(false);
     }
 
     public void ScrollPoster()
