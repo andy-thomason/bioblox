@@ -83,6 +83,7 @@ public class UIController : MonoBehaviour {
             position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
             GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
             GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
+            arpon_reference.GetComponent<ArponController>().enabled = true;
             //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
             arpon_reference.transform.LookAt(position);
             Debug.Log(position);
@@ -643,8 +644,13 @@ public class UIController : MonoBehaviour {
         //ToggleFreeCamera();
     }
 
+    public Material space_skybox;
+    public Material normal_skybox;
+
     public void StartExplore()
     {
+
+        RenderSettings.skybox = space_skybox;
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -657,6 +663,7 @@ public class UIController : MonoBehaviour {
 
     public void EndExplore()
     {
+        RenderSettings.skybox = normal_skybox;
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
@@ -691,4 +698,18 @@ public class UIController : MonoBehaviour {
         open_score_panel.alpha = toggle_score ? 1 : 0;
         toggle_score = !toggle_score;
     }
+
+    public Text level_description;
+    public Text level_title;
+    public Image image_description;
+    public GameObject button_play;
+
+    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image)
+    {
+        level_description.text = temp_description;
+        level_title.text = temp_title;
+        image_description.sprite = temp_image;
+        button_play.SetActive(true);
+    }
+
 }

@@ -107,8 +107,8 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_GenerateMotionCurves: 0
   m_Events:
-  - time: 1.5
-    functionName: FadeCycle
+  - time: 1
+    functionName: LoadGame
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
