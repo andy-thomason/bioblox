@@ -195,8 +195,6 @@ public class ShipController : MonoBehaviour {
         decel = -(maxSpeed + speed);
         accel = maxSpeed - speed;
 
-        Debug.Log("decel: " + decel);
-
 
         //simple accelerations
         if (Input.GetKey(KeyCode.Joystick1Button1) || Input.GetKey(KeyCode.LeftShift))
@@ -361,7 +359,6 @@ public class ShipController : MonoBehaviour {
 
     public void EndExplore()
     {
-        Debug.Log("si clickeado");
         atom_name.SetActive(false);
         scanning.SetActive(false);
         exit_button.SetActive(false);

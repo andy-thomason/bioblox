@@ -646,11 +646,13 @@ public class UIController : MonoBehaviour {
 
     public Material space_skybox;
     public Material normal_skybox;
+    public GameObject floor;
 
     public void StartExplore()
     {
 
-        RenderSettings.skybox = space_skybox;
+        //RenderSettings.skybox = space_skybox;
+        //floor.SetActive(false);
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -663,7 +665,8 @@ public class UIController : MonoBehaviour {
 
     public void EndExplore()
     {
-        RenderSettings.skybox = normal_skybox;
+        //RenderSettings.skybox = normal_skybox;
+       // floor.SetActive(true);
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
