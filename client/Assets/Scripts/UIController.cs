@@ -58,23 +58,70 @@ public class UIController : MonoBehaviour {
     ExploreController explorerController;
 
 	public Toggle[] ToggleButtonFunctionsView;
+    Camera MainCameraComponent;
 
 	void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
+        MainCameraComponent = MainCamera.GetComponent<Camera>();
     }
 
-	// Update is called once per frame
-	void Update () {
+    Vector3 dragOrigin;
+    float dragSpeed = 20.0f;
+    Vector3 move;
 
-		if(Input.GetKeyDown (KeyCode.F) && !ToggleFreeCameraStatus) {
-			MainCamera.GetComponent<CameraMovement> ().enabled = CameraFreeze;			
-			FreeCameraKeysFreeze.SetActive (CameraFreeze); 
-			FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
-			CameraFreeze = !CameraFreeze;
-		}
+    // Update is called once per frame
+    void Update () {
+
+        //if(Input.GetKeyDown (KeyCode.F) && !ToggleFreeCameraStatus) {
+        //	MainCamera.GetComponent<CameraMovement> ().enabled = CameraFreeze;			
+        //	FreeCameraKeysFreeze.SetActive (CameraFreeze); 
+        //	FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
+        //	CameraFreeze = !CameraFreeze;
+        //}
+
+        //camera zoom
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+        {
+            if (MainCameraComponent.fieldOfView > 1)
+                MainCameraComponent.fieldOfView -= 2f;
+            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+
+        }
+        else if(Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            if (MainCameraComponent.fieldOfView < 33)
+                MainCameraComponent.fieldOfView += 2f;
+            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            dragOrigin = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButton(1))
+        { 
+
+            Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+
+            if (MainCamera.transform.position.y > -25)
+            {
+                move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+            }
+            else
+            {
+                if (pos.y < 0)
+                    move = new Vector3(pos.x * dragSpeed, 0, 0);
+                else
+                    move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+            }
+
+
+            MainCamera.transform.Translate(move,Space.Self);
+        }
 
         if (first_person && Input.GetMouseButtonDown(1))
         {
@@ -713,6 +760,21 @@ public class UIController : MonoBehaviour {
         level_title.text = temp_title;
         image_description.sprite = temp_image;
         button_play.SetActive(true);
+    }
+
+    bool isProtein1Fixed = false;
+    bool isProtein2Fixed = false;
+
+    public void FixProtein1()
+    {
+        BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = !isProtein1Fixed;
+        isProtein1Fixed = !isProtein1Fixed;
+    }
+
+    public void FixProtein2()
+    {
+        BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
+        isProtein2Fixed = !isProtein2Fixed;
     }
 
 }

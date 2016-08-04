@@ -14,9 +14,9 @@ public class LineRenderer : MonoBehaviour {
 		public Line(Vector3 start, Vector3 end) {
 			this.start = start;
 			this.end = end;
-			this.width = 0.1f;
+			this.width = 0.5f;
 			Vector2 uv0 = new Vector2(0,0);
-			Vector2 uv1 = new Vector2(0,0);
+			Vector2 uv1 = new Vector2(1,1);
 			this.uv0 = uv0;
 			this.uv1 = uv1;
 		}
@@ -56,7 +56,7 @@ public class LineRenderer : MonoBehaviour {
 			Line line = lines[i];
 			Vector3 to_end = line.end - line.start;
 			Vector3 to_cam = camera_pos - line.start;
-			Vector3 up = Vector3.Cross(to_end, to_cam).normalized * (line.width * 2.0f);
+			Vector3 up = Vector3.Cross(to_end, to_cam).normalized * (line.width);
 			vertices[i*4+0] = line.start + up;
 			vertices[i*4+1] = line.start - up;
 			vertices[i*4+2] = line.end - up;

@@ -55,10 +55,10 @@ public class IntroController : MonoBehaviour {
 
     public void MainToGame()
     {
-        GameCamera.SetActive(true);
+        //GameCamera.SetActive(true);
         GameCanvas.alpha = 1;
         GameCanvas.blocksRaycasts = true;
-        gameObject.SetActive(false);
+        IntroCamera.SetActive(false);
     }
 
     public void ScrollPoster()
