@@ -118,6 +118,8 @@ public class BioBlox : MonoBehaviour
     public GameObject IntroCamera;
     UIController uiController;
     AminoSliderController aminoSlider;
+    public Transform TutorialHand;
+    public Transform SliderString;
 
     public enum GameState {
         Setup,
@@ -137,6 +139,7 @@ public class BioBlox : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        uiController = FindObjectOfType<UIController>();
     }
 
     public void StartGame()
@@ -187,7 +190,6 @@ public class BioBlox : MonoBehaviour
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         //first eprson
-        uiController = FindObjectOfType<UIController>();
         aminoSlider = FindObjectOfType<AminoSliderController>();
 
     }
@@ -336,7 +338,7 @@ public class BioBlox : MonoBehaviour
                 MainCamera.fieldOfView = 60;
             }
         }*/
-        if (ToggleMode.isOn)
+        if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
             UpdateHint();
     }
 
@@ -1110,8 +1112,13 @@ public class BioBlox : MonoBehaviour
         // state machine for hints.
         // todo: turn this into a JSON file.
         switch (hint_stage) {
-            case 0: {
-                hintText.text = "In the panel on the bottom left, select the blue finger marked LYS I 15.";
+            case 0:
+                {
+                    TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.y + 50.0f, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.z);
+                    //Debug.Log(MainCamera.ScreenToWorldPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
+                    //Debug.Log(MainCamera.WorldToScreenPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
+                    hintText.text = "In the panel on the bottom left, select the blue finger marked LYS I 15.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
@@ -1120,7 +1127,9 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 1: {
-                hintText.text = "In the panel on the bottom left, select the red atoms at the bottom of the hole marked ASP E 189.";
+                    //TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.y + 50.0f, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.z);
+                    hintText.text = "In the panel on the bottom left, select the red atoms at the bottom of the hole marked ASP E 189.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                     if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
@@ -1128,8 +1137,10 @@ public class BioBlox : MonoBehaviour
                     hint_stage =  2;
                 }
             } break;
-            case 2: {
-                hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole. You can spin the molecules to see the atoms in the hole.";
+            case 2:
+                {
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 20.0f, uiController.ConnectionButton.transform.position.y + 60.0f, uiController.ConnectionButton.transform.position.z);
+                    hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole. You can spin the molecules to see the atoms in the hole.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
@@ -1140,7 +1151,9 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 3: {
-                hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
+                    TutorialHand.rotation = Quaternion.AngleAxis(45, Vector3.forward);
+                    TutorialHand.position = new Vector3(SliderString.position.x + 40.0f, SliderString.position.y, SliderString.position.z);
+                    hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;

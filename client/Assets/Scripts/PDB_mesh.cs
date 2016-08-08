@@ -243,7 +243,7 @@ public class PDB_mesh : MonoBehaviour {
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
         Vector3 mousePos = Input.mousePosition;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !uIController.isOverUI)
         {
             if (atomID != -1)
             {

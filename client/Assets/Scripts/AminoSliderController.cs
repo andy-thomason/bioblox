@@ -336,10 +336,10 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.transform.SetParent (SliderMol[0].transform,false);
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
-		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
+		//AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+		//AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
-		InsertButtonToListOfAminoAcidsFuntionA1 (AminoButtonReference, currentAmino);
+		//InsertButtonToListOfAminoAcidsFuntionA1 (AminoButtonReference, currentAmino);
 
 		//Debug.Log (AminoColor [currentAmino]);
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
@@ -362,10 +362,10 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.transform.SetParent (SliderMol[1].transform,false);
 		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
 		//store the color in the button
-		AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
+		//AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+		//AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
-		InsertButtonToListOfAminoAcidsFuntionA2 (AminoButtonReference, currentAmino);
+		//InsertButtonToListOfAminoAcidsFuntionA2 (AminoButtonReference, currentAmino);
 
 		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
 		ButtonText [0].text = currentAmino.Replace (" ", "");

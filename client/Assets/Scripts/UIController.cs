@@ -59,6 +59,8 @@ public class UIController : MonoBehaviour {
 
 	public Toggle[] ToggleButtonFunctionsView;
     Camera MainCameraComponent;
+    
+    public bool isOverUI = false;
 
 	void Awake()
 	{
@@ -97,31 +99,31 @@ public class UIController : MonoBehaviour {
             //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
         }
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            dragOrigin = Input.mousePosition;
-        }
+        //if (Input.GetMouseButtonDown(1))
+        //{
+        //    dragOrigin = Input.mousePosition;
+        //}
 
-        if (Input.GetMouseButton(1))
-        { 
+        //if (Input.GetMouseButton(1))
+        //{ 
 
-            Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+        //    Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
 
-            if (MainCamera.transform.position.y > -25)
-            {
-                move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-            }
-            else
-            {
-                if (pos.y < 0)
-                    move = new Vector3(pos.x * dragSpeed, 0, 0);
-                else
-                    move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-            }
+        //    if (MainCamera.transform.position.y > -25)
+        //    {
+        //        move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //    }
+        //    else
+        //    {
+        //        if (pos.y < 0)
+        //            move = new Vector3(pos.x * dragSpeed, 0, 0);
+        //        else
+        //            move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //    }
 
 
-            MainCamera.transform.Translate(move,Space.Self);
-        }
+        //    MainCamera.transform.Translate(move,Space.Self);
+        //}
 
         if (first_person && Input.GetMouseButtonDown(1))
         {
@@ -671,7 +673,7 @@ public class UIController : MonoBehaviour {
         CutAway.value = -30;
         Tutorial.isOn = false;
         first_person = !first_person;
-		FreeCameraToggle.interactable = !first_person;
+		//FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;
 
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
