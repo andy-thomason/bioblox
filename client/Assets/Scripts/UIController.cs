@@ -58,23 +58,72 @@ public class UIController : MonoBehaviour {
     ExploreController explorerController;
 
 	public Toggle[] ToggleButtonFunctionsView;
+    Camera MainCameraComponent;
+    
+    public bool isOverUI = false;
 
 	void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
+        MainCameraComponent = MainCamera.GetComponent<Camera>();
     }
 
-	// Update is called once per frame
-	void Update () {
+    Vector3 dragOrigin;
+    float dragSpeed = 20.0f;
+    Vector3 move;
 
-		if(Input.GetKeyDown (KeyCode.F) && !ToggleFreeCameraStatus) {
-			MainCamera.GetComponent<CameraMovement> ().enabled = CameraFreeze;			
-			FreeCameraKeysFreeze.SetActive (CameraFreeze); 
-			FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
-			CameraFreeze = !CameraFreeze;
-		}
+    // Update is called once per frame
+    void Update () {
+
+        //if(Input.GetKeyDown (KeyCode.F) && !ToggleFreeCameraStatus) {
+        //	MainCamera.GetComponent<CameraMovement> ().enabled = CameraFreeze;			
+        //	FreeCameraKeysFreeze.SetActive (CameraFreeze); 
+        //	FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
+        //	CameraFreeze = !CameraFreeze;
+        //}
+
+        //camera zoom
+        if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+        {
+            if (MainCameraComponent.fieldOfView > 1)
+                MainCameraComponent.fieldOfView -= 2f;
+            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+
+        }
+        else if(Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            if (MainCameraComponent.fieldOfView < 33)
+                MainCameraComponent.fieldOfView += 2f;
+            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+        }
+
+        //if (Input.GetMouseButtonDown(1))
+        //{
+        //    dragOrigin = Input.mousePosition;
+        //}
+
+        //if (Input.GetMouseButton(1))
+        //{ 
+
+        //    Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+
+        //    if (MainCamera.transform.position.y > -25)
+        //    {
+        //        move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //    }
+        //    else
+        //    {
+        //        if (pos.y < 0)
+        //            move = new Vector3(pos.x * dragSpeed, 0, 0);
+        //        else
+        //            move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //    }
+
+
+        //    MainCamera.transform.Translate(move,Space.Self);
+        //}
 
         if (first_person && Input.GetMouseButtonDown(1))
         {
@@ -624,7 +673,7 @@ public class UIController : MonoBehaviour {
         CutAway.value = -30;
         Tutorial.isOn = false;
         first_person = !first_person;
-		FreeCameraToggle.interactable = !first_person;
+		//FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;
 
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
@@ -646,11 +695,13 @@ public class UIController : MonoBehaviour {
 
     public Material space_skybox;
     public Material normal_skybox;
+    public GameObject floor;
 
     public void StartExplore()
     {
 
-        RenderSettings.skybox = space_skybox;
+        //RenderSettings.skybox = space_skybox;
+        //floor.SetActive(false);
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -663,7 +714,8 @@ public class UIController : MonoBehaviour {
 
     public void EndExplore()
     {
-        RenderSettings.skybox = normal_skybox;
+        //RenderSettings.skybox = normal_skybox;
+       // floor.SetActive(true);
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
@@ -710,6 +762,21 @@ public class UIController : MonoBehaviour {
         level_title.text = temp_title;
         image_description.sprite = temp_image;
         button_play.SetActive(true);
+    }
+
+    bool isProtein1Fixed = false;
+    bool isProtein2Fixed = false;
+
+    public void FixProtein1()
+    {
+        BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = !isProtein1Fixed;
+        isProtein1Fixed = !isProtein1Fixed;
+    }
+
+    public void FixProtein2()
+    {
+        BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
+        isProtein2Fixed = !isProtein2Fixed;
     }
 
 }

@@ -6,11 +6,11 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Rope
+  m_Name: 02 - Default
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
-  m_CustomRenderQueue: 2000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   m_SavedProperties:
     serializedVersion: 2
@@ -19,19 +19,12 @@ Material:
         first:
           name: _MainTex
         second:
-          m_Texture: {fileID: 2800000, guid: d5b4fd180661d6247baf9a037e5f8657, type: 3}
-          m_Scale: {x: 1, y: 0.2}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _BumpMap
-        second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _NormalMap
+          name: _BumpMap
         second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
@@ -62,8 +55,8 @@ Material:
           name: _EmissionMap
         second:
           m_Texture: {fileID: 0}
-          m_Scale: {x: 20, y: 20}
-          m_Offset: {x: 1, y: 1}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
       data:
         first:
           name: _DetailMask
@@ -76,18 +69,11 @@ Material:
           name: _DetailAlbedoMap
         second:
           m_Texture: {fileID: 0}
-          m_Scale: {x: 10, y: 10}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _MetallicGlossMap
-        second:
-          m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _SpecGlossMap
+          name: _MetallicGlossMap
         second:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
@@ -104,15 +90,7 @@ Material:
       data:
         first:
           name: _Cutoff
-        second: 0.63
-      data:
-        first:
-          name: _Shininess
-        second: 0.078125
-      data:
-        first:
-          name: PixelSnap
-        second: 0
+        second: 0.5
       data:
         first:
           name: _Parallax
@@ -124,7 +102,7 @@ Material:
       data:
         first:
           name: _Glossiness
-        second: 0
+        second: 0.5
       data:
         first:
           name: _BumpScale
@@ -149,38 +127,6 @@ Material:
         first:
           name: _Metallic
         second: 0
-      data:
-        first:
-          name: _InvFade
-        second: 3
-      data:
-        first:
-          name: _EdgeLength
-        second: 50
-      data:
-        first:
-          name: _RimPower
-        second: 3
-      data:
-        first:
-          name: _tintAmount
-        second: 0.5
-      data:
-        first:
-          name: _Speed
-        second: 5
-      data:
-        first:
-          name: _Frequency
-        second: 2
-      data:
-        first:
-          name: _Amplitude
-        second: 1
-      data:
-        first:
-          name: _Transparency
-        second: 0.5
     m_Colors:
       data:
         first:
@@ -189,28 +135,4 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 1, g: 1, b: 1, a: 1}
-      data:
-        first:
-          name: _SpecColor
-        second: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-      data:
-        first:
-          name: _TintColor
-        second: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-      data:
-        first:
-          name: _EmisColor
-        second: {r: 1, g: 1, b: 1, a: 0}
-      data:
-        first:
-          name: _RimColor
-        second: {r: 0.26, g: 0.19, b: 0.16, a: 0}
-      data:
-        first:
-          name: _ColorA
-        second: {r: 1, g: 1, b: 1, a: 1}
-      data:
-        first:
-          name: _ColorB
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: 0.5882353, g: 0.5882353, b: 0.5882353, a: 1}

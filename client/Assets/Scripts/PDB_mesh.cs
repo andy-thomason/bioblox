@@ -221,8 +221,6 @@ public class PDB_mesh : MonoBehaviour {
     }
 
     Camera main_camera;
-    Ray ray_first_person;
-    int atom_first_person = -1;
     bool testi = false;
     // Update is called once per frame
     void Update () {
@@ -240,20 +238,14 @@ public class PDB_mesh : MonoBehaviour {
             }
         }
 
-        if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
-        {
-            ray_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        }
-
         ray = cam.ScreenPointToRay (Input.mousePosition);
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
-        int atomID_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, ray_first_person);
         Vector3 mousePos = Input.mousePosition;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !uIController.isOverUI)
         {
-            if (atomID != -1 || (uIController.first_person && atomID_first_person != -1))
+            if (atomID != -1)
             {
                 // "rotating" only gets set if we first click on an atom.
                 rotating = true;
@@ -290,14 +282,14 @@ public class PDB_mesh : MonoBehaviour {
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
                 int atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
-                if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
-                {
-                    Ray r_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-                    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
-                }
+                //if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
+                //{
+                //    Ray r_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+                //    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
+                //}
 
                 Debug.Log(atom);
-                if (atom != -1 || atom_first_person != -1)
+                if (atom != -1)
                 {
                     SelectAtom(atom);
 
@@ -313,8 +305,8 @@ public class PDB_mesh : MonoBehaviour {
                         temp.transform.SetParent(transform, false);
                         if(atom != -1)
                             temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
-                        else if(atom_first_person != -1)
-                            temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
+                        //else if(atom_first_person != -1)
+                        //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
 
                         temp.GetComponent<Animator>().enabled = true;
                         //temp.GetComponentInChildren<MeshRenderer>().enabled = true;
