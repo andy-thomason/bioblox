@@ -5,6 +5,7 @@ public class FadePanel : MonoBehaviour {
 
     bool FadeStatus = false;
     BioBlox bb;
+    public Light intro_light;
 
     void Start()
     {
@@ -19,6 +20,7 @@ public class FadePanel : MonoBehaviour {
 
     public void LoadGame()
     {
+        intro_light.enabled = false;
         FindObjectOfType<IntroController>().MainToGame();
         bb.StartGame();
     }

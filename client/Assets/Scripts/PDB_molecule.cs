@@ -336,7 +336,7 @@ end_header
     
     void build_ball_mesh(out Vector3[] vertices,out Vector3[] normals,out Vector2[] uvs,out Color[] colors,out int[] indices) {
         //debug.WriteLine("building mesh");
- 
+        Debug.Log("si");
         int num_atoms = atom_centres.Length;
         int vlen = vsphere.Length;
         int ilen = isphere.Length;

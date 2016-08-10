@@ -1115,10 +1115,10 @@ public class BioBlox : MonoBehaviour
             case 0:
                 {
                     TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.y + 50.0f, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.z);
                     //Debug.Log(MainCamera.ScreenToWorldPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
                     //Debug.Log(MainCamera.WorldToScreenPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
-                    hintText.text = "In the panel on the bottom left, select the blue finger marked LYS I 15.";
+                    hintText.text = "Welcome! In the panel on the bottom left there are buttons which represents amino acids. Select the blue button marked LYS I 15.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 5;
@@ -1128,8 +1128,8 @@ public class BioBlox : MonoBehaviour
             } break;
             case 1: {
                     //TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.y + 50.0f, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.z);
-                    hintText.text = "In the panel on the bottom left, select the red atoms at the bottom of the hole marked ASP E 189.";
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.z);
+                    hintText.text = "And now select the red button marked ASP E 189.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                     if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
@@ -1139,8 +1139,8 @@ public class BioBlox : MonoBehaviour
             } break;
             case 2:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 20.0f, uiController.ConnectionButton.transform.position.y + 60.0f, uiController.ConnectionButton.transform.position.z);
-                    hintText.text = "Good. Now press the '+' button to add a connection. This will connect the blue finger with the red hole. You can spin the molecules to see the atoms in the hole.";
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+                    hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids. You can spin the molecules to see the atoms in the hole.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsSelected(1, aas[0])) {
                     hint_stage =  0;
@@ -1151,8 +1151,8 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 3: {
-                    TutorialHand.rotation = Quaternion.AngleAxis(45, Vector3.forward);
-                    TutorialHand.position = new Vector3(SliderString.position.x + 40.0f, SliderString.position.y, SliderString.position.z);
+                    TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
+                    TutorialHand.position = new Vector3(SliderString.position.x + 80.0f, SliderString.position.y, SliderString.position.z);
                     hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
@@ -1171,41 +1171,165 @@ public class BioBlox : MonoBehaviour
                 }
             } break;
             case 5: {
-                hintText.text = "Now we can make two more connections. First try connecting ARG I 17 to ILE E 73.";
+                    TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.z);
+                hintText.text = "Now lets make two more connections. First select the blue button marked ARG I 17";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
-                } else if (sliders.IsConnectionMade(aas[2], aas[3])) {
+                } else if (sliders.IsSelected(1, aas[3])) {
                     hint_stage = 6;
                 }
-            } break;
-            case 6: {
-                hintText.text = "Now connect ARG I 39 to GLN E 175";
-                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
-                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
-                    hint_stage = 5;
-                } else if (!sliders.IsConnectionMade(aas[2], aas[3])) {
-                    hint_stage = 5;
-                } else if (sliders.IsConnectionMade(aas[4], aas[5])) {
-                    hint_stage = 7;
-                }
-            } break;
-            case 7: {
-                hintText.text = "Gently pull in the strings all the way using the left hand slider.";
-                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
-                if (!sliders.IsConnectionMade(aas[1], aas[0]) || !sliders.IsConnectionMade(aas[2], aas[3]) || !sliders.IsConnectionMade(aas[4], aas[5])) {
-                    hint_stage = 5;
-                } else if (conMan.SliderStrings.value == 0) {
+                else if (sliders.IsConnectionMade(aas[2], aas[3]))
+                {
                     hint_stage = 8;
                 }
-            } break;
-            case 8: {
-                hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct. Now press the 'Exit Tutorial' button and start playing!";
-                HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
-                if (!sliders.IsConnectionMade(aas[1], aas[0])) {
+                else if (!sliders.IsSelected(1, aas[3]))
+                {
                     hint_stage = 5;
                 }
-            } break;
+                } break;
+            case 6:
+                {
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.z);
+
+                    hintText.text = "Now select the grey button marked ILE E 73";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsConnectionMade(aas[1], aas[0]))
+                    {
+                        hint_stage = 0;
+                    }
+                    else if (sliders.IsSelected(0, aas[2]))
+                    {
+                        hint_stage = 7;
+                    }
+                    else if (!sliders.IsSelected(1, aas[3]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (!sliders.IsSelected(0, aas[2]))
+                    {
+                        hint_stage = 6;
+                    }
+                }
+                break;
+            case 7:
+                {
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+
+                    hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsSelected(1, aas[3]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (!sliders.IsSelected(0, aas[2]))
+                    {
+                        hint_stage = 6;
+                    }
+                    else if (sliders.IsConnectionMade(aas[2], aas[3]))
+                    {
+                        hint_stage = 8;
+                    }
+                }
+                break;
+            case 8:
+                {
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.z);
+
+                    hintText.text = "One more connection to go; select the blue button marked ARG I 39";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsConnectionMade(aas[1], aas[0]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (sliders.IsSelected(1, aas[5]))
+                    {
+                        hint_stage = 9;
+                    }
+                    else if (!sliders.IsSelected(1, aas[5]))
+                    {
+                        hint_stage = 8;
+                    }
+                }
+                break;
+            case 9:
+                {
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.z);
+
+                    hintText.text = "Select the pink button marked GLN E 175";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsConnectionMade(aas[1], aas[0]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (!sliders.IsConnectionMade(aas[2], aas[3]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (sliders.IsSelected(0, aas[4]))
+                    {
+                        hint_stage = 10;
+                    }
+                    else if (!sliders.IsSelected(1, aas[5]))
+                    {
+                        hint_stage = 8;
+                    }
+                    else if (!sliders.IsSelected(0, aas[4]))
+                    {
+                        hint_stage = 9;
+                    }
+                }
+                break;
+            case 10:
+                {
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+
+                    hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsSelected(1, aas[5]))
+                    {
+                        hint_stage = 8;
+                    }
+                    else if (!sliders.IsSelected(0, aas[4]))
+                    {
+                        hint_stage = 9;
+                    }
+                    else if (sliders.IsConnectionMade(aas[4], aas[5]))
+                    {
+                        hint_stage = 11;
+                    }
+                }
+                break;
+            case 11:
+                {
+                    TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
+                    TutorialHand.position = new Vector3(SliderString.position.x + 40.0f, SliderString.position.y, SliderString.position.z);
+                    hintText.text = "Gently pull in the strings all the way using the left hand slider.";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    Debug.Log("1: " + sliders.IsConnectionMade(aas[1], aas[0]) + " - 2: " + sliders.IsConnectionMade(aas[2], aas[3]) + " - 3: " + sliders.IsConnectionMade(aas[4], aas[5]));
+                    if (!sliders.IsConnectionMade(aas[1], aas[0]) || !sliders.IsConnectionMade(aas[2], aas[3]) || !sliders.IsConnectionMade(aas[4], aas[5]))
+                    {
+                        hint_stage = 5;
+                    }
+                    else if (conMan.SliderStrings.value == 0)
+                    {
+                        hint_stage = 12;
+                    }
+                }
+                break;
+            case 12:
+                {
+                    TutorialHand.position = new Vector3(5000.0f,0,0);
+
+                    hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct. Now press the 'Exit Tutorial' button and start playing!";
+                    HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
+                    if (!sliders.IsConnectionMade(aas[1], aas[0]))
+                    {
+                        hint_stage = 5;
+                    }
+                }
+                break;
         }
     }
 
@@ -1227,6 +1351,9 @@ public class BioBlox : MonoBehaviour
         HintText.SetActive(status);
         HintTextPanel.gameObject.SetActive(status);
         ExitTutorialButton.SetActive(status);
+
+        if(!status)
+            TutorialHand.position = new Vector3(5000.0f, 0, 0);
 
         Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
         Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
@@ -1250,6 +1377,38 @@ public class BioBlox : MonoBehaviour
         ToggleMode.isOn = false;
         ToggleGameMode();
         aminoSlider.DeleteAllAminoConnections();
+        TutorialHand.position = new Vector3(1000.0f, 0, 0);
+    }
+
+    public Material transparent_material;
+    public Material default_material;
+    bool switch_material = true;
+
+    public void TransparentRender()
+    {
+        if (switch_material)
+        {
+            for (int i = 0; i < molecules.Length; i++)
+            {
+                foreach (Transform molecule_renderer in molecules[i].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material = transparent_material;
+                }
+            }
+            switch_material = !switch_material;
+        }
+        else
+        {
+            for (int i = 0; i < molecules.Length; i++)
+            {
+                foreach (Transform molecule_renderer in molecules[i].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material = default_material;
+                }
+            }
+            switch_material = !switch_material;
+
+        }
     }
 
 }

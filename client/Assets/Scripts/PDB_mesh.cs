@@ -458,7 +458,6 @@ public class PDB_mesh : MonoBehaviour {
                 if (ids[j] == atom) {
                     SelectAminoAcid(i);                    
                     aminoSliderController.HighLight3DMesh(i,protein_id);
-                    if(uIController.auto_filter) FunctionTypeHighlight(i, protein_id);
                     return;
                 }
             }
@@ -480,38 +479,5 @@ public class PDB_mesh : MonoBehaviour {
             }
         }
         return id_atom;
-    }
-
-    int function_type;
-
-    public void FunctionTypeHighlight(int index, int protein_id)
-    {
-        //Debug.Log(buttonStructure.FunctionType[aminoSliderController.A1Buttons[index].GetComponent<AminoButtonController>().name_amino]);
-        if (protein_id == 0) function_type = buttonStructure.FunctionType[aminoSliderController.A1Buttons[index].GetComponent<AminoButtonController>().name_amino];
-        else function_type = buttonStructure.FunctionType[aminoSliderController.A2Buttons[index].GetComponent<AminoButtonController>().name_amino];
-        switch (function_type)
-        {//hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
-            case 0:
-                uIController.ToggleHydroA1();
-                break;
-            case 1:
-                if(protein_id == 0) uIController.TogglePositiveA1();
-                else uIController.TogglePositiveA2();
-                break;
-            case 2:
-                uIController.TogglePolarA1();
-                break;
-            case 3:
-                if (protein_id == 0) uIController.ToggleNegativeA1();
-                else uIController.ToggleNegativeA2();
-                break;
-            case 4:
-                uIController.ToggleOtherA1();
-                break;
-            default:
-                break;
-        }
-        
-        //highlight for function mode
     }
 }

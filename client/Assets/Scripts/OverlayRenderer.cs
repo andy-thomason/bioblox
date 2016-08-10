@@ -21,18 +21,28 @@ public class OverlayRenderer : MonoBehaviour {
 		}
 	}
 
-	List<Icon> icons = new List<Icon>();
+    List<Icon> icons = new List<Icon>();
+    List<GameObject> icons_spheres = new List<GameObject>();
+    List<GameObject> icons_spheres_store = new List<GameObject>();
 
-	public Camera lookat_camera;
+    public Material Atom_1;
+    public Material Atom_2;
+    Material material_to_use;
 
-	// Use this for initialization
-	void Start () {
+    public Camera lookat_camera;
+    public GameObject Sphere_atom;
+    GameObject Sphere_atom_reference;
+    public GameObject Sphere_atom_holder;
+
+    // Use this for initialization
+    void Start () {
 		MeshFilter mf = GetComponent<MeshFilter> ();
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
         MeshRenderer mr = GetComponent<MeshRenderer>();
         mr.material.renderQueue = 4000;
+        get_spheres();
     }
 
     // Update is called once per frame
@@ -40,6 +50,7 @@ public class OverlayRenderer : MonoBehaviour {
         BioBlox bb = GameObject.FindObjectsOfType<BioBlox>()[0];
         if (bb)
         {
+            clear_spheres();
             clear();
             for (int i = 0; i != bb.molecules.Length; ++i)
             {
@@ -59,6 +70,8 @@ public class OverlayRenderer : MonoBehaviour {
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
 
+                int sphere_index = 0;
+
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
                     bool is_selected = j < sel.Length && sel[j];
@@ -77,6 +90,16 @@ public class OverlayRenderer : MonoBehaviour {
                                 is_bad ? bad : is_touching ? touching : selected
                             )
                         );
+                    }
+                    if (is_touching || is_bad)
+                    {
+                        material_to_use = i == 0 ? Atom_1 : Atom_2;
+                        icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;
+                       icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                        add_Icon_sphere(icons_spheres_store[sphere_index]);
+                        sphere_index++;
+                        //Sphere_atom_reference = Instantiate(Sphere_atom);
+                        //Sphere_atom_reference.transform.Translate(t.TransformPoint(mol.atom_centres[j]));
                     }
                 }
             }
@@ -134,7 +157,7 @@ public class OverlayRenderer : MonoBehaviour {
 		mesh.uv = uvs;
 		mesh.triangles = indices;
 		mf.mesh = mesh;
-	}
+    }
 
 	public Icon add_Icon(Icon Icon) {
 		icons.Add (Icon);
@@ -148,4 +171,31 @@ public class OverlayRenderer : MonoBehaviour {
 	public void delete_Icon(Icon Icon) {
 		icons.Remove (Icon);
 	}
+
+    //shperes
+
+    public GameObject add_Icon_sphere(GameObject Icon)
+    {
+        icons_spheres.Add(Icon);
+        return Icon;
+    }
+
+    public void clear_spheres()
+    {
+        foreach (GameObject sphere in icons_spheres) sphere.transform.position = new Vector3(1000.0f,0,0);
+        icons_spheres.Clear();
+    }
+
+    public void delete_Icon_sphere(GameObject Icon)
+    {
+        icons_spheres.Remove(Icon);
+    }
+
+    void get_spheres()
+    {
+        foreach(Transform sphere_son in Sphere_atom_holder.transform)
+        {
+            icons_spheres_store.Add(sphere_son.gameObject);
+        }
+    }
 }
