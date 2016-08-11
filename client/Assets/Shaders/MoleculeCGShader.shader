@@ -1,6 +1,6 @@
 ﻿Shader "Custom/MoleculeCGShader" {
     Properties{
-        _Distance("Distance", Range(-400,0)) = 0
+        _Distance("Distance", Range(-400,400)) = 0
         _Color ("Color", Color) = (1,1,1,1) 
         _CutawayColor ("CutawayColor", Color) = (1,1,1,1) 
     }

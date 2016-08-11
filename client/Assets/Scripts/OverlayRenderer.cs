@@ -27,6 +27,7 @@ public class OverlayRenderer : MonoBehaviour {
 
     public Material Atom_1;
     public Material Atom_2;
+
     Material material_to_use;
 
     public Camera lookat_camera;
@@ -52,6 +53,8 @@ public class OverlayRenderer : MonoBehaviour {
         {
             clear_spheres();
             clear();
+
+            int sphere_index = 0;
             for (int i = 0; i != bb.molecules.Length; ++i)
             {
                 GameObject obj = bb.molecules[i];
@@ -69,8 +72,6 @@ public class OverlayRenderer : MonoBehaviour {
                 Color32 selected = new Color32(128, 128, 0, (byte)(63.0f*c10+192));
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
-
-                int sphere_index = 0;
 
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
@@ -90,16 +91,19 @@ public class OverlayRenderer : MonoBehaviour {
                                 is_bad ? bad : is_touching ? touching : selected
                             )
                         );
-                    }
-                    if (is_touching || is_bad)
-                    {
-                        material_to_use = i == 0 ? Atom_1 : Atom_2;
-                        icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;
-                       icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                        add_Icon_sphere(icons_spheres_store[sphere_index]);
-                        sphere_index++;
+
+                        if(is_touching)
+                        {
+                            material_to_use = i == 1 ? Atom_1 : Atom_2;
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            sphere_index++;
+                        }
                         //Sphere_atom_reference = Instantiate(Sphere_atom);
+                        //Sphere_atom_reference.GetComponent<Renderer>().material = material_to_use;
                         //Sphere_atom_reference.transform.Translate(t.TransformPoint(mol.atom_centres[j]));
+                        //add_Icon_sphere(Sphere_atom_reference);
                     }
                 }
             }

@@ -62,7 +62,15 @@ public class UIController : MonoBehaviour {
     
     public bool isOverUI = false;
 
-	void Awake()
+    public Material transparent_material;
+    public Material default_material;
+    public Material cutaway_material;
+    public Dropdown DropDownP1;
+    public Dropdown DropDownP2;
+
+    bool switch_material = true;
+
+    void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
@@ -671,6 +679,8 @@ public class UIController : MonoBehaviour {
     public void FirstPersonToggle()
     {
         CutAway.value = -30;
+        isOverUI = false;
+        MainCamera.GetComponent<Camera>().fieldOfView = 33;
         Tutorial.isOn = false;
         first_person = !first_person;
 		//FreeCameraToggle.interactable = !first_person;
@@ -702,6 +712,8 @@ public class UIController : MonoBehaviour {
 
         //RenderSettings.skybox = space_skybox;
         //floor.SetActive(false);
+        isOverUI = false;
+        MainCamera.GetComponent<Camera>().fieldOfView = 33;
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -778,5 +790,106 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
         isProtein2Fixed = !isProtein2Fixed;
     }
+
+    public void ChangeRenderProtein1()
+    {
+        switch (DropDownP1.value)
+        {
+            case 0:
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+                }
+            break;
+            case 1:
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
+                }
+                break;
+        }
+    }
+
+    public void ChangeRenderProtein2()
+    {
+        switch (DropDownP2.value)
+        {
+            case 0:
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+                }
+                break;
+            case 1:
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
+                }
+                break;
+        }
+    }
+
+    public void CutAwayTool()
+    {
+        //Change the material to cutaway material
+        //if (!BioBloxReference.molecules[0].transform.GetChild(0).transform.GetChild(0).GetComponent<Renderer>().material.HasProperty("_Distance"))
+        //{
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material = default_material;
+        //    }
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material = default_material;
+        //    }
+        //}
+
+        //Move the cutaway 
+        if(DropDownP1.value != 1)
+        {
+            foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+            {
+                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+            }
+        }
+        if (DropDownP2.value != 1)
+        {
+            foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
+            {
+                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+            }
+        }
+
+    }
+
+
+    //TEMP
+    public void TransparentRender()
+    {
+        if (switch_material)
+        {
+            for (int i = 0; i < BioBloxReference.molecules.Length; i++)
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[i].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material = transparent_material;
+                }
+            }
+            switch_material = !switch_material;
+        }
+        else
+        {
+            for (int i = 0; i < BioBloxReference.molecules.Length; i++)
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[i].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material = default_material;
+                }
+            }
+            switch_material = !switch_material;
+
+        }
+    }
+    //TEMP
 
 }

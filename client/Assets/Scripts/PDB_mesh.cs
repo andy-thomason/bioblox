@@ -390,35 +390,35 @@ public class PDB_mesh : MonoBehaviour {
         lastMousePos = mousePos;
         //light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
 
-        foreach (MeshRenderer r in meshes) {
-            r.material.SetVector ("_LightPos", light_pos);
-            if (bb.cutawaySlider) {
-                Vector4 plane;
-                if (bb.cutawaySlider.value == -30)
-                    plane = new Vector4(0, 0, 1, 130);
-                else
-                    plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
-                r.material.SetVector ("_CutawayPlane", plane);
-            }
-            if (bb.thicknessSlider)
-            {
-                r.material.SetFloat("_Thickness", bb.thicknessSlider.value);
-            }
+        //foreach (MeshRenderer r in meshes) {
+        //    r.material.SetVector ("_LightPos", light_pos);
+        //    if (bb.cutawaySlider) {
+        //        Vector4 plane;
+        //        if (bb.cutawaySlider.value == -30)
+        //            plane = new Vector4(0, 0, 1, 130);
+        //        else
+        //            plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
+        //        r.material.SetVector ("_CutawayPlane", plane);
+        //    }
+        //    if (bb.thicknessSlider)
+        //    {
+        //        r.material.SetFloat("_Thickness", bb.thicknessSlider.value);
+        //    }
 
-            /*Vector4[] uniforms = GetSelectedAtomUniforms(cam);
-            //int len = uniforms.Length;
-            r.material.SetVector ("_Atom0", uniforms[0]);
-            r.material.SetVector ("_Atom1", uniforms[1]);
-            r.material.SetVector ("_Atom2", uniforms[2]);
-            r.material.SetVector ("_Atom3", uniforms[3]);
-            r.material.SetVector ("_Atom4", uniforms[4]);
-            r.material.SetVector ("_Atom5", uniforms[5]);
-            r.material.SetVector ("_Atom6", uniforms[6]);
-            r.material.SetVector ("_Atom7", uniforms[7]);
-            r.material.SetVector ("_Atom8", uniforms[8]);
-            r.material.SetVector ("_Atom9", uniforms[9]);
-            r.material.SetVector ("_Atom10", uniforms[10]);*/
-        }
+        //    /*Vector4[] uniforms = GetSelectedAtomUniforms(cam);
+        //    //int len = uniforms.Length;
+        //    r.material.SetVector ("_Atom0", uniforms[0]);
+        //    r.material.SetVector ("_Atom1", uniforms[1]);
+        //    r.material.SetVector ("_Atom2", uniforms[2]);
+        //    r.material.SetVector ("_Atom3", uniforms[3]);
+        //    r.material.SetVector ("_Atom4", uniforms[4]);
+        //    r.material.SetVector ("_Atom5", uniforms[5]);
+        //    r.material.SetVector ("_Atom6", uniforms[6]);
+        //    r.material.SetVector ("_Atom7", uniforms[7]);
+        //    r.material.SetVector ("_Atom8", uniforms[8]);
+        //    r.material.SetVector ("_Atom9", uniforms[9]);
+        //    r.material.SetVector ("_Atom10", uniforms[10]);*/
+        //}
     }
 
     public float select_fudge = 0.67f;

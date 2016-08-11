@@ -119,6 +119,7 @@ public class BioBlox : MonoBehaviour
     UIController uiController;
     AminoSliderController aminoSlider;
     public Transform TutorialHand;
+    float button_offset = 80.0f;
     public Transform SliderString;
 
     public enum GameState {
@@ -786,6 +787,18 @@ public class BioBlox : MonoBehaviour
         //Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
+        //transpant
+        mol1_mesh = Instantiate(prefab_molecules[0]);
+        mol1_mesh.transform.SetParent(mol1.transform);
+        mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(mol1_mesh);
+        //transpant
+        mol2_mesh = Instantiate(prefab_molecules[1]);
+        mol2_mesh.transform.SetParent(mol2.transform);
+        mol2_mesh.name = "transparent_p2";
+        FixTransparentMolecule(mol2_mesh);
+
+
         if (init) {
             molecules = new GameObject[2];
             molecules [0] = mol1.gameObject;
@@ -1115,7 +1128,7 @@ public class BioBlox : MonoBehaviour
             case 0:
                 {
                     TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(14).transform.position.z);
                     //Debug.Log(MainCamera.ScreenToWorldPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
                     //Debug.Log(MainCamera.WorldToScreenPoint(aminoSlider.SliderMol[1].transform.GetChild(14).transform.localPosition));
                     hintText.text = "Welcome! In the panel on the bottom left there are buttons which represents amino acids. Select the blue button marked LYS I 15.";
@@ -1128,7 +1141,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 1: {
                     //TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.y + button_offset, aminoSlider.SliderMol[0].transform.GetChild(168).transform.position.z);
                     hintText.text = "And now select the red button marked ASP E 189.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                     if (!sliders.IsSelected(1, aas[0])) {
@@ -1139,7 +1152,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 2:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids. You can spin the molecules to see the atoms in the hole.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsSelected(1, aas[0])) {
@@ -1152,7 +1165,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 3: {
                     TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
-                    TutorialHand.position = new Vector3(SliderString.position.x + 80.0f, SliderString.position.y, SliderString.position.z);
+                    TutorialHand.position = new Vector3(SliderString.position.x + button_offset, SliderString.position.y, SliderString.position.z);
                     hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
@@ -1172,7 +1185,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 5: {
                     TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.z);
                 hintText.text = "Now lets make two more connections. First select the blue button marked ARG I 17";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
@@ -1191,7 +1204,7 @@ public class BioBlox : MonoBehaviour
                 } break;
             case 6:
                 {
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.y + button_offset, aminoSlider.SliderMol[0].transform.GetChild(54).transform.position.z);
 
                     hintText.text = "Now select the grey button marked ILE E 73";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1215,7 +1228,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 7:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
 
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1235,7 +1248,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 8:
                 {
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.y + 100.0f, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.z);
 
                     hintText.text = "One more connection to go; select the blue button marked ARG I 39";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1255,7 +1268,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 9:
                 {
-                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.y + 100.0f, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.z);
+                    TutorialHand.position = new Vector3(aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.x, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.y + button_offset, aminoSlider.SliderMol[0].transform.GetChild(154).transform.position.z);
 
                     hintText.text = "Select the pink button marked GLN E 175";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1283,7 +1296,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 10:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + 40.0f, uiController.ConnectionButton.transform.position.y + 120.0f, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
 
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1304,7 +1317,7 @@ public class BioBlox : MonoBehaviour
             case 11:
                 {
                     TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
-                    TutorialHand.position = new Vector3(SliderString.position.x + 40.0f, SliderString.position.y, SliderString.position.z);
+                    TutorialHand.position = new Vector3(SliderString.position.x + button_offset, SliderString.position.y, SliderString.position.z);
                     hintText.text = "Gently pull in the strings all the way using the left hand slider.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                     Debug.Log("1: " + sliders.IsConnectionMade(aas[1], aas[0]) + " - 2: " + sliders.IsConnectionMade(aas[2], aas[3]) + " - 3: " + sliders.IsConnectionMade(aas[4], aas[5]));
@@ -1320,7 +1333,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 12:
                 {
-                    TutorialHand.position = new Vector3(5000.0f,0,0);
+                    TutorialHand.position = new Vector3(6000.0f,0,0);
 
                     hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct. Now press the 'Exit Tutorial' button and start playing!";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1377,39 +1390,21 @@ public class BioBlox : MonoBehaviour
         ToggleMode.isOn = false;
         ToggleGameMode();
         aminoSlider.DeleteAllAminoConnections();
-        TutorialHand.position = new Vector3(1000.0f, 0, 0);
+        TutorialHand.position = new Vector3(6000.0f, 0, 0);
     }
 
     public Material transparent_material;
-    public Material default_material;
     bool switch_material = true;
 
-    public void TransparentRender()
+    //fix the transparent molecule
+    public void FixTransparentMolecule(GameObject protein)
     {
-        if (switch_material)
+        foreach (Transform molecule_renderer in protein.transform)
         {
-            for (int i = 0; i < molecules.Length; i++)
-            {
-                foreach (Transform molecule_renderer in molecules[i].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material = transparent_material;
-                }
-            }
-            switch_material = !switch_material;
-        }
-        else
-        {
-            for (int i = 0; i < molecules.Length; i++)
-            {
-                foreach (Transform molecule_renderer in molecules[i].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material = default_material;
-                }
-            }
-            switch_material = !switch_material;
-
+            molecule_renderer.GetComponent<Renderer>().material = transparent_material;
+            molecule_renderer.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            molecule_renderer.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
         }
     }
-
 }
 
