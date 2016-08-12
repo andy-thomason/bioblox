@@ -68,6 +68,8 @@ public class UIController : MonoBehaviour {
     public Dropdown DropDownP1;
     public Dropdown DropDownP2;
 
+    public Texture2D cursor_move;
+
     bool switch_material = true;
 
     void Awake()
@@ -91,55 +93,78 @@ public class UIController : MonoBehaviour {
         //	FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
         //	CameraFreeze = !CameraFreeze;
         //}
-
-        //camera zoom
-        if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+        //if first person of exploration not zoom nor movement
+        if (!first_person && !explore_view)
         {
-            if (MainCameraComponent.fieldOfView > 1)
-                MainCameraComponent.fieldOfView -= 2f;
-            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+            //camera zoom
+            if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+            {
+                if (MainCameraComponent.fieldOfView > 1)
+                    MainCameraComponent.fieldOfView -= 2f;
+                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
 
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                if (MainCameraComponent.fieldOfView < 33)
+                    MainCameraComponent.fieldOfView += 2f;
+                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+            }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                dragOrigin = Input.mousePosition;
+            }
+
+            if (Input.GetMouseButton(1))
+            {
+
+                Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
+
+                Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+
+                if (MainCamera.transform.position.y > -25)
+                {
+                    move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+                }
+                else
+                {
+                    if (pos.y < 0)
+                        move = new Vector3(pos.x * dragSpeed, 0, 0);
+                    else
+                        move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+                }
+
+
+                MainCamera.transform.Translate(move, Space.Self);
+            }
+            else
+            {
+                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            }
         }
-        else if(Input.GetAxis("Mouse ScrollWheel") < 0)
-        {
-            if (MainCameraComponent.fieldOfView < 33)
-                MainCameraComponent.fieldOfView += 2f;
-            //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-        }
-
-        //if (Input.GetMouseButtonDown(1))
-        //{
-        //    dragOrigin = Input.mousePosition;
-        //}
-
-        //if (Input.GetMouseButton(1))
-        //{ 
-
-        //    Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
-
-        //    if (MainCamera.transform.position.y > -25)
-        //    {
-        //        move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-        //    }
-        //    else
-        //    {
-        //        if (pos.y < 0)
-        //            move = new Vector3(pos.x * dragSpeed, 0, 0);
-        //        else
-        //            move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-        //    }
-
-
-        //    MainCamera.transform.Translate(move,Space.Self);
-        //}
 
         if (first_person && Input.GetMouseButtonDown(1))
         {
+            ////SHOOTING THE ARPON
+            //Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
+            //position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
+            //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+            //GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
+            //arpon_reference.GetComponent<ArponController>().enabled = true;
+            ////GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+            //arpon_reference.transform.LookAt(position);
+            //Debug.Log(position);
+            //arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+
             //SHOOTING THE ARPON
             Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
             position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
+            int id_protein = GameObject.FindGameObjectWithTag("FirstPerson").transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
+            Debug.Log("proteina de la camera: "+id_protein);
+            Debug.Log("atomo de donde se disapra: " + BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom);
             GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-            GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
+            GameObject arpon_reference = Instantiate(ArponObject, BioBloxReference.molecules[id_protein].transform.TransformPoint(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
             arpon_reference.GetComponent<ArponController>().enabled = true;
             //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
             arpon_reference.transform.LookAt(position);
@@ -680,7 +705,7 @@ public class UIController : MonoBehaviour {
     {
         CutAway.value = -30;
         isOverUI = false;
-        MainCamera.GetComponent<Camera>().fieldOfView = 33;
+        SetCameraDefaultPosition();
         Tutorial.isOn = false;
         first_person = !first_person;
 		//FreeCameraToggle.interactable = !first_person;
@@ -713,7 +738,7 @@ public class UIController : MonoBehaviour {
         //RenderSettings.skybox = space_skybox;
         //floor.SetActive(false);
         isOverUI = false;
-        MainCamera.GetComponent<Camera>().fieldOfView = 33;
+        SetCameraDefaultPosition();
         CutAway.value = -30;
         Tutorial.isOn = false;
         explore_view = true;
@@ -796,16 +821,10 @@ public class UIController : MonoBehaviour {
         switch (DropDownP1.value)
         {
             case 0:
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-                }
+                DefaultProtein(0);
             break;
             case 1:
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
-                }
+                TransparencyProtein(0);
                 break;
         }
     }
@@ -815,36 +834,16 @@ public class UIController : MonoBehaviour {
         switch (DropDownP2.value)
         {
             case 0:
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-                }
+                DefaultProtein(1);
                 break;
             case 1:
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
-                }
+                TransparencyProtein(1);
                 break;
         }
     }
 
     public void CutAwayTool()
     {
-        //Change the material to cutaway material
-        //if (!BioBloxReference.molecules[0].transform.GetChild(0).transform.GetChild(0).GetComponent<Renderer>().material.HasProperty("_Distance"))
-        //{
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material = default_material;
-        //    }
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material = default_material;
-        //    }
-        //}
-
-        //Move the cutaway 
         if(DropDownP1.value != 1)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
@@ -861,35 +860,27 @@ public class UIController : MonoBehaviour {
         }
 
     }
-
-
-    //TEMP
-    public void TransparentRender()
+   
+    public void SetCameraDefaultPosition()
     {
-        if (switch_material)
-        {
-            for (int i = 0; i < BioBloxReference.molecules.Length; i++)
-            {
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[i].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material = transparent_material;
-                }
-            }
-            switch_material = !switch_material;
-        }
-        else
-        {
-            for (int i = 0; i < BioBloxReference.molecules.Length; i++)
-            {
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[i].transform.GetChild(0).transform)
-                {
-                    molecule_renderer.GetComponent<Renderer>().material = default_material;
-                }
-            }
-            switch_material = !switch_material;
+        MainCamera.GetComponent<Camera>().fieldOfView = 33;
+        CameraSlider.GetComponent<Slider>().value = -90;
+    }
 
+    public void TransparencyProtein(int protein_index)
+    {
+        foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+        {
+            molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
         }
     }
-    //TEMP
+
+    public void DefaultProtein(int protein_index)
+    {
+        foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+        {
+            molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+        }
+    }
 
 }

@@ -447,16 +447,16 @@ public class BioBlox : MonoBehaviour
 
     public void HandleCameraSlider(Slider slide)
     {
-        Transform t = GameObject.Find ("Main Camera").transform;
-        GameObject cellCam = GameObject.Find ("Camera");
+        Transform t = MainCamera.gameObject.transform;
+        //GameObject cellCam = MainCamera.gameObject;
         float dist = t.position.magnitude;
 
         Vector3 dir = new Vector3 (Mathf.Cos(Mathf.Deg2Rad * slide.value),
                                   0,
                                   Mathf.Sin(Mathf.Deg2Rad * slide.value));
 
-        if (cellCam) {
-            cellCam.transform.localRotation = Quaternion.Euler(new Vector3(0,slide.value + 90,0));
+        if (MainCamera.gameObject) {
+            MainCamera.gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0,slide.value + 90,0));
         }
 
         Vector3 pos = dir * dist;

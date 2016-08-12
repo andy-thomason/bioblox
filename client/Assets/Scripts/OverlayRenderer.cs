@@ -29,6 +29,7 @@ public class OverlayRenderer : MonoBehaviour {
     public Material Atom_2;
 
     Material material_to_use;
+    UIController ui;
 
     public Camera lookat_camera;
     public GameObject Sphere_atom;
@@ -38,6 +39,7 @@ public class OverlayRenderer : MonoBehaviour {
     // Use this for initialization
     void Start () {
 		MeshFilter mf = GetComponent<MeshFilter> ();
+        ui = FindObjectOfType<UIController>();
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
@@ -93,6 +95,15 @@ public class OverlayRenderer : MonoBehaviour {
                         );
 
                         if(is_touching)
+                        {
+                            material_to_use = i == 1 ? Atom_1 : Atom_2;
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            sphere_index++;
+                        }
+
+                        if (is_selected && ui.first_person)
                         {
                             material_to_use = i == 1 ? Atom_1 : Atom_2;
                             icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;

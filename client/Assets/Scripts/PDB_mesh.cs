@@ -16,6 +16,7 @@ public class PDB_mesh : MonoBehaviour {
     public bool shouldCollide = false;
     float t=0;
     AminoSliderController aminoSliderController;
+    public int atom;
 
     // add atom indices to here to display them selected
     public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -234,7 +235,7 @@ public class PDB_mesh : MonoBehaviour {
                 GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
                 //point the camera to the other protein
                 Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                temp_camera.transform.LookAt(temp_pos);
+                //temp_camera.transform.LookAt(temp_pos);
             }
         }
 
@@ -281,7 +282,7 @@ public class PDB_mesh : MonoBehaviour {
             if (rotating && !has_rotated)
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
-                int atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
                 //if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
                 //{
                 //    Ray r_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
@@ -296,6 +297,7 @@ public class PDB_mesh : MonoBehaviour {
                     //first person only spawn camera
                     if (uIController.first_person)
                     {
+                        uIController.DefaultProtein(protein_id);
                         uIController.ChangeCCTVLoading();
                         //only 1 active
                         GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
@@ -303,8 +305,10 @@ public class PDB_mesh : MonoBehaviour {
                         GameObject temp = Instantiate(camera_first_person);
                         temp.tag = "FirstPerson";
                         temp.transform.SetParent(transform, false);
-                        if(atom != -1)
-                            temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
+                        temp.transform.position = transform.position;
+                        temp.transform.localPosition = new Vector3(-30, 30, -30);
+                        //if (atom != -1)
+                        //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
                         //else if(atom_first_person != -1)
                         //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
 
@@ -313,16 +317,20 @@ public class PDB_mesh : MonoBehaviour {
                         //temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
                         //point the camera to the other protein
                         Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                       // temp.transform.LookAt(temp_pos);
+                        if (atom != -1)
+                            temp.transform.LookAt(transform.TransformPoint(mol.atom_centres[atom]));
 
-                        Ray r_temp;
-                        do
-                        {
-                            temp.transform.position = temp.transform.position + temp.transform.forward * 2;
-                            r_temp = cam.ScreenPointToRay(temp.transform.forward);
+                        //Ray r_temp;
+                        //do
+                        //{
+                        //    temp.transform.position = temp.transform.position + temp.transform.forward * 2;
+                        //    r_temp = cam.ScreenPointToRay(temp.transform.forward);
 
-                        } while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
-                        temp.transform.position = temp.transform.position + temp.transform.forward * 2;
+                        //} while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
+                        //temp.transform.position = temp.transform.position + temp.transform.forward * 2;
+
+                        //transparent the protein
+                        uIController.TransparencyProtein(protein_id);
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP
