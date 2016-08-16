@@ -70,6 +70,10 @@ public class UIController : MonoBehaviour {
 
     public Texture2D cursor_move;
 
+    //camera first person
+    public GameObject FirstPersonCameraReference;
+    public Camera FirstPersonCameraReferenceCamera;
+
     bool switch_material = true;
 
     void Awake()
@@ -144,35 +148,60 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        if (first_person && Input.GetMouseButtonDown(1))
+        if (first_person)
         {
-            ////SHOOTING THE ARPON
-            //Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
-            //position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
-            //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-            //GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
-            //arpon_reference.GetComponent<ArponController>().enabled = true;
-            ////GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-            //arpon_reference.transform.LookAt(position);
-            //Debug.Log(position);
-            //arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+            if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
+            {
+                ////SHOOTING THE ARPON
+                //Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
+                //position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
+                //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+                //GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
+                //arpon_reference.GetComponent<ArponController>().enabled = true;
+                ////GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+                //arpon_reference.transform.LookAt(position);
+                //Debug.Log(position);
+                //arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
 
-            //SHOOTING THE ARPON
-            Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
-            position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
-            int id_protein = GameObject.FindGameObjectWithTag("FirstPerson").transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
-            Debug.Log("proteina de la camera: "+id_protein);
-            Debug.Log("atomo de donde se disapra: " + BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom);
-            GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-            GameObject arpon_reference = Instantiate(ArponObject, BioBloxReference.molecules[id_protein].transform.TransformPoint(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
-            arpon_reference.GetComponent<ArponController>().enabled = true;
-            //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-            arpon_reference.transform.LookAt(position);
-            Debug.Log(position);
-            arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+                //SHOOTING THE ARPON
+                Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
+                position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
+                int id_protein = FirstPersonCameraReference.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
+                Debug.Log("proteina de la camera: " + id_protein);
+                Debug.Log("atomo de donde se disapra: " + BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom);
+                GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+                GameObject arpon_reference = Instantiate(ArponObject, BioBloxReference.molecules[id_protein].transform.TransformPoint(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
+                arpon_reference.GetComponent<ArponController>().enabled = true;
+                //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+                arpon_reference.transform.LookAt(position);
+                Debug.Log(position);
+                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+            }
+
+            if (Input.GetMouseButton(1))
+            {
+                Debug.Log("X: " + Input.GetAxis("Mouse X"));
+                Debug.Log("Y: " + Input.GetAxis("Mouse Y"));
+                Debug.Log(new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0).normalized);
+                int id_protein = FirstPersonCameraReference.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
+                FirstPersonCameraReference.transform.RotateAround(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom], new Vector3(0, Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")), 30 * Time.deltaTime);
+            }
+
+            //camera zoom
+            if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+            {
+                if (FirstPersonCameraReferenceCamera.fieldOfView > 15)
+                    FirstPersonCameraReferenceCamera.fieldOfView -= 2f;
+                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            {
+                if (FirstPersonCameraReferenceCamera.fieldOfView < 70)
+                    FirstPersonCameraReferenceCamera.fieldOfView += 2f;
+                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+            }
         }
-
-
     }
 
 	public void ToggleFreeCamera()
@@ -306,331 +335,6 @@ public class UIController : MonoBehaviour {
 		FunctionInfoPanelStatus = !FunctionInfoPanelStatus;
 	}
 
-    public void AutoFilterAminoSlider()
-    {
-        //set all the buttons ON when return to normal view
-        //protein 1
-        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A1Negative, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A1Polar, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A1Positive, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A1Other, auto_filter);
-        //protein 2
-        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A2Polar, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A2Positive, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A2Negative, auto_filter);
-        ToggleAllButtonsSlider(aminoSliderController.A2Other, auto_filter);
-
-        //set all the togles ON
-        for (int i = 0; i < ToggleButtonFunctionsView.Length; i++)
-        {
-            ToggleButtonFunctionsView[i].isOn = auto_filter;
-        }
-
-        auto_filter = !auto_filter;
-    }
-
-    public void ToggleAminoAcidsToggles(bool status)
-    {
-        //set all the buttons ON when return to normal view
-        //protein 1
-        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, status);
-        ToggleAllButtonsSlider(aminoSliderController.A1Negative, status);
-        ToggleAllButtonsSlider(aminoSliderController.A1Polar, status);
-        ToggleAllButtonsSlider(aminoSliderController.A1Positive, status);
-        ToggleAllButtonsSlider(aminoSliderController.A1Other, status);
-        //protein 2
-        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, status);
-        ToggleAllButtonsSlider(aminoSliderController.A2Polar, status);
-        ToggleAllButtonsSlider(aminoSliderController.A2Positive, status);
-        ToggleAllButtonsSlider(aminoSliderController.A2Negative, status);
-        ToggleAllButtonsSlider(aminoSliderController.A2Other, status);
-
-        //set all the togles ON
-        for (int i = 0; i < ToggleButtonFunctionsView.Length; i++)
-        {
-            ToggleButtonFunctionsView[i].isOn = status;
-        }
-    }
-
-    //bool amino_status;
-
-    public void TogglePositiveA1()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Positive)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[0].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Negative)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[0].isOn);
-            }
-            ToggleButtonFunctionsView[0].isOn = ToggleButtonFunctionsView[6].isOn = true;
-        }
-        else
-        {
-            foreach (GameObject AminoButton in aminoSliderController.A1Positive)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[0].isOn);
-            }
-
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA1();
-	}
-
-	public void ToggleNegativeA1()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[1].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[1].isOn);
-            }
-            ToggleButtonFunctionsView[1].isOn = ToggleButtonFunctionsView[5].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[1].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA1();
-    }
-
-	public void TogglePolarA1()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Polar)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[3].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Polar)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[3].isOn);
-            }
-            ToggleButtonFunctionsView[3].isOn = ToggleButtonFunctionsView[8].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A1Polar)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[3].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA1();
-    }
-
-	public void ToggleOtherA1()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Other)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[4].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Other)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[4].isOn);
-            }
-            ToggleButtonFunctionsView[4].isOn = ToggleButtonFunctionsView[9].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A1Other)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[4].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA1();
-    }
-
-	public void ToggleHydroA1()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Hydro)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[2].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Hydro)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[2].isOn);
-            }
-            ToggleButtonFunctionsView[2].isOn = ToggleButtonFunctionsView[7].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A1Hydro)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[2].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA1();
-    }
-
-	//AMINO ACIDS 2
-
-	public void TogglePositiveA2()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[5].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A1Negative)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[5].isOn);
-            }
-            ToggleButtonFunctionsView[1].isOn = ToggleButtonFunctionsView[5].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A2Positive)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[5].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA2();
-    }
-	
-	public void ToggleNegativeA2()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Positive)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[6].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Negative)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[6].isOn);
-            }
-            ToggleButtonFunctionsView[0].isOn = ToggleButtonFunctionsView[6].isOn = true;
-
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A2Negative)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[6].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA2();
-    }
-	
-	public void TogglePolarA2()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A1Polar)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[8].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A2Polar)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[8].isOn);
-            }
-            ToggleButtonFunctionsView[3].isOn = ToggleButtonFunctionsView[8].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A2Polar)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[8].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA2();
-    }
-	
-	public void ToggleOtherA2()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A2Other)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[9].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A1Other)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[9].isOn);
-            }
-            ToggleButtonFunctionsView[4].isOn = ToggleButtonFunctionsView[9].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A2Other)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[9].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA2();
-    }
-	
-	public void ToggleHydroA2()
-	{
-        if (auto_filter)
-        {
-            ToggleAminoAcidsToggles(false);
-            //amino_status = !ToggleButtonFunctionsView[0].isOn;
-            //ToggleButtonFunctionsView[0].isOn = amino_status;
-            foreach (GameObject AminoButton in aminoSliderController.A2Hydro)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[7].isOn);
-            }
-            foreach (GameObject AminoButton in aminoSliderController.A1Hydro)
-            {
-                AminoButton.SetActive(!ToggleButtonFunctionsView[7].isOn);
-            }
-            ToggleButtonFunctionsView[2].isOn = ToggleButtonFunctionsView[7].isOn = true;
-        }
-        else {
-            foreach (GameObject AminoButton in aminoSliderController.A2Hydro)
-            {
-                AminoButton.SetActive(ToggleButtonFunctionsView[7].isOn);
-            }
-        }
-        //set id_s
-        aminoSliderController.UpdateButtonTempIDA2();
-    }
-
 	void ToggleAllButtonsSlider(List<GameObject> CurrentList, bool status)
 	{
 		foreach (GameObject AminoButton in CurrentList)
@@ -707,6 +411,7 @@ public class UIController : MonoBehaviour {
         isOverUI = false;
         SetCameraDefaultPosition();
         Tutorial.isOn = false;
+        Tutorial.enabled = first_person;
         first_person = !first_person;
 		//FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;
@@ -723,6 +428,12 @@ public class UIController : MonoBehaviour {
         AminoAcids.alpha = !first_person ? 1 : 0;
         ConnectionButton.alpha = !first_person ? 1 : 0;
         AminoLinks.alpha = !first_person ? 1 : 0;
+
+        if(!first_person)
+        {
+            DropDownP1.value = 0;
+            DropDownP2.value = 0;
+        }
 
         //if(ToggleFreeCameraStatus)
         //ToggleFreeCamera();
@@ -869,6 +580,7 @@ public class UIController : MonoBehaviour {
 
     public void TransparencyProtein(int protein_index)
     {
+
         foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
         {
             molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);

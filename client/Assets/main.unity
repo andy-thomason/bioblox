@@ -6605,7 +6605,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &255602935
@@ -24695,6 +24695,8 @@ MonoBehaviour:
   DropDownP1: {fileID: 1144836236}
   DropDownP2: {fileID: 717051225}
   cursor_move: {fileID: 2800000, guid: 8c9f3ecdfcb3bf64db70a518a3305898, type: 3}
+  FirstPersonCameraReference: {fileID: 0}
+  FirstPersonCameraReferenceCamera: {fileID: 0}
   AminoAcids: {fileID: 781166428}
   ConnectionButton: {fileID: 2086812396}
   AminoLinks: {fileID: 1864286206}
@@ -57995,7 +57997,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408

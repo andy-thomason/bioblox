@@ -297,12 +297,19 @@ public class PDB_mesh : MonoBehaviour {
                     //first person only spawn camera
                     if (uIController.first_person)
                     {
-                        uIController.DefaultProtein(protein_id);
                         uIController.ChangeCCTVLoading();
                         //only 1 active
                         GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
-                        if (check_new) Destroy(check_new);
+                        if (check_new)
+                        {
+                            Destroy(check_new);
+                            uIController.FirstPersonCameraReference = null;
+                        }
                         GameObject temp = Instantiate(camera_first_person);
+                        //set the camera
+                        uIController.FirstPersonCameraReference = temp;
+                        uIController.FirstPersonCameraReferenceCamera = temp.GetComponent<Camera>();
+
                         temp.tag = "FirstPerson";
                         temp.transform.SetParent(transform, false);
                         temp.transform.position = transform.position;
@@ -330,7 +337,18 @@ public class PDB_mesh : MonoBehaviour {
                         //temp.transform.position = temp.transform.position + temp.transform.forward * 2;
 
                         //transparent the protein
-                        uIController.TransparencyProtein(protein_id);
+                        //uIController.TransparencyProtein(protein_id);
+
+                        if (protein_id == 0)
+                        {
+                            uIController.DropDownP1.value = 1;
+                            uIController.DropDownP2.value = 0;
+                        }
+                        else
+                        {
+                            uIController.DropDownP2.value = 1;
+                            uIController.DropDownP1.value = 0;
+                        }
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP
