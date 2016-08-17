@@ -327,6 +327,10 @@ public class PDB_mesh : MonoBehaviour {
                         if (atom != -1)
                             temp.transform.LookAt(transform.TransformPoint(mol.atom_centres[atom]));
 
+                        temp.GetComponent<MouseOrbitImproved>().protein = gameObject;
+                        //temp.GetComponent<MouseOrbitImproved>().target = transform.TransformPoint(mol.atom_centres[atom]);
+                        temp.GetComponent<MouseOrbitImproved>().enabled = true;
+
                         //Ray r_temp;
                         //do
                         //{

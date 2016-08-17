@@ -32,6 +32,7 @@ GameObject:
   - 81: {fileID: 8109670}
   - 95: {fileID: 9506106}
   - 114: {fileID: 11411140}
+  - 114: {fileID: 11406306}
   m_Layer: 0
   m_Name: CameraFirstPerson
   m_TagString: Untagged
@@ -229,6 +230,26 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_AreaSize: {x: 1, y: 1}
+--- !u!114 &11406306
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 149654}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39bda8010f9cce6459eeb6eb38822ead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {x: 0, y: 0, z: 0}
+  protein: {fileID: 0}
+  distance: 30
+  xSpeed: 150
+  ySpeed: 150
+  yMinLimit: -20
+  yMaxLimit: 80
+  distanceMin: 15
+  distanceMax: 50
 --- !u!114 &11411140
 MonoBehaviour:
   m_ObjectHideFlags: 1

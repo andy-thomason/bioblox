@@ -184,23 +184,23 @@ public class UIController : MonoBehaviour {
                 Debug.Log("Y: " + Input.GetAxis("Mouse Y"));
                 Debug.Log(new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0).normalized);
                 int id_protein = FirstPersonCameraReference.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
-                FirstPersonCameraReference.transform.RotateAround(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom], new Vector3(0, Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")), 30 * Time.deltaTime);
+                FirstPersonCameraReference.transform.RotateAround(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom], FirstPersonCameraReference.transform.TransformDirection(new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0)), 30 * Time.deltaTime);
             }
 
-            //camera zoom
-            if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
-            {
-                if (FirstPersonCameraReferenceCamera.fieldOfView > 15)
-                    FirstPersonCameraReferenceCamera.fieldOfView -= 2f;
-                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+            ////camera zoom
+            //if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+            //{
+            //    if (FirstPersonCameraReferenceCamera.fieldOfView > 15)
+            //        FirstPersonCameraReferenceCamera.fieldOfView -= 2f;
+            //    //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
 
-            }
-            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            {
-                if (FirstPersonCameraReferenceCamera.fieldOfView < 70)
-                    FirstPersonCameraReferenceCamera.fieldOfView += 2f;
-                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-            }
+            //}
+            //else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+            //{
+            //    if (FirstPersonCameraReferenceCamera.fieldOfView < 70)
+            //        FirstPersonCameraReferenceCamera.fieldOfView += 2f;
+            //    //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+            //}
         }
     }
 
