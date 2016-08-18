@@ -70,9 +70,14 @@ public class UIController : MonoBehaviour {
 
     public Texture2D cursor_move;
 
+    public int first_person_protein = -1;
+
     //camera first person
     public GameObject FirstPersonCameraReference;
     public Camera FirstPersonCameraReferenceCamera;
+
+    public GameObject Arpon;
+    public CanvasGroup ScrollbarLinks;
 
     bool switch_material = true;
 
@@ -148,7 +153,7 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        if (first_person)
+        if (first_person && !isOverUI)
         {
             if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
             {
@@ -164,44 +169,29 @@ public class UIController : MonoBehaviour {
                 //arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
 
                 //SHOOTING THE ARPON
-                Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
+                Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 200.0f);
                 position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
-                int id_protein = FirstPersonCameraReference.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
-                Debug.Log("proteina de la camera: " + id_protein);
-                Debug.Log("atomo de donde se disapra: " + BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom);
-                GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-                GameObject arpon_reference = Instantiate(ArponObject, BioBloxReference.molecules[id_protein].transform.TransformPoint(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
+
+                //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+                GameObject arpon_reference = Instantiate(Arpon, BioBloxReference.molecules[first_person_protein].transform.TransformPoint(BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
                 arpon_reference.GetComponent<ArponController>().enabled = true;
                 //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
                 arpon_reference.transform.LookAt(position);
                 Debug.Log(position);
-                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
+                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1300);
             }
-
-            if (Input.GetMouseButton(1))
-            {
-                Debug.Log("X: " + Input.GetAxis("Mouse X"));
-                Debug.Log("Y: " + Input.GetAxis("Mouse Y"));
-                Debug.Log(new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0).normalized);
-                int id_protein = FirstPersonCameraReference.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id;
-                FirstPersonCameraReference.transform.RotateAround(BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[id_protein].GetComponent<PDB_mesh>().atom], FirstPersonCameraReference.transform.TransformDirection(new Vector3(Input.GetAxis("Mouse Y"), Input.GetAxis("Mouse X"), 0)), 30 * Time.deltaTime);
-            }
-
-            ////camera zoom
-            //if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
-            //{
-            //    if (FirstPersonCameraReferenceCamera.fieldOfView > 15)
-            //        FirstPersonCameraReferenceCamera.fieldOfView -= 2f;
-            //    //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-
-            //}
-            //else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            //{
-            //    if (FirstPersonCameraReferenceCamera.fieldOfView < 70)
-            //        FirstPersonCameraReferenceCamera.fieldOfView += 2f;
-            //    //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-            //}
         }
+        Debug.Log(first_person_protein);
+        if (first_person && first_person_protein != -1)
+        {
+            Debug.Log("enetro");
+            if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
+                isOverUI = true;
+            else
+                isOverUI = false;
+        }
+
+
     }
 
 	public void ToggleFreeCamera()
@@ -412,6 +402,8 @@ public class UIController : MonoBehaviour {
         SetCameraDefaultPosition();
         Tutorial.isOn = false;
         Tutorial.enabled = first_person;
+        //show the slider of more than 3 conenction
+        ScrollbarLinks.alpha = !first_person ? 0 : 1;
         first_person = !first_person;
 		//FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;

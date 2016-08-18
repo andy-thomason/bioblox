@@ -18,9 +18,11 @@ public class MouseOrbitImproved : MonoBehaviour
     public float distanceMax = 35f;
 
     private Rigidbody rigidbody;
+    public Texture2D cursor_move;
 
     Vector3 negDistance;
     Vector3 position;
+    Quaternion rotation;
 
     float x = 0.0f;
     float y = 0.0f;
@@ -32,13 +34,19 @@ public class MouseOrbitImproved : MonoBehaviour
         x = angles.y;
         y = angles.x;
 
-        //rigidbody = GetComponent<Rigidbody>();
+        target = protein.transform.TransformPoint(protein.GetComponent<PDB_mesh>().mol.atom_centres[protein.GetComponent<PDB_mesh>().atom]);
+        x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+        y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
 
-        //// Make the rigid body not change rotation
-        //if (rigidbody != null)
-        //{
-        //    rigidbody.freezeRotation = true;
-        //}
+        y = ClampAngle(y, yMinLimit, yMaxLimit);
+
+        rotation = Quaternion.Euler(y, x, 0);
+
+        negDistance = new Vector3(0.0f, 0.0f, -distance);
+        position = rotation * negDistance + target;
+
+        transform.rotation = rotation;
+        transform.position = position;
     }
 
     void LateUpdate()
@@ -47,44 +55,26 @@ public class MouseOrbitImproved : MonoBehaviour
 
         if (Input.GetMouseButton(1))
         {
+            Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
             x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
             y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
 
             y = ClampAngle(y, yMinLimit, yMaxLimit);
-
-            Quaternion rotation = Quaternion.Euler(y, x, 0);
-
-            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 5, distanceMin, distanceMax);
-
-            //RaycastHit hit;
-            //if (Physics.Linecast(target, transform.position, out hit))
-            //{
-            //    distance -= hit.distance;
-            //}
-            negDistance = new Vector3(0.0f, 0.0f, -distance);
-            position = rotation * negDistance + target;
-
-            transform.rotation = rotation;
-            transform.position = position;
         }
         else
         {
-
-            Quaternion rotation = Quaternion.Euler(0, 0, 0);
-
-            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 5, distanceMin, distanceMax);
-
-            //RaycastHit hit;
-            //if (Physics.Linecast(target, transform.position, out hit))
-            //{
-            //    distance -= hit.distance;
-            //}
-            negDistance = new Vector3(0.0f, 0.0f, -distance);
-            position = rotation * negDistance + target;
-
-            //transform.rotation = rotation;
-            transform.position = position;
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         }
+
+        distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 8, distanceMin, distanceMax);
+
+        y = ClampAngle(y, yMinLimit, yMaxLimit);
+        rotation = Quaternion.Euler(y, x, 0);
+        negDistance = new Vector3(0.0f, 0.0f, -distance);
+        position = rotation * negDistance + target;
+
+        transform.rotation = rotation;
+        transform.position = position;
 
     }
 
@@ -96,4 +86,27 @@ public class MouseOrbitImproved : MonoBehaviour
             angle -= 360F;
         return Mathf.Clamp(angle, min, max);
     }
+
+    //public void WhileRotatingProtein()
+    //{
+    //    x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+    //    y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
+
+    //    y = ClampAngle(y, yMinLimit, yMaxLimit);
+
+    //    Quaternion rotation = Quaternion.Euler(y, x, 0);
+
+    //    //distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 5, distanceMin, distanceMax);
+
+    //    //RaycastHit hit;
+    //    //if (Physics.Linecast(target, transform.position, out hit))
+    //    //{
+    //    //    distance -= hit.distance;
+    //    //}
+    //    negDistance = new Vector3(0.0f, 0.0f, -distance);
+    //    position = rotation * negDistance + target;
+
+    //    transform.rotation = rotation;
+    //    transform.position = position;
+    //}
 }

@@ -243,13 +243,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {x: 0, y: 0, z: 0}
   protein: {fileID: 0}
-  distance: 30
+  distance: 60
   xSpeed: 150
   ySpeed: 150
   yMinLimit: -20
   yMaxLimit: 80
   distanceMin: 15
-  distanceMax: 50
+  distanceMax: 100
+  cursor_move: {fileID: 2800000, guid: 8c9f3ecdfcb3bf64db70a518a3305898, type: 3}
 --- !u!114 &11411140
 MonoBehaviour:
   m_ObjectHideFlags: 1

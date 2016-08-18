@@ -228,16 +228,16 @@ public class PDB_mesh : MonoBehaviour {
 
         //look at the other protein when first eprson
         //first person only - updaate
-        if (uIController.first_person)
-        {
-            if (transform.GetComponentInChildren<Camera>())
-            {
-                GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
-                //point the camera to the other protein
-                Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                //temp_camera.transform.LookAt(temp_pos);
-            }
-        }
+        //if (uIController.first_person)
+        //{
+        //    if (transform.GetComponentInChildren<Camera>())
+        //    {
+        //        GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
+        //        //point the camera to the other protein
+        //        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
+        //        //temp_camera.transform.LookAt(temp_pos);
+        //    }
+        //}
 
         ray = cam.ScreenPointToRay (Input.mousePosition);
         //create a ray to the cursor and cast it, if it hits at all
@@ -274,6 +274,9 @@ public class PDB_mesh : MonoBehaviour {
 
                 transform.RotateAround(transform.position, dirRight, mouseDelta.y);
                 transform.RotateAround(transform.position, dirUp, -mouseDelta.x);
+
+                //if (uIController.first_person && (uIController.first_person_protein == protein_id))
+                //    uIController.FirstPersonCameraReference.GetComponent<MouseOrbitImproved>().WhileRotatingProtein();
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -304,16 +307,19 @@ public class PDB_mesh : MonoBehaviour {
                         {
                             Destroy(check_new);
                             uIController.FirstPersonCameraReference = null;
+                            uIController.first_person_protein = -1;
                         }
                         GameObject temp = Instantiate(camera_first_person);
                         //set the camera
                         uIController.FirstPersonCameraReference = temp;
                         uIController.FirstPersonCameraReferenceCamera = temp.GetComponent<Camera>();
+                        //setting the refernce of which protein is being used for the camera
+                        uIController.first_person_protein = protein_id;
 
                         temp.tag = "FirstPerson";
                         temp.transform.SetParent(transform, false);
-                        temp.transform.position = transform.position;
-                        temp.transform.localPosition = new Vector3(-30, 30, -30);
+                        //temp.transform.position = transform.position;
+                        //temp.transform.localPosition = new Vector3(-30, 30, -30);
                         //if (atom != -1)
                         //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
                         //else if(atom_first_person != -1)
@@ -323,9 +329,9 @@ public class PDB_mesh : MonoBehaviour {
                         //temp.GetComponentInChildren<MeshRenderer>().enabled = true;
                         //temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
                         //point the camera to the other protein
-                        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                        if (atom != -1)
-                            temp.transform.LookAt(transform.TransformPoint(mol.atom_centres[atom]));
+                        //Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
+                        //if (atom != -1)
+                        //    temp.transform.LookAt(transform.TransformPoint(mol.atom_centres[atom]));
 
                         temp.GetComponent<MouseOrbitImproved>().protein = gameObject;
                         //temp.GetComponent<MouseOrbitImproved>().target = transform.TransformPoint(mol.atom_centres[atom]);
