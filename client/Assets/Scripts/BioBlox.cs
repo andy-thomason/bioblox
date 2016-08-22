@@ -841,7 +841,6 @@ public class BioBlox : MonoBehaviour
                 //lockButton.gameObject.SetActive(false);
                 //lockButton.interactable = false;
             }
-            Debug.Log ("ento");
             make_molecules (true, MeshTopology.Triangles);
 
             // This is very grubby, must generalise.
@@ -1348,7 +1347,7 @@ public class BioBlox : MonoBehaviour
 
     //TEMP
     public Toggle ToggleMode;
-    public GameObject ScorePanel;
+    public CanvasGroup ScorePanel;
     public GameObject SimpleScoretemp;
     public GameObject Filter;
     public GameObject HintText;
@@ -1358,7 +1357,7 @@ public class BioBlox : MonoBehaviour
     {
         bool status = ToggleMode.isOn;
         Debug.Log(status);
-        ScorePanel.SetActive(!status);
+        //ScorePanel.alpha = status ? 0 : 1;
         //Filter.SetActive(!status);
         //SimpleScoretemp.SetActive(status);
         HintText.SetActive(status);

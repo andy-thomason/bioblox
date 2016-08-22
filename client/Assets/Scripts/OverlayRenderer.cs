@@ -27,6 +27,7 @@ public class OverlayRenderer : MonoBehaviour {
 
     public Material Atom_1;
     public Material Atom_2;
+    public Material Atom_selected;
 
     Material material_to_use;
     UIController ui;
@@ -94,7 +95,26 @@ public class OverlayRenderer : MonoBehaviour {
                             )
                         );
 
-                        if(is_touching)
+                        if (is_selected)
+                        {
+                            if (ui.DropDownP1.value == 1 && i == 0)
+                            {
+                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            }
+                            if (ui.DropDownP2.value == 1 && i == 1)
+                            {
+                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            }
+                            sphere_index++;
+                        }
+
+                        if (is_touching)
                         {
                             if(ui.DropDownP1.value == 1 && i == 0)
                             {
@@ -117,17 +137,12 @@ public class OverlayRenderer : MonoBehaviour {
                         {
                             if (i == ui.first_person_protein)
                             {
-                                material_to_use = i == 0 ? Atom_1 : Atom_2;
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = material_to_use;
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                             }
                             sphere_index++;
                         }
-                        //Sphere_atom_reference = Instantiate(Sphere_atom);
-                        //Sphere_atom_reference.GetComponent<Renderer>().material = material_to_use;
-                        //Sphere_atom_reference.transform.Translate(t.TransformPoint(mol.atom_centres[j]));
-                        //add_Icon_sphere(Sphere_atom_reference);
                     }
                 }
             }

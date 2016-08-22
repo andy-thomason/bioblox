@@ -81,6 +81,8 @@ public class UIController : MonoBehaviour {
 
     bool switch_material = true;
 
+    public bool is_moving_camera_first_person = false;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -153,7 +155,16 @@ public class UIController : MonoBehaviour {
             }
         }
 
-        if (first_person && !isOverUI)
+        //if the user is over the small camera in the first person, the harpoon will not be shot
+        if (first_person && first_person_protein != -1)
+        {
+            if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
+                is_moving_camera_first_person = true;
+            else
+                is_moving_camera_first_person = false;
+        }
+
+        if (first_person && !is_moving_camera_first_person && !isOverUI)
         {
             if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
             {
@@ -181,15 +192,7 @@ public class UIController : MonoBehaviour {
                 arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1300);
             }
         }
-        Debug.Log(first_person_protein);
-        if (first_person && first_person_protein != -1)
-        {
-            Debug.Log("enetro");
-            if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
-                isOverUI = true;
-            else
-                isOverUI = false;
-        }
+        
 
 
     }
@@ -397,7 +400,7 @@ public class UIController : MonoBehaviour {
 
     public void FirstPersonToggle()
     {
-        CutAway.value = -30;
+        CutAway.value = -60;
         isOverUI = false;
         SetCameraDefaultPosition();
         Tutorial.isOn = false;
@@ -442,7 +445,7 @@ public class UIController : MonoBehaviour {
         //floor.SetActive(false);
         isOverUI = false;
         SetCameraDefaultPosition();
-        CutAway.value = -30;
+        CutAway.value = -60;
         Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
@@ -478,7 +481,7 @@ public class UIController : MonoBehaviour {
         cctv_overlay.sprite = cctv_ship;
     }
 
-    bool toggle_score = true;
+    bool toggle_score = false;
     public CanvasGroup score_panel_alpha;
     public CanvasGroup close_score_panel;
     public CanvasGroup open_score_panel;
