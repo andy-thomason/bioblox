@@ -79,6 +79,30 @@ public class UIController : MonoBehaviour {
     public GameObject Arpon;
     public CanvasGroup ScrollbarLinks;
 
+
+    public CanvasGroup AminoAcids;
+    public CanvasGroup ConnectionButton;
+    public CanvasGroup AminoLinks;
+    public Toggle Tutorial;
+    public Slider CutAway;
+    public Toggle ToggleBeacon;
+
+    public Material space_skybox;
+    public Material normal_skybox;
+    public GameObject floor;
+    bool toggle_score = false;
+    public CanvasGroup score_panel_alpha;
+    public CanvasGroup close_score_panel;
+    public CanvasGroup open_score_panel;
+
+    public Text level_description;
+    public Text level_title;
+    public Image image_description;
+    public GameObject button_play;
+
+    public Transform AddConnectionButton;
+    public Text atom_name_firstperson;
+
     bool switch_material = true;
 
     public bool is_moving_camera_first_person = false;
@@ -156,12 +180,31 @@ public class UIController : MonoBehaviour {
         }
 
         //if the user is over the small camera in the first person, the harpoon will not be shot
-        if (first_person && first_person_protein != -1)
+        if (first_person)
         {
-            if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
-                is_moving_camera_first_person = true;
-            else
-                is_moving_camera_first_person = false;
+            if (first_person_protein != -1)
+            {
+                if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
+                    is_moving_camera_first_person = true;
+                else
+                    is_moving_camera_first_person = false;
+            }
+
+            atom_name_firstperson.text = "";
+            if (FirstPersonCameraReferenceCamera && !is_moving_camera_first_person && !isOverUI)
+            {
+                //scanning
+                Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
+                int protein_raycast = first_person_protein != 0 ? 0 : 1;
+
+                //MOLECULE 1 ATOM ID UI
+                int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
+                int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
+                //change the text in the UI depending which atom is being raycasted
+                if (atom_id_molecule >= 0)
+                    atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
+            }
+
         }
 
         if (first_person && !is_moving_camera_first_person && !isOverUI)
@@ -234,59 +277,6 @@ public class UIController : MonoBehaviour {
 		Protein1.SetActive (false);		
 		Protein2.SetActive (true);
 	}
-
-	/*void ChangeSliderViewToFunction()
-	{
-		foreach (Transform AminoButton in SliderProtein1.transform)
-		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().FunctionColor;
-		}
-		foreach (Transform AminoButton in SliderProtein2.transform)
-		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().FunctionColor;
-		}
-		FunctionInfoObject.SetActive (true);
-		//Change the coor of the buttons connections to function
-		ChangeAminoLinkPanelButtonColorToFunction ();
-        //default states of the filter bar
-        FunctionInfoPanelOpenImage.SetActive(false);
-        FunctionInfoPanelCloseImage.SetActive(true);
-        FunctionInfoPanelStatus = true;
-    }
-
-	void ChangeSliderViewToNormal()
-	{
-		foreach (Transform AminoButton in SliderProtein1.transform)
-		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
-		}
-		foreach (Transform AminoButton in SliderProtein2.transform)
-		{
-			AminoButton.GetComponent<Image>().color = AminoButton.GetComponent<AminoButtonController>().NormalColor;
-		}
-		FunctionInfoObject.SetActive (false);
-        //set all the buttons ON when return to normal view
-        //protein 1
-        ToggleAllButtonsSlider(aminoSliderController.A1Hydro, true);
-        ToggleAllButtonsSlider(aminoSliderController.A1Negative, true);
-        ToggleAllButtonsSlider(aminoSliderController.A1Polar, true);
-        ToggleAllButtonsSlider(aminoSliderController.A1Positive, true);
-        ToggleAllButtonsSlider(aminoSliderController.A1Other, true);
-        //protein 2
-        ToggleAllButtonsSlider(aminoSliderController.A2Hydro, true);
-        ToggleAllButtonsSlider(aminoSliderController.A2Polar, true);
-        ToggleAllButtonsSlider(aminoSliderController.A2Positive, true);
-        ToggleAllButtonsSlider(aminoSliderController.A2Negative, true);
-        ToggleAllButtonsSlider(aminoSliderController.A2Other, true);
-		//set all the togles ON
-		for (int i = 0; i< ToggleButtonFunctionsView.Length; i++)
-		{
-			ToggleButtonFunctionsView[i].isOn = true;
-		}
-		//set the color of the buttons of the connections tonormal
-		ChangeAminoLinkPanelButtonColorToNormal ();
-			 
-	}*/
 
 	void ChangeAminoLinkPanelButtonColorToNormal()
 	{
@@ -391,13 +381,6 @@ public class UIController : MonoBehaviour {
         }
     }*/
 
-    public CanvasGroup AminoAcids;
-    public CanvasGroup ConnectionButton;
-    public CanvasGroup AminoLinks;
-    public Toggle Tutorial;
-    public Slider CutAway;
-    public Toggle ToggleBeacon;
-
     public void FirstPersonToggle()
     {
         CutAway.value = -60;
@@ -433,10 +416,6 @@ public class UIController : MonoBehaviour {
         //if(ToggleFreeCameraStatus)
         //ToggleFreeCamera();
     }
-
-    public Material space_skybox;
-    public Material normal_skybox;
-    public GameObject floor;
 
     public void StartExplore()
     {
@@ -481,10 +460,6 @@ public class UIController : MonoBehaviour {
         cctv_overlay.sprite = cctv_ship;
     }
 
-    bool toggle_score = false;
-    public CanvasGroup score_panel_alpha;
-    public CanvasGroup close_score_panel;
-    public CanvasGroup open_score_panel;
 
     public void ToggleScore()
     {
@@ -493,11 +468,6 @@ public class UIController : MonoBehaviour {
         open_score_panel.alpha = toggle_score ? 1 : 0;
         toggle_score = !toggle_score;
     }
-
-    public Text level_description;
-    public Text level_title;
-    public Image image_description;
-    public GameObject button_play;
 
     public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image)
     {

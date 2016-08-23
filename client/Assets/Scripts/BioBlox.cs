@@ -119,8 +119,11 @@ public class BioBlox : MonoBehaviour
     UIController uiController;
     AminoSliderController aminoSlider;
     public Transform TutorialHand;
-    float button_offset = 80.0f;
+    float button_offset = 0.0f;
     public Transform SliderString;
+    public Sprite default_hand;
+    public Sprite slider_hand;
+
 
     public enum GameState {
         Setup,
@@ -1151,7 +1154,7 @@ public class BioBlox : MonoBehaviour
             } break;
             case 2:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.AddConnectionButton.position.x, uiController.AddConnectionButton.position.y, uiController.AddConnectionButton.position.z);
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids. You can spin the molecules to see the atoms in the hole.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsSelected(1, aas[0])) {
@@ -1162,7 +1165,9 @@ public class BioBlox : MonoBehaviour
                     hint_stage =  3;
                 }
             } break;
-            case 3: {
+            case 3:
+                {
+                    TutorialHand.GetChild(0).GetComponent<Image>().sprite = slider_hand;
                     TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
                     TutorialHand.position = new Vector3(SliderString.position.x + button_offset, SliderString.position.y, SliderString.position.z);
                     hintText.text = "Congratulations, you now have one connection. You can pull the connection gently in with the slider on the left. It won't dock correctly, but it shows how things work.";
@@ -1173,8 +1178,9 @@ public class BioBlox : MonoBehaviour
                     hint_stage = 4;
                 }
             } break;
-            case 4: {
-                hintText.text = "Good. Now we can let the slider out and make some more connections.";
+            case 4:
+                {
+                    hintText.text = "Good. Now we can let the slider out and make some more connections.";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
@@ -1182,7 +1188,9 @@ public class BioBlox : MonoBehaviour
                     hint_stage = 5;
                 }
             } break;
-            case 5: {
+            case 5:
+                {
+                    TutorialHand.GetChild(0).GetComponent<Image>().sprite = default_hand;
                     TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
                     TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.z);
                 hintText.text = "Now lets make two more connections. First select the blue button marked ARG I 17";
@@ -1227,7 +1235,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 7:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.AddConnectionButton.position.x, uiController.AddConnectionButton.position.y, uiController.AddConnectionButton.position.z);
 
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1295,7 +1303,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 10:
                 {
-                    TutorialHand.position = new Vector3(uiController.ConnectionButton.transform.position.x + (button_offset / 3.0f), uiController.ConnectionButton.transform.position.y + button_offset, uiController.ConnectionButton.transform.position.z);
+                    TutorialHand.position = new Vector3(uiController.AddConnectionButton.position.x, uiController.AddConnectionButton.position.y, uiController.AddConnectionButton.position.z);
 
                     hintText.text = "Good. Now press the '+' button to add a connection. This will connect both amino acids.";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
@@ -1315,6 +1323,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 11:
                 {
+                    TutorialHand.GetChild(0).GetComponent<Image>().sprite = slider_hand;
                     TutorialHand.rotation = Quaternion.AngleAxis(180, Vector3.forward);
                     TutorialHand.position = new Vector3(SliderString.position.x + button_offset, SliderString.position.y, SliderString.position.z);
                     hintText.text = "Gently pull in the strings all the way using the left hand slider.";
@@ -1332,6 +1341,7 @@ public class BioBlox : MonoBehaviour
                 break;
             case 12:
                 {
+                    TutorialHand.GetChild(0).GetComponent<Image>().sprite = default_hand;
                     TutorialHand.position = new Vector3(6000.0f,0,0);
 
                     hintText.text = "Now we have a dock, but perhaps not the best one. We can 'wiggle' the connections using the top arrows on the two right hand connection tabs. Keep the blue fingers the same as they are correct. Now press the 'Exit Tutorial' button and start playing!";
