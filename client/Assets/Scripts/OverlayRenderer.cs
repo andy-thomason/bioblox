@@ -81,7 +81,7 @@ public class OverlayRenderer : MonoBehaviour {
                     bool is_selected = j < sel.Length && sel[j];
                     bool is_touching = bb.atoms_touching != null && bb.atoms_touching[i][j];
                     bool is_bad = bb.atoms_bad != null && bb.atoms_bad[i][j];
-                    if (is_selected || is_touching || is_bad)
+                    if (is_touching || is_bad)
                     {
                         int name = mol.names[j];
                         int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
@@ -94,25 +94,36 @@ public class OverlayRenderer : MonoBehaviour {
                                 is_bad ? bad : is_touching ? touching : selected
                             )
                         );
-
-                        if (is_selected)
+                    }
+                    //show selected always and only in the protein which the camera is when first eprson
+                    if (is_selected && !(ui.first_person && ui.first_person_protein != i))
+                    {
+                        if (ui.DropDownP1.value == 1 && i == 0)
                         {
-                            if (ui.DropDownP1.value == 1 && i == 0)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            if (ui.DropDownP2.value == 1 && i == 1)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            sphere_index++;
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
                         }
+                        if (ui.DropDownP2.value == 1 && i == 1)
+                        {
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                        }
+                        sphere_index++;
+
+                        //highlight
+                        int name = mol.names[j];
+                        int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+                        int uvy = 3 - atom / 4;
+                        int uvx = atom & 3;
+                        add_Icon(
+                            new Icon(
+                                t.TransformPoint(mol.atom_centres[j]),
+                                mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f), selected
+                            )
+                        );
+                    }
 
                         if (is_touching)
                         {
@@ -132,18 +143,6 @@ public class OverlayRenderer : MonoBehaviour {
                             }
                             sphere_index++;
                         }
-
-                        if (is_selected && ui.first_person)
-                        {
-                            if (i == ui.first_person_protein)
-                            {
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            sphere_index++;
-                        }
-                    }
                 }
             }
         }

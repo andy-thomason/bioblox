@@ -211,20 +211,26 @@ public class UIController : MonoBehaviour {
         {
             if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
             {
-                ////SHOOTING THE ARPON
-                //Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 40.0f);
-                //position = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenToWorldPoint(position);
-                //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-                //GameObject arpon_reference = Instantiate(ArponObject, new Vector3(GameObject.FindGameObjectWithTag("FirstPerson").transform.position.x, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.y - 5, GameObject.FindGameObjectWithTag("FirstPerson").transform.position.z), Quaternion.identity) as GameObject;
-                //arpon_reference.GetComponent<ArponController>().enabled = true;
-                ////GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-                //arpon_reference.transform.LookAt(position);
-                //Debug.Log(position);
-                //arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 700);
-
                 //SHOOTING THE ARPON
-                Vector3 position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 200.0f);
-                position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
+                //where to shoot
+                Vector3 position;
+                //scanning
+                Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
+                int protein_raycast = first_person_protein != 0 ? 0 : 1;
+
+                //MOLECULE 1 ATOM ID UI
+                int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
+                int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
+                //change the text in the UI depending which atom is being raycasted
+                if (atom_id_molecule >= 0)
+                {
+                    position = BioBloxReference.molecules[protein_raycast].transform.TransformPoint(BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule]);
+                }
+                else
+                {
+                    position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 200.0f);
+                    position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
+                }
 
                 //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
                 GameObject arpon_reference = Instantiate(Arpon, BioBloxReference.molecules[first_person_protein].transform.TransformPoint(BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
@@ -232,7 +238,7 @@ public class UIController : MonoBehaviour {
                 //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
                 arpon_reference.transform.LookAt(position);
                 Debug.Log(position);
-                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1300);
+                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1000);
             }
         }
         
@@ -400,7 +406,8 @@ public class UIController : MonoBehaviour {
 			cctv_overlay.sprite = cctv_start;
 			MainCamera.transform.position = new Vector3 (0, 0, -150);
 			MainCamera.transform.rotation = Quaternion.identity;
-		}
+            first_person_protein = -1;
+        }
 
         //hide elements
         AminoAcids.alpha = !first_person ? 1 : 0;

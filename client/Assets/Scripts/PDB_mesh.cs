@@ -292,7 +292,7 @@ public class PDB_mesh : MonoBehaviour {
                 //    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
                 //}
 
-                Debug.Log(atom);
+                //Debug.Log(atom);
                 if (atom != -1)
                 {
                     SelectAtom(atom);
@@ -350,15 +350,9 @@ public class PDB_mesh : MonoBehaviour {
                         //uIController.TransparencyProtein(protein_id);
 
                         if (protein_id == 0)
-                        {
                             uIController.DropDownP1.value = 1;
-                            uIController.DropDownP2.value = 0;
-                        }
                         else
-                        {
                             uIController.DropDownP2.value = 1;
-                            uIController.DropDownP1.value = 0;
-                        }
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP

@@ -24715,7 +24715,7 @@ MonoBehaviour:
   DropDownP1: {fileID: 1144836236}
   DropDownP2: {fileID: 717051225}
   cursor_move: {fileID: 2800000, guid: 8c9f3ecdfcb3bf64db70a518a3305898, type: 3}
-  first_person_protein: 0
+  first_person_protein: -1
   FirstPersonCameraReference: {fileID: 0}
   FirstPersonCameraReferenceCamera: {fileID: 0}
   Arpon: {fileID: 115214, guid: 89eeafa33242e0f45a8d7ca97effa58d, type: 2}
