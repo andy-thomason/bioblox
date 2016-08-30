@@ -13,6 +13,7 @@ TagManager:
   - main_canvas
   - data_1
   - arpon
+  - overlay_renderer
   layers:
   - Default
   - TransparentFX

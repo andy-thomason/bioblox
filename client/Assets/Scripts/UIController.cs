@@ -106,6 +106,7 @@ public class UIController : MonoBehaviour {
     bool switch_material = true;
 
     public bool is_moving_camera_first_person = false;
+    public bool is_hovering = false;
 
     void Awake()
 	{
@@ -202,7 +203,15 @@ public class UIController : MonoBehaviour {
                 int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
                 //change the text in the UI depending which atom is being raycasted
                 if (atom_id_molecule >= 0)
+                {
                     atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
+                    BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule);
+                    is_hovering = true;
+                }
+                else
+                {
+                    is_hovering = false;
+                }
             }
 
         }
@@ -407,6 +416,9 @@ public class UIController : MonoBehaviour {
 			MainCamera.transform.position = new Vector3 (0, 0, -150);
 			MainCamera.transform.rotation = Quaternion.identity;
             first_person_protein = -1;
+
+            //change the overlay renderer camera to default one
+            //MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = MainCameraComponent;
         }
 
         //hide elements
@@ -444,7 +456,7 @@ public class UIController : MonoBehaviour {
     public void EndExplore()
     {
         //RenderSettings.skybox = normal_skybox;
-       // floor.SetActive(true);
+        // floor.SetActive(true);
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
@@ -455,6 +467,7 @@ public class UIController : MonoBehaviour {
     public void ExplorerBackToDefault()
     {
         ToolPanel.SetBool("Open", true);
+        isOverUI = false;
     }
 
     public void ChangeCCTVLoading()

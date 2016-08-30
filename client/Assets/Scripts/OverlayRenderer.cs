@@ -36,10 +36,13 @@ public class OverlayRenderer : MonoBehaviour {
     public GameObject Sphere_atom;
     GameObject Sphere_atom_reference;
     public GameObject Sphere_atom_holder;
+    BioBlox bb;
 
     // Use this for initialization
-    void Start () {
-		MeshFilter mf = GetComponent<MeshFilter> ();
+    void Start ()
+    {
+        bb = GameObject.FindObjectsOfType<BioBlox>()[0];
+        MeshFilter mf = GetComponent<MeshFilter> ();
         ui = FindObjectOfType<UIController>();
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
@@ -51,7 +54,6 @@ public class OverlayRenderer : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        BioBlox bb = GameObject.FindObjectsOfType<BioBlox>()[0];
         if (bb)
         {
             clear_spheres();
@@ -98,12 +100,14 @@ public class OverlayRenderer : MonoBehaviour {
                     //show selected always and only in the protein which the camera is when first eprson
                     if (is_selected && !(ui.first_person && ui.first_person_protein != i))
                     {
+                        //spheres on transparent render protein 0
                         if (ui.DropDownP1.value == 1 && i == 0)
                         {
                             icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                             icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                             add_Icon_sphere(icons_spheres_store[sphere_index]);
                         }
+                        //spheres on transparent render protein 1
                         if (ui.DropDownP2.value == 1 && i == 1)
                         {
                             icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
@@ -124,8 +128,23 @@ public class OverlayRenderer : MonoBehaviour {
                             )
                         );
                     }
+                    //if it's being hovered, it highlights the aminoacids BUT the overlayrednere is not rendering it well.
+                    //else if (is_selected && ui.is_hovering)
+                    //{
+                    //    //highlight
+                    //    int name = mol.names[j];
+                    //    int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+                    //    int uvy = 3 - atom / 4;
+                    //    int uvx = atom & 3;
+                    //    add_Icon(
+                    //        new Icon(
+                    //            t.TransformPoint(mol.atom_centres[j]),
+                    //            mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f), selected
+                    //        )
+                    //    );
+                    //}
 
-                        if (is_touching)
+                    if (is_touching)
                         {
                             if(ui.DropDownP1.value == 1 && i == 0)
                             {

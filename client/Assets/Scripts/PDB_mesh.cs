@@ -353,6 +353,9 @@ public class PDB_mesh : MonoBehaviour {
                             uIController.DropDownP1.value = 1;
                         else
                             uIController.DropDownP2.value = 1;
+                        
+                        ////change the overlay renderer camera
+                        //uIController.MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = temp.GetComponent<Camera>();
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP

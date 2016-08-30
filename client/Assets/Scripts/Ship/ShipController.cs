@@ -327,7 +327,7 @@ public class ShipController : MonoBehaviour {
                     r_temp = RayCastingCamera.ScreenPointToRay(temp.transform.forward);
 
                 } while (PDB_molecule.collide_ray(bb.molecules[1].gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, r_temp) != -1);
-                temp.transform.position -= temp.transform.forward * 20;
+                temp.transform.position -= temp.transform.forward * 10;
                 //temp.transform.GetChild(0).GetComponent<Animator>().enabled = true;
                 temp.transform.LookAt(bb.molecules[1].transform.position);
                 temp.transform.SetParent(bb.molecules[1].transform);
