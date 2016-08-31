@@ -108,6 +108,8 @@ public class UIController : MonoBehaviour {
     public bool is_moving_camera_first_person = false;
     public bool is_hovering = false;
 
+    public bool is_both_selected = false;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -250,9 +252,28 @@ public class UIController : MonoBehaviour {
                 arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1000);
             }
         }
-        
+        if (Input.GetMouseButton(0) && BioBloxReference.molecules.Length != 0)
+        {
+            Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
+            int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[0].transform, ray);
+            int atomID_molecule_temp_1 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[1].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[1].transform, ray);
+            if(!isOverUI && atomID_molecule_temp_0 == -1 && atomID_molecule_temp_1 == -1)
+            {
+                BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
+                BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
+                ConnectionButton.alpha = 0;
+            }
+        }
 
+    }
 
+    public void DeselectOnClick()
+    {
+        if (!isOverUI && (BioBloxReference.molecules[0].GetComponent<PDB_mesh>().atom != -1 || BioBloxReference.molecules[1].GetComponent<PDB_mesh>().atom != -1))
+        {
+            BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
+            BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
+        }
     }
 
 	public void ToggleFreeCamera()

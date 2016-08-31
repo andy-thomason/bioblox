@@ -24198,15 +24198,15 @@ MonoBehaviour:
   SliderString: {fileID: 450668216}
   default_hand: {fileID: 21300000, guid: bffc122064b82a448b5b4914dff2819f, type: 3}
   slider_hand: {fileID: 21300000, guid: 5a246074863386544a1ee9390ebf8171, type: 3}
-  game_state: 0
-  hint_stage: 0
-  work_done: 0
   ToggleMode: {fileID: 1971862419}
   ScorePanel: {fileID: 1057349239}
   SimpleScoretemp: {fileID: 1912775391}
   Filter: {fileID: 749217813}
   HintText: {fileID: 483533157}
   ExitTutorialButton: {fileID: 907967345}
+  game_state: 0
+  hint_stage: 0
+  work_done: 0
   transparent_material: {fileID: 2100000, guid: 9e72a4f45526f3e4c85c1dc68e794eae,
     type: 2}
 --- !u!114 &913013348
@@ -24300,6 +24300,7 @@ MonoBehaviour:
   atom_name_firstperson: {fileID: 1772258240}
   is_moving_camera_first_person: 0
   is_hovering: 0
+  is_both_selected: 0
 --- !u!114 &913013349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24355,7 +24356,7 @@ MonoBehaviour:
   AminoLinkPanel: {fileID: 153430, guid: 3909505c497e0d84e84f0613a55772ef, type: 2}
   AminoLinkPanelParent: {fileID: 413003055}
   AminoLinkBackground: {fileID: 1050879743}
-  AddConnection: {fileID: 1566881797}
+  AddConnection: {fileID: 2086812396}
   ScrollbarAmino1: {fileID: 957733119}
   ScrollbarAmino2: {fileID: 1952182102}
   A1Buttons: []
@@ -42818,7 +42819,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1566881798
 RectTransform:
   m_ObjectHideFlags: 0
@@ -53339,7 +53340,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Atom_1: {fileID: 2100000, guid: ad351bbff1ecb91458d9ac2f331d51c2, type: 2}
   Atom_2: {fileID: 2100000, guid: 3cf1afd09c4628045a53640e3440bcb4, type: 2}
-  Atom_selected: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
+  Atom_selected: {fileID: 2100000, guid: c0d6f1e42678e004db383abb9c5a657a, type: 2}
+  Atom_selected_fp: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
   lookat_camera: {fileID: 1348893749}
   Sphere_atom: {fileID: 198170, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   Sphere_atom_holder: {fileID: 1803283717}
@@ -56146,7 +56148,7 @@ CanvasGroup:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2086812394}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0

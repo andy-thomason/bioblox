@@ -28,7 +28,7 @@ public class AminoSliderController : MonoBehaviour {
 	float[] button_displace = {22.7f,-3.7f};
 	BioBlox BioBloxReference;
 	public List<AtomConnection> connections = new List<AtomConnection> ();
-	public GameObject AddConnection;
+	public CanvasGroup AddConnection;
 
 	//slider buttons
     // todo: put these in an array	
@@ -432,7 +432,7 @@ public class AminoSliderController : MonoBehaviour {
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
-            AddConnection.SetActive(true);
+            AddConnection.alpha = 1;
             AddConnectionText.SetActive(!BioBloxReference.GetComponent<UIController>().ToggleFreeCameraStatus);
 		} else {
 			AddConnectionText.SetActive(false);

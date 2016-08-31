@@ -123,6 +123,12 @@ public class BioBlox : MonoBehaviour
     public Transform SliderString;
     public Sprite default_hand;
     public Sprite slider_hand;
+    public Toggle ToggleMode;
+    public CanvasGroup ScorePanel;
+    public GameObject SimpleScoretemp;
+    public GameObject Filter;
+    public GameObject HintText;
+    public GameObject ExitTutorialButton;
 
 
     public enum GameState {
@@ -1354,14 +1360,6 @@ public class BioBlox : MonoBehaviour
                 break;
         }
     }
-
-    //TEMP
-    public Toggle ToggleMode;
-    public CanvasGroup ScorePanel;
-    public GameObject SimpleScoretemp;
-    public GameObject Filter;
-    public GameObject HintText;
-    public GameObject ExitTutorialButton;
 
     public void ToggleGameMode()
     {

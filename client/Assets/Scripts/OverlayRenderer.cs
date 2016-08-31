@@ -28,6 +28,7 @@ public class OverlayRenderer : MonoBehaviour {
     public Material Atom_1;
     public Material Atom_2;
     public Material Atom_selected;
+    public Material Atom_selected_fp;
 
     Material material_to_use;
     UIController ui;
@@ -128,21 +129,16 @@ public class OverlayRenderer : MonoBehaviour {
                             )
                         );
                     }
-                    //if it's being hovered, it highlights the aminoacids BUT the overlayrednere is not rendering it well.
-                    //else if (is_selected && ui.is_hovering)
-                    //{
-                    //    //highlight
-                    //    int name = mol.names[j];
-                    //    int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
-                    //    int uvy = 3 - atom / 4;
-                    //    int uvx = atom & 3;
-                    //    add_Icon(
-                    //        new Icon(
-                    //            t.TransformPoint(mol.atom_centres[j]),
-                    //            mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f), selected
-                    //        )
-                    //    );
-                    //}
+                    else if (is_selected && ui.is_hovering)
+                    {
+                        if (ui.DropDownP1.value == 1 || ui.DropDownP2.value == 1)
+                        {
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected_fp;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            sphere_index++;
+                        }
+                    }
 
                     if (is_touching)
                         {

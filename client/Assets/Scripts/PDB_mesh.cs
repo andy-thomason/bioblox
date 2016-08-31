@@ -292,6 +292,7 @@ public class PDB_mesh : MonoBehaviour {
                 //    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
                 //}
 
+                //Debug.Log("protein" + protein_id + ": " + atom);
                 //Debug.Log(atom);
                 if (atom != -1)
                 {
@@ -386,8 +387,13 @@ public class PDB_mesh : MonoBehaviour {
 
                 }
             }
+            //else if(!uIController.isOverUI)
+            //{
+            //    DeselectAminoAcid();
+            //}
             has_rotated = false;
             rotating = false;
+            //uIController.DeselectOnClick();
         }
         //else if (uIController.first_person && Input.GetMouseButtonDown(1))
         //{
