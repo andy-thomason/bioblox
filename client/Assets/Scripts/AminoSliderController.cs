@@ -44,7 +44,6 @@ public class AminoSliderController : MonoBehaviour {
 	public int CurrentButtonA1, CurrentButtonA2, LastButtonA1, LastButtonA2 = 0;
 
 	//text to link when there is the free camera
-	public GameObject AddConnectionText;
 	public Animator ConnectionExistMessage;
 
 	//linked
@@ -238,10 +237,6 @@ public class AminoSliderController : MonoBehaviour {
 			}
 		}
 
-		if(Input.GetKeyDown (KeyCode.L) && AddConnectionText.activeSelf) {
-            AddConnectionButton();
-		}
-
 	}
 
 	public void UpdateCurrentButtonA1(int index)
@@ -257,6 +252,17 @@ public class AminoSliderController : MonoBehaviour {
 		A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
         CurrentButtonA2 = index;
 		A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+    }
+
+    public void DeselectAmino()
+    {
+        //amino buttons
+        A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+        A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+        ButtonPickedA1 = null;
+        ButtonPickedA2 = null;
+        AddConnection.interactable = false;
+        AddConnection.GetComponentInChildren<Text>().color = Color.gray;
     }
 
 	public void HighLight3DMesh(int index, int molecule)
@@ -432,12 +438,9 @@ public class AminoSliderController : MonoBehaviour {
 
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
-            AddConnection.alpha = 1;
-            AddConnectionText.SetActive(!BioBloxReference.GetComponent<UIController>().ToggleFreeCameraStatus);
-		} else {
-			AddConnectionText.SetActive(false);
-			//DeactivateAddConnectionButton ();
-		}
+            AddConnection.interactable = true;
+            AddConnection.GetComponentInChildren<Text>().color = Color.black;
+        }
 
 
 /*
@@ -474,7 +477,6 @@ public class AminoSliderController : MonoBehaviour {
 			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
 			//ButtonPickedA1 = ButtonPickedA2 = null;
 			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
-			AddConnectionText.SetActive (false);
 			//DeactivateAddConnectionButton ();
 		}
 		else

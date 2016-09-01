@@ -2,11 +2,10 @@
 using System.Collections;
 
 [AddComponentMenu("Camera-Control/Mouse Orbit with zoom")]
-public class MouseOrbitImproved : MonoBehaviour
+public class MouseOrbitImproved_main : MonoBehaviour
 {
 
     public Vector3 target;
-    public GameObject protein;
     public float distance = 15.0f;
     public float xSpeed = 120.0f;
     public float ySpeed = 120.0f;
@@ -16,6 +15,8 @@ public class MouseOrbitImproved : MonoBehaviour
 
     public float distanceMin = 15f;
     public float distanceMax = 35f;
+
+    public float scroll_speed = 10;
 
     private Rigidbody rigidbody;
     public Texture2D cursor_move;
@@ -30,11 +31,17 @@ public class MouseOrbitImproved : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        Init();
+    }
+
+    public void Init()
+    {
         Vector3 angles = transform.eulerAngles;
         x = angles.y;
         y = angles.x;
+        distance = 150.0f;
 
-        target = protein.transform.TransformPoint(protein.GetComponent<PDB_mesh>().mol.atom_centres[protein.GetComponent<PDB_mesh>().atom]);
+        target = new Vector3(0, 0, 0);
         x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
         y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
 
@@ -51,8 +58,6 @@ public class MouseOrbitImproved : MonoBehaviour
 
     void LateUpdate()
     {
-        target = protein.transform.TransformPoint(protein.GetComponent<PDB_mesh>().mol.atom_centres[protein.GetComponent<PDB_mesh>().atom]);
-
         if (Input.GetMouseButton(1))
         {
             Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
@@ -66,7 +71,7 @@ public class MouseOrbitImproved : MonoBehaviour
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         }
 
-        distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 8, distanceMin, distanceMax);
+        distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * scroll_speed, distanceMin, distanceMax);
 
         y = ClampAngle(y, yMinLimit, yMaxLimit);
         rotation = Quaternion.Euler(y, x, 0);

@@ -132,55 +132,55 @@ public class UIController : MonoBehaviour {
         //	CameraFreeze = !CameraFreeze;
         //}
         //if first person of exploration not zoom nor movement
-        if (!first_person && !explore_view)
-        {
-            //camera zoom
-            if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
-            {
-                if (MainCameraComponent.fieldOfView > 1)
-                    MainCameraComponent.fieldOfView -= 2f;
-                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+        //if (!first_person && !explore_view)
+        //{
+        //    //camera zoom
+        //    if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
+        //    {
+        //        if (MainCameraComponent.fieldOfView > 1)
+        //            MainCameraComponent.fieldOfView -= 2f;
+        //        //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
 
-            }
-            else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            {
-                if (MainCameraComponent.fieldOfView < 33)
-                    MainCameraComponent.fieldOfView += 2f;
-                //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-            }
+        //    }
+        //    else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        //    {
+        //        if (MainCameraComponent.fieldOfView < 33)
+        //            MainCameraComponent.fieldOfView += 2f;
+        //        //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
+        //    }
 
-            if (Input.GetMouseButtonDown(1))
-            {
-                dragOrigin = Input.mousePosition;
-            }
+        //    if (Input.GetMouseButtonDown(1))
+        //    {
+        //        dragOrigin = Input.mousePosition;
+        //    }
 
-            if (Input.GetMouseButton(1))
-            {
+        //    if (Input.GetMouseButton(1))
+        //    {
 
-                Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
+        //        Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
 
-                Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
+        //        Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
 
-                if (MainCamera.transform.position.y > -25)
-                {
-                    move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-                }
-                else
-                {
-                    if (pos.y < 0)
-                        move = new Vector3(pos.x * dragSpeed, 0, 0);
-                    else
-                        move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-                }
+        //        if (MainCamera.transform.position.y > -25)
+        //        {
+        //            move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //        }
+        //        else
+        //        {
+        //            if (pos.y < 0)
+        //                move = new Vector3(pos.x * dragSpeed, 0, 0);
+        //            else
+        //                move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
+        //        }
 
 
-                MainCamera.transform.Translate(move, Space.Self);
-            }
-            else
-            {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            }
-        }
+        //        MainCamera.transform.Translate(move, Space.Self);
+        //    }
+        //    else
+        //    {
+        //        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+        //    }
+        //}
 
         //if the user is over the small camera in the first person, the harpoon will not be shot
         if (first_person)
@@ -252,7 +252,9 @@ public class UIController : MonoBehaviour {
                 arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1000);
             }
         }
-        if (Input.GetMouseButton(0) && BioBloxReference.molecules.Length != 0)
+
+        //deselection aminoacids
+        if (Input.GetMouseButtonDown(0) && !first_person && BioBloxReference.molecules.Length != 0)
         {
             Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
             int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[0].transform, ray);
@@ -261,7 +263,7 @@ public class UIController : MonoBehaviour {
             {
                 BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
                 BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
-                ConnectionButton.alpha = 0;
+                aminoSliderController.DeselectAmino();
             }
         }
 
@@ -298,11 +300,21 @@ public class UIController : MonoBehaviour {
 
 	public void RestartCamera()
 	{
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
 		MainCamera.transform.position = new Vector3 (0, 0, -150);
 		MainCamera.transform.rotation = Quaternion.identity;
-	}
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
+    }
 
-	public void ToggleProteinView1()
+    public void RepositionCameraWOMovement()
+    {
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
+        MainCamera.transform.position = new Vector3(0, 0, -150);
+        MainCamera.transform.rotation = Quaternion.identity;
+    }
+
+    public void ToggleProteinView1()
 	{
 		Protein1.SetActive (true);		
 		Protein2.SetActive (false);
@@ -421,7 +433,7 @@ public class UIController : MonoBehaviour {
     {
         CutAway.value = -60;
         isOverUI = false;
-        SetCameraDefaultPosition();
+        RepositionCameraWOMovement();
         Tutorial.isOn = false;
         Tutorial.enabled = first_person;
         //show the slider of more than 3 conenction
@@ -429,6 +441,7 @@ public class UIController : MonoBehaviour {
         first_person = !first_person;
 		//FreeCameraToggle.interactable = !first_person;
         ExplorerButton.interactable = !first_person;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = !first_person ? true : false;
 
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
         if (first_person)
@@ -437,7 +450,6 @@ public class UIController : MonoBehaviour {
 			MainCamera.transform.position = new Vector3 (0, 0, -150);
 			MainCamera.transform.rotation = Quaternion.identity;
             first_person_protein = -1;
-
             //change the overlay renderer camera to default one
             //MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = MainCameraComponent;
         }
@@ -463,15 +475,14 @@ public class UIController : MonoBehaviour {
         //RenderSettings.skybox = space_skybox;
         //floor.SetActive(false);
         isOverUI = false;
-        SetCameraDefaultPosition();
+        RepositionCameraWOMovement();
         CutAway.value = -60;
         Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
         MainCanvas.SetActive(false);
         ChangeCCTVShip();
-        MainCamera.transform.position = new Vector3(0, 0, -150);
-        MainCamera.transform.rotation = Quaternion.identity;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
     }
 
     public void EndExplore()
@@ -483,6 +494,7 @@ public class UIController : MonoBehaviour {
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
         if (explorerController.beacon_holder.Count > 0)
             ToggleBeacon.isOn = true;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
     }
 
     public void ExplorerBackToDefault()
@@ -576,12 +588,6 @@ public class UIController : MonoBehaviour {
             }
         }
 
-    }
-   
-    public void SetCameraDefaultPosition()
-    {
-        MainCamera.GetComponent<Camera>().fieldOfView = 33;
-        CameraSlider.GetComponent<Slider>().value = -90;
     }
 
     public void TransparencyProtein(int protein_index)
