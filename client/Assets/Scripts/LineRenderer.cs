@@ -14,7 +14,7 @@ public class LineRenderer : MonoBehaviour {
 		public Line(Vector3 start, Vector3 end) {
 			this.start = start;
 			this.end = end;
-			this.width = 0.1f;
+			this.width = 0.5f;
 			Vector2 uv0 = new Vector2(0,0);
 			Vector2 uv1 = new Vector2(1,1);
 			this.uv0 = uv0;
@@ -63,8 +63,8 @@ public class LineRenderer : MonoBehaviour {
 			vertices[i*4+3] = line.end + up;
 			uvs[i*4+0] = new Vector2(line.uv0.x, line.uv0.y);
 			uvs[i*4+1] = new Vector2(line.uv0.x, line.uv1.y);
-			uvs[i*4+2] = new Vector2(line.uv1.x, line.uv0.y);
-			uvs[i*4+3] = new Vector2(line.uv1.x, line.uv1.y);
+			uvs[i*4+2] = new Vector2(line.uv1.x, line.uv1.y);
+			uvs[i*4+3] = new Vector2(line.uv1.x, line.uv0.y);
 			// 0 3
 			// 1 2
 			indices[i*6+0] = i*4+0;
