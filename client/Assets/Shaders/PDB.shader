@@ -1,4 +1,6 @@
-﻿Shader "Custom/Bioblox/PDB" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Custom/Bioblox/PDB" {
   Properties {
     _Color ("Diffuse Material Color", Color) = (1,1,1,1) 
     _Specular ("Specular Material Color", Color) = (1,1,1,1) 
@@ -112,7 +114,7 @@
         varying_t o;
         float4 vertex = float4(v.vertex + v.normal * _Thickness, 1);
         o.projection_pos = mul (UNITY_MATRIX_MVP, vertex);
-        o.world_pos = mul (_Object2World, vertex);
+        o.world_pos = mul (unity_ObjectToWorld, vertex);
         return o;
       }
 
@@ -190,9 +192,9 @@
         varying_t o;
         float4 vertex = float4(v.vertex + v.normal * _Thickness, 1);
         o.projection_pos = mul (UNITY_MATRIX_MVP, vertex);
-        o.normal = mul(_Object2World, float4(v.normal, 0)).xyz;
+        o.normal = mul(unity_ObjectToWorld, float4(v.normal, 0)).xyz;
         o.model_pos = vertex;
-        o.world_pos = mul (_Object2World, vertex);
+        o.world_pos = mul (unity_ObjectToWorld, vertex);
         o.color = v.color;
         o.scrPos = ComputeScreenPos(o.projection_pos);
         return o;

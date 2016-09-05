@@ -1,4 +1,6 @@
-﻿Shader "Custom/MoleculeCGShader" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Custom/MoleculeCGShader" {
     Properties{
         _Distance("Distance", Range(-400,400)) = 0
         _Color ("Color", Color) = (1,1,1,1) 
@@ -59,7 +61,7 @@
             {
                 UNITY_INITIALIZE_OUTPUT(Input,o);
                 o.vertexColor = v.color; // Save the Vertex Color in the Input for the surf() method
-                o.worldPos = mul(_Object2World, v.vertex).xyz;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
             }
 
             float _Distance;
@@ -120,7 +122,7 @@
           vert (v, customInputData);
           o.custompack0.xyz = customInputData.vertexColor;
           o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
-          float3 worldPos = mul(_Object2World, v.vertex).xyz;
+          float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
           fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
           #if !defined(LIGHTMAP_OFF) && defined(DIRLIGHTMAP_COMBINED)
           fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
@@ -300,7 +302,7 @@
             {
                 UNITY_INITIALIZE_OUTPUT(Input,o);
                 o.vertexColor = v.color; // Save the Vertex Color in the Input for the surf() method
-                o.worldPos = mul(_Object2World, v.vertex).xyz;
+                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
             }
 
             float _Distance;
@@ -360,7 +362,7 @@
           vert (v, customInputData);
           o.custompack0.xyz = customInputData.vertexColor;
           o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
-          float3 worldPos = mul(_Object2World, v.vertex).xyz;
+          float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
           fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
           #if !defined(LIGHTMAP_OFF) && defined(DIRLIGHTMAP_COMBINED)
           fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);

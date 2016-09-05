@@ -110,6 +110,9 @@ public class UIController : MonoBehaviour {
 
     public bool is_both_selected = false;
 
+    //cutaway wall
+    public Transform cutaway_wall;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -573,7 +576,9 @@ public class UIController : MonoBehaviour {
 
     public void CutAwayTool()
     {
-        if(DropDownP1.value != 1)
+
+        cutaway_wall.gameObject.SetActive(true);
+        if (DropDownP1.value != 1)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
             {
@@ -587,6 +592,11 @@ public class UIController : MonoBehaviour {
                 molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
             }
         }
+
+        cutaway_wall.localPosition = new Vector3(0, 0, CutAway.value);
+
+        if (CutAway.value == CutAway.minValue)
+            cutaway_wall.gameObject.SetActive(false);
 
     }
 
