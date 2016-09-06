@@ -103,6 +103,9 @@ public class UIController : MonoBehaviour {
     public Transform AddConnectionButton;
     public Text atom_name_firstperson;
 
+    public GameObject button_erase_connections_1p;
+    public Button button_erase_connections_1p_button;
+
     bool switch_material = true;
 
     public bool is_moving_camera_first_person = false;
@@ -119,6 +122,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.GetComponent<Camera>();
+        button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
     }
 
     Vector3 dragOrigin;
@@ -269,6 +273,8 @@ public class UIController : MonoBehaviour {
                 aminoSliderController.DeselectAmino();
             }
         }
+
+        //Debug.Log("isoverUI: " + isOverUI);
 
     }
 
@@ -434,15 +440,16 @@ public class UIController : MonoBehaviour {
 
     public void FirstPersonToggle()
     {
+        first_person = !first_person;
         CutAway.value = -60;
         isOverUI = false;
         RepositionCameraWOMovement();
         Tutorial.isOn = false;
-        Tutorial.enabled = first_person;
+        Tutorial.enabled = !first_person;
         //show the slider of more than 3 conenction
-        ScrollbarLinks.alpha = !first_person ? 0 : 1;
-        first_person = !first_person;
-		//FreeCameraToggle.interactable = !first_person;
+        ScrollbarLinks.alpha = !first_person ? 1 : 0;
+        //erase connections
+        button_erase_connections_1p.SetActive(first_person);
         ExplorerButton.interactable = !first_person;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = !first_person ? true : false;
 
@@ -455,18 +462,20 @@ public class UIController : MonoBehaviour {
             first_person_protein = -1;
             //change the overlay renderer camera to default one
             //MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = MainCameraComponent;
+            //check conenctions
+            if (aminoSliderController.ReturnNumberOfConnection() > 0)
+                button_erase_connections_1p_button.interactable = true;
+        }
+        else
+        {
+            DropDownP1.value = 0;
+            DropDownP2.value = 0;
         }
 
         //hide elements
         AminoAcids.alpha = !first_person ? 1 : 0;
         ConnectionButton.alpha = !first_person ? 1 : 0;
         AminoLinks.alpha = !first_person ? 1 : 0;
-
-        if(!first_person)
-        {
-            DropDownP1.value = 0;
-            DropDownP2.value = 0;
-        }
 
         //if(ToggleFreeCameraStatus)
         //ToggleFreeCamera();
@@ -616,5 +625,4 @@ public class UIController : MonoBehaviour {
             molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
         }
     }
-
 }

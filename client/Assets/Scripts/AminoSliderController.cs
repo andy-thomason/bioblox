@@ -738,6 +738,7 @@ public class AminoSliderController : MonoBehaviour {
     public void DeleteAllAminoConnections()
     {
         foreach (Transform childTransform in AminoLinkPanelParent.transform) childTransform.GetComponentInChildren<AminoConnectionHolder>().DeleteLink();
+        uIController.button_erase_connections_1p_button.interactable = false;
     }
 
     /*public void DeselectAmino()

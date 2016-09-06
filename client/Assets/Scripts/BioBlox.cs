@@ -43,6 +43,7 @@ public class BioBlox : MonoBehaviour
     List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
     // the molecules in the scene
     public GameObject[] prefab_molecules;
+    public GameObject[] prefab_molecules_bs;
     // the molecules in the scene
     public GameObject[] molecules;
     public BitArray[] atoms_touching;
@@ -699,7 +700,7 @@ public class BioBlox : MonoBehaviour
         if (!p)
         {
             p = obj.AddComponent<PDB_mesh>();
-            obj.AddComponent<FirstPerson>();
+            //obj.AddComponent<FirstPerson>();
         }
 
         PDB_molecule mol = PDB_parser.get_molecule (name);
@@ -800,22 +801,30 @@ public class BioBlox : MonoBehaviour
         GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
         mol1_mesh.transform.SetParent(mol1.transform);
 
-        GameObject mol2_mesh = Instantiate(prefab_molecules[1]);
+        GameObject mol2_mesh= Instantiate(prefab_molecules[1]);
         mol2_mesh.transform.SetParent(mol2.transform);
 
         //Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
-        //transpant
+        //transpant 1
         mol1_mesh = Instantiate(prefab_molecules[0]);
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol1_mesh);
-        //transpant
+        //transpant 2
         mol2_mesh = Instantiate(prefab_molecules[1]);
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "transparent_p2";
         FixTransparentMolecule(mol2_mesh);
+        //ball and stick 1
+        mol1_mesh = Instantiate(prefab_molecules_bs[0]);
+        mol1_mesh.transform.SetParent(mol1.transform);
+        mol1_mesh.name = "bs_p1";
+        //ball and stick 2
+        mol2_mesh = Instantiate(prefab_molecules_bs[1]);
+        mol2_mesh.transform.SetParent(mol2.transform);
+        mol2_mesh.name = "bs_p2";
 
 
         if (init) {
@@ -883,11 +892,11 @@ public class BioBlox : MonoBehaviour
             p2.other = p1.gameObject;
             p1.gameObject.SetActive (false);
             p2.gameObject.SetActive (false);
-        
+
             //pop the molecules in for a visually pleasing effect
-            PopInSound (mol1.gameObject);
-            yield return new WaitForSeconds (0.2f);
-            PopInSound (mol2.gameObject);
+            PopInSound(mol1.gameObject);
+            yield return new WaitForSeconds(0.2f);
+            PopInSound(mol2.gameObject);
 
             //this is the connection manager for the complex game, it handles grappling between the molecules
             ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
@@ -1118,7 +1127,7 @@ public class BioBlox : MonoBehaviour
 
 
 
-        if (eventSystem != null && eventSystem.IsActive() && (!uiController.first_person || aminoSlider.ReturnNumberOfConnection() != 0)) {
+        if (eventSystem != null && eventSystem.IsActive()) {
             ApplyReturnToOriginForce();
         }
     }

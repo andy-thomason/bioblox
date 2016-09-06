@@ -5,6 +5,7 @@ public class ArponController : MonoBehaviour {
 
     BioBlox bb;
     AminoSliderController aminoSliderController;
+    UIController UI;
     GameObject current_camera;
     int protein_to_shot;
 
@@ -12,6 +13,7 @@ public class ArponController : MonoBehaviour {
 	void Start () {
         bb = FindObjectOfType<BioBlox>();
         aminoSliderController = FindObjectOfType<AminoSliderController>();
+        UI = FindObjectOfType<UIController>();
         current_camera = GameObject.FindGameObjectWithTag("FirstPerson");
         if (current_camera.transform.parent.gameObject.GetComponent<PDB_mesh>().protein_id == 0)
             protein_to_shot = 1;
@@ -35,6 +37,8 @@ public class ArponController : MonoBehaviour {
             GetComponent<Rigidbody>().isKinematic = true;
             transform.SetParent(bb.molecules[protein_to_shot].transform);
             // Destroy(gameObject);
+            //deactivate/activate delete button
+            UI.button_erase_connections_1p_button.interactable = true;
         }
 
         //realistic flying
