@@ -11,6 +11,8 @@ public class BioBlox : MonoBehaviour
     // dictaing which gametype, puzzle or museum
     //bool simpleGame = true;
 
+    public int level;
+
     // controls whether the win state should attempt to fade out the molecules
     public bool winShouldFadeMol = false;
 
@@ -25,6 +27,19 @@ public class BioBlox : MonoBehaviour
 
     // a holder variable for the current event system
     EventSystem eventSystem;
+    //files
+    List<string> filename_levels = new List<string>();
+
+    //levels name
+    List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
+    List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
+    //public Dictionary<string, string> level_mesh_default = new Dictionary<string, string>{
+    //    {"0",  "1"}, {"4KC3_A_se_1",  "4KC3_B_se_1"}
+    //};
+
+    //public Dictionary<string, string> level_mesh_bs = new Dictionary<string, string>{
+    //    {"2PTC_E_bs_1",  "2PTC_I_bs_1"}, {"4KC3_A_bs_1",  "4KC3_B_bs_1"}
+    //};
 
 
 
@@ -42,8 +57,8 @@ public class BioBlox : MonoBehaviour
     // a list of win conditions where two atoms must be paired
     List<Tuple<int,int>> winCondition = new List<Tuple<int,int>> ();
     // the molecules in the scene
-    public GameObject[] prefab_molecules;
-    public GameObject[] prefab_molecules_bs;
+    //public GameObject[] prefab_molecules;
+    //public GameObject[] prefab_molecules_bs;
     // the molecules in the scene
     public GameObject[] molecules;
     public BitArray[] atoms_touching;
@@ -151,10 +166,24 @@ public class BioBlox : MonoBehaviour
     void Start ()
     {
         uiController = FindObjectOfType<UIController>();
+        //filenames 
+        filename_levels.Add("2PTC");
+        filename_levels.Add("4KC3");
+        filename_levels.Add("1FSS");
+        //fill the levels
+        level_mesh_default.Add(new Tuple<string, string>("0", "1"));
+        level_mesh_default.Add(new Tuple<string, string>("4KC3_A_se_1", "4KC3_B_se_1"));
+        level_mesh_default.Add(new Tuple<string, string>("1FSS_A_se_1", "1FSS_B_se_1"));
+
+        level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1",  "2PTC_I_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("4KC3_A_bs_1", "4KC3_B_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("1FSS_A_bs_1", "1FSS_B_bs_1"));
     }
 
     public void StartGame()
     {
+        if (level == 0)
+            ToggleMode.isOn = true;
         //winSplash.SetActive (false);
         //looseSplash.SetActive (false);
         //goSplash.SetActive (false);
@@ -181,7 +210,7 @@ public class BioBlox : MonoBehaviour
         //filenames.Add ("betabarrel_b");
         //filenames.Add("2ptc_u_new_edited");
 
-        filenames.Add("pdb2ptcWithTags");
+        filenames.Add(filename_levels[level]);
 
         //filenames.Add("1GCQ_bWithTags");
 
@@ -798,33 +827,62 @@ public class BioBlox : MonoBehaviour
         GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
         GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
 
-        GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
+        GameObject mol1_mesh = Instantiate(Resources.Load("Mesh/"+level_mesh_default[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
 
-        GameObject mol2_mesh= Instantiate(prefab_molecules[1]);
+        GameObject mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
 
         //Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
         //transpant 1
-        mol1_mesh = Instantiate(prefab_molecules[0]);
+        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol1_mesh);
         //transpant 2
-        mol2_mesh = Instantiate(prefab_molecules[1]);
+        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "transparent_p2";
         FixTransparentMolecule(mol2_mesh);
         //ball and stick 1
-        mol1_mesh = Instantiate(prefab_molecules_bs[0]);
+        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "bs_p1";
         //ball and stick 2
-        mol2_mesh = Instantiate(prefab_molecules_bs[1]);
+        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "bs_p2";
+
+
+        //GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
+        //mol1_mesh.transform.SetParent(mol1.transform);
+
+        //GameObject mol2_mesh= Instantiate(prefab_molecules[1]);
+        //mol2_mesh.transform.SetParent(mol2.transform);
+
+        ////Ioannis
+        //scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
+
+        ////transpant 1
+        //mol1_mesh = Instantiate(prefab_molecules[0]);
+        //mol1_mesh.transform.SetParent(mol1.transform);
+        //mol1_mesh.name = "transparent_p1";
+        //FixTransparentMolecule(mol1_mesh);
+        ////transpant 2
+        //mol2_mesh = Instantiate(prefab_molecules[1]);
+        //mol2_mesh.transform.SetParent(mol2.transform);
+        //mol2_mesh.name = "transparent_p2";
+        //FixTransparentMolecule(mol2_mesh);
+        ////ball and stick 1
+        //mol1_mesh = Instantiate(prefab_molecules_bs[0]);
+        //mol1_mesh.transform.SetParent(mol1.transform);
+        //mol1_mesh.name = "bs_p1";
+        ////ball and stick 2
+        //mol2_mesh = Instantiate(prefab_molecules_bs[1]);
+        //mol2_mesh.transform.SetParent(mol2.transform);
+        //mol2_mesh.name = "bs_p2";
 
 
         if (init) {
@@ -1383,7 +1441,6 @@ public class BioBlox : MonoBehaviour
     public void ToggleGameMode()
     {
         bool status = ToggleMode.isOn;
-        Debug.Log(status);
         //ScorePanel.alpha = status ? 0 : 1;
         //Filter.SetActive(!status);
         //SimpleScoretemp.SetActive(status);
@@ -1391,7 +1448,7 @@ public class BioBlox : MonoBehaviour
         HintTextPanel.gameObject.SetActive(status);
         ExitTutorialButton.SetActive(status);
 
-        if(!status)
+        if (!status)
             TutorialHand.position = new Vector3(5000.0f, 0, 0);
 
         Transform Amino1 = GameObject.Find("ContentPanelA1").transform;

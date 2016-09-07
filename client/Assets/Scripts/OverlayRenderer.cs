@@ -99,6 +99,7 @@ public class OverlayRenderer : MonoBehaviour {
                         );
                     }
                     //show selected always and only in the protein which the camera is when first eprson
+                    //BHERE TO SYNC THE PDB WITH THE MESH - is_selected && 
                     if (is_selected && !(ui.first_person && ui.first_person_protein != i))
                     {
                         if (sphere_index < icons_spheres_store.Count)

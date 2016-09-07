@@ -6,7 +6,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
 {
 
     public Vector3 target;
-    public float distance = 15.0f;
+    public float distance = 200.0f;
     public float xSpeed = 120.0f;
     public float ySpeed = 120.0f;
 
@@ -39,7 +39,6 @@ public class MouseOrbitImproved_main : MonoBehaviour
         Vector3 angles = transform.eulerAngles;
         x = angles.y;
         y = angles.x;
-        distance = 150.0f;
 
         target = new Vector3(0, 0, 0);
         x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;

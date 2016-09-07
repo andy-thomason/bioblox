@@ -115,6 +115,7 @@ public class UIController : MonoBehaviour {
 
     //cutaway wall
     public Transform cutaway_wall;
+    float camera_distance;
 
     void Awake()
 	{
@@ -123,6 +124,7 @@ public class UIController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.GetComponent<Camera>();
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
+        camera_distance = -MainCamera.GetComponent<MouseOrbitImproved_main>().distance;
     }
 
     Vector3 dragOrigin;
@@ -310,7 +312,7 @@ public class UIController : MonoBehaviour {
 	public void RestartCamera()
 	{
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-		MainCamera.transform.position = new Vector3 (0, 0, -150);
+		MainCamera.transform.position = new Vector3 (0, 0, camera_distance);
 		MainCamera.transform.rotation = Quaternion.identity;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
@@ -319,7 +321,7 @@ public class UIController : MonoBehaviour {
     public void RepositionCameraWOMovement()
     {
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        MainCamera.transform.position = new Vector3(0, 0, -150);
+        MainCamera.transform.position = new Vector3(0, 0, camera_distance);
         MainCamera.transform.rotation = Quaternion.identity;
     }
 
@@ -441,7 +443,7 @@ public class UIController : MonoBehaviour {
     public void FirstPersonToggle()
     {
         first_person = !first_person;
-        CutAway.value = -60;
+        CutAway.value = CutAway.minValue;
         isOverUI = false;
         RepositionCameraWOMovement();
         Tutorial.isOn = false;
@@ -457,7 +459,7 @@ public class UIController : MonoBehaviour {
         if (first_person)
 		{
 			cctv_overlay.sprite = cctv_start;
-			MainCamera.transform.position = new Vector3 (0, 0, -150);
+			MainCamera.transform.position = new Vector3 (0, 0, camera_distance);
 			MainCamera.transform.rotation = Quaternion.identity;
             first_person_protein = -1;
             //change the overlay renderer camera to default one
@@ -488,7 +490,7 @@ public class UIController : MonoBehaviour {
         //floor.SetActive(false);
         isOverUI = false;
         RepositionCameraWOMovement();
-        CutAway.value = -60;
+        CutAway.value = CutAway.minValue;
         Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
@@ -534,8 +536,9 @@ public class UIController : MonoBehaviour {
         toggle_score = !toggle_score;
     }
 
-    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image)
+    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp)
     {
+        BioBloxReference.level = level_temp;
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;
