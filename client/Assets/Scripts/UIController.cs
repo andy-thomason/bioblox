@@ -468,11 +468,6 @@ public class UIController : MonoBehaviour {
             if (aminoSliderController.ReturnNumberOfConnection() > 0)
                 button_erase_connections_1p_button.interactable = true;
         }
-        else
-        {
-            DropDownP1.value = 0;
-            DropDownP2.value = 0;
-        }
 
         //hide elements
         AminoAcids.alpha = !first_person ? 1 : 0;
@@ -536,9 +531,10 @@ public class UIController : MonoBehaviour {
         toggle_score = !toggle_score;
     }
 
-    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp)
+    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_offset_index_temp)
     {
         BioBloxReference.level = level_temp;
+        BioBloxReference.mesh_offset_index = mesh_offset_index_temp;
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;
@@ -559,6 +555,8 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
         isProtein2Fixed = !isProtein2Fixed;
     }
+
+
 
     public void ChangeRenderProtein1()
     {
@@ -617,7 +615,7 @@ public class UIController : MonoBehaviour {
 
         foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
         {
-            molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 30);
+            molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", 100);
         }
     }
 
@@ -628,4 +626,105 @@ public class UIController : MonoBehaviour {
             molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
         }
     }
+
+    public Toggle p1_trans;
+    public Toggle p1_bs;
+    public Toggle p2_trans;
+    public Toggle p2_bs;
+    bool toggle_temp;
+
+    public void P1Transparent()
+    {
+        ToggleTransparentMesh(0);
+    }
+
+    public void P2Transparent()
+    {
+        ToggleTransparentMesh(1);
+    }
+
+    public void P1BS()
+    {
+        ToggleBSMesh(0);
+    }
+
+    public void P2BS()
+    {
+        ToggleBSMesh(1);
+    }
+
+    void ToggleTransparentMesh(int protein_index)
+    {
+        toggle_temp = protein_index == 0 ? p1_trans.isOn : p2_trans.isOn;
+        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(toggle_temp);
+        CheckDefaultMesh(protein_index);
+    }
+    
+    void ToggleBSMesh(int protein_index)
+    {
+        toggle_temp = protein_index == 0 ? p1_bs.isOn : p2_bs.isOn;
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(toggle_temp);
+        CheckDefaultMesh(protein_index);
+    }
+
+    void CheckDefaultMesh(int protein_index)
+    {
+        if(protein_index == 0)
+        {
+            if (p1_trans.isOn || p1_bs.isOn)
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.maxValue);
+                }
+            }
+            else
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.minValue);
+                }
+            }
+        }
+        else
+        {
+            if (p2_trans.isOn || p2_bs.isOn)
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.maxValue);
+                }
+            }
+            else
+            {
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[protein_index].transform.GetChild(0).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.minValue);
+                }
+            }
+        }
+    }
+
+    public GameObject EndLevelPanel;
+    public Text number_atoms_end_level;
+    public Text time_end_level;
+
+    public void EndLevel()
+    {
+        if (BioBloxReference.is_score_valid)
+        {
+            EndLevelPanel.SetActive(true);
+            number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
+            time_end_level.text = BioBloxReference.game_time.ToString();
+        }
+    }
+
+    public void RestartLevel()
+    {
+        EndLevelPanel.SetActive(false);
+        RestartCamera();
+        aminoSliderController.DeleteAllAminoConnections();
+    }
+
+        
 }

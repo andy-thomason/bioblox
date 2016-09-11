@@ -145,7 +145,11 @@ public class BioBlox : MonoBehaviour
     public GameObject Filter;
     public GameObject HintText;
     public GameObject ExitTutorialButton;
-
+    int[] meshes_offset = new int[] {-1,-2,-3};
+    public int mesh_offset_index;
+    public bool is_score_valid;
+    public float game_time = 0;
+    bool playing = false;
 
     public enum GameState {
         Setup,
@@ -170,20 +174,35 @@ public class BioBlox : MonoBehaviour
         filename_levels.Add("2PTC");
         filename_levels.Add("4KC3");
         filename_levels.Add("1FSS");
+        filename_levels.Add("1EMV");
+        filename_levels.Add("1GRN");
+        filename_levels.Add("1OHZ"); 
+        filename_levels.Add("2VIR");
         //fill the levels
+        //name of the meshes in Resources/Mesh - normal one with cutaway material
         level_mesh_default.Add(new Tuple<string, string>("0", "1"));
         level_mesh_default.Add(new Tuple<string, string>("4KC3_A_se_1", "4KC3_B_se_1"));
         level_mesh_default.Add(new Tuple<string, string>("1FSS_A_se_1", "1FSS_B_se_1"));
-
+        level_mesh_default.Add(new Tuple<string, string>("1EMV_A_se_1", "1EMV_B_se_1"));
+        level_mesh_default.Add(new Tuple<string, string>("1GRN_A_se_1", "1GRN_B_se_1"));
+        level_mesh_default.Add(new Tuple<string, string>("1OHZ_A_se_1", "1OHZ_B_se_1"));
+        level_mesh_default.Add(new Tuple<string, string>("2VIR_AB_se_1", "2VIR_C_se_1"));
+        //name of the meshes in Resources/Mesh - ball and stick renderer
         level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1",  "2PTC_I_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("4KC3_A_bs_1", "4KC3_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1FSS_A_bs_1", "1FSS_B_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("1EMV_A_bs_1", "1EMV_B_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("1GRN_A_bs_1", "1GRN_B_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("1OHZ_A_bs_1", "1OHZ_B_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));
     }
 
     public void StartGame()
     {
         if (level == 0)
             ToggleMode.isOn = true;
+
+        playing = true;
         //winSplash.SetActive (false);
         //looseSplash.SetActive (false);
         //goSplash.SetActive (false);
@@ -337,6 +356,10 @@ public class BioBlox : MonoBehaviour
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
     {
+        
+        if(playing)
+            game_time += Time.deltaTime;
+        Debug.Log(game_time);
 
         if (line_renderer && camera)
         {
@@ -841,19 +864,23 @@ public class BioBlox : MonoBehaviour
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol1_mesh);
+        mol1_mesh.SetActive(false);
         //transpant 2
         mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "transparent_p2";
         FixTransparentMolecule(mol2_mesh);
+        mol2_mesh.SetActive(false);
         //ball and stick 1
         mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "bs_p1";
+        mol1_mesh.SetActive(false);
         //ball and stick 2
         mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "bs_p2";
+        mol2_mesh.SetActive(false);
 
 
         //GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
@@ -890,12 +917,13 @@ public class BioBlox : MonoBehaviour
             molecules [0] = mol1.gameObject;
             molecules [1] = mol2.gameObject;
 
-            float offset = -1;
+            float offset = meshes_offset[mesh_offset_index];
+            float offset_distance = Mathf.Abs(meshes_offset[mesh_offset_index]) + 1;
             int molNum = 0;
             foreach (GameObject obj in molecules)
             {
                 reset_molecule(obj, offset, molNum++);
-                offset += 2;
+                offset += offset_distance;
             }
         }
     }
@@ -1142,6 +1170,8 @@ public class BioBlox : MonoBehaviour
 
             if (num_touching_0 + num_touching_1 != 0)
             {
+                //save button
+
                 scoring.calcScore();
                 //set values for refence
                 lennard_score = (int)scoring.vdwScore;
@@ -1171,7 +1201,7 @@ public class BioBlox : MonoBehaviour
 
         invalidDockText.SetActive(num_invalid != 0);
         InvalidDockScore.SetActive(num_invalid != 0);
-
+        is_score_valid = num_invalid == 0;
         /*
         //lock button
         if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))

@@ -351,10 +351,10 @@ public class PDB_mesh : MonoBehaviour {
                         //uIController.TransparencyProtein(protein_id);
 
                         if (protein_id == 0)
-                            uIController.DropDownP1.value = 1;
+                            uIController.p1_trans.isOn = true;
                         else
-                            uIController.DropDownP2.value = 1;
-                        
+                            uIController.p2_trans.isOn = true;
+
                         ////change the overlay renderer camera
                         //uIController.MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = temp.GetComponent<Camera>();
                     }

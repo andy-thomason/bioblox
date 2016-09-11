@@ -105,14 +105,14 @@ public class OverlayRenderer : MonoBehaviour {
                         if (sphere_index < icons_spheres_store.Count)
                         {
                             //spheres on transparent render protein 0
-                            if (ui.DropDownP1.value == 1 && i == 0)
+                            if ((ui.p1_bs.isOn || ui.p1_trans.isOn) && i == 0)
                             {
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                             }
                             //spheres on transparent render protein 1
-                            if (ui.DropDownP2.value == 1 && i == 1)
+                            if ((ui.p2_bs.isOn || ui.p2_trans.isOn) && i == 1)
                             {
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
@@ -137,7 +137,7 @@ public class OverlayRenderer : MonoBehaviour {
                     {
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            if (ui.DropDownP1.value == 1 || ui.DropDownP2.value == 1)
+                            if (ui.p1_bs.isOn || ui.p1_trans.isOn || ui.p2_bs.isOn || ui.p2_trans.isOn)
                             {
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected_fp;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
@@ -151,14 +151,14 @@ public class OverlayRenderer : MonoBehaviour {
                         {
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            if (ui.DropDownP1.value == 1 && i == 0)
+                            if ((ui.p1_bs.isOn || ui.p1_trans.isOn) && i == 0)
                             {
                                 //material_to_use = i == 1 ? Atom_1 : Atom_2;
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                             }
-                            if (ui.DropDownP2.value == 1 && i == 1)
+                            if ((ui.p2_bs.isOn || ui.p2_trans.isOn) && i == 1)
                             {
                                 //material_to_use = i == 1 ? Atom_1 : Atom_2;
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
