@@ -9,7 +9,8 @@ public class LevelInfo : MonoBehaviour, IPointerClickHandler {
     public Sprite level_image;
     public int level;
     //meshes distance
-    public int mesh_offset_index;
+    public int mesh_offset_1 = -1;
+    public int mesh_offset_2 = 2;
 
     UIController UI;
 
@@ -20,7 +21,7 @@ public class LevelInfo : MonoBehaviour, IPointerClickHandler {
 
     public void OnPointerClick(PointerEventData data)
     {
-        UI.LoadLevelDescription(level_name, level_description, level_image, level, mesh_offset_index);
+        UI.LoadLevelDescription(level_name, level_description, level_image, level, mesh_offset_1, mesh_offset_2);
     }
 
 

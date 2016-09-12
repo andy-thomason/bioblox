@@ -117,6 +117,19 @@ public class UIController : MonoBehaviour {
     public Transform cutaway_wall;
     float camera_distance;
 
+    public Toggle p1_trans;
+    public Toggle p1_bs;
+    public Toggle p2_trans;
+    public Toggle p2_bs;
+    bool toggle_temp;
+
+    public GameObject EndLevelPanel;
+    public Text number_atoms_end_level;
+    public Text time_end_level;
+
+    //save button
+    public GameObject SaveButton;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -133,146 +146,91 @@ public class UIController : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-
-        //if(Input.GetKeyDown (KeyCode.F) && !ToggleFreeCameraStatus) {
-        //	MainCamera.GetComponent<CameraMovement> ().enabled = CameraFreeze;			
-        //	FreeCameraKeysFreeze.SetActive (CameraFreeze); 
-        //	FreeCameraKeysUnfreeze.SetActive (!CameraFreeze);
-        //	CameraFreeze = !CameraFreeze;
-        //}
-        //if first person of exploration not zoom nor movement
-        //if (!first_person && !explore_view)
-        //{
-        //    //camera zoom
-        //    if (Input.GetAxis("Mouse ScrollWheel") > 0) // back
-        //    {
-        //        if (MainCameraComponent.fieldOfView > 1)
-        //            MainCameraComponent.fieldOfView -= 2f;
-        //        //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-
-        //    }
-        //    else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-        //    {
-        //        if (MainCameraComponent.fieldOfView < 33)
-        //            MainCameraComponent.fieldOfView += 2f;
-        //        //MainCamera.transform.LookAt(MainCameraComponent.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, MainCameraComponent.nearClipPlane)), Vector3.up);
-        //    }
-
-        //    if (Input.GetMouseButtonDown(1))
-        //    {
-        //        dragOrigin = Input.mousePosition;
-        //    }
-
-        //    if (Input.GetMouseButton(1))
-        //    {
-
-        //        Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
-
-        //        Vector3 pos = MainCameraComponent.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
-
-        //        if (MainCamera.transform.position.y > -25)
-        //        {
-        //            move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-        //        }
-        //        else
-        //        {
-        //            if (pos.y < 0)
-        //                move = new Vector3(pos.x * dragSpeed, 0, 0);
-        //            else
-        //                move = new Vector3(pos.x * dragSpeed, pos.y * dragSpeed, 0);
-        //        }
-
-
-        //        MainCamera.transform.Translate(move, Space.Self);
-        //    }
-        //    else
-        //    {
-        //        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-        //    }
-        //}
-
-        //if the user is over the small camera in the first person, the harpoon will not be shot
-        if (first_person)
+        if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
-            if (first_person_protein != -1)
+            //if the user is over the small camera in the first person, the harpoon will not be shot
+            if (first_person)
             {
-                if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
-                    is_moving_camera_first_person = true;
-                else
-                    is_moving_camera_first_person = false;
+                if (first_person_protein != -1)
+                {
+                    if (MainCameraComponent.pixelRect.Contains(Input.mousePosition))
+                        is_moving_camera_first_person = true;
+                    else
+                        is_moving_camera_first_person = false;
+                }
+
+                atom_name_firstperson.text = "";
+                if (FirstPersonCameraReferenceCamera && !is_moving_camera_first_person && !isOverUI)
+                {
+                    //scanning
+                    Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
+                    int protein_raycast = first_person_protein != 0 ? 0 : 1;
+
+                    //MOLECULE 1 ATOM ID UI
+                    int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
+                    int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
+                    //change the text in the UI depending which atom is being raycasted
+                    if (atom_id_molecule >= 0)
+                    {
+                        atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
+                        BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule);
+                        is_hovering = true;
+                    }
+                    else
+                    {
+                        is_hovering = false;
+                    }
+                }
+
             }
 
-            atom_name_firstperson.text = "";
-            if (FirstPersonCameraReferenceCamera && !is_moving_camera_first_person && !isOverUI)
+            if (first_person && !is_moving_camera_first_person && !isOverUI)
             {
-                //scanning
-                Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
-                int protein_raycast = first_person_protein != 0 ? 0 : 1;
+                if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
+                {
+                    //SHOOTING THE ARPON
+                    //where to shoot
+                    Vector3 position;
+                    //scanning
+                    Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
+                    int protein_raycast = first_person_protein != 0 ? 0 : 1;
 
-                //MOLECULE 1 ATOM ID UI
-                int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
-                int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
-                //change the text in the UI depending which atom is being raycasted
-                if (atom_id_molecule >= 0)
-                {
-                    atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
-                    BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule);
-                    is_hovering = true;
-                }
-                else
-                {
-                    is_hovering = false;
+                    //MOLECULE 1 ATOM ID UI
+                    int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
+                    int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
+                    //change the text in the UI depending which atom is being raycasted
+                    if (atom_id_molecule >= 0)
+                    {
+                        position = BioBloxReference.molecules[protein_raycast].transform.TransformPoint(BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule]);
+                    }
+                    else
+                    {
+                        position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 200.0f);
+                        position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
+                    }
+
+                    //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
+                    GameObject arpon_reference = Instantiate(Arpon, BioBloxReference.molecules[first_person_protein].transform.TransformPoint(BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
+                    arpon_reference.GetComponent<ArponController>().enabled = true;
+                    //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
+                    arpon_reference.transform.LookAt(position);
+                    Debug.Log(position);
+                    arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1000);
                 }
             }
 
-        }
-
-        if (first_person && !is_moving_camera_first_person && !isOverUI)
-        {
-            if (Input.GetMouseButtonDown(0) && FirstPersonCameraReference != null)
+            //deselection aminoacids
+            if (Input.GetMouseButtonDown(0) && !first_person && BioBloxReference.molecules.Length != 0)
             {
-                //SHOOTING THE ARPON
-                //where to shoot
-                Vector3 position;
-                //scanning
-                Ray ray = FirstPersonCameraReferenceCamera.ScreenPointToRay(Input.mousePosition);
-                int protein_raycast = first_person_protein != 0 ? 0 : 1;
-
-                //MOLECULE 1 ATOM ID UI
-                int atomID_molecule = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[protein_raycast].transform, ray);
-                int atom_id_molecule = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule);
-                //change the text in the UI depending which atom is being raycasted
-                if (atom_id_molecule >= 0)
+                Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
+                int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[0].transform, ray);
+                int atomID_molecule_temp_1 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[1].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[1].transform, ray);
+                if (!isOverUI && atomID_molecule_temp_0 == -1 && atomID_molecule_temp_1 == -1)
                 {
-                    position = BioBloxReference.molecules[protein_raycast].transform.TransformPoint(BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.atom_centres[atomID_molecule]);
+                    BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
+                    BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
+                    aminoSliderController.DeselectAmino();
                 }
-                else
-                {
-                    position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 200.0f);
-                    position = FirstPersonCameraReference.GetComponent<Camera>().ScreenToWorldPoint(position);
-                }
-
-                //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-                GameObject arpon_reference = Instantiate(Arpon, BioBloxReference.molecules[first_person_protein].transform.TransformPoint(BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().mol.atom_centres[BioBloxReference.molecules[first_person_protein].GetComponent<PDB_mesh>().atom]), Quaternion.identity) as GameObject;
-                arpon_reference.GetComponent<ArponController>().enabled = true;
-                //GameObject arpon_reference = Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-                arpon_reference.transform.LookAt(position);
-                Debug.Log(position);
-                arpon_reference.GetComponent<Rigidbody>().AddForce(arpon_reference.transform.forward * 1000);
-            }
-        }
-
-        //deselection aminoacids
-        if (Input.GetMouseButtonDown(0) && !first_person && BioBloxReference.molecules.Length != 0)
-        {
-            Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
-            int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[0].transform, ray);
-            int atomID_molecule_temp_1 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules[1].GetComponent<PDB_mesh>().mol, BioBloxReference.molecules[1].transform, ray);
-            if(!isOverUI && atomID_molecule_temp_0 == -1 && atomID_molecule_temp_1 == -1)
-            {
-                BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
-                BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
-                aminoSliderController.DeselectAmino();
             }
         }
 
@@ -453,6 +411,7 @@ public class UIController : MonoBehaviour {
         //erase connections
         button_erase_connections_1p.SetActive(first_person);
         ExplorerButton.interactable = !first_person;
+        SaveButton.SetActive(!first_person);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = !first_person ? true : false;
 
         MainCamera.GetComponent<Animator>().SetBool("Start", first_person);
@@ -492,6 +451,7 @@ public class UIController : MonoBehaviour {
         MainCanvas.SetActive(false);
         ChangeCCTVShip();
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
+        SaveButton.SetActive(false);
     }
 
     public void EndExplore()
@@ -504,6 +464,7 @@ public class UIController : MonoBehaviour {
         if (explorerController.beacon_holder.Count > 0)
             ToggleBeacon.isOn = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+        SaveButton.SetActive(true);
     }
 
     public void ExplorerBackToDefault()
@@ -531,10 +492,11 @@ public class UIController : MonoBehaviour {
         toggle_score = !toggle_score;
     }
 
-    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_offset_index_temp)
+    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_temp1, int mesh_temp2)
     {
         BioBloxReference.level = level_temp;
-        BioBloxReference.mesh_offset_index = mesh_offset_index_temp;
+        BioBloxReference.mesh_offset_1 = mesh_temp1;
+        BioBloxReference.mesh_offset_2 = mesh_temp2;
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;
@@ -588,14 +550,14 @@ public class UIController : MonoBehaviour {
     {
 
         cutaway_wall.gameObject.SetActive(true);
-        if (DropDownP1.value != 1)
+        if (!p1_trans.isOn)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
             {
                 molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
             }
         }
-        if (DropDownP2.value != 1)
+        if (!p2_trans.isOn)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
             {
@@ -626,12 +588,6 @@ public class UIController : MonoBehaviour {
             molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
         }
     }
-
-    public Toggle p1_trans;
-    public Toggle p1_bs;
-    public Toggle p2_trans;
-    public Toggle p2_bs;
-    bool toggle_temp;
 
     public void P1Transparent()
     {
@@ -705,10 +661,6 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    public GameObject EndLevelPanel;
-    public Text number_atoms_end_level;
-    public Text time_end_level;
-
     public void EndLevel()
     {
         if (BioBloxReference.is_score_valid)
@@ -724,7 +676,18 @@ public class UIController : MonoBehaviour {
         EndLevelPanel.SetActive(false);
         RestartCamera();
         aminoSliderController.DeleteAllAminoConnections();
+        BioBloxReference.game_time = 0;
+        isOverUI = false;
     }
 
-        
+    public void Reset()
+    {
+        p1_bs.isOn = false;
+        p2_bs.isOn = false;
+        p1_trans.isOn = false;
+        p2_trans.isOn = false;
+        ToogleToolMenu(false);
+    }
+
+
 }

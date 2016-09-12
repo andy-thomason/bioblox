@@ -17,12 +17,18 @@ public class IntroController : MonoBehaviour {
     public GameObject IntroCamera;
     public Canvas AboutButton;
     public Canvas PlayButton;
+    public Light intro_light;
+    UIController ui;
+    BioBlox bb;
 
     void Awake()
     {
         IntroCamera.SetActive(true);
         //PlayButton.worldCamera = IntroCamera.GetComponent<Camera>();
-       // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
+        // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
+        ui = FindObjectOfType<UIController>();
+        bb = FindObjectOfType<BioBlox>();
+        bb.game_status = BioBlox.GameStatus.MainScreen;
     }
 
     public void CameraStart()
@@ -44,44 +50,35 @@ public class IntroController : MonoBehaviour {
 	public void StartFadeCanvas()
 	{
         FadeCanvas.SetBool("Fade", true);
-	}
-
-    public void MainToMicroscopeCamera()
-    {
-       gameObject.SetActive(false);
-        //MicroscopeView.SetActive(true);
-        //IntroLabModel.SetActive(false);
+        StartCoroutine(WaitForFade());
     }
 
     public void MainToGame()
     {
-        //GameCamera.SetActive(true);
+        intro_light.enabled = false;
         GameCanvas.alpha = 1;
         GameCanvas.blocksRaycasts = true;
         IntroCamera.SetActive(false);
     }
-
-    public void ScrollPoster()
+    
+    public void GameToMain()
     {
-        Poster.position = new Vector3(5.7f,(2.0f + (PosterScrollBar.value * 1.88f)) - 600.0f,-0.1f);
+        bb.Reset();
+        ui.Reset();
+        bb.game_status = BioBlox.GameStatus.MainScreen;
+        ui.EndLevelPanel.SetActive(false);
+        intro_light.enabled = true;
+        GameCanvas.alpha = 0;
+        GameCanvas.blocksRaycasts = false;
+        IntroCamera.SetActive(true);
+        FadeCanvas.SetBool("Fade", false);
     }
 
-    public void EnableScrollBarCanvas()
+    IEnumerator WaitForFade()
     {
-        PosterScrollBarCanvas.SetActive(true);
-    }
-    //change to game scene
-    public void ChangeToGameScene()
-    {
-        FadeCanvas.SetBool("Fade", true);
-        StartCoroutine(WaitForSeconds());
-
-    }
-
-    IEnumerator WaitForSeconds()
-    {
-        yield return new WaitForSeconds(1.0f);
-        SceneManager.LoadScene("main");
+        yield return new WaitForSeconds(1);
+        MainToGame();
+        bb.StartGame();
     }
 
 
