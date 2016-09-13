@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<database current_instance="11">
+  <instance number="1" level="0" atoms="0" time="0" />
+  <instance number="2" level="4" atoms="66" time="38.16756" />
+  <instance number="3" level="4" atoms="72" time="45.07877" />
+  <instance number="4" level="0" atoms="72" time="65.00433" />
+  <instance number="5" level="0" atoms="6" time="6.481651" />
+  <instance number="6" level="0" atoms="4" time="13.33325" />
+  <instance number="7" level="3" atoms="2" time="7.096729" />
+  <instance number="8" level="0" atoms="85" time="19.82859" />
+  <instance number="9" level="3" atoms="7" time="10.47889" />
+  <instance number="10" level="3" atoms="8" time="9.782974" />
+  <instance number="11" level="3" atoms="34" time="12.59183" />
+</database>

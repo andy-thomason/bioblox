@@ -264,7 +264,6 @@ public class AminoSliderController : MonoBehaviour {
         ButtonPickedA1 = null;
         ButtonPickedA2 = null;
         AddConnection.interactable = false;
-        AddConnection.GetComponentInChildren<Text>().color = Color.gray;
     }
 
 	public void HighLight3DMesh(int index, int molecule)
@@ -443,7 +442,6 @@ public class AminoSliderController : MonoBehaviour {
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
             AddConnection.interactable = true;
-            AddConnection.GetComponentInChildren<Text>().color = Color.black;
         }
 
 

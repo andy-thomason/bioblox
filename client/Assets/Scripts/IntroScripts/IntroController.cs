@@ -59,6 +59,8 @@ public class IntroController : MonoBehaviour {
         GameCanvas.alpha = 1;
         GameCanvas.blocksRaycasts = true;
         IntroCamera.SetActive(false);
+        FindObjectOfType<ConnectionManager>().DisableSlider();
+        ui.CutAway.value = ui.CutAway.minValue;
     }
     
     public void GameToMain()

@@ -129,6 +129,7 @@ public class UIController : MonoBehaviour {
 
     //save button
     public GameObject SaveButton;
+    XML xml;
 
     void Awake()
 	{
@@ -138,7 +139,9 @@ public class UIController : MonoBehaviour {
         MainCameraComponent = MainCamera.GetComponent<Camera>();
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         camera_distance = -MainCamera.GetComponent<MouseOrbitImproved_main>().distance;
+        xml = FindObjectOfType<XML>();
     }
+
 
     Vector3 dragOrigin;
     float dragSpeed = 20.0f;
@@ -667,7 +670,25 @@ public class UIController : MonoBehaviour {
         {
             EndLevelPanel.SetActive(true);
             number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
-            time_end_level.text = BioBloxReference.game_time.ToString();
+
+            //format
+            int minutes = Mathf.FloorToInt(BioBloxReference.game_time / 60F);
+            int seconds = Mathf.FloorToInt(BioBloxReference.game_time - minutes * 60);
+            string time_game;
+            //string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+            if (minutes == 0)
+                time_game = seconds + " seconds";
+            else
+                time_game = minutes + " minutes " + seconds + " seconds";
+
+
+            time_end_level.text = time_game;
+
+            //isnert to xml
+            if(number_atoms_end_level.text != "0")
+            {
+                xml.SaveXML(BioBloxReference.level, number_atoms_end_level.text, BioBloxReference.game_time);
+            }
         }
     }
 
