@@ -130,6 +130,7 @@ public class UIController : MonoBehaviour {
     //save button
     public GameObject SaveButton;
     XML xml;
+    public Animator HintPanel;
 
     void Awake()
 	{
@@ -709,6 +710,14 @@ public class UIController : MonoBehaviour {
         p2_trans.isOn = false;
         ToogleToolMenu(false);
     }
+
+    ////tool panel
+    //public void ToogleToolMenu(bool Status)
+    //{
+    //    ToolPanel.SetBool("Open", Status);
+    //    OpenToolImage.SetActive(!Status);
+    //    CloseToolImage.SetActive(Status);
+    //}
 
 
 }
