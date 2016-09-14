@@ -2109,6 +2109,7 @@ public class PDB_score {
     }
 
     public PDB_score(PDB_molecule receptor, Transform recT, PDB_molecule ligand, Transform ligT) {
+
         // calculate Emin and Rmin^2 values and add them to the scoring matrix
         List<string> keys = new List<string>(scoringMatrix.Keys);
         foreach (string key in keys) {
@@ -2130,8 +2131,8 @@ public class PDB_score {
         ligAtomCoords = reducedRepresentation (ligand, out ligAtomLabels);
         this.recT = recT;
         this.ligT = ligT;
-        Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
-        Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
+        //Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
+        //Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
     }
 
     public void calcScore() {
@@ -2139,6 +2140,7 @@ public class PDB_score {
         vdwScore = 0f;
         int charge1 = 0;
         int charge2 = 0;
+        //Debug.Log("recAtomLabels.Length: " + recAtomLabels.Length + " ligAtomLabels.Length: " + ligAtomLabels.Length + " ligAtomCoords.Length: " + ligAtomCoords.Length);
         // Check the distance between all ligand-receptor atom pairs.
         Matrix4x4 transfMat = recT.worldToLocalMatrix * ligT.localToWorldMatrix;
         for (int j = 0; j != ligAtomCoords.Length; ++j) {
@@ -2151,6 +2153,7 @@ public class PDB_score {
                     if (distance2 < 0.001) {
                         distance2 = 0.001f;
                     }
+                    //Debug.Log(recAtomLabels[j] + "_" + ligAtomLabels[j]);
                     string key = recAtomLabels[j] + "_" + ligAtomLabels[j];
 
                     charges.TryGetValue(ligAtomLabels[j], out charge1);
@@ -2182,6 +2185,14 @@ public class PDB_score {
         }
 
         score = elecScore + vdwScore;
+    }
+
+    public void Reset()
+    {
+         recAtomCoords.Initialize();
+        ligAtomCoords.Initialize();
+        recAtomLabels.Initialize();
+        ligAtomLabels.Initialize();
     }
     
 }

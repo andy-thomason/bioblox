@@ -5,6 +5,7 @@ public class CamerFirstPerson : MonoBehaviour {
 
 	public GameObject CameraFrame;
     public GameObject MainCanvas;
+    public GameObject FirstPersonText;
     UIController uiController;
 
     void Start()
@@ -32,10 +33,12 @@ public class CamerFirstPerson : MonoBehaviour {
 	public void CameraFrameOff()
 	{
 		CameraFrame.SetActive(false);
-	}
+        FirstPersonText.SetActive(false);
+    }
 	
 	public void CameraFrameOn()
 	{
 		CameraFrame.SetActive(true);
-	}
+        FirstPersonText.SetActive(true);
+    }
 }

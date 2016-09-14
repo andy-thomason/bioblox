@@ -146,12 +146,16 @@ public class BioBlox : MonoBehaviour
     public GameObject HintText;
     public GameObject ExitTutorialButton;
     int[] meshes_offset = new int[] {-1,-2,-3};
-    public int mesh_offset_index;
+    public int mesh_offset_1;
+    public int mesh_offset_2;
     public bool is_score_valid;
     public float game_time = 0;
     bool playing = false;
 
-    public enum GameState {
+    bool first_time = true;
+
+    public enum GameState
+    {
         Setup,
         Waiting,
         Picking,
@@ -159,7 +163,14 @@ public class BioBlox : MonoBehaviour
         Locked
     }
 
+    public enum GameStatus
+    {
+        MainScreen,
+        GameScreen
+    }
+
     public GameState game_state;
+    public GameStatus game_status;
 
     public int hint_stage = 0;
 
@@ -199,9 +210,17 @@ public class BioBlox : MonoBehaviour
 
     public void StartGame()
     {
+
+        game_status = GameStatus.GameScreen;
+        uiController.isOverUI = false;
+
         if (level == 0)
             ToggleMode.isOn = true;
+        else
+            ToggleMode.isOn = false;
 
+
+        game_time = 0;
         playing = true;
         //winSplash.SetActive (false);
         //looseSplash.SetActive (false);
@@ -228,28 +247,28 @@ public class BioBlox : MonoBehaviour
 
         //filenames.Add ("betabarrel_b");
         //filenames.Add("2ptc_u_new_edited");
-
+        //empty fiels name
+        filenames.Clear();
+        //set the fielanem
         filenames.Add(filename_levels[level]);
+        //set the hint image
+        uiController.SetHintImage(filename_levels[level]);
 
-        //filenames.Add("1GCQ_bWithTags");
-
-
-        //filenames.Add("pdb2ptcWithTags");
-
-        //        scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
-        //scoreCard.gameObject.SetActive (false);
-
-        //game_loop loads the file at filenames[current_level]
-        eventSystem = EventSystem.current;
 
         StartCoroutine(game_loop());
         GetComponent<AminoSliderController>().init();
 
-        //update
-        line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
-        camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        //first eprson
-        aminoSlider = FindObjectOfType<AminoSliderController>();
+        if (first_time)
+        {
+
+            eventSystem = EventSystem.current;
+            //update
+            line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+            camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+            //first eprson
+            aminoSlider = FindObjectOfType<AminoSliderController>();
+            first_time = false;
+        }
 
     }
     public string GetCurrentLevelName ()
@@ -356,63 +375,21 @@ public class BioBlox : MonoBehaviour
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
     {
-        
-        if(playing)
-            game_time += Time.deltaTime;
-        Debug.Log(game_time);
 
-        if (line_renderer && camera)
+        if(game_status == GameStatus.GameScreen)
         {
-            line_renderer.clear();
+            if (playing)
+                game_time += Time.deltaTime;
+
+            if (line_renderer && camera)
+            {
+                line_renderer.clear();
+            }
+
+
+            if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
+                UpdateHint();
         }
-
-        //if (line_renderer && camera)
-        //{
-        //    line_renderer.clear();
-        //    if (cutawaySlider && cutawaySlider.value > cutawaySlider.minValue)
-        //    {
-        //        for (int x = -50; x <= 50; x += 10)
-        //        {
-        //            //Vector3 p0 = camera.transform.TransformPoint(new Vector3( x, -50, cutawaySlider.value));
-        //            //Vector3 p1 = camera.transform.TransformPoint(new Vector3( x,  50, cutawaySlider.value));
-        //            Vector3 p0 = new Vector3(x, -50, cutawaySlider.value);
-        //            Vector3 p1 = new Vector3(x, 50, cutawaySlider.value);
-        //            line_renderer.add_line(new LineRenderer.Line(p0, p1));
-        //        }
-        //        for (int y = -50; y <= 50; y += 10)
-        //        {
-        //            Vector3 p0 = new Vector3(-50, y, cutawaySlider.value);
-        //            Vector3 p1 = new Vector3(50, y, cutawaySlider.value);
-        //            //Vector3 p0 = camera.transform.TransformPoint(new Vector3( -50, y, cutawaySlider.value));
-        //            //Vector3 p1 = camera.transform.TransformPoint(new Vector3(  50, y, cutawaySlider.value));
-        //            line_renderer.add_line(new LineRenderer.Line(p0, p1));
-        //        }
-        //    }
-        //}
-
-        /*
-        //camera zoom roll mouse
-        if (Input.GetAxis ("Mouse ScrollWheel") != 0)
-        {
-            if(MainCamera.transform.position.z >= -120 && MainCamera.transform.position.z <= 0)
-            {
-                Vector3 temp = MainCamera.transform.position;
-                temp.z += Input.GetAxis ("Mouse ScrollWheel") * 5;
-                MainCamera.transform.position = temp;
-            }
-
-            if(MainCamera.fieldOfView < 20)
-            {
-                MainCamera.fieldOfView = 20;
-            }
-
-            if(MainCamera.fieldOfView > 60)
-            {
-                MainCamera.fieldOfView = 60;
-            }
-        }*/
-        if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
-            UpdateHint();
     }
 
     void PopInSound (GameObject g)
@@ -682,26 +659,29 @@ public class BioBlox : MonoBehaviour
 
 
     
-    void Reset ()
+    public void Reset ()
     {
         //clears the molecules and re-randomizes the colour range
         //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
         GameObject.Destroy (molecules [0].gameObject);
         GameObject.Destroy (molecules [1].gameObject);
 
-        //clear the old win condition
-        winCondition.Clear ();
+        ////clear the old win condition
+        //winCondition.Clear ();
 
-        game_state = GameState.Picking;
+        //game_state = GameState.Picking;
 
-        //Clear score
-        LennardScore.text = "0";
-        ElectricScore.text = "0";
+        ////Clear score
+        //LennardScore.text = "0";
+        //ElectricScore.text = "0";
+
+        gameObject.GetComponent<ConnectionManager>().Reset();
+        //molecules = null;
         //heuristicScore.fillAmount = 0;
         //GameScoreValue.text = "0";
         //MainCamera.fieldOfView = 60;
 
-        GetComponent<AminoSliderController> ().init ();
+        //GetComponent<AminoSliderController> ().init ();
     }
 
     //since a molecule may be too large for one mesh we may have to make several
@@ -917,13 +897,13 @@ public class BioBlox : MonoBehaviour
             molecules [0] = mol1.gameObject;
             molecules [1] = mol2.gameObject;
 
-            float offset = meshes_offset[mesh_offset_index];
-            float offset_distance = Mathf.Abs(meshes_offset[mesh_offset_index]) + 1;
+            //float offset = meshes_offset[mesh_offset_index];
+            //float offset_distance = Mathf.Abs(meshes_offset[mesh_offset_index]) + 1;
             int molNum = 0;
             foreach (GameObject obj in molecules)
             {
-                reset_molecule(obj, offset, molNum++);
-                offset += offset_distance;
+                reset_molecule(obj, mesh_offset_1, molNum++);
+                mesh_offset_1 += mesh_offset_2;
             }
         }
     }
@@ -941,162 +921,176 @@ public class BioBlox : MonoBehaviour
     //main meat of the initilisation logic and level completion logic
     IEnumerator game_loop ()
     {
-        // for each level
-        for (;;) {
-            Debug.Log ("start level " + current_level);
-            //if true, we have no more levels listed in the vector
-            //to be replaced with level selection. Talk to andy on PDB file selection
-            if (current_level >= filenames.Count) {
-                Debug.LogError ("No next level");
-                current_level = 0;
-            }
-
-            if (lockButton) {
-                //lockButton.gameObject.SetActive(false);
-                //lockButton.interactable = false;
-            }
-            make_molecules (true, MeshTopology.Triangles);
-
-            // This is very grubby, must generalise.
-            GameObject mol1 = molecules [0];
-            GameObject mol2 = molecules [1];
-
-            originPosition [0] = mol1.transform.position;
-            originPosition [1] = mol2.transform.position;
-        
-            PDB_mesh p1 = mol1.GetComponent<PDB_mesh> ();
-            PDB_mesh p2 = mol2.GetComponent<PDB_mesh> ();
-
-            //create the win condition from the file specified paired atoms
-            for (int i=0; i<p1.mol.pairedLabels.Length; ++i) {
-                winCondition.Add (new Tuple<int,int> (p1.mol.pairedLabels [i].First,
-                                 p1.mol.pairedLabels [i].Second));
-            }
-            //debug 3D texture
-            //GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
-            p1.other = p2.gameObject;
-            p2.other = p1.gameObject;
-            p1.gameObject.SetActive (false);
-            p2.gameObject.SetActive (false);
-
-            //pop the molecules in for a visually pleasing effect
-            PopInSound(mol1.gameObject);
-            yield return new WaitForSeconds(0.2f);
-            PopInSound(mol2.gameObject);
-
-            //this is the connection manager for the complex game, it handles grappling between the molecules
-            ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-            /*
-            for (int i = 0; i < dockSliders.Count; ++i) {
-                dockSliders[i].maxValue =  conMan.maxDistance;
-                dockSliders[i].minValue = conMan.minDistance;
-                dockSliders[i].value =conMan.maxDistance;
-                //dockSliders[i].gameObject.SetActive(false);
-                //sliderConstarinedByOverride.Add(true);
-            }
-            overrideSlider.maxValue = conMan.maxDistance;
-            overrideSlider.minValue = conMan.minDistance;
-            overrideSlider.value = conMan.maxDistance;
-            
-            overrideSlider.interactable = false;*/
-
-            mol1.transform.localScale = new Vector3 (1, 1, 1);
-            mol2.transform.localScale = new Vector3 (1, 1, 1);
-            yield return new WaitForSeconds (0.1f);
-            eventSystem.enabled = true;
-
-
-            // Enter waiting state
-            game_state = GameState.Waiting;
-
-            /*if (goSplash) {
-                PopInWaitDisappear (goSplash, 1.0f);
-            }*/
-
-            // Enter picking state
-            game_state = GameState.Picking;
-
-            // In this loop, the game state is either Picking or Docking.
-            while (game_state ==  GameState.Picking || game_state ==  GameState.Docking) {
-                // start the new frame
-                yield return new WaitForEndOfFrame();
-                //Debug.Log ("gs = " + game_state);
-
-                // measure the score
-                float rms_distance_score = ScoreRMSD ();
-                if (rmsScoreSlider) {
-                    rmsScoreSlider.value = rms_distance_score * 0.1f;
-                    /*float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
-                    if(scaleGameScore <= 1.0f && scaleGameScore > 0)
-                    {
-                        GameScore.fillAmount = scaleGameScore;                        
-                        GameScoreValue.text = ((int)(scaleGameScore * 1250)).ToString();
-                    }
-                    else
-                    {
-                        GameScore.fillAmount = 0;
-                        GameScoreValue.text = "0";
-                    }*/
-                }
-
-                if (lockButton) {
-                    //lockButton.gameObject.SetActive (rms_distance_score < winScore);
-                    //lockButton.interactable = (rms_distance_score < winScore);
-                }
-            }
-
-            Debug.Log ("exited docking loop " + game_state);
-
-            if (game_state == GameState.Locked) {
-                Debug.Log ("locking");
-
-                eventSystem.enabled = false;
-
-                //StartCoroutine("DockingOneAxis");
-                if (sites [0]) {
-                    PopOut (sites [0]);
-                }
-
-                if (sites [1]) {
-                    PopOut (sites [1]);
-                }
-
-                //lockButton.gameObject.SetActive(false);
-                //lockButton.interactable = false;
-                    
-                Debug.Log ("Docked");
-
-                this.GetComponent<AudioManager> ().Play ("Win");
-
-                GameObject parent = new GameObject ();
-                Rigidbody r = parent.AddComponent<Rigidbody> ();
-                molecules [0].transform.SetParent (parent.transform, true);
-                molecules [1].transform.SetParent (parent.transform, true);
-                
-                r.angularDrag = 1.0f;
-                r.constraints = RigidbodyConstraints.FreezePosition;
-                r.useGravity = false;
-                parent.name = "MoveableParent";
-
-                //this is to stop the molecules rumbling around as they inherit the pearents velocity
-                Component.Destroy (molecules [0].GetComponent<Rigidbody> ());
-                Component.Destroy (molecules [1].GetComponent<Rigidbody> ());
-                    
-                //StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
-                GameObject.Destroy (sites [0]);
-                GameObject.Destroy (sites [1]);
-
-                Debug.Log("current_level=" + current_level);
-                current_level++;
-                if (current_level == filenames.Count) {
-                    Debug.Log ("End of levels");
+        if (game_status == GameStatus.GameScreen)
+        {
+            // for each level
+            for (;;)
+            {
+                Debug.Log("start level " + current_level);
+                //if true, we have no more levels listed in the vector
+                //to be replaced with level selection. Talk to andy on PDB file selection
+                if (current_level >= filenames.Count)
+                {
+                    Debug.LogError("No next level");
                     current_level = 0;
                 }
-                conMan.Reset();
-                Reset ();
-                molecules = null;            
-                //GetComponent<AminoButtonController> ().EmptyAminoSliders ();
-                //EndLevelMenu.SetActive(true);
+
+                if (lockButton)
+                {
+                    //lockButton.gameObject.SetActive(false);
+                    //lockButton.interactable = false;
+                }
+                make_molecules(true, MeshTopology.Triangles);
+
+                // This is very grubby, must generalise.
+                GameObject mol1 = molecules[0];
+                GameObject mol2 = molecules[1];
+
+                originPosition[0] = mol1.transform.position;
+                originPosition[1] = mol2.transform.position;
+
+                PDB_mesh p1 = mol1.GetComponent<PDB_mesh>();
+                PDB_mesh p2 = mol2.GetComponent<PDB_mesh>();
+
+                //create the win condition from the file specified paired atoms
+                for (int i = 0; i < p1.mol.pairedLabels.Length; ++i)
+                {
+                    winCondition.Add(new Tuple<int, int>(p1.mol.pairedLabels[i].First,
+                                     p1.mol.pairedLabels[i].Second));
+                }
+                //debug 3D texture
+                //GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
+                p1.other = p2.gameObject;
+                p2.other = p1.gameObject;
+                p1.gameObject.SetActive(false);
+                p2.gameObject.SetActive(false);
+
+                //pop the molecules in for a visually pleasing effect
+                PopInSound(mol1.gameObject);
+                yield return new WaitForSeconds(0.2f);
+                PopInSound(mol2.gameObject);
+
+                //this is the connection manager for the complex game, it handles grappling between the molecules
+                ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+                /*
+                for (int i = 0; i < dockSliders.Count; ++i) {
+                    dockSliders[i].maxValue =  conMan.maxDistance;
+                    dockSliders[i].minValue = conMan.minDistance;
+                    dockSliders[i].value =conMan.maxDistance;
+                    //dockSliders[i].gameObject.SetActive(false);
+                    //sliderConstarinedByOverride.Add(true);
+                }
+                overrideSlider.maxValue = conMan.maxDistance;
+                overrideSlider.minValue = conMan.minDistance;
+                overrideSlider.value = conMan.maxDistance;
+
+                overrideSlider.interactable = false;*/
+
+                mol1.transform.localScale = new Vector3(1, 1, 1);
+                mol2.transform.localScale = new Vector3(1, 1, 1);
+                yield return new WaitForSeconds(0.1f);
+                eventSystem.enabled = true;
+
+
+                // Enter waiting state
+                game_state = GameState.Waiting;
+
+                /*if (goSplash) {
+                    PopInWaitDisappear (goSplash, 1.0f);
+                }*/
+
+                // Enter picking state
+                game_state = GameState.Picking;
+
+                // In this loop, the game state is either Picking or Docking.
+                while (game_state == GameState.Picking || game_state == GameState.Docking || game_status == GameStatus.GameScreen)
+                {
+                    // start the new frame
+                    yield return new WaitForEndOfFrame();
+                    //Debug.Log ("gs = " + game_state);
+
+                    // measure the score
+                    float rms_distance_score = ScoreRMSD();
+                    if (rmsScoreSlider)
+                    {
+                        rmsScoreSlider.value = rms_distance_score * 0.1f;
+                        /*float scaleGameScore = 1.0f - (rms_distance_score * 0.1f);
+                        if(scaleGameScore <= 1.0f && scaleGameScore > 0)
+                        {
+                            GameScore.fillAmount = scaleGameScore;                        
+                            GameScoreValue.text = ((int)(scaleGameScore * 1250)).ToString();
+                        }
+                        else
+                        {
+                            GameScore.fillAmount = 0;
+                            GameScoreValue.text = "0";
+                        }*/
+                    }
+
+                    if (lockButton)
+                    {
+                        //lockButton.gameObject.SetActive (rms_distance_score < winScore);
+                        //lockButton.interactable = (rms_distance_score < winScore);
+                    }
+                }
+
+                Debug.Log("exited docking loop " + game_state);
+
+                if (game_state == GameState.Locked)
+                {
+                    Debug.Log("locking");
+
+                    eventSystem.enabled = false;
+
+                    //StartCoroutine("DockingOneAxis");
+                    if (sites[0])
+                    {
+                        PopOut(sites[0]);
+                    }
+
+                    if (sites[1])
+                    {
+                        PopOut(sites[1]);
+                    }
+
+                    //lockButton.gameObject.SetActive(false);
+                    //lockButton.interactable = false;
+
+                    Debug.Log("Docked");
+
+                    this.GetComponent<AudioManager>().Play("Win");
+
+                    GameObject parent = new GameObject();
+                    Rigidbody r = parent.AddComponent<Rigidbody>();
+                    molecules[0].transform.SetParent(parent.transform, true);
+                    molecules[1].transform.SetParent(parent.transform, true);
+
+                    r.angularDrag = 1.0f;
+                    r.constraints = RigidbodyConstraints.FreezePosition;
+                    r.useGravity = false;
+                    parent.name = "MoveableParent";
+
+                    //this is to stop the molecules rumbling around as they inherit the pearents velocity
+                    Component.Destroy(molecules[0].GetComponent<Rigidbody>());
+                    Component.Destroy(molecules[1].GetComponent<Rigidbody>());
+
+                    //StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
+                    GameObject.Destroy(sites[0]);
+                    GameObject.Destroy(sites[1]);
+
+                    Debug.Log("current_level=" + current_level);
+                    current_level++;
+                    if (current_level == filenames.Count)
+                    {
+                        Debug.Log("End of levels");
+                        current_level = 0;
+                    }
+                    conMan.Reset();
+                    Reset();
+                    molecules = null;
+                    //GetComponent<AminoButtonController> ().EmptyAminoSliders ();
+                    //EndLevelMenu.SetActive(true);
+                }
             }
         }
     }
@@ -1106,117 +1100,127 @@ public class BioBlox : MonoBehaviour
     // Physics simulation
     void FixedUpdate() {
 
-        num_touching_0 = 0;
-        num_touching_1 = 0;
-        num_invalid = 0;
-        num_connections = 0;
-        //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
+        if (game_status == GameStatus.GameScreen)
+        {
 
-        //score system display
-        if (scoring == null) {
-            return;
-        }
+            num_touching_0 = 0;
+            num_touching_1 = 0;
+            num_invalid = 0;
+            num_connections = 0;
+            //Debug.Log ("game_state=" + game_state + "molecules.Length=" + molecules.Length)
 
-
-        if (molecules != null && molecules.Length >= 2) {
-
-            // Get a list of atoms that collide.
-            GameObject obj0 = molecules[0];
-            GameObject obj1 = molecules[1];
-            PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
-            PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
-            Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-            Rigidbody r1 = obj1.GetComponent<Rigidbody>();
-            Transform t0 = obj0.transform;
-            Transform t1 = obj1.transform;
-            PDB_molecule mol0 = mesh0.mol;
-            PDB_molecule mol1 = mesh1.mol;
-            GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
-            work_done = b.work_done;
-
-            BitArray ba0 = new BitArray(mol0.atom_centres.Length);
-            BitArray ba1 = new BitArray(mol1.atom_centres.Length);
-            BitArray bab0 = new BitArray(mol0.atom_centres.Length);
-            BitArray bab1 = new BitArray(mol1.atom_centres.Length);
-            atoms_touching = new BitArray[] { ba0, ba1 };
-            atoms_bad = new BitArray[] { bab0, bab1 };
-
-            
-            // Apply forces to the rigid bodies.
-            foreach (GridCollider.Result r in b.results) {
-                Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-                Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
-                float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
-                float distance = (c1 - c0).magnitude;
-                
-                num_connections++;
-
-                if (distance < min_d) {
-                    Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-                    normal *= seperationForce;
-                    r0.AddForceAtPosition(normal,c0);
-                    r1.AddForceAtPosition(-normal, c1);
-
-                    if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-                    if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                    if (distance < min_d * 0.5) {
-                        num_invalid++;
-                        bab0.Set(r.i0, true);
-                        bab1.Set(r.i1, true);
-                    }
-                }
-                
+            //score system display
+            if (scoring == null)
+            {
+                return;
             }
 
-            if (num_touching_0 + num_touching_1 != 0)
+
+            if (molecules != null && molecules.Length >= 2)
             {
-                //save button
 
-                scoring.calcScore();
-                //set values for refence
-                lennard_score = (int)scoring.vdwScore;
-                electric_score = (int)scoring.elecScore;
-                if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
-                if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+                // Get a list of atoms that collide.
+                GameObject obj0 = molecules[0];
+                GameObject obj1 = molecules[1];
+                PDB_mesh mesh0 = (PDB_mesh)obj0.GetComponent<PDB_mesh>();
+                PDB_mesh mesh1 = (PDB_mesh)obj1.GetComponent<PDB_mesh>();
+                Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+                Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+                Transform t0 = obj0.transform;
+                Transform t1 = obj1.transform;
+                PDB_molecule mol0 = mesh0.mol;
+                PDB_molecule mol1 = mesh1.mol;
+                GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
+                work_done = b.work_done;
 
-                if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
-                if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
+                BitArray ba0 = new BitArray(mol0.atom_centres.Length);
+                BitArray ba1 = new BitArray(mol1.atom_centres.Length);
+                BitArray bab0 = new BitArray(mol0.atom_centres.Length);
+                BitArray bab1 = new BitArray(mol1.atom_centres.Length);
+                atoms_touching = new BitArray[] { ba0, ba1 };
+                atoms_bad = new BitArray[] { bab0, bab1 };
+
+
+                // Apply forces to the rigid bodies.
+                foreach (GridCollider.Result r in b.results)
+                {
+                    Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
+                    Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+                    float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
+                    float distance = (c1 - c0).magnitude;
+
+                    num_connections++;
+
+                    if (distance < min_d)
+                    {
+                        Vector3 normal = (c0 - c1).normalized * (min_d - distance);
+                        normal *= seperationForce;
+                        r0.AddForceAtPosition(normal, c0);
+                        r1.AddForceAtPosition(-normal, c1);
+
+                        if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+                        if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+                        if (distance < min_d * 0.5)
+                        {
+                            num_invalid++;
+                            bab0.Set(r.i0, true);
+                            bab1.Set(r.i1, true);
+                        }
+                    }
+
+                }
+
+                if (num_touching_0 + num_touching_1 != 0)
+                {
+                    //save button
+
+                    scoring.calcScore();
+                    //set values for refence
+                    lennard_score = (int)scoring.vdwScore;
+                    electric_score = (int)scoring.elecScore;
+                    if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
+                    if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+
+                    if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+                    if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
+                }
+                else
+                {
+                    ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0";
+                    SimpleScore.text = "Score: 0 atoms touching.";
+                }
+
+                //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
+
+                //num_invalid = when the physics fails
+                // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
+
+                //LennardScore.text = num_invalid != 0 ? LennardScore.text = (scoring.vdwScore).ToString("F2") : "0";
+                //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
+                //Debug.Log ("num_invalid: "+num_invalid);
+
+            }
+
+            invalidDockText.SetActive(num_invalid != 0);
+            InvalidDockScore.SetActive(num_invalid != 0);
+            is_score_valid = num_invalid == 0;
+            /*
+            //lock button
+            if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
+            {
+                lockButton.interactable = true;
             }
             else
             {
-                ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0";
-                SimpleScore.text = "Score: 0 atoms touching.";
+                lockButton.interactable = false;
+            }*/
+
+
+
+            if (eventSystem != null && eventSystem.IsActive())
+            {
+                ApplyReturnToOriginForce();
             }
-
-            //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
-
-            //num_invalid = when the physics fails
-            // ElectricScore.text = num_invalid != 0 ? ElectricScore.text = (scoring.elecScore).ToString("F2") : "0";
-
-            //LennardScore.text = num_invalid != 0 ? LennardScore.text = (scoring.vdwScore).ToString("F2") : "0";
-            //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
-            //Debug.Log ("num_invalid: "+num_invalid);
-
-        }
-
-        invalidDockText.SetActive(num_invalid != 0);
-        InvalidDockScore.SetActive(num_invalid != 0);
-        is_score_valid = num_invalid == 0;
-        /*
-        //lock button
-        if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
-        {
-            lockButton.interactable = true;
-        }
-        else
-        {
-            lockButton.interactable = false;
-        }*/
-
-
-
-        if (eventSystem != null && eventSystem.IsActive()) {
-            ApplyReturnToOriginForce();
         }
     }
 

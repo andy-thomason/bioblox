@@ -121,122 +121,124 @@ public class AminoSliderController : MonoBehaviour {
 
     void Update()
 	{
+        if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
+        {
 
-		if (ButtonA1LDown)
-		{
-            if (ScrollbarAmino1.value > 0.0f)
+            if (ButtonA1LDown)
             {
-                A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-                //save the last active one
-                LastButtonA1 = CurrentButtonA1;
-                //pass over non-active
-                do
+                if (ScrollbarAmino1.value > 0.0f)
                 {
-                    if (CurrentButtonA1 == 0)
+                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+                    //save the last active one
+                    LastButtonA1 = CurrentButtonA1;
+                    //pass over non-active
+                    do
                     {
-                        CurrentButtonA1 = LastButtonA1;
-                        break;
-                    }
-                    else
-                    {
-                        CurrentButtonA1--;
-                    }
-                } while (!A1Buttons[CurrentButtonA1].IsActive());
+                        if (CurrentButtonA1 == 0)
+                        {
+                            CurrentButtonA1 = LastButtonA1;
+                            break;
+                        }
+                        else
+                        {
+                            CurrentButtonA1--;
+                        }
+                    } while (!A1Buttons[CurrentButtonA1].IsActive());
 
-                A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
-				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-                //Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
+                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                    ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
+                    A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+                    //Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
 
+                }
             }
-		}
-		
-		if (ButtonA1RDown)
-		{
-			if(ScrollbarAmino1.value < 1.0f)
-			{
-                A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-                //save the last active one
-                LastButtonA1 = CurrentButtonA1;
-                //pass over non-active
-                do
-                {
-                    if (CurrentButtonA1 == A1Buttons.Count - 1)
-                    {
-                        CurrentButtonA1= LastButtonA1;
-                        break;
-                    }
-                    else
-                    {
-                        CurrentButtonA1++;
-                    }
-                } while (!A1Buttons[CurrentButtonA1].IsActive());
-                
 
-                A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
-				A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-               // Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
+            if (ButtonA1RDown)
+            {
+                if (ScrollbarAmino1.value < 1.0f)
+                {
+                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+                    //save the last active one
+                    LastButtonA1 = CurrentButtonA1;
+                    //pass over non-active
+                    do
+                    {
+                        if (CurrentButtonA1 == A1Buttons.Count - 1)
+                        {
+                            CurrentButtonA1 = LastButtonA1;
+                            break;
+                        }
+                        else
+                        {
+                            CurrentButtonA1++;
+                        }
+                    } while (!A1Buttons[CurrentButtonA1].IsActive());
+
+
+                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                    ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
+                    A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
+                    // Debug.Log("CurrentButtonA1: " + CurrentButtonA1 + " - A1Buttons.count: " + A1Buttons.Count + "- number_childs_A1: "+number_childs_A1);
+                }
             }
-		}
-        
-        if (ButtonA2LDown)
-		{			
-			if(ScrollbarAmino2.value > 0.0f)
-			{
-                A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
-                //save the last active one
-                LastButtonA2 = CurrentButtonA2;
-                //pass over non-active
-                do
+
+            if (ButtonA2LDown)
+            {
+                if (ScrollbarAmino2.value > 0.0f)
                 {
-                    if (CurrentButtonA2 == 0)
+                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+                    //save the last active one
+                    LastButtonA2 = CurrentButtonA2;
+                    //pass over non-active
+                    do
                     {
-                        CurrentButtonA2 = LastButtonA2;
-                        break;
-                    }
-                    else
-                    {
-                        CurrentButtonA2--;
-                    }
+                        if (CurrentButtonA2 == 0)
+                        {
+                            CurrentButtonA2 = LastButtonA2;
+                            break;
+                        }
+                        else
+                        {
+                            CurrentButtonA2--;
+                        }
 
-                } while (!A2Buttons[CurrentButtonA2].IsActive());
+                    } while (!A2Buttons[CurrentButtonA2].IsActive());
 
-                A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
-				A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
-			}
-		}
-		
-		if (ButtonA2RDown)
-		{
-			if(ScrollbarAmino2.value < 1.0f)
-			{
+                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
+                    A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+                }
+            }
 
-                A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
-                //save the last active one
-                LastButtonA2 = CurrentButtonA2;
-                //pass over non-active
-                do
+            if (ButtonA2RDown)
+            {
+                if (ScrollbarAmino2.value < 1.0f)
                 {
-                    if (CurrentButtonA2 == A2Buttons.Count - 1)
+
+                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+                    //save the last active one
+                    LastButtonA2 = CurrentButtonA2;
+                    //pass over non-active
+                    do
                     {
-                        CurrentButtonA2 = LastButtonA2;
-                        break;
-                    }
-                    else
-                    {
-                        CurrentButtonA2++;
-                    }
+                        if (CurrentButtonA2 == A2Buttons.Count - 1)
+                        {
+                            CurrentButtonA2 = LastButtonA2;
+                            break;
+                        }
+                        else
+                        {
+                            CurrentButtonA2++;
+                        }
 
-                } while (!A2Buttons[CurrentButtonA2].IsActive());
+                    } while (!A2Buttons[CurrentButtonA2].IsActive());
 
-                A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
-                ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
-                A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
-			}
-		}
-
+                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
+                    A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
+                }
+            }
+        }
 	}
 
 	public void UpdateCurrentButtonA1(int index)
@@ -262,7 +264,6 @@ public class AminoSliderController : MonoBehaviour {
         ButtonPickedA1 = null;
         ButtonPickedA2 = null;
         AddConnection.interactable = false;
-        AddConnection.GetComponentInChildren<Text>().color = Color.gray;
     }
 
 	public void HighLight3DMesh(int index, int molecule)
@@ -419,7 +420,9 @@ public class AminoSliderController : MonoBehaviour {
 		foreach (Transform childTransform in SliderMol[1].transform) Destroy(childTransform.gameObject);
 		//delete connetions		
 		foreach (Transform childTransform in AminoLinkPanelParent.transform) Destroy(childTransform.gameObject);
-	}
+        A1Buttons.Clear();
+        A2Buttons.Clear();
+    }
 
 	public void ChangeAminoAcidSelection(GameObject ButtonSelected)
 	{
@@ -439,7 +442,6 @@ public class AminoSliderController : MonoBehaviour {
 		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
             AddConnection.interactable = true;
-            AddConnection.GetComponentInChildren<Text>().color = Color.black;
         }
 
 
