@@ -1,16 +1,14 @@
 fileFormatVersion: 2
-guid: f483df0eacc8fd34aa66f82e86b87028
-timeCreated: 1473072467
+guid: 525cb1941b93efd46a03fe0341440ee9
+timeCreated: 1473614973
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
-    100002: spear_8
     400000: //RootNode
-    400002: spear_8
-    2300000: spear_8
-    3300000: spear_8
+    2300000: //RootNode
+    3300000: //RootNode
     4300000: spear_8
   materials:
     importMaterials: 1
