@@ -249,19 +249,11 @@ public class BioBlox : MonoBehaviour
         //filenames.Add("2ptc_u_new_edited");
         //empty fiels name
         filenames.Clear();
+        //set the fielanem
         filenames.Add(filename_levels[level]);
+        //set the hint image
+        uiController.SetHintImage(filename_levels[level]);
 
-        //filenames.Add("1GCQ_bWithTags");
-
-
-        //filenames.Add("pdb2ptcWithTags");
-
-        //        scoreCard = GameObject.Find ("ScoreCard").GetComponent<ScoreSheet> ();
-        //scoreCard.gameObject.SetActive (false);
-
-        //game_loop loads the file at filenames[current_level]
-
-       
 
         StartCoroutine(game_loop());
         GetComponent<AminoSliderController>().init();

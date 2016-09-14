@@ -131,6 +131,9 @@ public class UIController : MonoBehaviour {
     public GameObject SaveButton;
     XML xml;
     public Animator HintPanel;
+    public GameObject HintPanelOpen;
+    public GameObject HintPanelClose;
+    public Image HintImage;
 
     void Awake()
 	{
@@ -554,14 +557,14 @@ public class UIController : MonoBehaviour {
     {
 
         cutaway_wall.gameObject.SetActive(true);
-        if (!p1_trans.isOn)
+        if (!p1_trans.isOn && !p1_bs.isOn)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
             {
                 molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
             }
         }
-        if (!p2_trans.isOn)
+        if (!p2_trans.isOn && !p2_bs.isOn)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
             {
@@ -709,15 +712,21 @@ public class UIController : MonoBehaviour {
         p1_trans.isOn = false;
         p2_trans.isOn = false;
         ToogleToolMenu(false);
+        ToggleHint(false);
     }
 
-    ////tool panel
-    //public void ToogleToolMenu(bool Status)
-    //{
-    //    ToolPanel.SetBool("Open", Status);
-    //    OpenToolImage.SetActive(!Status);
-    //    CloseToolImage.SetActive(Status);
-    //}
+    //tool panel
+    public void ToggleHint(bool Status)
+    {
+        HintPanel.SetBool("Start", Status);
+        HintPanelOpen.SetActive(!Status);
+        HintPanelClose.SetActive(Status);
+        
+    }
 
-
+    public void SetHintImage(string level_name)
+    {
+        Debug.Log(level_name);
+        HintImage.sprite = Sprite.Create(Resources.Load<Texture2D>("hint/"+ level_name), HintImage.sprite.rect, HintImage.sprite.pivot);
+    }
 }

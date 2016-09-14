@@ -2852,6 +2852,7 @@ GameObject:
   m_Component:
   - 224: {fileID: 95891675}
   - 95: {fileID: 95891676}
+  - 114: {fileID: 95891677}
   m_Layer: 5
   m_Name: Hint
   m_TagString: Untagged
@@ -2873,7 +2874,7 @@ RectTransform:
   - {fileID: 919090290}
   - {fileID: 386096939}
   m_Father: {fileID: 1464341408}
-  m_RootOrder: 23
+  m_RootOrder: 22
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: -50, y: 50}
@@ -2896,6 +2897,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &95891677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 95891674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &96218841
 GameObject:
   m_ObjectHideFlags: 0
@@ -10975,9 +10987,7 @@ MonoBehaviour:
   level_name: 4KC3
   level_description: Interleukin (IL)-33 is an important member of the IL-1 family
     that has pleiotropic activities in innate and adaptive immune responses in host
-    defense and disease. It signals through its ligand-binding primary receptor ST2
-    and IL-1 receptor accessory protein (IL-1RAcP), both of which are members of the
-    IL-1 receptor family.
+    defense and disease.
   level_image: {fileID: 21300000, guid: 650ae7f20c40cf24bae9a0e1864b37c8, type: 3}
   level: 1
   mesh_offset_1: -3
@@ -11670,7 +11680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.52156866}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -19278,7 +19288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.52156866}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -21636,14 +21646,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -24613,7 +24623,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 913013348}
-          m_MethodName: ToogleToolMenu
+          m_MethodName: ToggleHint
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -26139,14 +26149,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -28213,7 +28223,10 @@ MonoBehaviour:
   number_atoms_end_level: {fileID: 1969124711}
   time_end_level: {fileID: 56166053}
   SaveButton: {fileID: 1977203196}
-  HintPanel: {fileID: 0}
+  HintPanel: {fileID: 95891676}
+  HintPanelOpen: {fileID: 787862198}
+  HintPanelClose: {fileID: 1624139460}
+  HintImage: {fileID: 1425595132}
 --- !u!114 &913013349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28429,7 +28442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.52156866}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -30127,7 +30140,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1624556581}
   m_HandleRect: {fileID: 1624556580}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -31153,7 +31166,7 @@ RectTransform:
   - {fileID: 222647629}
   - {fileID: 1760405915}
   m_Father: {fileID: 1464341408}
-  m_RootOrder: 22
+  m_RootOrder: 24
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -35360,6 +35373,82 @@ MonoBehaviour:
 Transform:
   m_PrefabParentObject: {fileID: 453972, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   m_PrefabInternal: {fileID: 85509979}
+--- !u!1 &1137885375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 1137885376}
+  - 222: {fileID: 1137885378}
+  - 114: {fileID: 1137885377}
+  m_Layer: 5
+  m_Name: FirstPersonText
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1137885376
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1137885375}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1464341408}
+  m_RootOrder: 23
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 250, y: -108}
+  m_SizeDelta: {x: 326.4, y: 48.8}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1137885377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1137885375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 20
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 1
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 'Click an atom to place the camera.
+
+    Hold left click to rotate the proteins.'
+--- !u!222 &1137885378
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1137885375}
 --- !u!1 &1140703159
 GameObject:
   m_ObjectHideFlags: 0
@@ -38828,14 +38917,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -41267,7 +41356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.522}
+  m_Color: {r: 0.91764706, g: 0.91764706, b: 0.91764706, a: 0.39215687}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -42117,6 +42206,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CameraFrame: {fileID: 1639629503}
   MainCanvas: {fileID: 1464341407}
+  FirstPersonText: {fileID: 1137885375}
 --- !u!114 &1348893754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45262,7 +45352,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1885682005}
   m_Direction: 0
   m_Value: 1
-  m_Size: 1
+  m_Size: 0.99999976
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -45806,8 +45896,9 @@ RectTransform:
   - {fileID: 359174796}
   - {fileID: 1772258239}
   - {fileID: 1977203197}
-  - {fileID: 989267037}
   - {fileID: 95891675}
+  - {fileID: 1137885376}
+  - {fileID: 989267037}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_AnchorMin: {x: 0, y: 0}
@@ -48410,11 +48501,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level_name: 1GRN
-  level_description: These structures, which mimic the transition state for the GTP
-    hydrolytic reaction, show the presence of an AIF3 molecule, as was seen for the
-    corresponding Ras-p120RasGAP complex, but in contrast to what has been reported
-    for the Rho-Cdc42GAP complex or for heterotrimeric G protein alpha subunits, where
-    AIF4- was observed.
+  level_description: Structures of Cdc42 bound to the active and catalytically compromised
+    forms of Cdc42GAP. The Rho-related small GTP-binding protein Cdc42 has a low intrinsic
+    GTPase activity that is significantly enhanced by its specific GTPase-activating
+    protein, Cdc42GAP.
   level_image: {fileID: 21300000, guid: 16a6a2c0dd9b62d428f17ad7d420a6ff, type: 3}
   level: 4
   mesh_offset_1: -3
@@ -50385,7 +50475,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 913013348}
-          m_MethodName: ToogleToolMenu
+          m_MethodName: ToggleHint
           m_Mode: 6
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -60371,7 +60461,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1936962431}
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -61413,11 +61503,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level_name: 1OHZ
-  level_description: The utilization of organized supramolecular assemblies to exploit
-    the synergistic interactions afforded by close proximity, both for enzymatic synthesis
-    and for the degradation of recalcitrant substrates, is an emerging theme in cellular
-    biology. Anaerobic bacteria harness a multiprotein complex, termed the "cellulosome,"
-    for efficient degradation of the plant cell wall.
+  level_description: 'Cellulosome Assembly Revealed by the Crystal Structure of the
+    Cohesin-Dockerin Complex. The utilization of organized supramolecular assemblies
+    to exploit the synergistic interactions afforded by close proximity, both for
+    enzymatic synthesis and for the degradation of recalcitrant substrates, is an
+    emerging theme in cellular biology. '
   level_image: {fileID: 21300000, guid: e791af564d1ecc0419cf7c90d99d9a96, type: 3}
   level: 5
   mesh_offset_1: -3
