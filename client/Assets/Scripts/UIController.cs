@@ -499,8 +499,8 @@ public class UIController : MonoBehaviour {
     public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_temp1, int mesh_temp2)
     {
         BioBloxReference.level = level_temp;
-        BioBloxReference.mesh_offset_1 = mesh_temp1;
-        BioBloxReference.mesh_offset_2 = mesh_temp2;
+        //BioBloxReference.mesh_offset_1 = mesh_temp1;
+        //BioBloxReference.mesh_offset_2 = mesh_temp2;
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;

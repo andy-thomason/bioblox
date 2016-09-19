@@ -31,18 +31,20 @@ public class BioBlox : MonoBehaviour
       public string chainsB;
       public string lod;
       public Vector3 offset;
+      public float separation;
 
-      public Level(string pdbFile, string chainsA, string chainsB, string lod, Vector3 offset) {
+      public Level(string pdbFile, string chainsA, string chainsB, string lod, Vector3 offset, float separation) {
         this.pdbFile = pdbFile;
         this.chainsA = chainsA;
         this.chainsB =chainsB;
         this.lod = lod;
         this.offset = offset;
+        this.separation = separation;
       }
     };
 
     Level[] levels = {
-       new Level("2PTC", "E", "I", "1", new Vector3(-20, 0, 0))
+       new Level("2PTC", "E", "I", "1", new Vector3(-20, 0, 0), 40)
     };
 
     // a holder variable for the current event system
@@ -166,8 +168,8 @@ public class BioBlox : MonoBehaviour
     public GameObject HintText;
     public GameObject ExitTutorialButton;
     int[] meshes_offset = new int[] {-1,-2,-3};
-    public int mesh_offset_1;
-    public int mesh_offset_2;
+    //public int mesh_offset_1;
+    //public int mesh_offset_2;
     public bool is_score_valid;
     public float game_time = 0;
     bool playing = false;
@@ -793,12 +795,11 @@ public class BioBlox : MonoBehaviour
     }
 
     // set the object to its initial position etc.
-    void reset_molecule(GameObject obj, float xoffset, int molNum, Vector3 offset)
+    void reset_molecule(GameObject obj, int molNum, Vector3 offset)
     {
         PDB_mesh p = obj.GetComponent<PDB_mesh> ();
         Rigidbody ri = obj.AddComponent<Rigidbody> ();
         PDB_molecule mol = p.mol;
-        //obj.AddComponent<AsteriodController>();
 
         float mass = 1000;
         float r = mol.bvh_radii [0] * 0.5f;
@@ -811,20 +812,7 @@ public class BioBlox : MonoBehaviour
         ri.inertiaTensor = new Vector3 (val, val, val);
 
         obj.transform.Translate (offset);
-        obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
-        //obj.transform.Translate (xoffset * 30, 0, 0);
         obj.transform.Rotate (0, 0, 270);
-
-        //obj.transform.rotation = Random.rotation;
-
-        //if this is the simple game load in labels from the file
-        /*if (simpleGame) {
-            for (int i=0; i<mol.labels.Length; ++i) {
-                if (mol.labels [i].atomIds.Count > 0) {
-                    CreateLabel (p.mol.labels [i], molNum, "Label" + i + "mol" + name, mol);
-                }
-            }
-        }*/
     }
 
 
@@ -935,15 +923,10 @@ public class BioBlox : MonoBehaviour
             molecules = new GameObject[2];
             molecules [0] = mol1.gameObject;
             molecules [1] = mol2.gameObject;
+            Vector3 xoff = new Vector3(level.separation, 0, 0);
 
-            //float offset = meshes_offset[mesh_offset_index];
-            //float offset_distance = Mathf.Abs(meshes_offset[mesh_offset_index]) + 1;
-            int molNum = 0;
-            foreach (GameObject obj in molecules)
-            {
-                reset_molecule(obj, mesh_offset_1, molNum++, level.offset);
-                mesh_offset_1 += mesh_offset_2;
-            }
+            reset_molecule(molecules[0], 0, level.offset - xoff);
+            reset_molecule(molecules[1], 1, level.offset + xoff);
         }
     }
 
