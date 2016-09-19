@@ -17,7 +17,7 @@ public class MouseOrbitImproved : MonoBehaviour
     public float distanceMin = 15f;
     public float distanceMax = 35f;
 
-    private Rigidbody rigidbody;
+    //private Rigidbody rigidbody;
     public Texture2D cursor_move;
 
     Vector3 negDistance;

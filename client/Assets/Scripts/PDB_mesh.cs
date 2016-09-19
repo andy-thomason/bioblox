@@ -204,7 +204,7 @@ public class PDB_mesh : MonoBehaviour {
     ButtonStructure buttonStructure;
     UIController uIController;
     MeshRenderer[] meshes;
-    Vector3 light_pos;
+    //Vector3 light_pos;
     ExploreController exploreController;
     //test
     GameObject camera_first_person;
@@ -221,8 +221,9 @@ public class PDB_mesh : MonoBehaviour {
         exploreController = FindObjectOfType<ExploreController>();
     }
 
-    Camera main_camera;
-    bool testi = false;
+    //Camera main_camera;
+    //bool testi = false;
+
     // Update is called once per frame
     void Update () {
 
