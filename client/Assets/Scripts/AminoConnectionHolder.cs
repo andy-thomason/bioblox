@@ -10,6 +10,7 @@ public class AminoConnectionHolder : MonoBehaviour {
 	Text distancia;
     GameObject AminoPanel1;
     GameObject AminoPanel2;
+    SFX sfx;
 	
 	public void UpdateLink()
 	{		
@@ -21,6 +22,7 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void DeleteLink()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
         FindObjectOfType<AminoSliderController>().RestoreDeletedAminoButtons(ID_button1, ID_button2);
         FindObjectOfType<ConnectionManager>().DisableSlider();
@@ -29,6 +31,7 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void HighlightClick()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button2);
         FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA2(ID_button2);			
 		FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button1);
@@ -39,6 +42,7 @@ public class AminoConnectionHolder : MonoBehaviour {
     void Awake()
 	{
 		distancia = GetComponentInChildren<Text> ();
+        sfx = FindObjectOfType<SFX>();
         AminoPanel1 = GameObject.Find("ContentPanelA1").gameObject;
         AminoPanel2 = GameObject.Find("ContentPanelA2").gameObject;
     }
@@ -53,18 +57,22 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void A1L()
     {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
         ModifyConnection(-1, 0);
     }
     public void A1R()
     {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
         ModifyConnection(1, 0);
     }
     public void A2L()
     {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
         ModifyConnection(0, -1);
     }
     public void A2R()
     {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
         ModifyConnection(0, 1);
     }
 

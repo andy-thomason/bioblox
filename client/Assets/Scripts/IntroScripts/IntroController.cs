@@ -20,6 +20,8 @@ public class IntroController : MonoBehaviour {
     public Light intro_light;
     UIController ui;
     BioBlox bb;
+    public Animator SFXAnimator;
+    SFX sfx;
 
     void Awake()
     {
@@ -28,6 +30,7 @@ public class IntroController : MonoBehaviour {
         // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
         ui = FindObjectOfType<UIController>();
         bb = FindObjectOfType<BioBlox>();
+        sfx = FindObjectOfType<SFX>();
         bb.game_status = BioBlox.GameStatus.MainScreen;
     }
 
@@ -49,6 +52,7 @@ public class IntroController : MonoBehaviour {
 
 	public void StartFadeCanvas()
 	{
+        sfx.PlayTrack(SFX.sound_index.button_click);
         FadeCanvas.SetBool("Fade", true);
         StartCoroutine(WaitForFade());
     }
@@ -61,6 +65,7 @@ public class IntroController : MonoBehaviour {
         IntroCamera.SetActive(false);
         FindObjectOfType<ConnectionManager>().DisableSlider();
         ui.CutAway.value = ui.CutAway.minValue;
+        SFXAnimator.SetBool("Start", true);
     }
     
     public void GameToMain()
@@ -74,6 +79,7 @@ public class IntroController : MonoBehaviour {
         GameCanvas.blocksRaycasts = false;
         IntroCamera.SetActive(true);
         FadeCanvas.SetBool("Fade", false);
+        SFXAnimator.SetBool("Start", false);
     }
 
     IEnumerator WaitForFade()

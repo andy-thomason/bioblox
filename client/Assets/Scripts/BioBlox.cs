@@ -153,6 +153,7 @@ public class BioBlox : MonoBehaviour
     bool playing = false;
 
     bool first_time = true;
+    SFX sfx;
 
     public enum GameState
     {
@@ -181,6 +182,7 @@ public class BioBlox : MonoBehaviour
     void Start ()
     {
         uiController = FindObjectOfType<UIController>();
+        sfx = FindObjectOfType<SFX>();
         //filenames 
         filename_levels.Add("2PTC");
         filename_levels.Add("4KC3");
@@ -210,7 +212,8 @@ public class BioBlox : MonoBehaviour
 
     public void StartGame()
     {
-
+        sfx.PlayTrack(SFX.sound_index.amb);
+        sfx.PlayTrack(SFX.sound_index.main_audio);
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
 
@@ -1096,6 +1099,8 @@ public class BioBlox : MonoBehaviour
     }
 
     public int work_done = 0;
+    int number_total_atoms = 0;
+    int sound_to_play;
 
     // Physics simulation
     void FixedUpdate() {
@@ -1204,6 +1209,10 @@ public class BioBlox : MonoBehaviour
             invalidDockText.SetActive(num_invalid != 0);
             InvalidDockScore.SetActive(num_invalid != 0);
             is_score_valid = num_invalid == 0;
+            if (num_invalid != 0 && !sfx.isPlaying(SFX.sound_index.warning))
+                sfx.InvalidDockSFX();
+            else if (num_invalid == 0 && sfx.isPlaying(SFX.sound_index.warning))
+                sfx.StopTrack(SFX.sound_index.warning);
             /*
             //lock button
             if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
@@ -1214,13 +1223,20 @@ public class BioBlox : MonoBehaviour
             {
                 lockButton.interactable = false;
             }*/
-
-
-
+            
             if (eventSystem != null && eventSystem.IsActive())
             {
                 ApplyReturnToOriginForce();
             }
+
+            if (number_total_atoms+2 < num_touching_0 + num_touching_1)
+            {
+                sound_to_play = Random.Range(0, 4);
+                if(!sfx.isPlaying_collision(sound_to_play))
+                    sfx.PlayTrackChild(sound_to_play);
+            }
+
+            number_total_atoms = num_touching_0 + num_touching_1;
         }
     }
 

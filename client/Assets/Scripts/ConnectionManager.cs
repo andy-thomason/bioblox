@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using AssemblyCSharp;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System;
 
-public class ConnectionManager : MonoBehaviour {
+public class ConnectionManager : MonoBehaviour
+{
 
 	int numChainClicks = 0;
 
@@ -18,8 +21,9 @@ public class ConnectionManager : MonoBehaviour {
 	public float maxDistance = 60.0f;
 	public float spring_constant = 10000.0f;
 	public Slider SliderStrings;
+    SFX sfx;
 
-	public float[] connectionMinDistances;
+    public float[] connectionMinDistances;
 
 	public bool shouldContract = false;
 	
@@ -28,14 +32,36 @@ public class ConnectionManager : MonoBehaviour {
 
 	public List<AtomConnection> connections = new List<AtomConnection> ();
 	public int nc;
+    public bool scrolling_up = false;
+    public bool scrolling_down = false;
+    float current_slider_value = 1;
 
 	public void StringManager()
 	{
 		for (int i = 0; i<connectionMinDistances.Length; i++)
 		{
 			connectionMinDistances[i] = 60 * SliderStrings.value;
-		}
-	}
+        }
+
+        if (SliderStrings.value < current_slider_value && !scrolling_up)
+        {
+            sfx.ReelSound(SFX.sound_index.string_reel_in);
+            scrolling_up = true;
+            scrolling_down = false;
+        }
+        else if(SliderStrings.value > current_slider_value && !scrolling_down)
+        {
+            sfx.ReelSound(SFX.sound_index.string_reel_out);
+            scrolling_up = false;
+            scrolling_down = true;
+        }
+
+        if (SliderStrings.value == SliderStrings.maxValue || SliderStrings.value == SliderStrings.minValue || SliderStrings.value == current_slider_value)
+            sfx.StopReel();
+
+        //Debug.Log(" current_slider_value: " + current_slider_value + " = SliderStrings.value:" + SliderStrings.value);
+        current_slider_value = SliderStrings.value;
+    }
 
 	public void DisableSlider()
 	{
@@ -156,6 +182,7 @@ public class ConnectionManager : MonoBehaviour {
 	void Start () {
         bb = FindObjectOfType<BioBlox>();
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+        sfx = FindObjectOfType<SFX>();
     }
 
 
@@ -170,68 +197,11 @@ public class ConnectionManager : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-		//if (line_renderer) line_renderer.clear ();
-
-		/*if (numChainClicks > 0) {
-			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
-			AtomConnection con = connections[connections.Count-1];
-			Vector3 atomCenter = con.molecules[0].mol.atom_centres[con.atomIds[0]];
-			
-			Vector3 to = new Vector3(Input.mousePosition.x,
-			                         Input.mousePosition.y,
-			                        -c.transform.position.z);
-			//to=c.ScreenToWorldPoint(to);
-			//Vector3 from = con.molecules[0].transform.TransformPoint(atomCenter);
-			//Debug.DrawLine(from, to);
-		}*/
-
-		/*if (line_renderer) {
-			Debug.Log("zzz");
-			Vector2 uv0 = new Vector2(0, 0);
-			Vector2 uv1 = new Vector2(1, 1);
-			line_renderer.add_line(new LineRenderer.Line(from, to, 0.1f, uv0, uv1));
-		}*/
-
-		for (int i = 0; i < connections.Count; ++i) {
+	void Update () 
+    {
+		for (int i = 0; i < connections.Count; ++i)
+        {
 			connections[i].Draw(line_renderer);
 		}
-
-//		if (Input.GetMouseButtonDown (0) &&
-//		    Input.GetKey(KeyCode.LeftShift)) {
-//			Camera c = GameObject.Find("Main Camera").GetComponent<Camera>();
-//			Ray cursorRay = c.ScreenPointToRay(Input.mousePosition);
-//			for(int i = 0; i < connections.Count; ++i)
-//			{
-//				AtomConnection con=connections[i];
-//				if(con.isActive)
-//				{
-//					Vector3 aPos = con.molecules[0].GetAtomWorldPositon(con.atomIds[0]);
-//					Vector3 bPos = con.molecules[1].GetAtomWorldPositon(con.atomIds[1]);
-//
-//					Vector3 aToB = bPos - aPos;;
-//					Plane p = new Plane(aPos,bPos,aPos+ new Vector3(0,1,0));
-//					float distOut;
-//					p.Raycast(cursorRay,out distOut);
-//					Vector3 cursorWorldPos = cursorRay.GetPoint(distOut);
-//
-//					Vector3 aToCursor = cursorWorldPos - aPos;
-//
-//					float f = Vector3.Dot(aToCursor,aToB.normalized);
-//
-//					if(f < aToB.magnitude && f > 0)
-//					{
-//						Vector3 closestPoint = aPos + (aToB.normalized * f);
-//						float dist = (cursorWorldPos - closestPoint).sqrMagnitude;
-//
-//						if(dist <1.0f)
-//						{
-//							connections.RemoveAt(i);
-//						}
-//					}
-//				}
-//			}
-//		}
-
 	}
 }

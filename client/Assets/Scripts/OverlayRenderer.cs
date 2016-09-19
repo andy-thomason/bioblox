@@ -38,6 +38,7 @@ public class OverlayRenderer : MonoBehaviour {
     GameObject Sphere_atom_reference;
     public GameObject Sphere_atom_holder;
     BioBlox bb;
+    SFX sfx;
 
     // Use this for initialization
     void Start ()
@@ -45,6 +46,7 @@ public class OverlayRenderer : MonoBehaviour {
         bb = GameObject.FindObjectsOfType<BioBlox>()[0];
         MeshFilter mf = GetComponent<MeshFilter> ();
         ui = FindObjectOfType<UIController>();
+        sfx = FindObjectOfType<SFX>();
 		Mesh mesh = new Mesh();
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
@@ -148,7 +150,13 @@ public class OverlayRenderer : MonoBehaviour {
                     }
 
                     if (is_touching)
-                        {
+                    {
+                        //Debug.Log(!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying);
+                        //if (!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying)
+                        //{
+                        //    sfx.PlayTrack(SFX.sound_index.protein_colliding);
+                        //}
+
                         if (sphere_index < icons_spheres_store.Count)
                         {
                             if ((ui.p1_bs.isOn || ui.p1_trans.isOn) && i == 0)
@@ -167,7 +175,7 @@ public class OverlayRenderer : MonoBehaviour {
                             }
                             sphere_index++;
                         }
-                        }
+                    }
                 }
             }
         }

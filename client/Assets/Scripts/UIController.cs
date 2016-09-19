@@ -134,6 +134,7 @@ public class UIController : MonoBehaviour {
     public GameObject HintPanelOpen;
     public GameObject HintPanelClose;
     public Image HintImage;
+    SFX sfx;
 
     void Awake()
 	{
@@ -144,6 +145,7 @@ public class UIController : MonoBehaviour {
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         camera_distance = -MainCamera.GetComponent<MouseOrbitImproved_main>().distance;
         xml = FindObjectOfType<XML>();
+        sfx = FindObjectOfType<SFX>();
     }
 
 
@@ -269,13 +271,15 @@ public class UIController : MonoBehaviour {
 	//tool panel
 	public void ToogleToolMenu(bool Status)
 	{
+        sfx.PlayTrack(SFX.sound_index.button_click);
 		ToolPanel.SetBool ("Open", Status);
 		OpenToolImage.SetActive (!Status);
 		CloseToolImage.SetActive (Status);
 	}
 
 	public void RestartCamera()
-	{
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
 		MainCamera.transform.position = new Vector3 (0, 0, camera_distance);
 		MainCamera.transform.rotation = Quaternion.identity;
@@ -433,6 +437,11 @@ public class UIController : MonoBehaviour {
             //check conenctions
             if (aminoSliderController.ReturnNumberOfConnection() > 0)
                 button_erase_connections_1p_button.interactable = true;
+            sfx.PlayTrack(SFX.sound_index.camera_shrink);
+        }
+        else
+        {
+            sfx.PlayTrack(SFX.sound_index.camera_expand);
         }
 
         //hide elements
@@ -447,6 +456,7 @@ public class UIController : MonoBehaviour {
     public void StartExplore()
     {
 
+        sfx.PlayTrack(SFX.sound_index.button_click);
         //RenderSettings.skybox = space_skybox;
         //floor.SetActive(false);
         isOverUI = false;
@@ -493,6 +503,7 @@ public class UIController : MonoBehaviour {
 
     public void ToggleScore()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         score_panel_alpha.alpha = toggle_score ? 0 : 1;
         close_score_panel.alpha = toggle_score ? 0 : 1;
         open_score_panel.alpha = toggle_score ? 1 : 0;
@@ -515,12 +526,14 @@ public class UIController : MonoBehaviour {
 
     public void FixProtein1()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = !isProtein1Fixed;
         isProtein1Fixed = !isProtein1Fixed;
     }
 
     public void FixProtein2()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
         isProtein2Fixed = !isProtein2Fixed;
     }
@@ -553,10 +566,12 @@ public class UIController : MonoBehaviour {
         }
     }
 
+    bool cutawayON = false;
+
     public void CutAwayTool()
     {
+        sfx.PlayTrack(SFX.sound_index.cutaway_protein);
 
-        cutaway_wall.gameObject.SetActive(true);
         if (!p1_trans.isOn && !p1_bs.isOn)
         {
             foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
@@ -575,7 +590,19 @@ public class UIController : MonoBehaviour {
         cutaway_wall.localPosition = new Vector3(0, 0, CutAway.value);
 
         if (CutAway.value == CutAway.minValue)
+        {
             cutaway_wall.gameObject.SetActive(false);
+            cutawayON = false;
+            sfx.StopTrack(SFX.sound_index.cutaway_cutting);
+            sfx.StopTrack(SFX.sound_index.cutaway_protein);
+        }
+        else if(!cutawayON)
+        {
+            sfx.PlayTrack(SFX.sound_index.cutaway_cutting);
+            sfx.PlayTrack(SFX.sound_index.cutaway_start);
+            cutaway_wall.gameObject.SetActive(true);
+            cutawayON = true;
+        }
 
     }
 
@@ -598,21 +625,25 @@ public class UIController : MonoBehaviour {
 
     public void P1Transparent()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         ToggleTransparentMesh(0);
     }
 
     public void P2Transparent()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         ToggleTransparentMesh(1);
     }
 
     public void P1BS()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         ToggleBSMesh(0);
     }
 
     public void P2BS()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         ToggleBSMesh(1);
     }
 
@@ -691,6 +722,8 @@ public class UIController : MonoBehaviour {
             //isnert to xml
             if(number_atoms_end_level.text != "0")
             {
+                //play audio
+                sfx.PlayTrack(SFX.sound_index.end_level);
                 xml.SaveXML(BioBloxReference.level, number_atoms_end_level.text, BioBloxReference.game_time);
             }
         }
@@ -718,6 +751,7 @@ public class UIController : MonoBehaviour {
     //tool panel
     public void ToggleHint(bool Status)
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         HintPanel.SetBool("Start", Status);
         HintPanelOpen.SetActive(!Status);
         HintPanelClose.SetActive(Status);

@@ -110,10 +110,13 @@ public class AminoSliderController : MonoBehaviour {
 		{"TYR",  "Hydro"}, {"VAL",  "Hydro"},
 	};
 
+    SFX sfx;
+
 	void Awake()
 	{
 		buttonStructure = FindObjectOfType<ButtonStructure> ();
         uIController = FindObjectOfType<UIController>();
+        sfx = FindObjectOfType<SFX>();
     }
 
     int number_childs_A1 = 0;
@@ -466,11 +469,12 @@ public class AminoSliderController : MonoBehaviour {
     }
 
 	public void AddConnectionButton()
-	{		
+	{
 		//ButtonPickedA1.GetComponent<Button>().interactable = false;
 		//ButtonPickedA2.GetComponent<Button>().interactable = false;
 		if (!CheckIfConnectionExist (ButtonPickedA1, ButtonPickedA2))
         {
+            sfx.PlayTrack(SFX.sound_index.connection_click);
             //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
             //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
@@ -484,7 +488,9 @@ public class AminoSliderController : MonoBehaviour {
 		else
 		{
 			ConnectionExistMessage.SetBool("Play",true);
-		}
+            if (!sfx.isPlaying(SFX.sound_index.connection_exist))
+                sfx.PlayTrack(SFX.sound_index.connection_exist);
+        }
 	}
 
 	void DeactivateAddConnectionButton()

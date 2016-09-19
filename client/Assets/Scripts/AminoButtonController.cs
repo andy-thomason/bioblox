@@ -10,32 +10,46 @@ public class AminoButtonController : MonoBehaviour {
 	public Color32 NormalColor;
 	public Color32 FunctionColor;
     public int temp_AminoButtonID;
+    BioBlox bb;
+    SFX sfx;
+    AminoSliderController aminoSli;
+
+    void Start()
+    {
+        bb = FindObjectOfType<BioBlox>();
+        sfx = FindObjectOfType<SFX>();
+        aminoSli = FindObjectOfType<AminoSliderController>();
+    }
+
 
 	public void HighLight()
 	{
-		if (transform.parent.name == "ContentPanelA2")
+        sfx.PlayTrack(SFX.sound_index.amino_click);
+
+        if (transform.parent.name == "ContentPanelA2")
 		{
-			FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
 		}
 		else
-		{			
-			FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+		{
+            bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
 		}
-		FindObjectOfType<AminoSliderController> ().ChangeAminoAcidSelection (gameObject);
+        aminoSli.ChangeAminoAcidSelection (gameObject);
 	}
 
 	public void HighLightOnClick()
-	{
-		if (transform.parent.name == "ContentPanelA2")
+    {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
+        if (transform.parent.name == "ContentPanelA2")
 		{
-			FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
-			FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA2(AminoButtonID);
+			bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            aminoSli.UpdateCurrentButtonA2(AminoButtonID);
 		}
 		else
 		{			
-			FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
-			FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(AminoButtonID);
+			bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            aminoSli.UpdateCurrentButtonA1(AminoButtonID);
 		}
-		FindObjectOfType<AminoSliderController> ().ChangeAminoAcidSelection (gameObject);
+        aminoSli.ChangeAminoAcidSelection (gameObject);
     }
 }

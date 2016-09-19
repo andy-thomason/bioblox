@@ -28,6 +28,7 @@ public class ArponController : MonoBehaviour {
 
         if (molecule.results.Count > 0)
         {
+            GetComponents<AudioSource>()[1].Play();
             //Debug.Log(bb.molecules[0].transform.TransformPoint(bb.molecules[protein_to_shot].GetComponent<PDB_mesh>().mol.atom_centres[molecule.results[0].index]));
             bb.molecules[protein_to_shot].GetComponent<PDB_mesh>().SelectAtom(molecule.results[0].index);
             aminoSliderController.AddConnectionButton();
@@ -77,6 +78,12 @@ public class ArponController : MonoBehaviour {
 
     void OnCollisionEnter(Collision collision)
     {
-        GetComponent<ArponController>().enabled = false;
+        if(collision.gameObject.tag == "floor")
+        {
+            if (GetComponent<ArponController>().enabled)
+                GetComponents<AudioSource>()[2].Play();
+            GetComponent<ArponController>().enabled = false;
+
+        }
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<database current_instance="14">
+<database current_instance="18">
   <instance number="1" level="0" atoms="0" time="0" />
   <instance number="2" level="4" atoms="66" time="38.16756" />
   <instance number="3" level="4" atoms="72" time="45.07877" />
@@ -14,4 +14,8 @@
   <instance number="12" level="4" atoms="3" time="8.390301" />
   <instance number="13" level="4" atoms="37" time="28.28033" />
   <instance number="14" level="1" atoms="20" time="27.54531" />
+  <instance number="15" level="3" atoms="8" time="4.957446" />
+  <instance number="16" level="3" atoms="38" time="6.88453" />
+  <instance number="17" level="4" atoms="46" time="82.12737" />
+  <instance number="18" level="3" atoms="5" time="36.63238" />
 </database>
