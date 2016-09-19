@@ -42,7 +42,7 @@ public class BioBlox : MonoBehaviour
     };
 
     Level[] levels = {
-       new Level("2PTC", "E", "I", "1", new Vector3(-30, 0, 0))
+       new Level("2PTC", "E", "I", "1", new Vector3(-20, 0, 0))
     };
 
     // a holder variable for the current event system
@@ -793,7 +793,7 @@ public class BioBlox : MonoBehaviour
     }
 
     // set the object to its initial position etc.
-    void reset_molecule(GameObject obj, float xoffset, int molNum)
+    void reset_molecule(GameObject obj, float xoffset, int molNum, Vector3 offset)
     {
         PDB_mesh p = obj.GetComponent<PDB_mesh> ();
         Rigidbody ri = obj.AddComponent<Rigidbody> ();
@@ -810,10 +810,10 @@ public class BioBlox : MonoBehaviour
         ri.mass = mass;
         ri.inertiaTensor = new Vector3 (val, val, val);
 
+        obj.transform.Translate (offset);
         obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
         //obj.transform.Translate (xoffset * 30, 0, 0);
         obj.transform.Rotate (0, 0, 270);
-        obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
 
         //obj.transform.rotation = Random.rotation;
 
@@ -941,7 +941,7 @@ public class BioBlox : MonoBehaviour
             int molNum = 0;
             foreach (GameObject obj in molecules)
             {
-                reset_molecule(obj, mesh_offset_1, molNum++);
+                reset_molecule(obj, mesh_offset_1, molNum++, level.offset);
                 mesh_offset_1 += mesh_offset_2;
             }
         }
