@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Cutaway_main
+  m_Name: Cutaway_main_1
   m_Shader: {fileID: 4800000, guid: 28617ceeb1c2c954f9bdfdbbdc42f414, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
@@ -115,7 +115,7 @@ Material:
       second: {r: 0.6691177, g: 0.6691177, b: 0.6691177, a: 1}
     - first:
         name: _CutawayColor
-      second: {r: 0.41370368, g: 0.9852941, b: 0.18836506, a: 1}
+      second: {r: 1, g: 0, b: 0, a: 1}
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}
