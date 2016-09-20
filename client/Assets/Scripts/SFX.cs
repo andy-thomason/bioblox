@@ -3,18 +3,17 @@ using System.Collections;
 
 public class SFX : MonoBehaviour {
 
-    public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand };
+    public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand, ship, ship_scanning };
     public AudioClip ReelIn;
     public AudioClip ReelOut;
     public AudioSource[] audioSource;
     public AudioSource[] audioSource_collision;
     // Use this for initialization
 
-    void Start ()
+    void Awake ()
     {
         audioSource = GetComponents<AudioSource>();
         audioSource_collision = transform.GetChild(0).GetComponents<AudioSource>();
-
     }
 	
 	// Update is called once per frame
@@ -85,8 +84,8 @@ public class SFX : MonoBehaviour {
         audioSource[sound_index.slider_mouse_out.GetHashCode()].Play();
     }
 
-    public void InvalidDockSFX()
+    public void PlayTrackDelay(sound_index index, float delay)
     {
-        audioSource[sound_index.warning.GetHashCode()].PlayDelayed(1.5f);
+        audioSource[index.GetHashCode()].PlayDelayed(delay);
     }
 }

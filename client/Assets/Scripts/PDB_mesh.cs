@@ -20,6 +20,7 @@ public class PDB_mesh : MonoBehaviour {
 
     // add atom indices to here to display them selected
     public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    SFX sfx;
 
     //public bool hasCollided=false;
 
@@ -28,6 +29,7 @@ public class PDB_mesh : MonoBehaviour {
         mol = PDB_parser.get_molecule(this.name);
         aminoSliderController = FindObjectOfType<AminoSliderController> ();
         meshes = GetComponentsInChildren<MeshRenderer>();
+        sfx = FindObjectOfType<SFX>();
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)
@@ -226,19 +228,6 @@ public class PDB_mesh : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
-        //look at the other protein when first eprson
-        //first person only - updaate
-        //if (uIController.first_person)
-        //{
-        //    if (transform.GetComponentInChildren<Camera>())
-        //    {
-        //        GameObject temp_camera = GameObject.FindGameObjectWithTag("FirstPerson");
-        //        //point the camera to the other protein
-        //        Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-        //        //temp_camera.transform.LookAt(temp_pos);
-        //    }
-        //}
-
         ray = cam.ScreenPointToRay (Input.mousePosition);
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
@@ -274,9 +263,6 @@ public class PDB_mesh : MonoBehaviour {
 
                 transform.RotateAround(transform.position, dirRight, mouseDelta.y);
                 transform.RotateAround(transform.position, dirUp, -mouseDelta.x);
-
-                //if (uIController.first_person && (uIController.first_person_protein == protein_id))
-                //    uIController.FirstPersonCameraReference.GetComponent<MouseOrbitImproved>().WhileRotatingProtein();
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -286,14 +272,6 @@ public class PDB_mesh : MonoBehaviour {
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
                 atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
-                //if (uIController.first_person && GameObject.FindGameObjectWithTag("FirstPerson"))
-                //{
-                //    Ray r_first_person = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-                //    atom_first_person = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person);
-                //}
-
-                //Debug.Log("protein" + protein_id + ": " + atom);
-                //Debug.Log(atom);
                 if (atom != -1)
                 {
                     SelectAtom(atom);
@@ -319,54 +297,28 @@ public class PDB_mesh : MonoBehaviour {
 
                         temp.tag = "FirstPerson";
                         temp.transform.SetParent(transform, false);
-                        //temp.transform.position = transform.position;
-                        //temp.transform.localPosition = new Vector3(-30, 30, -30);
-                        //if (atom != -1)
-                        //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
-                        //else if(atom_first_person != -1)
-                        //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom_first_person]);
 
                         temp.GetComponent<Animator>().enabled = true;
-                        //temp.GetComponentInChildren<MeshRenderer>().enabled = true;
-                        //temp.transform.GetChild(1).GetComponent<Light>().enabled = true;
-                        //point the camera to the other protein
-                        //Vector3 temp_pos = protein_id == 0 ? bb.molecules[1].transform.position : bb.molecules[0].transform.position;
-                        //if (atom != -1)
-                        //    temp.transform.LookAt(transform.TransformPoint(mol.atom_centres[atom]));
 
                         temp.GetComponent<MouseOrbitImproved>().protein = gameObject;
-                        //temp.GetComponent<MouseOrbitImproved>().target = transform.TransformPoint(mol.atom_centres[atom]);
                         temp.GetComponent<MouseOrbitImproved>().enabled = true;
-
-                        //Ray r_temp;
-                        //do
-                        //{
-                        //    temp.transform.position = temp.transform.position + temp.transform.forward * 2;
-                        //    r_temp = cam.ScreenPointToRay(temp.transform.forward);
-
-                        //} while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
-                        //temp.transform.position = temp.transform.position + temp.transform.forward * 2;
-
-                        //transparent the protein
-                        //uIController.TransparencyProtein(protein_id);
 
                         if (protein_id == 0)
                             uIController.p1_trans.isOn = true;
                         else
                             uIController.p2_trans.isOn = true;
-
-                        ////change the overlay renderer camera
-                        //uIController.MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = temp.GetComponent<Camera>();
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP
                     if (uIController.explore_view)
                     {
+                        sfx.StopTrack(SFX.sound_index.ship);
                         uIController.ChangeCCTVLoading();
                         //only 1 active
                         GameObject check_new = GameObject.FindGameObjectWithTag("space_ship");
                         if (check_new) Destroy(check_new);
                         GameObject temp = Instantiate(space_ship);
+                        sfx.PlayTrackDelay(SFX.sound_index.ship, 0.6f);
                         temp.tag = "space_ship";
                         //temp.transform.SetParent(transform, false);
                         temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
@@ -387,77 +339,15 @@ public class PDB_mesh : MonoBehaviour {
 
                 }
             }
-            //else if(!uIController.isOverUI)
-            //{
-            //    DeselectAminoAcid();
-            //}
             has_rotated = false;
             rotating = false;
-            //uIController.DeselectOnClick();
         }
-        //else if (uIController.first_person && Input.GetMouseButtonDown(1))
-        //{
-        //    Ray r_first_person_link;
-        //    int atom_first_person_link = -1;
-        //    if (GameObject.FindGameObjectWithTag("FirstPerson"))
-        //    {
-        //        r_first_person_link = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        //        atom_first_person_link = PDB_molecule.collide_ray(gameObject, mol, transform, r_first_person_link);
-        //    }
-                
-        //    if (atom_first_person_link != -1)
-        //    {
-        //        //CRETING THE LAZO
-        //        //GameObject ArponObject = GameObject.FindGameObjectWithTag("arpon");
-        //        //GameObject arpon_reference = Instantiate(ArponObject);
-        //        //arpon_reference.transform.position = GameObject.FindGameObjectWithTag("FirstPerson").transform.position;
-        //        //arpon_reference.GetComponent<Rigidbody>().AddForce(Input.mousePosition.normalized * -100);
-        //        //Debug.Log("lazo");
-
-               
-
-
-        //        //SelectAtom(atom_first_person_link);
-        //        //aminoSliderController.AddConnectionButton();
-        //    }
-        //}
         else {
             has_rotated = false;
             rotating = false;
         }
         
         lastMousePos = mousePos;
-        //light_pos = cam.transform.TransformPoint(new Vector3(-50, 0, 0));
-
-        //foreach (MeshRenderer r in meshes) {
-        //    r.material.SetVector ("_LightPos", light_pos);
-        //    if (bb.cutawaySlider) {
-        //        Vector4 plane;
-        //        if (bb.cutawaySlider.value == -30)
-        //            plane = new Vector4(0, 0, 1, 130);
-        //        else
-        //            plane = new Vector4(0, 0, 1, -bb.cutawaySlider.value);
-        //        r.material.SetVector ("_CutawayPlane", plane);
-        //    }
-        //    if (bb.thicknessSlider)
-        //    {
-        //        r.material.SetFloat("_Thickness", bb.thicknessSlider.value);
-        //    }
-
-        //    /*Vector4[] uniforms = GetSelectedAtomUniforms(cam);
-        //    //int len = uniforms.Length;
-        //    r.material.SetVector ("_Atom0", uniforms[0]);
-        //    r.material.SetVector ("_Atom1", uniforms[1]);
-        //    r.material.SetVector ("_Atom2", uniforms[2]);
-        //    r.material.SetVector ("_Atom3", uniforms[3]);
-        //    r.material.SetVector ("_Atom4", uniforms[4]);
-        //    r.material.SetVector ("_Atom5", uniforms[5]);
-        //    r.material.SetVector ("_Atom6", uniforms[6]);
-        //    r.material.SetVector ("_Atom7", uniforms[7]);
-        //    r.material.SetVector ("_Atom8", uniforms[8]);
-        //    r.material.SetVector ("_Atom9", uniforms[9]);
-        //    r.material.SetVector ("_Atom10", uniforms[10]);*/
-        //}
     }
 
     public float select_fudge = 0.67f;

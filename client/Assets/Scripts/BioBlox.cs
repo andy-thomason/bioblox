@@ -212,8 +212,6 @@ public class BioBlox : MonoBehaviour
 
     public void StartGame()
     {
-        sfx.PlayTrack(SFX.sound_index.amb);
-        sfx.PlayTrack(SFX.sound_index.main_audio);
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
 
@@ -1179,12 +1177,12 @@ public class BioBlox : MonoBehaviour
                 {
                     //save button
 
-                    scoring.calcScore();
-                    //set values for refence
-                    lennard_score = (int)scoring.vdwScore;
-                    electric_score = (int)scoring.elecScore;
-                    if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
-                    if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+                    //scoring.calcScore();
+                    ////set values for refence
+                    //lennard_score = (int)scoring.vdwScore;
+                    //electric_score = (int)scoring.elecScore;
+                    //if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
+                    //if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
 
                     if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
                     if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
@@ -1210,7 +1208,7 @@ public class BioBlox : MonoBehaviour
             InvalidDockScore.SetActive(num_invalid != 0);
             is_score_valid = num_invalid == 0;
             if (num_invalid != 0 && !sfx.isPlaying(SFX.sound_index.warning))
-                sfx.InvalidDockSFX();
+                sfx.PlayTrackDelay(SFX.sound_index.warning, 1.5f);
             else if (num_invalid == 0 && sfx.isPlaying(SFX.sound_index.warning))
                 sfx.StopTrack(SFX.sound_index.warning);
             /*
@@ -1326,7 +1324,7 @@ public class BioBlox : MonoBehaviour
                     TutorialHand.GetChild(0).GetComponent<Image>().sprite = default_hand;
                     TutorialHand.rotation = Quaternion.AngleAxis(90, -Vector3.forward);
                     TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(16).transform.position.z);
-                hintText.text = "Now lets make two more connections. First select the blue button marked ARG I 17";
+                hintText.text = "You can rotate the proteins by holding the left mouse click over and also select the amino acids directly by clicking them! Now lets make two more connections. First select the blue button marked ARG I 17";
                 HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                 if (!sliders.IsConnectionMade(aas[1], aas[0])) {
                     hint_stage = 0;
@@ -1390,7 +1388,7 @@ public class BioBlox : MonoBehaviour
                 {
                     TutorialHand.position = new Vector3(aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.x, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.y + button_offset, aminoSlider.SliderMol[1].transform.GetChild(38).transform.position.z);
 
-                    hintText.text = "One more connection to go; select the blue button marked ARG I 39";
+                    hintText.text = "Try rotate the camera, by holding the right mouse click. One more connection to go; select the blue button marked ARG I 39";
                     HintTextPanel.sizeDelta = new Vector2(320, LayoutUtility.GetPreferredHeight(hobj.GetComponent<RectTransform>()) + 10);
                     if (!sliders.IsConnectionMade(aas[1], aas[0]))
                     {

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 public class UIController : MonoBehaviour {
 
@@ -135,6 +136,8 @@ public class UIController : MonoBehaviour {
     public GameObject HintPanelClose;
     public Image HintImage;
     SFX sfx;
+    public Toggle FixProtein1Toggle;
+    public Toggle FixProtein2Toggle;
 
     void Awake()
 	{
@@ -143,7 +146,6 @@ public class UIController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.GetComponent<Camera>();
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
-        camera_distance = -MainCamera.GetComponent<MouseOrbitImproved_main>().distance;
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
     }
@@ -457,6 +459,7 @@ public class UIController : MonoBehaviour {
     {
 
         sfx.PlayTrack(SFX.sound_index.button_click);
+        sfx.PlayTrack(SFX.sound_index.camera_shrink);
         //RenderSettings.skybox = space_skybox;
         //floor.SetActive(false);
         isOverUI = false;
@@ -475,6 +478,9 @@ public class UIController : MonoBehaviour {
     {
         //RenderSettings.skybox = normal_skybox;
         // floor.SetActive(true);
+        sfx.PlayTrack(SFX.sound_index.button_click);
+        sfx.PlayTrack(SFX.sound_index.camera_shrink);
+        sfx.StopTrack(SFX.sound_index.ship);
         explore_view = false;
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
         MainCamera.GetComponent<Animator>().SetBool("Start", false);
@@ -510,7 +516,7 @@ public class UIController : MonoBehaviour {
         toggle_score = !toggle_score;
     }
 
-    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_temp1, int mesh_temp2)
+    public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_temp1, int mesh_temp2, int camera_zoom)
     {
         BioBloxReference.level = level_temp;
         BioBloxReference.mesh_offset_1 = mesh_temp1;
@@ -519,6 +525,12 @@ public class UIController : MonoBehaviour {
         level_title.text = temp_title;
         image_description.sprite = temp_image;
         button_play.SetActive(true);
+        button_play.GetComponent<Button>().interactable = true;
+        if (level_temp == 6)
+            button_play.GetComponent<Button>().interactable = false;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_zoom;
+        camera_distance = -camera_zoom;
+        RestartCamera();
     }
 
     bool isProtein1Fixed = false;
@@ -595,6 +607,9 @@ public class UIController : MonoBehaviour {
             cutawayON = false;
             sfx.StopTrack(SFX.sound_index.cutaway_cutting);
             sfx.StopTrack(SFX.sound_index.cutaway_protein);
+            //shadow on
+            Shadows(true, 0);
+            Shadows(true, 1);
         }
         else if(!cutawayON)
         {
@@ -602,6 +617,9 @@ public class UIController : MonoBehaviour {
             sfx.PlayTrack(SFX.sound_index.cutaway_start);
             cutaway_wall.gameObject.SetActive(true);
             cutawayON = true;
+            //shadow off
+            Shadows(false, 0);
+            Shadows(false, 1);
         }
 
     }
@@ -671,6 +689,7 @@ public class UIController : MonoBehaviour {
                 {
                     molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.maxValue);
                 }
+                Shadows(false, 0);
             }
             else
             {
@@ -678,6 +697,7 @@ public class UIController : MonoBehaviour {
                 {
                     molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.minValue);
                 }
+                Shadows(true,0);
             }
         }
         else
@@ -688,6 +708,7 @@ public class UIController : MonoBehaviour {
                 {
                     molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.maxValue);
                 }
+                Shadows(false, 1);
             }
             else
             {
@@ -695,6 +716,7 @@ public class UIController : MonoBehaviour {
                 {
                     molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.minValue);
                 }
+                Shadows(true,1);
             }
         }
     }
@@ -736,6 +758,13 @@ public class UIController : MonoBehaviour {
         aminoSliderController.DeleteAllAminoConnections();
         BioBloxReference.game_time = 0;
         isOverUI = false;
+
+        p1_bs.isOn = false;
+        p2_bs.isOn = false;
+        p1_trans.isOn = false;
+        p2_trans.isOn = false;
+        FixProtein1Toggle.isOn = false;
+        FixProtein2Toggle.isOn = false;
     }
 
     public void Reset()
@@ -755,12 +784,19 @@ public class UIController : MonoBehaviour {
         HintPanel.SetBool("Start", Status);
         HintPanelOpen.SetActive(!Status);
         HintPanelClose.SetActive(Status);
-        
     }
 
     public void SetHintImage(string level_name)
     {
         Debug.Log(level_name);
         HintImage.sprite = Sprite.Create(Resources.Load<Texture2D>("hint/"+ level_name), HintImage.sprite.rect, HintImage.sprite.pivot);
+    }
+
+    public void Shadows(bool status, int protein)
+    {
+        foreach (Transform molecule_renderer in BioBloxReference.molecules[protein].transform.GetChild(0).transform)
+        {
+            molecule_renderer.GetComponent<MeshRenderer>().shadowCastingMode = status ? ShadowCastingMode.On : ShadowCastingMode.Off;
+        }
     }
 }

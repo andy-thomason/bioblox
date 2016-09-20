@@ -47,6 +47,7 @@ public class ShipController : MonoBehaviour {
     ExploreController explorerController;
     FadeToExplorerController fadePanel;
     UIController uI;
+    SFX sfx;
 
     // Use this for initialization
     void Start()
@@ -59,6 +60,7 @@ public class ShipController : MonoBehaviour {
         uI = FindObjectOfType<UIController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
         exit_button.SetActive(true);
+        sfx = FindObjectOfType<SFX>();
         //SwitchCameraInside();
         //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
     }
@@ -242,6 +244,8 @@ public class ShipController : MonoBehaviour {
         //LASER
         if (Input.GetMouseButton(1))
         {
+            if(!sfx.isPlaying(SFX.sound_index.ship_scanning))
+                sfx.PlayTrack(SFX.sound_index.ship_scanning);
             Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
             atom_name.SetActive(true);
             scanning.SetActive(true);
@@ -266,6 +270,7 @@ public class ShipController : MonoBehaviour {
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             atom_name.SetActive(false);
             scanning.SetActive(false);
+            sfx.StopTrack(SFX.sound_index.ship_scanning);
         }
 
         if (Input.GetKeyDown(KeyCode.V))
