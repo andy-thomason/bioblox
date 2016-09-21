@@ -257,7 +257,7 @@ public class OverlayRenderer : MonoBehaviour {
 
     public void clear_spheres()
     {
-        foreach (GameObject sphere in icons_spheres) sphere.transform.position = new Vector3(1000.0f,0,0);
+        foreach (GameObject sphere in icons_spheres) sphere.transform.position = new Vector3(1000.0f,-500.0f,0);
         icons_spheres.Clear();
     }
 

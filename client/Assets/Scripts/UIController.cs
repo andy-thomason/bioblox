@@ -608,8 +608,10 @@ public class UIController : MonoBehaviour {
             sfx.StopTrack(SFX.sound_index.cutaway_cutting);
             sfx.StopTrack(SFX.sound_index.cutaway_protein);
             //shadow on
-            Shadows(true, 0);
-            Shadows(true, 1);
+            if (!p1_trans.isOn && !p1_bs.isOn)
+                Shadows(true, 0);
+            if (!p2_trans.isOn && !p2_bs.isOn)
+                Shadows(true, 1);
         }
         else if(!cutawayON)
         {
