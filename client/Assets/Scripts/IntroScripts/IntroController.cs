@@ -68,7 +68,6 @@ public class IntroController : MonoBehaviour {
         GameCanvas.blocksRaycasts = true;
         IntroCamera.SetActive(false);
         FindObjectOfType<ConnectionManager>().DisableSlider();
-        ui.CutAway.value = ui.CutAway.minValue;
         IntroCanvas.interactable = false;
         IntroCanvas.blocksRaycasts = false;
     }
@@ -86,6 +85,7 @@ public class IntroController : MonoBehaviour {
         FadeCanvas.SetBool("Fade", false);
         IntroCanvas.interactable = true;
         IntroCanvas.blocksRaycasts = true;
+        sfx.StopTrack(SFX.sound_index.warning);
     }
 
     IEnumerator WaitForFade()

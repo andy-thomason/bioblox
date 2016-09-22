@@ -156,7 +156,8 @@ public class UIController : MonoBehaviour {
     Vector3 move;
 
     // Update is called once per frame
-    void Update () {
+    void Update ()
+    {
         if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
             //if the user is over the small camera in the first person, the harpoon will not be shot
@@ -516,9 +517,12 @@ public class UIController : MonoBehaviour {
         toggle_score = !toggle_score;
     }
 
+    public int previous_level = -1;
+
     public void LoadLevelDescription(string temp_title, string temp_description, Sprite temp_image, int level_temp, int mesh_temp1, int mesh_temp2, int camera_zoom)
     {
         BioBloxReference.level = level_temp;
+        previous_level = BioBloxReference.level;
         BioBloxReference.mesh_offset_1 = mesh_temp1;
         BioBloxReference.mesh_offset_2 = mesh_temp2;
         level_description.text = temp_description;
@@ -532,6 +536,7 @@ public class UIController : MonoBehaviour {
         camera_distance = -camera_zoom;
         RestartCamera();
     }
+
 
     bool isProtein1Fixed = false;
     bool isProtein2Fixed = false;
@@ -725,32 +730,31 @@ public class UIController : MonoBehaviour {
 
     public void EndLevel()
     {
-        if (BioBloxReference.is_score_valid)
+        
+        EndLevelPanel.SetActive(true);
+        number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
+
+        //format
+        int minutes = Mathf.FloorToInt(BioBloxReference.game_time / 60F);
+        int seconds = Mathf.FloorToInt(BioBloxReference.game_time - minutes * 60);
+        string time_game;
+        //string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+        if (minutes == 0)
+            time_game = seconds + " seconds";
+        else
+            time_game = minutes + " minutes " + seconds + " seconds";
+
+
+        time_end_level.text = time_game;
+
+        //isnert to xml
+        if(number_atoms_end_level.text != "0" && BioBloxReference.is_score_valid)
         {
-            EndLevelPanel.SetActive(true);
-            number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
-
-            //format
-            int minutes = Mathf.FloorToInt(BioBloxReference.game_time / 60F);
-            int seconds = Mathf.FloorToInt(BioBloxReference.game_time - minutes * 60);
-            string time_game;
-            //string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
-            if (minutes == 0)
-                time_game = seconds + " seconds";
-            else
-                time_game = minutes + " minutes " + seconds + " seconds";
-
-
-            time_end_level.text = time_game;
-
-            //isnert to xml
-            if(number_atoms_end_level.text != "0")
-            {
-                //play audio
-                sfx.PlayTrack(SFX.sound_index.end_level);
-                xml.SaveXML(BioBloxReference.level, number_atoms_end_level.text, BioBloxReference.game_time);
-            }
+            //play audio
+            sfx.PlayTrack(SFX.sound_index.end_level);
+            xml.SaveXML(BioBloxReference.level, number_atoms_end_level.text, BioBloxReference.game_time);
         }
+
     }
 
     public void RestartLevel()
@@ -759,14 +763,13 @@ public class UIController : MonoBehaviour {
         RestartCamera();
         aminoSliderController.DeleteAllAminoConnections();
         BioBloxReference.game_time = 0;
+        Reset();
+        CutAway.value = CutAway.minValue;
+        if (BioBloxReference.level == 0)
+            BioBloxReference.ToggleMode.isOn = true;
         isOverUI = false;
+        sfx.StopTrack(SFX.sound_index.warning);
 
-        p1_bs.isOn = false;
-        p2_bs.isOn = false;
-        p1_trans.isOn = false;
-        p2_trans.isOn = false;
-        FixProtein1Toggle.isOn = false;
-        FixProtein2Toggle.isOn = false;
     }
 
     public void Reset()
@@ -777,6 +780,9 @@ public class UIController : MonoBehaviour {
         p2_trans.isOn = false;
         ToogleToolMenu(false);
         ToggleHint(false);
+        FixProtein1Toggle.isOn = false;
+        FixProtein2Toggle.isOn = false;
+        CutAway.value = CutAway.minValue;
     }
 
     //tool panel

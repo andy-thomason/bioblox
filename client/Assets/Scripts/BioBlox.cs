@@ -220,6 +220,8 @@ public class BioBlox : MonoBehaviour
         else
             ToggleMode.isOn = false;
 
+        if (uiController.previous_level == level)
+            uiController.RestartLevel();
 
         game_time = 0;
         playing = true;

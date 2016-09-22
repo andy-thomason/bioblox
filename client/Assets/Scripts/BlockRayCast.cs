@@ -29,4 +29,10 @@ public class BlockRayCast : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         ui.isOverUI = false;
     }
 
+    void OnDisable()
+    {
+        OverIt = false;
+        ui.isOverUI = false;
+    }
+
 }
