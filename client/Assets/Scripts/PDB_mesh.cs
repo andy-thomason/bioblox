@@ -304,9 +304,9 @@ public class PDB_mesh : MonoBehaviour {
                         temp.GetComponent<MouseOrbitImproved>().enabled = true;
 
                         if (protein_id == 0)
-                            uIController.p1_trans.isOn = true;
+                            uIController.ToggleTransparentMesh(0);
                         else
-                            uIController.p2_trans.isOn = true;
+                            uIController.ToggleTransparentMesh(1);
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP

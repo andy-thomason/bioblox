@@ -25,7 +25,13 @@ public class LevelInfo : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick(PointerEventData data)
     {
         sfx.PlayTrack(SFX.sound_index.amino_click);
-        UI.LoadLevelDescription(level_name, level_description, level_image, level, mesh_offset_1, mesh_offset_2, camera_zoom);
+        UI.SaveLastLevelPlayed(gameObject);
+        UI.LoadLevelDescriptionIntro(level_name, level_description, level_image, level);
+    }
+
+    public void SendData()
+    {
+        UI.LoadLevelDescription(level, mesh_offset_1, mesh_offset_2, camera_zoom);
     }
 
 

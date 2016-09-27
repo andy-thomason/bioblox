@@ -154,6 +154,8 @@ public class BioBlox : MonoBehaviour
 
     bool first_time = true;
     SFX sfx;
+    //obkect where the molecules will be parrented
+    public Transform Molecules;
 
     public enum GameState
     {
@@ -220,8 +222,8 @@ public class BioBlox : MonoBehaviour
         else
             ToggleMode.isOn = false;
 
-        if (uiController.previous_level == level)
-            uiController.RestartLevel();
+        //if (uiController.previous_level == level)
+        //    uiController.RestartLevel();
 
         game_time = 0;
         playing = true;
@@ -666,8 +668,12 @@ public class BioBlox : MonoBehaviour
     {
         //clears the molecules and re-randomizes the colour range
         //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
-        GameObject.Destroy (molecules [0].gameObject);
-        GameObject.Destroy (molecules [1].gameObject);
+        //GameObject.Destroy (molecules [0].gameObject);
+        //GameObject.Destroy (molecules [1].gameObject);
+        foreach(Transform proteins in Molecules)
+        {
+            Destroy(proteins.gameObject);
+        }
 
         ////clear the old win condition
         //winCondition.Clear ();
@@ -831,7 +837,9 @@ public class BioBlox : MonoBehaviour
         string file = filenames [current_level];
         
         GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
+        mol1.transform.SetParent(Molecules);
         GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
+        mol2.transform.SetParent(Molecules);
 
         GameObject mol1_mesh = Instantiate(Resources.Load("Mesh/"+level_mesh_default[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
@@ -846,13 +854,13 @@ public class BioBlox : MonoBehaviour
         mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "transparent_p1";
-        FixTransparentMolecule(mol1_mesh);
+        FixTransparentMolecule(mol1_mesh,0);
         mol1_mesh.SetActive(false);
         //transpant 2
         mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "transparent_p2";
-        FixTransparentMolecule(mol2_mesh);
+        FixTransparentMolecule(mol2_mesh,1);
         mol2_mesh.SetActive(false);
         //ball and stick 1
         mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
@@ -1526,15 +1534,16 @@ public class BioBlox : MonoBehaviour
         TutorialHand.position = new Vector3(6000.0f, 0, 0);
     }
 
-    public Material transparent_material;
+    public Material transparent_0;
+    public Material transparent_1;
     bool switch_material = true;
 
     //fix the transparent molecule
-    public void FixTransparentMolecule(GameObject protein)
+    public void FixTransparentMolecule(GameObject protein, int id_protein)
     {
         foreach (Transform molecule_renderer in protein.transform)
         {
-            molecule_renderer.GetComponent<Renderer>().material = transparent_material;
+            molecule_renderer.GetComponent<Renderer>().material = id_protein == 0 ? transparent_0 : transparent_1;
             molecule_renderer.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             molecule_renderer.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
         }

@@ -61,4 +61,10 @@ IPointerEnterHandler, IPointerExitHandler
         //reset the timer and dont count
         HoverElement = false;
     }
+
+    void OnDisable()
+    {
+        toolTipController.DestroyToolTip();
+        ToolTipExist = false;
+    }
 }
