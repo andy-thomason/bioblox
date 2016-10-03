@@ -33,6 +33,7 @@ public class BioBlox : MonoBehaviour
     //levels name
     List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
     List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
+    List<Tuple<string, string>> level_mesh_carbon = new List<Tuple<string, string>>();
     //public Dictionary<string, string> level_mesh_default = new Dictionary<string, string>{
     //    {"0",  "1"}, {"4KC3_A_se_1",  "4KC3_B_se_1"}
     //};
@@ -203,19 +204,28 @@ public class BioBlox : MonoBehaviour
         level_mesh_default.Add(new Tuple<string, string>("1OHZ_A_se_1", "1OHZ_B_se_1"));
         level_mesh_default.Add(new Tuple<string, string>("2VIR_AB_se_1", "2VIR_C_se_1"));
         //name of the meshes in Resources/Mesh - ball and stick renderer
-        level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1",  "2PTC_I_bs_1"));
+        level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1", "2PTC_I_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("4KC3_A_bs_1", "4KC3_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1FSS_A_bs_1", "1FSS_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1EMV_A_bs_1", "1EMV_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1GRN_A_bs_1", "1GRN_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1OHZ_A_bs_1", "1OHZ_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));
+        //name of the meshes in Resources/Mesh - ball and stick renderer
+        level_mesh_carbon.Add(new Tuple<string, string>("2PTC_E_ca_1", "2PTC_I_ca_1"));
+        level_mesh_carbon.Add(new Tuple<string, string>("4KC3_A_ca_1", "4KC3_B_ca_1"));
+        level_mesh_carbon.Add(new Tuple<string, string>("1FSS_A_ca_1", "1FSS_B_ca_1"));
+        level_mesh_carbon.Add(new Tuple<string, string>("1EMV_A_ca_1", "1EMV_B_ca_1"));
+        level_mesh_carbon.Add(new Tuple<string, string>("1GRN_A_ca_1", "1GRN_B_ca_1"));
+        level_mesh_carbon.Add(new Tuple<string, string>("1OHZ_A_ca_1", "1OHZ_B_ca_1"));
+        //level_mesh_carbon.Add(new Tuple<string, string>("2VIR_AB_ca_1", "2VIR_C_ca_1"));
     }
 
     public void StartGame()
     {
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
+        uiController.ToggleHint(true);
 
         if (level == 0)
             ToggleMode.isOn = true;
@@ -261,7 +271,6 @@ public class BioBlox : MonoBehaviour
 
 
         StartCoroutine(game_loop());
-        GetComponent<AminoSliderController>().init();
 
         if (first_time)
         {
@@ -274,6 +283,14 @@ public class BioBlox : MonoBehaviour
             aminoSlider = FindObjectOfType<AminoSliderController>();
             first_time = false;
         }
+        aminoSlider.init();
+
+        molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
+        molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
+        aminoSlider.DeselectAmino();
+
+        //UI INIT
+        uiController.init();
 
     }
     public string GetCurrentLevelName ()
@@ -683,7 +700,7 @@ public class BioBlox : MonoBehaviour
         ////Clear score
         //LennardScore.text = "0";
         //ElectricScore.text = "0";
-
+        aminoSlider.Reset();
         gameObject.GetComponent<ConnectionManager>().Reset();
         //molecules = null;
         //heuristicScore.fillAmount = 0;
@@ -850,6 +867,26 @@ public class BioBlox : MonoBehaviour
         //Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
+        //ball and stick 1
+        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
+        mol1_mesh.transform.SetParent(mol1.transform);
+        mol1_mesh.name = "bs_p1";
+        mol1_mesh.SetActive(false);
+        //ball and stick 2
+        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].Second)) as GameObject;
+        mol2_mesh.transform.SetParent(mol2.transform);
+        mol2_mesh.name = "bs_p2";
+        mol2_mesh.SetActive(false);
+        //carbon 1
+        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_carbon[level].First)) as GameObject;
+        mol1_mesh.transform.SetParent(mol1.transform);
+        mol1_mesh.name = "c_p1";
+        mol1_mesh.SetActive(false);
+        //carbon 2
+        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_carbon[level].Second)) as GameObject;
+        mol2_mesh.transform.SetParent(mol2.transform);
+        mol2_mesh.name = "c_p2";
+        mol2_mesh.SetActive(false);
         //transpant 1
         mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].First)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
@@ -862,17 +899,6 @@ public class BioBlox : MonoBehaviour
         mol2_mesh.name = "transparent_p2";
         FixTransparentMolecule(mol2_mesh,1);
         mol2_mesh.SetActive(false);
-        //ball and stick 1
-        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
-        mol1_mesh.transform.SetParent(mol1.transform);
-        mol1_mesh.name = "bs_p1";
-        mol1_mesh.SetActive(false);
-        //ball and stick 2
-        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].Second)) as GameObject;
-        mol2_mesh.transform.SetParent(mol2.transform);
-        mol2_mesh.name = "bs_p2";
-        mol2_mesh.SetActive(false);
-
 
         //GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
         //mol1_mesh.transform.SetParent(mol1.transform);
@@ -1524,6 +1550,7 @@ public class BioBlox : MonoBehaviour
                 childTransform.gameObject.SetActive(true);
             }
         }
+        uiController.ToggleAminoButtonRL(!status);
     }
 
     public void ExitTutorial()

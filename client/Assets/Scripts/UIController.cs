@@ -118,12 +118,6 @@ public class UIController : MonoBehaviour {
     public Transform cutaway_wall;
     float camera_distance;
 
-    public Toggle p1_trans;
-    public Toggle p1_bs;
-    public Toggle p2_trans;
-    public Toggle p2_bs;
-    bool toggle_temp;
-
     public GameObject EndLevelPanel;
     public Text number_atoms_end_level;
     public Text time_end_level;
@@ -139,9 +133,15 @@ public class UIController : MonoBehaviour {
     public Toggle FixProtein1Toggle;
     public Toggle FixProtein2Toggle;
 
-    public enum protein_render { normal, transparent, bs};
+    public enum protein_render { normal, transparent, bs, carbon};
 
     public GameObject LevelClickled;
+    public GameObject A1R;
+    public GameObject A1L;
+    public GameObject A2R;
+    public GameObject A2L;
+
+    int number_of_meshes;
 
     void Awake()
 	{
@@ -152,6 +152,11 @@ public class UIController : MonoBehaviour {
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
+    }
+
+    public void init()
+    {
+        number_of_meshes = BioBloxReference.molecules[0].transform.childCount;
     }
 
 
@@ -287,9 +292,10 @@ public class UIController : MonoBehaviour {
 	public void RestartCamera()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+        Debug.Log("camera_distance: "+ camera_distance);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-		MainCamera.transform.position = new Vector3 (0, 0, camera_distance);
-		MainCamera.transform.rotation = Quaternion.identity;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
+        MainCamera.transform.rotation = Quaternion.identity;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
     }
@@ -297,7 +303,7 @@ public class UIController : MonoBehaviour {
     public void RepositionCameraWOMovement()
     {
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        MainCamera.transform.position = new Vector3(0, 0, camera_distance);
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
     }
 
@@ -453,8 +459,8 @@ public class UIController : MonoBehaviour {
         }
 
         //hide elements
-        AminoAcids.alpha = !first_person ? 1 : 0;
-        ConnectionButton.alpha = !first_person ? 1 : 0;
+        //AminoAcids.alpha = !first_person ? 1 : 0;
+        //ConnectionButton.alpha = !first_person ? 1 : 0;
         AminoLinks.alpha = !first_person ? 1 : 0;
 
         //if(ToggleFreeCameraStatus)
@@ -583,6 +589,9 @@ public class UIController : MonoBehaviour {
             case 2:
                 ToggleBSMesh(0);
                 break;
+            case 3:
+                ToggleCMesh(0);
+                break;
         }
     }
 
@@ -599,6 +608,9 @@ public class UIController : MonoBehaviour {
                 break;
             case 2:
                 ToggleBSMesh(1);
+                break;
+            case 3:
+                ToggleCMesh(1);
                 break;
         }
     }
@@ -617,37 +629,48 @@ public class UIController : MonoBehaviour {
     {
         sfx.PlayTrack(SFX.sound_index.cutaway_protein);
 
-        if (DropDownP1.value == protein_render.normal.GetHashCode())
+        for(int j = 0; j < 2; j++)
         {
-            foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+            for (int i = 0; i < number_of_meshes - 1; i++)
             {
-                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[j].transform.GetChild(i).transform)
+                {
+                    molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+                }
             }
         }
 
-        if (DropDownP1.value == protein_render.bs.GetHashCode())
-        {
-            foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(2).transform)
-            {
-                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-            }
-        }
+        //if (DropDownP1.value == protein_render.normal.GetHashCode())
+        //{
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+        //    }
+        //}
 
-        if (DropDownP2.value == protein_render.normal.GetHashCode())
-        {
-            foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
-            {
-                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-            }
-        }
+        //if (DropDownP1.value == protein_render.bs.GetHashCode())
+        //{
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(2).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+        //    }
+        //}
 
-        if (DropDownP2.value == protein_render.bs.GetHashCode())
-        {
-            foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(2).transform)
-            {
-                molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-            }
-        }
+        //if (DropDownP2.value == protein_render.normal.GetHashCode())
+        //{
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+        //    }
+        //}
+
+        //if (DropDownP2.value == protein_render.bs.GetHashCode())
+        //{
+        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(2).transform)
+        //    {
+        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
+        //    }
+        //}
 
         cutaway_wall.localPosition = new Vector3(0, 0, CutAway.value);
 
@@ -658,9 +681,9 @@ public class UIController : MonoBehaviour {
             sfx.StopTrack(SFX.sound_index.cutaway_cutting);
             sfx.StopTrack(SFX.sound_index.cutaway_protein);
             //shadow on
-            if (!p1_trans.isOn && !p1_bs.isOn)
+            if (DropDownP1.value == protein_render.normal.GetHashCode())
                 Shadows(true, 0);
-            if (!p2_trans.isOn && !p2_bs.isOn)
+            if (DropDownP2.value == protein_render.normal.GetHashCode())
                 Shadows(true, 1);
         }
         else if(!cutawayON)
@@ -698,24 +721,37 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        UpdateMeshCutaway(protein_index, 1);
+        BioBloxReference.molecules[protein_index].transform.GetChild(3).gameObject.SetActive(false);
+        UpdateMeshCutaway(protein_index, 0);
         //CheckDefaultMesh(protein_index);
     }
 
     public void ToggleTransparentMesh(int protein_index)
     {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(3).gameObject.SetActive(true);
         //CheckDefaultMesh(protein_index);
     }
-    
+
     public void ToggleBSMesh(int protein_index)
     {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(3).gameObject.SetActive(true);
         UpdateMeshCutaway(protein_index, 2);
+        //CheckDefaultMesh(protein_index);
+    }
+
+    public void ToggleCMesh(int protein_index)
+    {
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(3).gameObject.SetActive(true);
+        UpdateMeshCutaway(protein_index, 3);
         //CheckDefaultMesh(protein_index);
     }
 
@@ -755,30 +791,28 @@ public class UIController : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.button_click);
         EndLevelPanel.SetActive(false);
     }
+    //for the button in the end level panel
+    public void RestartLevel()
+    {
+        EndLevelPanel.SetActive(false);
+        RestartCamera();
+        aminoSliderController.DeleteAllAminoConnections();
+        BioBloxReference.game_time = 0;
+        Reset_UI();
+        CutAway.value = CutAway.minValue;
+        if (BioBloxReference.level == 0)
+            BioBloxReference.ToggleMode.isOn = true;
+        isOverUI = false;
+        DeleteHarpoons();
 
-    //public void RestartLevel()
-    //{
-    //    EndLevelPanel.SetActive(false);
-    //    RestartCamera();
-    //    aminoSliderController.DeleteAllAminoConnections();
-    //    BioBloxReference.game_time = 0;
-    //    Reset_UI();
-    //    CutAway.value = CutAway.minValue;
-    //    if (BioBloxReference.level == 0)
-    //        BioBloxReference.ToggleMode.isOn = true;
-    //    isOverUI = false;
-    //    sfx.StopTrack(SFX.sound_index.warning);
-
-    //}
+        sfx.StopTrack(SFX.sound_index.warning);
+    }
 
     public void Reset_UI()
     {
-        p1_bs.isOn = false;
-        p2_bs.isOn = false;
-        p1_trans.isOn = false;
-        p2_trans.isOn = false;
+        DropDownP1.value = protein_render.normal.GetHashCode();
+        DropDownP2.value = protein_render.normal.GetHashCode();
         ToogleToolMenu(false);
-        ToggleHint(false);
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
@@ -811,7 +845,7 @@ public class UIController : MonoBehaviour {
     {
         if (BioBloxReference.molecules[0].transform.childCount > 3)
         {
-            for (int i = 3; i == BioBloxReference.molecules[0].transform.childCount; i++)
+            for (int i = 3; i < BioBloxReference.molecules[0].transform.childCount; i++)
             {
                 Destroy(BioBloxReference.molecules[0].transform.GetChild(i).gameObject);
             }
@@ -819,7 +853,7 @@ public class UIController : MonoBehaviour {
         }
         if (BioBloxReference.molecules[1].transform.childCount > 3)
         { 
-            for (int i = 3; i == BioBloxReference.molecules[1].transform.childCount; i++)
+            for (int i = 3; i < BioBloxReference.molecules[1].transform.childCount; i++)
             {
                 Destroy(BioBloxReference.molecules[1].transform.GetChild(i).gameObject);
             }
@@ -829,6 +863,14 @@ public class UIController : MonoBehaviour {
     public void SaveLastLevelPlayed(GameObject LevelButtonClickled)
     {
         LevelClickled = LevelButtonClickled;
+    }
+
+    public void ToggleAminoButtonRL(bool status)
+    {
+        A1L.SetActive(status);
+        A2L.SetActive(status);
+        A1R.SetActive(status);
+        A2R.SetActive(status);
     }
 
 }

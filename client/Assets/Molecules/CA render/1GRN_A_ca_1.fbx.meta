@@ -1,38 +1,15 @@
 fileFormatVersion: 2
-guid: 5466ab99901a7ed4c893d8ba547a21f5
-timeCreated: 1469198253
+guid: 4745187d1f6113c41ac072161217b1d0
+timeCreated: 1475507907
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: 2_I_0.25
-    100002: 2_I_0.25_MeshPart0
-    100004: 2_I_0.25_MeshPart1
-    100006: 2_I_0.25_MeshPart2
-    100008: 2_I_0.25_MeshPart3
-    100010: //RootNode
-    100012: Camera
-    100014: Lamp
-    400000: 2_I_0.25
-    400002: 2_I_0.25_MeshPart0
-    400004: 2_I_0.25_MeshPart1
-    400006: 2_I_0.25_MeshPart2
-    400008: 2_I_0.25_MeshPart3
-    400010: //RootNode
-    400012: Camera
-    400014: Lamp
-    2300000: 2_I_0.25_MeshPart0
-    2300002: 2_I_0.25_MeshPart1
-    2300004: 2_I_0.25_MeshPart2
-    2300006: 2_I_0.25_MeshPart3
-    3300000: 2_I_0.25_MeshPart0
-    3300002: 2_I_0.25_MeshPart1
-    3300004: 2_I_0.25_MeshPart2
-    3300006: 2_I_0.25_MeshPart3
-    4300000: 2_I_0.25_MeshPart0
-    4300002: 2_I_0.25_MeshPart1
-    4300004: 2_I_0.25_MeshPart2
-    4300006: 2_I_0.25_MeshPart3
+    100000: //RootNode
+    400000: //RootNode
+    2300000: //RootNode
+    3300000: //RootNode
+    4300000: Cube
   materials:
     importMaterials: 1
     materialName: 0
@@ -40,7 +17,7 @@ ModelImporter:
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
-    resampleRotations: 1
+    resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 

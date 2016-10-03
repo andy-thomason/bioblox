@@ -304,9 +304,9 @@ public class PDB_mesh : MonoBehaviour {
                         temp.GetComponent<MouseOrbitImproved>().enabled = true;
 
                         if (protein_id == 0)
-                            uIController.ToggleTransparentMesh(0);
+                            uIController.DropDownP1.value = UIController.protein_render.transparent.GetHashCode();
                         else
-                            uIController.ToggleTransparentMesh(1);
+                            uIController.DropDownP2.value = UIController.protein_render.transparent.GetHashCode();
                     }
 
                     //EXPLORER MODE ONLY - PLACE SHIP
