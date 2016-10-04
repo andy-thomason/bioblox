@@ -292,6 +292,16 @@ public class UIController : MonoBehaviour {
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
     }
 
+    public void RestartCameraFromIntro()
+    {
+        Debug.Log("camera_distance: " + camera_distance);
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
+        MainCamera.transform.rotation = Quaternion.identity;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
+    }
+
     public void RepositionCameraWOMovement()
     {
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
@@ -533,7 +543,7 @@ public class UIController : MonoBehaviour {
        
         MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_zoom;
         camera_distance = -camera_zoom;
-        RestartCamera();
+        RestartCameraFromIntro();
     }
 
     public void LoadLevelDescriptionIntro(string temp_title, string temp_description, Sprite temp_image, int level_temp)
@@ -816,6 +826,15 @@ public class UIController : MonoBehaviour {
     {
         hint_panel_status = !hint_panel_status;
         sfx.PlayTrack(SFX.sound_index.button_click);
+        HintPanel.SetBool("Start", hint_panel_status);
+        HintPanelOpen.SetActive(!hint_panel_status);
+        HintPanelClose.SetActive(hint_panel_status);
+    }
+
+    //tool panel
+    public void ToggleHintFromIntro()
+    {
+        hint_panel_status = true;
         HintPanel.SetBool("Start", hint_panel_status);
         HintPanelOpen.SetActive(!hint_panel_status);
         HintPanelClose.SetActive(hint_panel_status);
