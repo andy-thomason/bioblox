@@ -141,6 +141,9 @@ public class UIController : MonoBehaviour {
     public GameObject A2R;
     public GameObject A2L;
 
+    public bool tool_panel_status = false;
+    public bool hint_panel_status = false;
+
     int number_of_meshes;
 
     void Awake()
@@ -268,26 +271,15 @@ public class UIController : MonoBehaviour {
         }
     }
 
-	public void ToggleFreeCamera()
-	{
-		MainCamera.GetComponent<CameraMovement> ().enabled = ToggleFreeCameraStatus;
-		FreeCameraKeysFreeze.SetActive (ToggleFreeCameraStatus);
-        CameraSlider.SetActive(!ToggleFreeCameraStatus);
-
-        FreeCameraKeysUnfreeze.SetActive (false);
-		ToogleToolMenu (false);
-		AddConnectionText.SetActive (false);
-		ToggleFreeCameraStatus = !ToggleFreeCameraStatus;
-	}
-
 	//tool panel
-	public void ToogleToolMenu(bool Status)
+	public void ToogleToolMenu()
 	{
+        tool_panel_status = !tool_panel_status;
         sfx.PlayTrack(SFX.sound_index.button_click);
-		ToolPanel.SetBool ("Open", Status);
-		OpenToolImage.SetActive (!Status);
-		CloseToolImage.SetActive (Status);
-	}
+		ToolPanel.SetBool ("Open", tool_panel_status);
+        CloseToolImage.SetActive(tool_panel_status);
+        OpenToolImage.SetActive(!tool_panel_status);
+    }
 
 	public void RestartCamera()
     {
@@ -812,19 +804,21 @@ public class UIController : MonoBehaviour {
     {
         DropDownP1.value = protein_render.normal.GetHashCode();
         DropDownP2.value = protein_render.normal.GetHashCode();
-        ToogleToolMenu(false);
+        tool_panel_status = true;
+        ToogleToolMenu();
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
     }
 
     //tool panel
-    public void ToggleHint(bool Status)
+    public void ToggleHint()
     {
+        hint_panel_status = !hint_panel_status;
         sfx.PlayTrack(SFX.sound_index.button_click);
-        HintPanel.SetBool("Start", Status);
-        HintPanelOpen.SetActive(!Status);
-        HintPanelClose.SetActive(Status);
+        HintPanel.SetBool("Start", hint_panel_status);
+        HintPanelOpen.SetActive(!hint_panel_status);
+        HintPanelClose.SetActive(hint_panel_status);
     }
 
     public void SetHintImage(string level_name)
@@ -845,7 +839,7 @@ public class UIController : MonoBehaviour {
     {
         if (BioBloxReference.molecules[0].transform.childCount > 3)
         {
-            for (int i = 3; i < BioBloxReference.molecules[0].transform.childCount; i++)
+            for (int i = number_of_meshes; i < BioBloxReference.molecules[0].transform.childCount; i++)
             {
                 Destroy(BioBloxReference.molecules[0].transform.GetChild(i).gameObject);
             }
@@ -853,7 +847,7 @@ public class UIController : MonoBehaviour {
         }
         if (BioBloxReference.molecules[1].transform.childCount > 3)
         { 
-            for (int i = 3; i < BioBloxReference.molecules[1].transform.childCount; i++)
+            for (int i = number_of_meshes; i < BioBloxReference.molecules[1].transform.childCount; i++)
             {
                 Destroy(BioBloxReference.molecules[1].transform.GetChild(i).gameObject);
             }

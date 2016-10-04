@@ -225,7 +225,8 @@ public class BioBlox : MonoBehaviour
     {
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
-        uiController.ToggleHint(true);
+        uiController.hint_panel_status = false;
+        uiController.ToggleHint();
 
         if (level == 0)
             ToggleMode.isOn = true;

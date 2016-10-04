@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: c5fb9a4f40b18ea48948bc35ce0e0d33
-timeCreated: 1475076041
+guid: e20038c5793030e458bcc0d607afc8cd
+timeCreated: 1475592642
 licenseType: Free
 TrueTypeFontImporter:
   serializedVersion: 4
@@ -10,7 +10,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Berlin Sans FB
+  - Berlin Sans FB Demi
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
