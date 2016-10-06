@@ -1308,19 +1308,19 @@ public void StartGame()
                 {
                     //save button
 
-                    scoring.calcScore();
+                    //scoring.calcScore();
                     ////set values for refence
-                    lennard_score = (int)scoring.vdwScore;
-                    electric_score = (int)scoring.elecScore;
-                    if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
-                    if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+                    //lennard_score = (int)scoring.vdwScore;
+                    //electric_score = (int)scoring.elecScore;
+                    //if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
+                    //if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
 
                     if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
                     if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
                 }
                 else
                 {
-                    ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0.0";
+                    //ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0.0";
                     SimpleScore.text = "Score: 0 atoms touching.";
                 }
 
