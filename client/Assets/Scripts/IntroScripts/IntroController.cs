@@ -78,7 +78,7 @@ public class IntroController : MonoBehaviour {
     public void GameToMain()
     {
         if(ui.number_atoms_end_level.text != "0" && bb.is_score_valid)
-            xml.SaveXML(bb.level, ui.number_atoms_end_level.text, ui.time_to_save);
+            xml.SaveXML(bb.current_level, ui.number_atoms_end_level.text, ui.time_to_save);
 
         bb.Reset();
         ui.Reset_UI();

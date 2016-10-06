@@ -536,11 +536,11 @@ public class UIController : MonoBehaviour {
 
     public void LoadLevelDescription(int level_temp, int mesh_temp1, int mesh_temp2, int camera_zoom)
     {
-        BioBloxReference.level = level_temp;
-<<<<<<< HEAD
-        previous_level = BioBloxReference.level;
-        BioBloxReference.mesh_offset_1 = mesh_offset_temp_1 = mesh_temp1;
-        BioBloxReference.mesh_offset_2 = mesh_offset_temp_2 = mesh_temp2;
+        BioBloxReference.current_level = level_temp;
+//<<<<<<< HEAD
+        previous_level = BioBloxReference.current_level;
+        //BioBloxReference.mesh_offset_1 = mesh_offset_temp_1 = mesh_temp1;
+        //BioBloxReference.mesh_offset_2 = mesh_offset_temp_2 = mesh_temp2;
        
         MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_zoom;
         camera_distance = -camera_zoom;
@@ -549,10 +549,10 @@ public class UIController : MonoBehaviour {
 
     public void LoadLevelDescriptionIntro(string temp_title, string temp_description, Sprite temp_image, int level_temp)
     {
-=======
+//=======
         //BioBloxReference.mesh_offset_1 = mesh_temp1;
         //BioBloxReference.mesh_offset_2 = mesh_temp2;
->>>>>>> chains
+//>>>>>>> chains
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;
@@ -807,7 +807,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.game_time = 0;
         Reset_UI();
         CutAway.value = CutAway.minValue;
-        if (BioBloxReference.level == 0)
+        if (BioBloxReference.current_level == 0)
             BioBloxReference.ToggleMode.isOn = true;
         isOverUI = false;
         DeleteHarpoons();
