@@ -2140,7 +2140,6 @@ public class PDB_score {
         vdwScore = 0f;
         int charge1 = 0;
         int charge2 = 0;
-        //Debug.Log("recAtomLabels.Length: " + recAtomLabels.Length + " ligAtomLabels.Length: " + ligAtomLabels.Length + " ligAtomCoords.Length: " + ligAtomCoords.Length);
         // Check the distance between all ligand-receptor atom pairs.
         Matrix4x4 transfMat = recT.worldToLocalMatrix * ligT.localToWorldMatrix;
         for (int j = 0; j != ligAtomCoords.Length; ++j) {
@@ -2153,7 +2152,6 @@ public class PDB_score {
                     if (distance2 < 0.001) {
                         distance2 = 0.001f;
                     }
-                    //Debug.Log(recAtomLabels[j] + "_" + ligAtomLabels[j]);
                     string key = recAtomLabels[j] + "_" + ligAtomLabels[j];
 
                     charges.TryGetValue(ligAtomLabels[j], out charge1);
