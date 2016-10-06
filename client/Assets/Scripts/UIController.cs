@@ -537,6 +537,7 @@ public class UIController : MonoBehaviour {
     public void LoadLevelDescription(int level_temp, int mesh_temp1, int mesh_temp2, int camera_zoom)
     {
         BioBloxReference.level = level_temp;
+<<<<<<< HEAD
         previous_level = BioBloxReference.level;
         BioBloxReference.mesh_offset_1 = mesh_offset_temp_1 = mesh_temp1;
         BioBloxReference.mesh_offset_2 = mesh_offset_temp_2 = mesh_temp2;
@@ -548,6 +549,10 @@ public class UIController : MonoBehaviour {
 
     public void LoadLevelDescriptionIntro(string temp_title, string temp_description, Sprite temp_image, int level_temp)
     {
+=======
+        //BioBloxReference.mesh_offset_1 = mesh_temp1;
+        //BioBloxReference.mesh_offset_2 = mesh_temp2;
+>>>>>>> chains
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;

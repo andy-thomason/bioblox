@@ -30,12 +30,12 @@ public class OverlayRenderer : MonoBehaviour {
     public Material Atom_selected;
     public Material Atom_selected_fp;
 
-    Material material_to_use;
+    //Material material_to_use;
     UIController ui;
 
     public Camera lookat_camera;
     public GameObject Sphere_atom;
-    GameObject Sphere_atom_reference;
+    //GameObject Sphere_atom_reference;
     public GameObject Sphere_atom_holder;
     BioBlox bb;
     SFX sfx;

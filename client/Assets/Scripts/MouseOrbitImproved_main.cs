@@ -18,7 +18,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
 
     public float scroll_speed = 10;
 
-    private Rigidbody rigidbody;
+    //private Rigidbody rigidbody;
     public Texture2D cursor_move;
 
     Vector3 negDistance;

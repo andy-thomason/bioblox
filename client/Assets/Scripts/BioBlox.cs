@@ -20,20 +20,47 @@ public class BioBlox : MonoBehaviour
     //ScoreSheet scoreCard;
 
     // filenames for the levels, without the .txt
-    public List<string> filenames = new List<string> ();
+    //public List<string> filenames = new List<string> ();
 
     // the level we are currently on, incremented at the end of a level
     int current_level = 0;
 
+    struct Level {
+      public string pdbFile;
+      public string chainsA;
+      public string chainsB;
+      public string lod;
+      public Vector3 offset;
+      public float separation;
+
+      public Level(string pdbFile, string chainsA, string chainsB, string lod, Vector3 offset, float separation) {
+        this.pdbFile = pdbFile;
+        this.chainsA = chainsA;
+        this.chainsB =chainsB;
+        this.lod = lod;
+        this.offset = offset;
+        this.separation = separation;
+      }
+    };
+
+    Level[] levels = {
+       new Level("2PTC", "E", "I", "1", new Vector3(-20, 0, 0), 40)
+    };
+
     // a holder variable for the current event system
     EventSystem eventSystem;
     //files
-    List<string> filename_levels = new List<string>();
+    //List<string> filename_levels = new List<string>();
 
     //levels name
+<<<<<<< HEAD
     List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
     List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
     List<Tuple<string, string>> level_mesh_carbon = new List<Tuple<string, string>>();
+=======
+    //List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
+    //List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
+>>>>>>> chains
     //public Dictionary<string, string> level_mesh_default = new Dictionary<string, string>{
     //    {"0",  "1"}, {"4KC3_A_se_1",  "4KC3_B_se_1"}
     //};
@@ -147,8 +174,8 @@ public class BioBlox : MonoBehaviour
     public GameObject HintText;
     public GameObject ExitTutorialButton;
     int[] meshes_offset = new int[] {-1,-2,-3};
-    public int mesh_offset_1;
-    public int mesh_offset_2;
+    //public int mesh_offset_1;
+    //public int mesh_offset_2;
     public bool is_score_valid;
     public float game_time = 0;
     bool playing = false;
@@ -187,7 +214,7 @@ public class BioBlox : MonoBehaviour
         uiController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
         //filenames 
-        filename_levels.Add("2PTC");
+        /*filename_levels.Add("2PTC");
         filename_levels.Add("4KC3");
         filename_levels.Add("1FSS");
         filename_levels.Add("1EMV");
@@ -195,6 +222,7 @@ public class BioBlox : MonoBehaviour
         filename_levels.Add("1OHZ"); 
         filename_levels.Add("2VIR");
         //fill the levels
+
         //name of the meshes in Resources/Mesh - normal one with cutaway material
         level_mesh_default.Add(new Tuple<string, string>("0", "1"));
         level_mesh_default.Add(new Tuple<string, string>("4KC3_A_se_1", "4KC3_B_se_1"));
@@ -203,6 +231,7 @@ public class BioBlox : MonoBehaviour
         level_mesh_default.Add(new Tuple<string, string>("1GRN_A_se_1", "1GRN_B_se_1"));
         level_mesh_default.Add(new Tuple<string, string>("1OHZ_A_se_1", "1OHZ_B_se_1"));
         level_mesh_default.Add(new Tuple<string, string>("2VIR_AB_se_1", "2VIR_C_se_1"));
+
         //name of the meshes in Resources/Mesh - ball and stick renderer
         level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1", "2PTC_I_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("4KC3_A_bs_1", "4KC3_B_bs_1"));
@@ -210,6 +239,7 @@ public class BioBlox : MonoBehaviour
         level_mesh_bs.Add(new Tuple<string, string>("1EMV_A_bs_1", "1EMV_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1GRN_A_bs_1", "1GRN_B_bs_1"));
         level_mesh_bs.Add(new Tuple<string, string>("1OHZ_A_bs_1", "1OHZ_B_bs_1"));
+<<<<<<< HEAD
         level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));
         //name of the meshes in Resources/Mesh - ball and stick renderer
         level_mesh_carbon.Add(new Tuple<string, string>("2PTC_E_ca_1", "2PTC_I_ca_1"));
@@ -219,6 +249,9 @@ public class BioBlox : MonoBehaviour
         level_mesh_carbon.Add(new Tuple<string, string>("1GRN_A_ca_1", "1GRN_B_ca_1"));
         level_mesh_carbon.Add(new Tuple<string, string>("1OHZ_A_ca_1", "1OHZ_B_ca_1"));
         //level_mesh_carbon.Add(new Tuple<string, string>("2VIR_AB_ca_1", "2VIR_C_ca_1"));
+=======
+        level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));*/
+>>>>>>> chains
     }
 
     public void StartGame()
@@ -263,11 +296,16 @@ public class BioBlox : MonoBehaviour
         //filenames.Add ("betabarrel_b");
         //filenames.Add("2ptc_u_new_edited");
         //empty fiels name
+<<<<<<< HEAD
         filenames.Clear();
         //set the fielanem
         filenames.Add(filename_levels[level]);
         //set the hint image
         uiController.SetHintImage(filename_levels[level]);
+=======
+        //filenames.Clear();
+        //filenames.Add(filename_levels[level]);
+>>>>>>> chains
 
 
         StartCoroutine(game_loop());
@@ -295,7 +333,7 @@ public class BioBlox : MonoBehaviour
     }
     public string GetCurrentLevelName ()
     {
-        return filenames [current_level];
+        return levels[current_level].pdbFile;
     }
 
     //converts an atom serial number (unique file identifier) into a index
@@ -789,12 +827,11 @@ public class BioBlox : MonoBehaviour
     }
 
     // set the object to its initial position etc.
-    void reset_molecule(GameObject obj, float xoffset, int molNum)
+    void reset_molecule(GameObject obj, int molNum, Vector3 offset)
     {
         PDB_mesh p = obj.GetComponent<PDB_mesh> ();
         Rigidbody ri = obj.AddComponent<Rigidbody> ();
         PDB_molecule mol = p.mol;
-        //obj.AddComponent<AsteriodController>();
 
         float mass = 1000;
         float r = mol.bvh_radii [0] * 0.5f;
@@ -806,21 +843,8 @@ public class BioBlox : MonoBehaviour
         ri.mass = mass;
         ri.inertiaTensor = new Vector3 (val, val, val);
 
-        obj.transform.Translate ((mol.bvh_radii [0] * xoffset) * 0.7f, 0, 0);
-        //obj.transform.Translate (xoffset * 30, 0, 0);
+        obj.transform.Translate (offset);
         obj.transform.Rotate (0, 0, 270);
-        obj.transform.Translate (mol.pos.x, mol.pos.y, mol.pos.z);
-
-        //obj.transform.rotation = Random.rotation;
-
-        //if this is the simple game load in labels from the file
-        /*if (simpleGame) {
-            for (int i=0; i<mol.labels.Length; ++i) {
-                if (mol.labels [i].atomIds.Count > 0) {
-                    CreateLabel (p.mol.labels [i], molNum, "Label" + i + "mol" + name, mol);
-                }
-            }
-        }*/
     }
 
 
@@ -850,30 +874,61 @@ public class BioBlox : MonoBehaviour
 
     // create both molecules
     void make_molecules(bool init, MeshTopology mesh_type) {
-        //Debug.Log ("make_molecules");
-        string file = filenames [current_level];
+        Level level = levels[current_level];
         
+<<<<<<< HEAD
         GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
         mol1.transform.SetParent(Molecules);
         GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
         mol2.transform.SetParent(Molecules);
+=======
+        // These filenames refer to the prefabs in Assets/Resources/Mesh
+        string mol1_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+        string mol2_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
+        string mol1_bs_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod;
+        string mol2_bs_filename = "Mesh/" + level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod;
 
-        GameObject mol1_mesh = Instantiate(Resources.Load("Mesh/"+level_mesh_default[level].First)) as GameObject;
+        // Make two PDB_mesh instances from the PDB file and a chain selection.
+        GameObject mol1 = make_molecule (level.pdbFile + "." + level.chainsA, "Proto1", 7, mesh_type, 0);
+        GameObject mol2 = make_molecule (level.pdbFile + "." + level.chainsB, "Proto2", 7, mesh_type, 1);
+>>>>>>> chains
+
+        GameObject mol1_mesh = Instantiate(Resources.Load(mol1_se_filename)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
 
-        GameObject mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
+        GameObject mol2_mesh = Instantiate(Resources.Load(mol2_se_filename)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
 
-        //Ioannis
+        // Ioannis
         scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
+<<<<<<< HEAD
         //ball and stick 1
         mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
+=======
+        // transparent 1
+        mol1_mesh = Instantiate(Resources.Load(mol1_se_filename)) as GameObject;
+        mol1_mesh.transform.SetParent(mol1.transform);
+        mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(mol1_mesh);
+        mol1_mesh.SetActive(false);
+
+        // transparent 2
+        mol2_mesh = Instantiate(Resources.Load(mol2_se_filename)) as GameObject;
+        mol2_mesh.transform.SetParent(mol2.transform);
+        mol2_mesh.name = "transparent_p2";
+        FixTransparentMolecule(mol2_mesh);
+        mol2_mesh.SetActive(false);
+
+        // ball and stick 1
+        mol1_mesh = Instantiate(Resources.Load(mol1_bs_filename)) as GameObject;
+>>>>>>> chains
         mol1_mesh.transform.SetParent(mol1.transform);
         mol1_mesh.name = "bs_p1";
         mol1_mesh.SetActive(false);
-        //ball and stick 2
-        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].Second)) as GameObject;
+
+        // ball and stick 2
+        mol2_mesh = Instantiate(Resources.Load(mol2_bs_filename)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
         mol2_mesh.name = "bs_p2";
         mol2_mesh.SetActive(false);
@@ -933,15 +988,10 @@ public class BioBlox : MonoBehaviour
             molecules = new GameObject[2];
             molecules [0] = mol1.gameObject;
             molecules [1] = mol2.gameObject;
+            Vector3 xoff = new Vector3(level.separation, 0, 0);
 
-            //float offset = meshes_offset[mesh_offset_index];
-            //float offset_distance = Mathf.Abs(meshes_offset[mesh_offset_index]) + 1;
-            int molNum = 0;
-            foreach (GameObject obj in molecules)
-            {
-                reset_molecule(obj, mesh_offset_1, molNum++);
-                mesh_offset_1 += mesh_offset_2;
-            }
+            reset_molecule(molecules[0], 0, level.offset - xoff);
+            reset_molecule(molecules[1], 1, level.offset + xoff);
         }
     }
 
@@ -966,7 +1016,7 @@ public class BioBlox : MonoBehaviour
                 Debug.Log("start level " + current_level);
                 //if true, we have no more levels listed in the vector
                 //to be replaced with level selection. Talk to andy on PDB file selection
-                if (current_level >= filenames.Count)
+                if (current_level >= levels.Length)
                 {
                     Debug.LogError("No next level");
                     current_level = 0;
@@ -1117,7 +1167,7 @@ public class BioBlox : MonoBehaviour
 
                     Debug.Log("current_level=" + current_level);
                     current_level++;
-                    if (current_level == filenames.Count)
+                    if (current_level == levels.Length)
                     {
                         Debug.Log("End of levels");
                         current_level = 0;
@@ -1561,9 +1611,14 @@ public class BioBlox : MonoBehaviour
         TutorialHand.position = new Vector3(6000.0f, 0, 0);
     }
 
+<<<<<<< HEAD
     public Material transparent_0;
     public Material transparent_1;
     bool switch_material = true;
+=======
+    public Material transparent_material;
+    //bool switch_material = true;
+>>>>>>> chains
 
     //fix the transparent molecule
     public void FixTransparentMolecule(GameObject protein, int id_protein)
