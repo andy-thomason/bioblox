@@ -37937,14 +37937,13 @@ MonoBehaviour:
   ExitTutorialButton: {fileID: 907967345}
   is_score_valid: 0
   game_time: 0
-  Molecules: {fileID: 0}
+  Molecules: {fileID: 268347350}
   game_state: 0
   game_status: 0
   hint_stage: 0
   work_done: 0
-  transparent_0: {fileID: 0}
-  transparent_1: {fileID: 0}
-  transparent_material: {fileID: 0}
+  transparent_0: {fileID: 2100000, guid: 9e72a4f45526f3e4c85c1dc68e794eae, type: 2}
+  transparent_1: {fileID: 2100000, guid: 68e9fc130e3f8464fa1ff81baad4ac4d, type: 2}
 --- !u!114 &913013348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -38047,9 +38046,9 @@ MonoBehaviour:
   HintPanel: {fileID: 95891676}
   HintPanelOpen: {fileID: 787862198}
   HintPanelClose: {fileID: 1624139460}
-  HintImage: {fileID: 1560643300}
-  FixProtein1Toggle: {fileID: 0}
-  FixProtein2Toggle: {fileID: 0}
+  HintImage: {fileID: 1425595132}
+  FixProtein1Toggle: {fileID: 511841512}
+  FixProtein2Toggle: {fileID: 1167817083}
   LevelClickled: {fileID: 0}
   A1R: {fileID: 737148250}
   A1L: {fileID: 1997617908}
@@ -81500,7 +81499,11 @@ MonoBehaviour:
   lookat_camera: {fileID: 1348893749}
   Sphere_atom: {fileID: 198170, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   Sphere_atom_holder: {fileID: 1803283717}
-  atom_material: []
+  atom_material:
+  - {fileID: 2100000, guid: ab8ad56a626745d4493ebb26173ec4fc, type: 2}
+  - {fileID: 2100000, guid: cdecaee07fbb53e448098b82895c13ce, type: 2}
+  - {fileID: 2100000, guid: b46c051696c13ef42bd8b531da8e8566, type: 2}
+  - {fileID: 2100000, guid: 4404180198f2ad947a9ae9d39faf346e, type: 2}
 --- !u!4 &1958373725
 Transform:
   m_ObjectHideFlags: 0

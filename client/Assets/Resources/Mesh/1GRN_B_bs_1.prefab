@@ -1,13 +1,58 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &-858769978
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1000010745658252}
+  m_IsPrefabParent: 1
+--- !u!1 &1000010613085524
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 493358}
+  - 4: {fileID: 4000013655941596}
+  - 33: {fileID: 33000010667368636}
+  - 23: {fileID: 23000013590929706}
+  m_Layer: 0
+  m_Name: Cube_MeshPart0
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1000010745658252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000013421100708}
+  m_Layer: 0
+  m_Name: 1GRN_B_bs_1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1000013556626886
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000013658639026}
+  - 33: {fileID: 33000013795445470}
+  - 23: {fileID: 23000013996712158}
   m_Layer: 0
   m_Name: Cube_MeshPart1
   m_TagString: Untagged
@@ -15,14 +60,16 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!1 &-826721820
+--- !u!1 &1000013588675044
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 445654}
+  - 4: {fileID: 4000013591807522}
+  - 33: {fileID: 33000011611018274}
+  - 23: {fileID: 23000013141969800}
   m_Layer: 0
   m_Name: Cube_MeshPart2
   m_TagString: Untagged
@@ -30,53 +77,59 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &403790
+--- !u!4 &4000013421100708
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 625228684}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_GameObject: {fileID: 1000010745658252}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 14.3, y: 5.7, z: -27.6}
+  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 4000013655941596}
+  - {fileID: 4000013658639026}
+  - {fileID: 4000013591807522}
   m_Father: {fileID: 0}
-  m_RootOrder: 56
---- !u!4 &445654
+  m_RootOrder: 0
+--- !u!4 &4000013591807522
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: -826721820}
+  m_GameObject: {fileID: 1000013588675044}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 54
---- !u!4 &478626
+  m_Father: {fileID: 4000013421100708}
+  m_RootOrder: 2
+--- !u!4 &4000013655941596
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 492655956}
+  m_GameObject: {fileID: 1000010613085524}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 55
---- !u!4 &493358
+  m_Father: {fileID: 4000013421100708}
+  m_RootOrder: 0
+--- !u!4 &4000013658639026
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: -858769978}
+  m_GameObject: {fileID: 1000013556626886}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-<<<<<<< HEAD
   m_Father: {fileID: 4000013421100708}
   m_RootOrder: 1
 --- !u!23 &23000013141969800
@@ -175,48 +228,15 @@ MeshFilter:
   m_Mesh: {fileID: 4300000, guid: 62c1aeafc34de684b861050d5ce302d7, type: 3}
 --- !u!33 &33000011611018274
 MeshFilter:
-=======
-  m_Father: {fileID: 0}
-  m_RootOrder: 53
---- !u!1001 &100100000
-Prefab:
->>>>>>> chains
   m_ObjectHideFlags: 1
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications: []
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 0}
-  m_IsPrefabParent: 1
---- !u!1 &492655956
-GameObject:
-  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 478626}
-  m_Layer: 0
-  m_Name: Cube_MeshPart0
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &625228684
-GameObject:
-  m_ObjectHideFlags: 0
+  m_GameObject: {fileID: 1000013588675044}
+  m_Mesh: {fileID: 4300004, guid: 62c1aeafc34de684b861050d5ce302d7, type: 3}
+--- !u!33 &33000013795445470
+MeshFilter:
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 403790}
-  m_Layer: 0
-  m_Name: 1GRN_B_bs_1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_GameObject: {fileID: 1000013556626886}
+  m_Mesh: {fileID: 4300002, guid: 62c1aeafc34de684b861050d5ce302d7, type: 3}

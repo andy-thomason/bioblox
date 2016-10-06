@@ -306,7 +306,6 @@ public void StartGame()
         ////set the fielanem
         //filenames.Add(filename_levels[level]);
         //set the hint image
-        //uiController.SetHintImage(filename_levels[level]); //HINT
 //=======
         //filenames.Clear();
         //filenames.Add(filename_levels[level]);
@@ -880,13 +879,15 @@ public void StartGame()
     // create both molecules
     void make_molecules(bool init, MeshTopology mesh_type) {
         Level level = levels[current_level];
-        
-//<<<<<<< HEAD
-//        GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
-//        mol1.transform.SetParent(Molecules);
-//        GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
-//        mol2.transform.SetParent(Molecules);
-//=======
+
+        uiController.SetHintImage(level.pdbFile); //HINT
+
+        //<<<<<<< HEAD
+        //        GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
+        //        mol1.transform.SetParent(Molecules);
+        //        GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
+        //        mol2.transform.SetParent(Molecules);
+        //=======
         // These filenames refer to the prefabs in Assets/Resources/Mesh
         string mol1_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
         string mol2_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
@@ -897,7 +898,9 @@ public void StartGame()
 
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         GameObject mol1 = make_molecule (level.pdbFile + "." + level.chainsA, "Proto1", 7, mesh_type, 0);
+        mol1.transform.SetParent(Molecules);
         GameObject mol2 = make_molecule (level.pdbFile + "." + level.chainsB, "Proto2", 7, mesh_type, 1);
+        mol2.transform.SetParent(Molecules);
 
         //DEFAULT
         GameObject mol1_mesh = Instantiate(Resources.Load(mol1_se_filename)) as GameObject;
@@ -912,35 +915,35 @@ public void StartGame()
         //BALLS AND STICK 1
         mol1_mesh = Instantiate(Resources.Load(mol1_bs_filename)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
-        mol1_mesh.name = "bs_p1";
+        //mol1_mesh.name = "bs_p1";
         mol1_mesh.SetActive(false);
         //BALLS AND STICK 1
         mol2_mesh = Instantiate(Resources.Load(mol2_bs_filename)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
-        mol2_mesh.name = "bs_p2";
+        //mol2_mesh.name = "bs_p2";
         mol2_mesh.SetActive(false);
 
         //CARBON ALPHA 1
         mol1_mesh = Instantiate(Resources.Load(mol1_ca_filename)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
-        mol1_mesh.name = "ca_p1";
+        //mol1_mesh.name = "ca_p1";
         mol1_mesh.SetActive(false);
         //CARBON ALPHA 2
         mol2_mesh = Instantiate(Resources.Load(mol2_ca_filename)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
-        mol2_mesh.name = "ca_p2";
+        //mol2_mesh.name = "ca_p2";
         mol2_mesh.SetActive(false);
 
         //TRANSPARENT 1
         mol1_mesh = Instantiate(Resources.Load(mol1_se_filename)) as GameObject;
         mol1_mesh.transform.SetParent(mol1.transform);
-        mol1_mesh.name = "transparent_p1";
+       // mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol1_mesh, 0);
         mol1_mesh.SetActive(false);
         //TRANSPARENT 2
         mol2_mesh = Instantiate(Resources.Load(mol2_se_filename)) as GameObject;
         mol2_mesh.transform.SetParent(mol2.transform);
-        mol2_mesh.name = "transparent_p1";
+        //mol2_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol2_mesh, 1);
         mol2_mesh.SetActive(false);
 
@@ -1657,8 +1660,6 @@ public void StartGame()
     public Material transparent_0;
     public Material transparent_1;
     bool switch_material = true;
-//=======
-    public Material transparent_material;
     //bool switch_material = true;
 //>>>>>>> chains
 

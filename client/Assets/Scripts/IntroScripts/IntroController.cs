@@ -80,9 +80,9 @@ public class IntroController : MonoBehaviour {
         if(ui.number_atoms_end_level.text != "0" && bb.is_score_valid)
             xml.SaveXML(bb.current_level, ui.number_atoms_end_level.text, ui.time_to_save);
 
+        bb.game_status = BioBlox.GameStatus.MainScreen;
         bb.Reset();
         ui.Reset_UI();
-        bb.game_status = BioBlox.GameStatus.MainScreen;
         ui.EndLevelPanel.SetActive(false);
         intro_light.enabled = true;
         GameCanvas.alpha = 0;

@@ -1,9 +1,5 @@
 <?xml version="1.0"?>
-<<<<<<< HEAD
-<database current_instance="41">
-=======
-<database current_instance="13">
->>>>>>> chains
+<database current_instance="42">
   <instance number="1" level="0" atoms="0" time="0" />
   <instance number="2" level="4" atoms="66" time="38.16756" />
   <instance number="3" level="4" atoms="72" time="45.07877" />
@@ -16,7 +12,6 @@
   <instance number="10" level="3" atoms="8" time="9.782974" />
   <instance number="11" level="3" atoms="34" time="12.59183" />
   <instance number="12" level="4" atoms="3" time="8.390301" />
-<<<<<<< HEAD
   <instance number="13" level="4" atoms="37" time="28.28033" />
   <instance number="14" level="1" atoms="20" time="27.54531" />
   <instance number="15" level="3" atoms="8" time="4.957446" />
@@ -46,7 +41,5 @@
   <instance number="39" level="0" atoms="28" time="9.468569" />
   <instance number="40" level="0" atoms="72" time="68.87046" />
   <instance number="41" level="0" atoms="72" time="161.1958" />
-=======
-  <instance number="13" level="0" atoms="72" time="88.04307" />
->>>>>>> chains
+  <instance number="42" level="0" atoms="12" time="15.4426" />
 </database>
