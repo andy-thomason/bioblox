@@ -11,13 +11,16 @@ public class AminoConnectionHolder : MonoBehaviour {
     GameObject AminoPanel1;
     GameObject AminoPanel2;
     SFX sfx;
+    UIController ui;
 	
 	public void UpdateLink()
 	{		
 		FindObjectOfType<ConnectionManager> ().DeleteAminoAcidLink (connection);
 		FindObjectOfType<AminoSliderController> ().RestoreDeletedAminoButtons (ID_button1, ID_button2);
 		FindObjectOfType<ConnectionManager> ().DisableSlider ();
-		Destroy (gameObject);
+        ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+        ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+        Destroy (gameObject);
 	}
 
     public void DeleteLink()
@@ -37,12 +40,15 @@ public class AminoConnectionHolder : MonoBehaviour {
 		FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button1);
         FindObjectOfType<AminoSliderController>().UpdateCurrentButtonA1(ID_button1);
         FindObjectOfType<AminoSliderController>().HighLight3DMeshAll(ID_button1, ID_button2);
+        ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+        ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
     }
 
     void Awake()
 	{
 		distancia = GetComponentInChildren<Text> ();
         sfx = FindObjectOfType<SFX>();
+        ui = FindObjectOfType<UIController>();
         AminoPanel1 = GameObject.Find("ContentPanelA1").gameObject;
         AminoPanel2 = GameObject.Find("ContentPanelA2").gameObject;
     }

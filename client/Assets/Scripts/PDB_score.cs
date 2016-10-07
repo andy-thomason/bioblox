@@ -2152,10 +2152,10 @@ public class PDB_score {
                     if (distance2 < 0.001) {
                         distance2 = 0.001f;
                     }
-                    string key = recAtomLabels[j] + "_" + ligAtomLabels[j];
+                    string key = recAtomLabels[i] + "_" + ligAtomLabels[j];
 
                     charges.TryGetValue(ligAtomLabels[j], out charge1);
-                    charges.TryGetValue(recAtomLabels[j], out charge2);
+                    charges.TryGetValue(recAtomLabels[i], out charge2);
                     float elec = (332.053986f * charge1 * charge2) / (15.0f * distance2);
 
                     // dvd: stands for dividend

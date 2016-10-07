@@ -146,6 +146,13 @@ public class UIController : MonoBehaviour {
 
     int number_of_meshes;
 
+    public int p1_atom_status;
+    public int p2_atom_status;
+    public enum p_atom_status_enum { find_atoms, done };
+    public GameObject[] atom_buttons = new GameObject[4];
+    public Transform p1_atom_holder;
+    public Transform p2_atom_holder;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -160,6 +167,9 @@ public class UIController : MonoBehaviour {
     public void init()
     {
         number_of_meshes = BioBloxReference.molecules[0].transform.childCount;
+        //DONT FIND ATOMS
+        p1_atom_status = 0;
+        p2_atom_status = 0;
     }
 
 
@@ -254,6 +264,7 @@ public class UIController : MonoBehaviour {
                     BioBloxReference.molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
                     BioBloxReference.molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
                     aminoSliderController.DeselectAmino();
+                    DeselectAtoms();
                 }
             }
         }
@@ -890,5 +901,49 @@ public class UIController : MonoBehaviour {
         A1R.SetActive(status);
         A2R.SetActive(status);
     }
+
+    public void P1CreateAtomButtons(List<int> atoms)
+    {
+        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
+
+        foreach(int atomo in atoms) Instantiate(atom_buttons[atomo]).transform.SetParent(p1_atom_holder);
+    }
+
+    public void P2CreateAtomButtons(List<int> atoms)
+    {
+        foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
+
+        foreach (int atomo in atoms) Instantiate(atom_buttons[atomo]).transform.SetParent(p2_atom_holder);
+    }
+
+    void DeselectAtoms()
+    {
+
+        foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
+        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
+    }
+
+    #region TOGGLE GAME MODE
+
+    public Slider slider_game_mode;
+    float previous_slider_value = 0;
+
+    public void GameModeClick()
+    {
+        if(slider_game_mode.value == previous_slider_value)
+            slider_game_mode.value = slider_game_mode.value == 0 ? slider_game_mode.maxValue : slider_game_mode.minValue;
+
+        previous_slider_value = slider_game_mode.value;
+    }
+
+    public void GameModeSlider()
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
+        p1_atom_holder.parent.gameObject.SetActive(slider_game_mode.value == 1 ? true : false);
+        p2_atom_holder.parent.gameObject.SetActive(slider_game_mode.value == 1 ? true : false);
+        score_panel_alpha.alpha = slider_game_mode.value == 0 ? 0 : 1;
+    }
+
+    #endregion
 
 }

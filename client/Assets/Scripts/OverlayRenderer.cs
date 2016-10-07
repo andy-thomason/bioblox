@@ -40,6 +40,8 @@ public class OverlayRenderer : MonoBehaviour {
     BioBlox bb;
     SFX sfx;
     public Material[] atom_material;
+    List<int> p1_atomos = new List<int>();
+    List<int> p2_atomos = new List<int>();
 
     // Use this for initialization
     void Start ()
@@ -81,7 +83,6 @@ public class OverlayRenderer : MonoBehaviour {
                 Color32 selected = new Color32(128, 128, 0, (byte)(63.0f*c10+192));
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
-                int atomos = 0;
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
                     bool is_selected = j < sel.Length && sel[j];
@@ -133,8 +134,10 @@ public class OverlayRenderer : MonoBehaviour {
                                 )
                             );
                         }
-                        //ATOMS DESCRIPTION
-                        atomos++;
+                        //get ATOMS DESCRIPTION
+                        if(i == 0) p1_atomos.Add(atom);
+                        else p2_atomos.Add(atom);
+
                     }
                     else if (is_selected && ui.is_hovering)
                     {
@@ -179,8 +182,22 @@ public class OverlayRenderer : MonoBehaviour {
                         }
                     }
                 }
-                Debug.Log("atomos: "+ atomos);
             }
+
+            if (ui.p1_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
+            {
+                ui.P1CreateAtomButtons(p1_atomos);
+                ui.p1_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
+            }
+
+            if (ui.p2_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
+            {
+                ui.P2CreateAtomButtons(p2_atomos);
+                ui.p2_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
+            }
+
+            p1_atomos.Clear();
+            p2_atomos.Clear();
         }
 
         if (lookat_camera == null) {

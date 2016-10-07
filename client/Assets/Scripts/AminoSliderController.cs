@@ -282,7 +282,8 @@ public class AminoSliderController : MonoBehaviour {
 			A1Buttons [CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
             ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
 			A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().HighLight ();
-		} else
+		}
+        else
 		{
 			A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
             CurrentButtonA2 = index;
