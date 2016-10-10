@@ -152,6 +152,7 @@ public class UIController : MonoBehaviour {
     public GameObject[] atom_buttons = new GameObject[4];
     public Transform p1_atom_holder;
     public Transform p2_atom_holder;
+    OverlayRenderer or;
 
     void Awake()
 	{
@@ -162,6 +163,7 @@ public class UIController : MonoBehaviour {
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
+        or = FindObjectOfType<OverlayRenderer>();
     }
 
     public void init()
@@ -493,7 +495,7 @@ public class UIController : MonoBehaviour {
         Tutorial.isOn = false;
         explore_view = true;
         MainCamera.GetComponent<Animator>().SetBool("Start", true);
-        MainCanvas.SetActive(false);
+        //MainCanvas.SetActive(false);
         ChangeCCTVShip();
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
         SaveButton.SetActive(false);
@@ -641,7 +643,7 @@ public class UIController : MonoBehaviour {
         }
     }
 
-    bool cutawayON = false;
+    public bool cutawayON = false;
 
     public void CutAwayTool()
     {
@@ -657,38 +659,6 @@ public class UIController : MonoBehaviour {
                 }
             }
         }
-
-        //if (DropDownP1.value == protein_render.normal.GetHashCode())
-        //{
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(0).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-        //    }
-        //}
-
-        //if (DropDownP1.value == protein_render.bs.GetHashCode())
-        //{
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[0].transform.GetChild(2).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-        //    }
-        //}
-
-        //if (DropDownP2.value == protein_render.normal.GetHashCode())
-        //{
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(0).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-        //    }
-        //}
-
-        //if (DropDownP2.value == protein_render.bs.GetHashCode())
-        //{
-        //    foreach (Transform molecule_renderer in BioBloxReference.molecules[1].transform.GetChild(2).transform)
-        //    {
-        //        molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
-        //    }
-        //}
 
         cutaway_wall.localPosition = new Vector3(0, 0, CutAway.value);
 
@@ -713,6 +683,9 @@ public class UIController : MonoBehaviour {
             //shadow off
             Shadows(false, 0);
             Shadows(false, 1);
+            //delete overlays - when cutaway active
+            or.clear_spheres();
+            or.clear();
         }
 
     }
@@ -835,6 +808,7 @@ public class UIController : MonoBehaviour {
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
+        slider_game_mode.value = 0;
     }
 
     //tool panel

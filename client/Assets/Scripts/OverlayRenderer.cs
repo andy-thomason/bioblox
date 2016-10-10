@@ -60,7 +60,7 @@ public class OverlayRenderer : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (bb && bb.game_status == BioBlox.GameStatus.GameScreen)
+        if (bb && bb.game_status == BioBlox.GameStatus.GameScreen && !ui.cutawayON)
         {
             clear_spheres();
             clear();

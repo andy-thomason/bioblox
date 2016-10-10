@@ -68,16 +68,16 @@ public class ShipController : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 
-       /* time_rotation_acu += Time.fixedDeltaTime;
+        /* time_rotation_acu += Time.fixedDeltaTime;
 
-        if(Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetKey(KeyCode.I) || Input.GetKey(KeyCode.O) || Input.GetKey(KeyCode.LeftShift))
-        {
-            time_rotation_acu = 0;
-            time_rotation = 1;
-        }
-        if (time_rotation_acu > 4)
-            time_rotation = 10;
-            */
+         if(Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0 || Input.GetKey(KeyCode.I) || Input.GetKey(KeyCode.O) || Input.GetKey(KeyCode.LeftShift))
+         {
+             time_rotation_acu = 0;
+             time_rotation = 1;
+         }
+         if (time_rotation_acu > 4)
+             time_rotation = 10;
+             */
         /*if (Physics.Raycast(transform.position, Vector3.down, 3))
             GetComponent<Rigidbody>().AddForce(Vector3.up * 2);*/
 
@@ -91,32 +91,33 @@ public class ShipController : MonoBehaviour {
              GetComponent<Rigidbody>().AddForce(appliedHoverForce, ForceMode.Acceleration);
          }*/
 
+        //                  COLLISION ------------********************************
+        //BvhSphereCollider molecule_1 = new BvhSphereCollider(bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, transform.position, 2.0f);
+        //BvhSphereCollider molecule_2 = new BvhSphereCollider(bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, transform.position, 2.0f);
 
-        BvhSphereCollider molecule_1 = new BvhSphereCollider(bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, transform.position, 2.0f);
-        BvhSphereCollider molecule_2 = new BvhSphereCollider(bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, transform.position, 2.0f);
+        //if (molecule_1.results.Count > 0)
+        //{
+        //    for (int i = 0; i < molecule_1.results.Count; i++)
+        //    {
+        //        Vector3 dir = transform.position - bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]);
+        //        //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
+        //        dir = dir.normalized;
+        //        GetComponent<Rigidbody>().AddForce((dir * 250));
+        //    }
+        //}
 
-        if (molecule_1.results.Count > 0)
-        {
-            for (int i = 0; i < molecule_1.results.Count; i++)
-            {
-                Vector3 dir = transform.position - bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]);
-                //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
-                dir = dir.normalized;
-                GetComponent<Rigidbody>().AddForce((dir * 250));
-            }
-        }
-
-        if (molecule_2.results.Count > 0)
-        {
-            for (int i = 0; i < molecule_2.results.Count; i++)
-            {
-                Vector3 dir = transform.position - bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[molecule_2.results[i].index]);
-                //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
-                dir = dir.normalized;
-                GetComponent<Rigidbody>().AddForce((dir * 250));
-            }
-        }
+        //if (molecule_2.results.Count > 0)
+        //{
+        //    for (int i = 0; i < molecule_2.results.Count; i++)
+        //    {
+        //        Vector3 dir = transform.position - bb.molecules[1].transform.TransformPoint(bb.molecules[1].GetComponent<PDB_mesh>().mol.atom_centres[molecule_2.results[i].index]);
+        //        //float distancia = Vector3.Distance(transform.position, bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[i].index]));
+        //        dir = dir.normalized;
+        //        GetComponent<Rigidbody>().AddForce((dir * 250));
+        //    }
+        //}
         //Debug.Log(bb.molecules[0].transform.TransformPoint(bb.molecules[0].GetComponent<PDB_mesh>().mol.atom_centres[molecule_1.results[0].index]));
+        //                  COLLISION ------------********************************
 
         /*float altitude = PDB_molecule.collide_ray_distance_object(bb.molecules[0].gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, new Ray(transform.position, -transform.up), gameObject);
         if (altitude < 3.0f)

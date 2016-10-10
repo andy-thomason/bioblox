@@ -115,7 +115,7 @@ Material:
       second: {r: 0.8014706, g: 0.8014706, b: 0.8014706, a: 1}
     - first:
         name: _CutawayColor
-      second: {r: 1, g: 0, b: 0, a: 0.78431374}
+      second: {r: 1, g: 0, b: 0, a: 0.39215687}
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}
