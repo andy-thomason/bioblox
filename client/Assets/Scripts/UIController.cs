@@ -153,7 +153,13 @@ public class UIController : MonoBehaviour {
     public Transform p1_atom_holder;
     public Transform p2_atom_holder;
     OverlayRenderer or;
-
+    #region EXPLORER VIEW
+    //reference for ship/explore view to know which one is being scanned
+    public int protein_scanned;
+    public Text atom_name;
+    GameObject space_ship;
+    public Animator FadeCanvasToExplore;
+    #endregion
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -164,6 +170,7 @@ public class UIController : MonoBehaviour {
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
+        space_ship = Resources.Load("Ship") as GameObject;
     }
 
     public void init()
@@ -481,41 +488,25 @@ public class UIController : MonoBehaviour {
         //if(ToggleFreeCameraStatus)
         //ToggleFreeCamera();
     }
+    
 
-    public void StartExplore()
-    {
-
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        sfx.PlayTrack(SFX.sound_index.camera_shrink);
-        //RenderSettings.skybox = space_skybox;
-        //floor.SetActive(false);
-        isOverUI = false;
-        RepositionCameraWOMovement();
-        CutAway.value = CutAway.minValue;
-        Tutorial.isOn = false;
-        explore_view = true;
-        MainCamera.GetComponent<Animator>().SetBool("Start", true);
-        //MainCanvas.SetActive(false);
-        ChangeCCTVShip();
-        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        SaveButton.SetActive(false);
-    }
-
-    public void EndExplore()
-    {
-        //RenderSettings.skybox = normal_skybox;
-        // floor.SetActive(true);
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        sfx.PlayTrack(SFX.sound_index.camera_shrink);
-        sfx.StopTrack(SFX.sound_index.ship);
-        explore_view = false;
-        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-        MainCamera.GetComponent<Animator>().SetBool("Start", false);
-        if (explorerController.beacon_holder.Count > 0)
-            ToggleBeacon.isOn = true;
-        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
-        SaveButton.SetActive(true);
-    }
+    //public void EndExplore()
+    //{
+    //    //RenderSettings.skybox = normal_skybox;
+    //    // floor.SetActive(true);
+    //    sfx.PlayTrack(SFX.sound_index.button_click);
+    //    sfx.PlayTrack(SFX.sound_index.camera_shrink);
+    //    sfx.StopTrack(SFX.sound_index.ship);
+    //    MainCamera.GetComponent<Camera>().enabled = true;
+    //    explore_view = false;
+    //    Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    //    MainCamera.GetComponent<Animator>().SetBool("Start", false);
+    //    if (explorerController.beacon_holder.Count > 0)
+    //        ToggleBeacon.isOn = true;
+    //    MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+    //    SaveButton.SetActive(true);
+    //    Destroy(temp_ship);
+    //}
 
     public void ExplorerBackToDefault()
     {
@@ -918,6 +909,93 @@ public class UIController : MonoBehaviour {
         score_panel_alpha.alpha = slider_game_mode.value == 0 ? 0 : 1;
     }
 
+    #endregion
+    #region EXPLORER VIEW
+    public void SetAtomNameExplorerView(string temp)
+    {
+        atom_name.gameObject.SetActive(true);
+        atom_name.text = temp;
+    }
+
+    GameObject temp_ship;
+    public Slider slider_explore_view;
+    float previous_slider_explore_value = 0;
+
+    public void ToggleExploreView()
+    {
+        slider_explore_view.interactable = false;
+        if (!explore_view)
+        {
+            sfx.PlayTrack(SFX.sound_index.button_click);
+            FadeCanvasToExplore.SetBool("Start", true);
+            isOverUI = false;
+            RepositionCameraWOMovement();
+            CutAway.value = CutAway.minValue;
+            Tutorial.isOn = false;
+            StartCoroutine(WaitForFade());
+        }
+        else
+        {
+            sfx.PlayTrack(SFX.sound_index.button_click);
+            sfx.StopTrack(SFX.sound_index.ship);
+            FadeCanvasToExplore.SetBool("Start", false);
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            StartCoroutine(WaitForFade());
+        }
+
+        explore_view = !explore_view;
+    }
+
+    public void StartExplore()
+    {
+        //RenderSettings.skybox = space_skybox;
+        //floor.SetActive(false);
+
+        //MainCamera.GetComponent<Animator>().SetBool("Start", true);
+        MainCamera.GetComponent<Camera>().enabled = false;
+        //MainCanvas.SetActive(false);
+        //ChangeCCTVShip();
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
+        SaveButton.SetActive(false);
+
+        //spawn ship
+        sfx.StopTrack(SFX.sound_index.ship);
+        //uIController.ChangeCCTVLoading();
+        //only 1 active
+        temp_ship = Instantiate(space_ship);
+        sfx.PlayTrackDelay(SFX.sound_index.ship, 0.6f);
+        temp_ship.tag = "space_ship";
+        //temp.transform.SetParent(transform, false);
+        temp_ship.transform.position = new Vector3(0, 0, -60);
+    }
+
+    public void EndExplore()
+    {
+        MainCamera.GetComponent<Camera>().enabled = true;
+        if (explorerController.beacon_holder.Count > 0)
+            ToggleBeacon.isOn = true;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+        SaveButton.SetActive(true);
+        Destroy(temp_ship);
+    }
+
+    IEnumerator WaitForFade()
+    {
+        yield return new WaitForSeconds(1);
+        if(explore_view)
+            StartExplore();
+        else
+            EndExplore();
+        slider_explore_view.interactable = true;
+    }
+
+    public void ExploreViewClick()
+    {
+        if (slider_explore_view.value == previous_slider_explore_value)
+            slider_explore_view.value = slider_explore_view.value == 0 ? slider_explore_view.maxValue : slider_explore_view.minValue;
+
+        previous_slider_explore_value = slider_explore_view.value;
+    }
     #endregion
 
 }

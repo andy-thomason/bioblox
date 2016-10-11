@@ -174,6 +174,7 @@ public class AminoSliderController : MonoBehaviour {
                 //CHECK IF EXIST
                 if (CurrentButtonA1 >= 0)
                 {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
                     A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
                     A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
@@ -195,6 +196,7 @@ public class AminoSliderController : MonoBehaviour {
             //CHECK IF EXIST
                 if (A1Buttons.Count > CurrentButtonA1)
                 {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
                     A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
                     A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
@@ -215,6 +217,7 @@ public class AminoSliderController : MonoBehaviour {
                 //CHECK IF EXIST
                 if (CurrentButtonA2 >= 0)
                 {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
                     A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
                     A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
@@ -235,6 +238,7 @@ public class AminoSliderController : MonoBehaviour {
                 //CHECK IF EXIST
                 if (A2Buttons.Count > CurrentButtonA2)
                 {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
                     A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
                     A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);

@@ -33,12 +33,12 @@ public class CamerFirstPerson : MonoBehaviour {
 	public void CameraFrameOff()
 	{
 		CameraFrame.SetActive(false);
-        FirstPersonText.SetActive(false);
+        //FirstPersonText.SetActive(false);
     }
 	
 	public void CameraFrameOn()
 	{
 		CameraFrame.SetActive(true);
-        FirstPersonText.SetActive(true);
+        //FirstPersonText.SetActive(true);
     }
 }

@@ -17,10 +17,12 @@ public class PDB_mesh : MonoBehaviour {
     float t=0;
     AminoSliderController aminoSliderController;
     public int atom;
+    public Camera ship_camera;
 
     // add atom indices to here to display them selected
     public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     SFX sfx;
+    int last_atom_scanned = -1;
 
     //public bool hasCollided=false;
 
@@ -210,7 +212,6 @@ public class PDB_mesh : MonoBehaviour {
     ExploreController exploreController;
     //test
     GameObject camera_first_person;
-    GameObject space_ship;
 
     void Awake()
     {
@@ -219,7 +220,6 @@ public class PDB_mesh : MonoBehaviour {
         buttonStructure = FindObjectOfType<ButtonStructure>();
         uIController = FindObjectOfType<UIController>();
         camera_first_person = GameObject.Find("CameraFirstPerson");
-        space_ship = GameObject.Find("Ship");
         exploreController = FindObjectOfType<ExploreController>();
     }
 
@@ -276,74 +276,86 @@ public class PDB_mesh : MonoBehaviour {
                 if (atom != -1)
                 {
                     SelectAtom(atom);
-
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
                     //first person only spawn camera
-                    if (uIController.first_person)
-                    {
-                        uIController.ChangeCCTVLoading();
-                        //only 1 active
-                        GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
-                        if (check_new)
-                        {
-                            Destroy(check_new);
-                            uIController.FirstPersonCameraReference = null;
-                            uIController.first_person_protein = -1;
-                        }
-                        GameObject temp = Instantiate(camera_first_person);
-                        //set the camera
-                        uIController.FirstPersonCameraReference = temp;
-                        uIController.FirstPersonCameraReferenceCamera = temp.GetComponent<Camera>();
-                        //setting the refernce of which protein is being used for the camera
-                        uIController.first_person_protein = protein_id;
+                    //if (uIController.first_person)
+                    //{
+                    //    uIController.ChangeCCTVLoading();
+                    //    //only 1 active
+                    //    GameObject check_new = GameObject.FindGameObjectWithTag("FirstPerson");
+                    //    if (check_new)
+                    //    {
+                    //        Destroy(check_new);
+                    //        uIController.FirstPersonCameraReference = null;
+                    //        uIController.first_person_protein = -1;
+                    //    }
+                    //    GameObject temp = Instantiate(camera_first_person);
+                    //    //set the camera
+                    //    uIController.FirstPersonCameraReference = temp;
+                    //    uIController.FirstPersonCameraReferenceCamera = temp.GetComponent<Camera>();
+                    //    //setting the refernce of which protein is being used for the camera
+                    //    uIController.first_person_protein = protein_id;
 
-                        temp.tag = "FirstPerson";
-                        temp.transform.SetParent(transform, false);
+                    //    temp.tag = "FirstPerson";
+                    //    temp.transform.SetParent(transform, false);
 
-                        temp.GetComponent<Animator>().enabled = true;
+                    //    temp.GetComponent<Animator>().enabled = true;
 
-                        temp.GetComponent<MouseOrbitImproved>().protein = gameObject;
-                        temp.GetComponent<MouseOrbitImproved>().enabled = true;
+                    //    temp.GetComponent<MouseOrbitImproved>().protein = gameObject;
+                    //    temp.GetComponent<MouseOrbitImproved>().enabled = true;
 
-                        if (protein_id == 0)
-                            uIController.DropDownP1.value = UIController.protein_render.transparent.GetHashCode();
-                        else
-                            uIController.DropDownP2.value = UIController.protein_render.transparent.GetHashCode();
-                    }
+                    //    if (protein_id == 0)
+                    //        uIController.DropDownP1.value = UIController.protein_render.transparent.GetHashCode();
+                    //    else
+                    //        uIController.DropDownP2.value = UIController.protein_render.transparent.GetHashCode();
+                    //}
 
                     //EXPLORER MODE ONLY - PLACE SHIP
-                    if (uIController.explore_view)
-                    {
-                        sfx.StopTrack(SFX.sound_index.ship);
-                        uIController.ChangeCCTVLoading();
-                        //only 1 active
-                        GameObject check_new = GameObject.FindGameObjectWithTag("space_ship");
-                        if (check_new) Destroy(check_new);
-                        GameObject temp = Instantiate(space_ship);
-                        sfx.PlayTrackDelay(SFX.sound_index.ship, 0.6f);
-                        temp.tag = "space_ship";
-                        //temp.transform.SetParent(transform, false);
-                        temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
+                    //if (uIController.explore_view)
+                    //{
+                    //    sfx.StopTrack(SFX.sound_index.ship);
+                    //    uIController.ChangeCCTVLoading();
+                    //    //only 1 active
+                    //    GameObject check_new = GameObject.FindGameObjectWithTag("space_ship");
+                    //    if (check_new) Destroy(check_new);
+                    //    GameObject temp = Instantiate(space_ship);
+                    //    sfx.PlayTrackDelay(SFX.sound_index.ship, 0.6f);
+                    //    temp.tag = "space_ship";
+                    //    //temp.transform.SetParent(transform, false);
+                    //    temp.transform.position = transform.TransformPoint(mol.atom_centres[atom]);
 
-                        Ray r_temp;
-                        do
-                        {
-                            temp.transform.position -= temp.transform.forward * 5;
-                            r_temp = cam.ScreenPointToRay(temp.transform.forward);
+                    //    Ray r_temp;
+                    //    do
+                    //    {
+                    //        temp.transform.position -= temp.transform.forward * 5;
+                    //        r_temp = cam.ScreenPointToRay(temp.transform.forward);
 
-                        } while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
-                        temp.transform.position -= temp.transform.forward * 20;
-                        temp.transform.GetChild(0).GetComponent<Animator>().enabled = true;
-                        Vector3 temp_pos = protein_id == 0 ? bb.molecules[0].transform.position : bb.molecules[1].transform.position;
-                        temp.transform.LookAt(temp_pos);
-                        exploreController.StartExplore(temp);
-                    }
+                    //    } while (PDB_molecule.collide_ray(gameObject, mol, transform, r_temp) != -1);
+                    //    temp.transform.position -= temp.transform.forward * 20;
+                    //    temp.transform.GetChild(0).GetComponent<Animator>().enabled = true;
+                    //    Vector3 temp_pos = protein_id == 0 ? bb.molecules[0].transform.position : bb.molecules[1].transform.position;
+                    //    temp.transform.LookAt(temp_pos);
+                    //    exploreController.StartExplore(temp);
+                    //}
 
                 }
             }
             has_rotated = false;
             rotating = false;
         }
-        else {
+        else if (Input.GetMouseButton(1) && uIController.explore_view)
+        {
+            Ray r = ship_camera.ScreenPointToRay(Input.mousePosition);
+            atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+            if (atom != -1 && last_atom_scanned != atom)
+            {
+                SelectAtom(atom);
+                uIController.SetAtomNameExplorerView(mol.aminoAcidsNames[return_atom_id(atom)] + " - " + mol.aminoAcidsTags[return_atom_id(atom)]);
+                last_atom_scanned = atom;
+            }
+        }
+        else
+        {
             has_rotated = false;
             rotating = false;
         }

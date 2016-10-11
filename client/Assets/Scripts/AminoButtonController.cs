@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class AminoButtonController : MonoBehaviour {
+public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
 	public int AminoButtonID;
 	public bool Linked = false;
@@ -23,11 +24,14 @@ public class AminoButtonController : MonoBehaviour {
         ui = FindObjectOfType<UIController>();
     }
 
-
-	public void HighLight()
-	{
+    public void OnPointerClick(PointerEventData eventData)
+    {
         sfx.PlayTrack(SFX.sound_index.amino_click);
+    }
 
+
+    public void HighLight()
+    {
         if (transform.parent.name == "ContentPanelA2")
 		{
             bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);

@@ -45,9 +45,9 @@ public class ShipController : MonoBehaviour {
     float time_rotation_acu = 0;
 
     ExploreController explorerController;
-    FadeToExplorerController fadePanel;
     UIController uI;
     SFX sfx;
+    AminoSliderController aminoSlider;
 
     // Use this for initialization
     void Start()
@@ -56,13 +56,16 @@ public class ShipController : MonoBehaviour {
         //rb = GetComponent<Rigidbody>();
         bb = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
-        fadePanel = FindObjectOfType<FadeToExplorerController>();
         uI = FindObjectOfType<UIController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
         exit_button.SetActive(true);
         sfx = FindObjectOfType<SFX>();
+        aminoSlider = FindObjectOfType<AminoSliderController>();
         //SwitchCameraInside();
         //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+        bb.molecules[0].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
+        bb.molecules[1].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
+        uI.atom_name = transform.GetChild(2).transform.GetChild(1).GetComponent<Text>();
     }
 	
 	// Update is called once per frame
@@ -248,23 +251,31 @@ public class ShipController : MonoBehaviour {
             if(!sfx.isPlaying(SFX.sound_index.ship_scanning))
                 sfx.PlayTrack(SFX.sound_index.ship_scanning);
             Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
-            atom_name.SetActive(true);
             scanning.SetActive(true);
 
-            Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
-            //MOLECULE 1 ATOM ID UI
-            int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[0].GetComponent<PDB_mesh>().mol, bb.molecules[0].transform, ray);
-            int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
-            //MOLECULE 2 ATOM ID UI
-            int atomID_molecule_2 = PDB_molecule.collide_ray(gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, ray);
-            int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
-            //change the text in the UI depending which atom is being raycasted
-            if (atom_id_molecule_1 >= 0)
-                atom_name.GetComponent<Text>().text = bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_1)] + " - " + bb.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_1)];
-            else if (atom_id_molecule_2 >= 0)
-                atom_name.GetComponent<Text>().text = bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_2)] + " - " + bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule_2)];
-            else
-                atom_name.GetComponent<Text>().text = "";
+
+            //Ray ray = RayCastingCamera.ScreenPointToRay(Input.mousePosition);
+            ////MOLECULE 1 ATOM ID UI
+            //int atomID_molecule_1 = PDB_molecule.collide_ray(gameObject, bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().mol, bb.molecules[uI.protein_scanned].transform, ray);
+            ////int atom_id_molecule_1 = bb.molecules[0].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1);
+            ////MOLECULE 2 ATOM ID UI
+            ////int atomID_molecule_2 = PDB_molecule.collide_ray(gameObject, bb.molecules[1].GetComponent<PDB_mesh>().mol, bb.molecules[1].transform, ray);
+            ////int atom_id_molecule_2 = bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2);
+            ////change the text in the UI depending which atom is being raycasted
+            //if (atomID_molecule_1 >= 0)
+            //{
+            //    atom_name.GetComponent<Text>().text = bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1)] + " - " + bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_1)];
+            //    bb.molecules[uI.protein_scanned].GetComponent<PDB_mesh>().SelectAtom(atomID_molecule_1);
+            //}
+            ////else if (atomID_molecule_2 >= 0)
+            ////{
+            ////    atom_name.GetComponent<Text>().text = bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsNames[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2)] + " - " + bb.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsTags[bb.molecules[1].GetComponent<PDB_mesh>().return_atom_id(atomID_molecule_2)];
+            ////    bb.molecules[1].GetComponent<PDB_mesh>().SelectAtom(atomID_molecule_2);
+            ////}
+            //else
+            //{
+            //    atom_name.GetComponent<Text>().text = "";
+            //}
         }
         else
         {
@@ -272,20 +283,6 @@ public class ShipController : MonoBehaviour {
             atom_name.SetActive(false);
             scanning.SetActive(false);
             sfx.StopTrack(SFX.sound_index.ship_scanning);
-        }
-
-        if (Input.GetKeyDown(KeyCode.V))
-            SwitchCameraInside();
-
-        if (Input.GetKeyDown(KeyCode.Home))
-        {
-            transform.position = new Vector3(0, -600, -8);
-            transform.LookAt(new Vector3(5, -600, -4));
-        }
-        if (Input.GetKeyDown(KeyCode.Insert))
-        {
-            transform.position = new Vector3(0, 70, 5);
-            transform.LookAt(new Vector3(0, 0, 5));
         }
         
         //place beacon
@@ -344,52 +341,52 @@ public class ShipController : MonoBehaviour {
         }
     }
 
-    void SwitchCameraInside()
-    {
-        //camera_in.enabled = !view_status;
-        //camera_out.enabled = view_status;
-        cabine.SetActive(!view_status);
-        exit_button.SetActive(!view_status);
-        ship.enabled = view_status;
-        if (view_status)
-        {
-            cameraOffset = new Vector3(0, 1, -3);
-        }
-        else
-        {
+    //void SwitchCameraInside()
+    //{
+    //    //camera_in.enabled = !view_status;
+    //    //camera_out.enabled = view_status;
+    //    cabine.SetActive(!view_status);
+    //    exit_button.SetActive(!view_status);
+    //    ship.enabled = view_status;
+    //    if (view_status)
+    //    {
+    //        cameraOffset = new Vector3(0, 1, -3);
+    //    }
+    //    else
+    //    {
 
-            cameraOffset = new Vector3(0, 0, 0);
-        }
-        view_status = !view_status;
-    }
+    //        cameraOffset = new Vector3(0, 0, 0);
+    //    }
+    //    view_status = !view_status;
+    //}
 
     public void EndExplore()
     {
         atom_name.SetActive(false);
         scanning.SetActive(false);
         exit_button.SetActive(false);
-        FindObjectOfType<UIController>().EndExplore();
+        //FindObjectOfType<UIController>().EndExplore();
     }
 
-    public void BeaconColor(int index)
-    {
-       // temp_beacon.transform.GetChild(0).transform.GetChild(0).GetComponent<Light>().color = beacon_colors[index];
-       // temp_beacon.transform.GetChild(1).GetComponent<MeshRenderer>().material = material_colors[index];
-    }
+    //public void BeaconColor(int index)
+    //{
+    //   // temp_beacon.transform.GetChild(0).transform.GetChild(0).GetComponent<Light>().color = beacon_colors[index];
+    //   // temp_beacon.transform.GetChild(1).GetComponent<MeshRenderer>().material = material_colors[index];
+    //}
 
-    public void CloseColorPanel()
-    {
-        ColorPanel.SetActive(false);
-        Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
-        InsideUI = false;
-    }
+    //public void CloseColorPanel()
+    //{
+    //    ColorPanel.SetActive(false);
+    //    Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+    //    InsideUI = false;
+    //}
 
-    public void DeleteBeacon()
-    {
-        Destroy(temp_beacon);
-        temp_beacon = null;
-        CloseColorPanel();
-    }
+    //public void DeleteBeacon()
+    //{
+    //    Destroy(temp_beacon);
+    //    temp_beacon = null;
+    //    CloseColorPanel();
+    //}
 
     public void MouseUIEnter()
     {
