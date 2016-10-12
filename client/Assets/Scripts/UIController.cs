@@ -799,7 +799,6 @@ public class UIController : MonoBehaviour {
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
-        slider_game_mode.value = 0;
     }
 
     //tool panel
@@ -890,25 +889,66 @@ public class UIController : MonoBehaviour {
 
     #region TOGGLE GAME MODE
 
-    public Slider slider_game_mode;
-    float previous_slider_value = 0;
+    public Button OnExpert;
+    public Button OffExpert;
+    bool expert_mode = false;
+    ColorBlock button_color;
 
-    public void GameModeClick()
+    //public void GameModeClick()
+    //{
+    //    if(slider_game_mode.value == previous_slider_value)
+    //        slider_game_mode.value = slider_game_mode.value == 0 ? slider_game_mode.maxValue : slider_game_mode.minValue;
+
+    //    previous_slider_value = slider_game_mode.value;
+    //}
+
+    public void ExpertModeOn()
     {
-        if(slider_game_mode.value == previous_slider_value)
-            slider_game_mode.value = slider_game_mode.value == 0 ? slider_game_mode.maxValue : slider_game_mode.minValue;
-
-        previous_slider_value = slider_game_mode.value;
+        if(!expert_mode)
+        {
+            sfx.PlayTrack(SFX.sound_index.button_click);
+            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            score_panel_alpha.alpha = expert_mode ? 0 : 1;
+            expert_mode = !expert_mode;
+            //set the color
+            button_color = OnExpert.colors;
+            button_color.normalColor = Color.white;
+            button_color.highlightedColor = Color.white;
+            button_color.pressedColor = Color.white;
+            OnExpert.colors = button_color;
+            //off
+            button_color = OffExpert.colors;
+            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            OffExpert.colors = button_color;
+        }
     }
 
-    public void GameModeSlider()
+    public void ExpertModeOff()
     {
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        p1_atom_holder.parent.gameObject.SetActive(slider_game_mode.value == 1 ? true : false);
-        p2_atom_holder.parent.gameObject.SetActive(slider_game_mode.value == 1 ? true : false);
-        score_panel_alpha.alpha = slider_game_mode.value == 0 ? 0 : 1;
+        if (expert_mode)
+        {
+            sfx.PlayTrack(SFX.sound_index.button_click);
+            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            score_panel_alpha.alpha = expert_mode ? 0 : 1;
+            expert_mode = !expert_mode;
+            //set the color
+            button_color = OnExpert.colors;
+            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            OnExpert.colors = button_color;
+            //off
+            button_color = OffExpert.colors;
+            button_color.normalColor = Color.white;
+            button_color.highlightedColor = Color.white;
+            button_color.pressedColor = Color.white;
+            OffExpert.colors = button_color;
+        }
     }
-
     #endregion
     #region EXPLORER VIEW
     public void SetAtomNameExplorerView(string temp)
@@ -920,30 +960,86 @@ public class UIController : MonoBehaviour {
     GameObject temp_ship;
     public Slider slider_explore_view;
     float previous_slider_explore_value = 0;
+    public Button OnExplorer;
+    public Button OffExplorer;
 
-    public void ToggleExploreView()
+    //public void ToggleExploreView()
+    //{
+    //    MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
+    //    if (!explore_view)
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.button_click);
+    //        FadeCanvasToExplore.SetBool("Start", true);
+    //        SaveButton.SetActive(false);
+    //        isOverUI = false;
+    //        //RepositionCameraWOMovement();
+    //        CutAway.value = CutAway.minValue;
+    //        Tutorial.isOn = false;
+    //        StartCoroutine(WaitForFade());
+    //    }
+    //    else
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.button_click);
+    //        FadeCanvasToExplore.SetBool("Start", false);
+    //        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+    //        StartCoroutine(WaitForFade());
+    //    }
+
+    //    explore_view = !explore_view;
+    //}
+
+    public void StartExploreButton()
     {
-        slider_explore_view.interactable = false;
         if (!explore_view)
         {
+            MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
             sfx.PlayTrack(SFX.sound_index.button_click);
             FadeCanvasToExplore.SetBool("Start", true);
+            SaveButton.SetActive(false);
             isOverUI = false;
-            RepositionCameraWOMovement();
+            //RepositionCameraWOMovement();
             CutAway.value = CutAway.minValue;
             Tutorial.isOn = false;
             StartCoroutine(WaitForFade());
+            explore_view = !explore_view;
+            //set the color
+            button_color = OnExplorer.colors;
+            button_color.normalColor = Color.white;
+            button_color.highlightedColor = Color.white;
+            button_color.pressedColor = Color.white;
+            OnExplorer.colors = button_color;
+            //off
+            button_color = OffExplorer.colors;
+            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            OffExplorer.colors = button_color;
         }
-        else
+    }
+
+    public void EndExploreButton()
+    {
+        if (explore_view)
         {
+            MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
             sfx.PlayTrack(SFX.sound_index.button_click);
-            sfx.StopTrack(SFX.sound_index.ship);
             FadeCanvasToExplore.SetBool("Start", false);
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             StartCoroutine(WaitForFade());
+            explore_view = !explore_view;
+            //set the color
+            ColorBlock button_color = OnExplorer.colors;
+            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            OnExplorer.colors = button_color;
+            //off
+            button_color = OffExplorer.colors;
+            button_color.normalColor = Color.white;
+            button_color.highlightedColor = Color.white;
+            button_color.pressedColor = Color.white;
+            OffExplorer.colors = button_color;
         }
-
-        explore_view = !explore_view;
     }
 
     public void StartExplore()
@@ -956,7 +1052,6 @@ public class UIController : MonoBehaviour {
         //MainCanvas.SetActive(false);
         //ChangeCCTVShip();
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        SaveButton.SetActive(false);
 
         //spawn ship
         sfx.StopTrack(SFX.sound_index.ship);
@@ -971,6 +1066,7 @@ public class UIController : MonoBehaviour {
 
     public void EndExplore()
     {
+        sfx.StopTrack(SFX.sound_index.ship);
         MainCamera.GetComponent<Camera>().enabled = true;
         if (explorerController.beacon_holder.Count > 0)
             ToggleBeacon.isOn = true;
@@ -986,16 +1082,16 @@ public class UIController : MonoBehaviour {
             StartExplore();
         else
             EndExplore();
-        slider_explore_view.interactable = true;
+        MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = true;
     }
 
-    public void ExploreViewClick()
-    {
-        if (slider_explore_view.value == previous_slider_explore_value)
-            slider_explore_view.value = slider_explore_view.value == 0 ? slider_explore_view.maxValue : slider_explore_view.minValue;
+    //public void ExploreViewClick()
+    //{
+    //    if (slider_explore_view.value == previous_slider_explore_value)
+    //        slider_explore_view.value = slider_explore_view.value == 0 ? slider_explore_view.maxValue : slider_explore_view.minValue;
 
-        previous_slider_explore_value = slider_explore_view.value;
-    }
+    //    previous_slider_explore_value = slider_explore_view.value;
+    //}
     #endregion
 
 }

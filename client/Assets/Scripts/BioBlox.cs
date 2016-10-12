@@ -1320,7 +1320,8 @@ public void StartGame()
                 }
                 else
                 {
-                    ElectricScore.text = LennardScore.text = NumberOfAtoms.text = "0.0";
+                    ElectricScore.text = LennardScore.text = "0.0";
+                    NumberOfAtoms.text = "0";
                     SimpleScore.text = "Score: 0 atoms touching.";
                 }
 

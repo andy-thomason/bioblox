@@ -23,7 +23,6 @@ public class ShipController : MonoBehaviour {
     public GameObject atom_name;
     public GameObject scanning;
     public GameObject aim;
-    public GameObject exit_button;
     public Canvas canvas;
     public GameObject cabine;
     public MeshRenderer ship;
@@ -58,7 +57,6 @@ public class ShipController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         uI = FindObjectOfType<UIController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
-        exit_button.SetActive(true);
         sfx = FindObjectOfType<SFX>();
         aminoSlider = FindObjectOfType<AminoSliderController>();
         //SwitchCameraInside();
@@ -364,7 +362,6 @@ public class ShipController : MonoBehaviour {
     {
         atom_name.SetActive(false);
         scanning.SetActive(false);
-        exit_button.SetActive(false);
         //FindObjectOfType<UIController>().EndExplore();
     }
 
