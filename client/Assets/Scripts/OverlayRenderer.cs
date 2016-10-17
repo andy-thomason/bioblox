@@ -42,6 +42,8 @@ public class OverlayRenderer : MonoBehaviour {
     public Material[] atom_material;
     List<int> p1_atomos = new List<int>();
     List<int> p2_atomos = new List<int>();
+    public bool atom_2d_overlay = false;
+    public bool atom_3d_overlay = false;
 
     // Use this for initialization
     void Start ()
@@ -92,7 +94,8 @@ public class OverlayRenderer : MonoBehaviour {
                     int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
                     int uvy = 3 - atom / 4;
                     int uvx = atom & 3;
-                    if (is_touching || is_bad)
+                    //2D OVERLAY
+                    if ((is_touching || is_bad) && atom_2d_overlay)
                     {
                         add_Icon(
                             new Icon(
@@ -152,8 +155,8 @@ public class OverlayRenderer : MonoBehaviour {
                             }
                         }
                     }
-
-                    if (is_touching)
+                    //3D OVERLAY
+                    if (is_touching && atom_3d_overlay)
                     {
                         //Debug.Log(!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying);
                         //if (!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying)

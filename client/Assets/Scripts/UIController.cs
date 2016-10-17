@@ -911,7 +911,8 @@ public class UIController : MonoBehaviour {
             p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
             score_panel_alpha.alpha = expert_mode ? 0 : 1;
             expert_mode = !expert_mode;
-            //set the color
+            #region set the color OF THE BUTTON ON/OFF
+            //set the color OF THE BUTTON ON/OFF
             button_color = OnExpert.colors;
             button_color.normalColor = Color.white;
             button_color.highlightedColor = Color.white;
@@ -923,6 +924,7 @@ public class UIController : MonoBehaviour {
             button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
             button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
             OffExpert.colors = button_color;
+            #endregion
         }
     }
 
@@ -935,6 +937,7 @@ public class UIController : MonoBehaviour {
             p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
             score_panel_alpha.alpha = expert_mode ? 0 : 1;
             expert_mode = !expert_mode;
+            #region set the color OF THE BUTTON ON/OFF
             //set the color
             button_color = OnExpert.colors;
             button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
@@ -947,6 +950,7 @@ public class UIController : MonoBehaviour {
             button_color.highlightedColor = Color.white;
             button_color.pressedColor = Color.white;
             OffExpert.colors = button_color;
+            #endregion
         }
     }
     #endregion
@@ -1092,6 +1096,18 @@ public class UIController : MonoBehaviour {
 
     //    previous_slider_explore_value = slider_explore_view.value;
     //}
+    #endregion
+
+    #region ATOM OVERLAY
+    public void Atom2DDisplay()
+    {
+        or.atom_2d_overlay = !or.atom_2d_overlay;
+    }
+
+    public void Atom3DDisplay()
+    {
+        or.atom_3d_overlay = !or.atom_3d_overlay;
+    }
     #endregion
 
 }

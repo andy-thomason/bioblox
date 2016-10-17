@@ -44,8 +44,8 @@ public class BioBlox : MonoBehaviour
     };
 
     Level[] levels = {
-       new Level("2PTC", "E", "I", "1", new Vector3(-10, 0, 0), 50),
-       new Level("4KC3", "A", "B", "1", new Vector3(-20, 0, 0), 40),
+       new Level("2PTC", "E", "I", "1", new Vector3(0, 0, 0), 35),
+       new Level("4KC3", "A", "B", "1", new Vector3(0, 0, 0), 40),
        new Level("1FSS", "A", "B", "1", new Vector3(-20, 0, 0), 40),
        new Level("1EMV", "A", "B", "1", new Vector3(-20, 0, 0), 40),
        new Level("1GRN", "A", "B", "1", new Vector3(-20, 0, 0), 40),
