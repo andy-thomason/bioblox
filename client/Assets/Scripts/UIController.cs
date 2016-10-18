@@ -866,18 +866,32 @@ public class UIController : MonoBehaviour {
         A2R.SetActive(status);
     }
 
-    public void P1CreateAtomButtons(List<int> atoms)
+    GameObject atom_button_temp;
+
+    public void P1CreateAtomButtons(List<OverlayRenderer.Atom> atoms)
     {
         foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
 
-        foreach(int atomo in atoms) Instantiate(atom_buttons[atomo]).transform.SetParent(p1_atom_holder);
+        foreach (OverlayRenderer.Atom atomo in atoms)
+        {
+            atom_button_temp = Instantiate(atom_buttons[atomo.atom_material]);
+            atom_button_temp.transform.SetParent(p1_atom_holder);
+            atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atomo.atom_id;
+            atom_button_temp.GetComponent<AtomConnectionController>().protein_id = atomo.protein_id;
+        }
     }
 
-    public void P2CreateAtomButtons(List<int> atoms)
+    public void P2CreateAtomButtons(List<OverlayRenderer.Atom> atoms)
     {
         foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
 
-        foreach (int atomo in atoms) Instantiate(atom_buttons[atomo]).transform.SetParent(p2_atom_holder);
+        foreach (OverlayRenderer.Atom atomo in atoms)
+        {
+            atom_button_temp = Instantiate(atom_buttons[atomo.atom_material]);
+            atom_button_temp.transform.SetParent(p2_atom_holder);
+            atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atomo.atom_id;
+            atom_button_temp.GetComponent<AtomConnectionController>().protein_id = atomo.protein_id;
+        }
     }
 
     void DeselectAtoms()

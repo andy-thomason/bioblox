@@ -388,11 +388,11 @@ public class PDB_mesh : MonoBehaviour {
     public void SelectAminoAcid(int acid_number)
     {
         selected_atoms = mol.aminoAcidsAtomIds[acid_number];
-        Debug.Log("Aminoacids selected:" + acid_number);
+        //Debug.Log("Aminoacids selected:" + acid_number);
         //go through the atoms of the amino acids
         for (int i = 0; i != selected_atoms.Length; ++i)
         {
-            Debug.Log("amino acid atoms id:" + selected_atoms[i]);
+            //Debug.Log("amino acid atoms id:" + selected_atoms[i]);
             //DECODER
             int remainder1;
             int quotient1 = Math.DivRem(mol.names[selected_atoms[i]], Convert.ToInt32(0x1000000), out remainder1);
@@ -402,7 +402,7 @@ public class PDB_mesh : MonoBehaviour {
             int quotient3 = Math.DivRem(remainder2, Convert.ToInt32(0x100), out remainder3);
             string atom_name = string.Concat(Convert.ToChar(quotient1), Convert.ToChar(quotient2), Convert.ToChar(quotient3), Convert.ToChar(remainder3)).Trim();
 
-            Debug.Log("atom_name: " + atom_name);
+            //Debug.Log("atom_name: " + atom_name);
         }
     }
 

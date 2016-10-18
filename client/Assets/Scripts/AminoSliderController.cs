@@ -114,6 +114,11 @@ public class AminoSliderController : MonoBehaviour {
     int number_childs_A1 = 0;
     int number_childs_A2 = 0;
 
+    #region ATOM TO ATOM CONNECTION
+    public int atom_selected_p1 = -1;
+    public int atom_selected_p2 = -1;
+    #endregion
+
     void Awake()
 	{
 		buttonStructure = FindObjectOfType<ButtonStructure> ();
@@ -538,8 +543,9 @@ public class AminoSliderController : MonoBehaviour {
 		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
 		AminoButtonReference.GetComponent<Button> ().interactable = true;
 		AminoButtonReference.GetComponent<Button> ().enabled = false;
-		//deactivate the linked image
-		Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
+        AminoButtonReference.GetComponent<Image>().raycastTarget = false;
+        //deactivate the linked image
+        Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
 
 		AminoButtonReference.transform.SetParent(PanelParent, false);
 		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();

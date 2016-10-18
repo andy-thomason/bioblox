@@ -20,6 +20,8 @@ GameObject:
   m_Component:
   - 224: {fileID: 224000010336931958}
   - 114: {fileID: 114000013938350184}
+  - 114: {fileID: 114000011141845558}
+  - 114: {fileID: 114000014092553530}
   m_Layer: 5
   m_Name: Sulfur
   m_TagString: Untagged
@@ -94,6 +96,19 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: S
+--- !u!114 &114000011141845558
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010458271396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e6cfdfe5488234fb0075a1d4d1439d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  atom_id: 0
+  protein_id: 0
 --- !u!114 &114000013916817024
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -133,12 +148,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: -1
-  m_PreferredWidth: 20
-  m_PreferredHeight: 20
+  m_MinWidth: 20
+  m_MinHeight: 20
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+--- !u!114 &114000014092553530
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010458271396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!222 &222000010185278996
 CanvasRenderer:
   m_ObjectHideFlags: 1

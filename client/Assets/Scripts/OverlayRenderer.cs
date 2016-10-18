@@ -21,6 +21,20 @@ public class OverlayRenderer : MonoBehaviour {
 		}
 	}
 
+    public struct Atom
+    {
+        public int atom_material;
+        public int atom_id;
+        public int protein_id;
+
+        public Atom(int atom_material, int atom_id, int protein_id)
+        {
+            this.atom_material = atom_material;
+            this.atom_id = atom_id;
+            this.protein_id = protein_id;
+        }
+    };
+
     List<Icon> icons = new List<Icon>();
     List<GameObject> icons_spheres = new List<GameObject>();
     List<GameObject> icons_spheres_store = new List<GameObject>();
@@ -40,8 +54,8 @@ public class OverlayRenderer : MonoBehaviour {
     BioBlox bb;
     SFX sfx;
     public Material[] atom_material;
-    List<int> p1_atomos = new List<int>();
-    List<int> p2_atomos = new List<int>();
+    List<Atom> p1_atomos = new List<Atom>();
+    List<Atom> p2_atomos = new List<Atom>();
     public bool atom_2d_overlay = false;
     public bool atom_3d_overlay = false;
 
@@ -138,8 +152,8 @@ public class OverlayRenderer : MonoBehaviour {
                             );
                         }
                         //get ATOMS DESCRIPTION
-                        if(i == 0) p1_atomos.Add(atom);
-                        else p2_atomos.Add(atom);
+                        if(i == 0) p1_atomos.Add(new Atom(atom,j,i));
+                        else p2_atomos.Add(new Atom(atom, j, i)); ;
 
                     }
                     else if (is_selected && ui.is_hovering)
