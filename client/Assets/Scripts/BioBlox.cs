@@ -1304,10 +1304,8 @@ public void StartGame()
 
                 }
 
-                if (num_touching_0 + num_touching_1 != 0)
+                if (num_touching_0 + num_touching_1 != 0 && uiController.expert_mode)
                 {
-                    //save button
-
                     scoring.calcScore();
                     ////set values for refence
                     lennard_score = (int)scoring.vdwScore;

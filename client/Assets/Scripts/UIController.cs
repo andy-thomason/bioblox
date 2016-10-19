@@ -868,30 +868,33 @@ public class UIController : MonoBehaviour {
 
     GameObject atom_button_temp;
 
-    public void P1CreateAtomButtons(List<OverlayRenderer.Atom> atoms)
+    public void P1CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type)
     {
-        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
-
-        foreach (OverlayRenderer.Atom atomo in atoms)
-        {
-            atom_button_temp = Instantiate(atom_buttons[atomo.atom_material]);
-            atom_button_temp.transform.SetParent(p1_atom_holder);
-            atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atomo.atom_id;
-            atom_button_temp.GetComponent<AtomConnectionController>().protein_id = atomo.protein_id;
-        }
+        atom_button_temp = Instantiate(atom_buttons[element_type]);
+        atom_button_temp.transform.SetParent(p1_atom_holder);
+        atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
     }
 
-    public void P2CreateAtomButtons(List<OverlayRenderer.Atom> atoms)
+    public void P1CleanAtomButtons()
+    {
+        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
+    }
+
+    public void P2CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type)
+    {
+
+        atom_button_temp = Instantiate(atom_buttons[element_type]);
+        atom_button_temp.transform.SetParent(p2_atom_holder);
+        atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
+    }
+
+    public void P2CleanAtomButtons()
     {
         foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
-
-        foreach (OverlayRenderer.Atom atomo in atoms)
-        {
-            atom_button_temp = Instantiate(atom_buttons[atomo.atom_material]);
-            atom_button_temp.transform.SetParent(p2_atom_holder);
-            atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atomo.atom_id;
-            atom_button_temp.GetComponent<AtomConnectionController>().protein_id = atomo.protein_id;
-        }
     }
 
     void DeselectAtoms()
@@ -905,7 +908,7 @@ public class UIController : MonoBehaviour {
 
     public Button OnExpert;
     public Button OffExpert;
-    bool expert_mode = false;
+    public bool expert_mode = false;
     ColorBlock button_color;
 
     //public void GameModeClick()

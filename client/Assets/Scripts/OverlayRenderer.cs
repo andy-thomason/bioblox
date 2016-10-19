@@ -21,19 +21,19 @@ public class OverlayRenderer : MonoBehaviour {
 		}
 	}
 
-    public struct Atom
-    {
-        public int atom_material;
-        public int atom_id;
-        public int protein_id;
+    //public struct Atom
+    //{
+    //    public int atom_material;
+    //    public int atom_id;
+    //    public int protein_id;
 
-        public Atom(int atom_material, int atom_id, int protein_id)
-        {
-            this.atom_material = atom_material;
-            this.atom_id = atom_id;
-            this.protein_id = protein_id;
-        }
-    };
+    //    public Atom(int atom_material, int atom_id, int protein_id)
+    //    {
+    //        this.atom_material = atom_material;
+    //        this.atom_id = atom_id;
+    //        this.protein_id = protein_id;
+    //    }
+    //};
 
     List<Icon> icons = new List<Icon>();
     List<GameObject> icons_spheres = new List<GameObject>();
@@ -53,9 +53,13 @@ public class OverlayRenderer : MonoBehaviour {
     public GameObject Sphere_atom_holder;
     BioBlox bb;
     SFX sfx;
-    public Material[] atom_material;
-    List<Atom> p1_atomos = new List<Atom>();
-    List<Atom> p2_atomos = new List<Atom>();
+    public Material[] P1atom_material;
+    public Material[] P2atom_material;
+    public Material[] P1atom_material_o;
+    public Material[] P2atom_material_o;
+    public Material overlaping;
+    //List<Atom> p1_atomos = new List<Atom>();
+    //List<Atom> p2_atomos = new List<Atom>();
     public bool atom_2d_overlay = false;
     public bool atom_3d_overlay = false;
 
@@ -141,7 +145,7 @@ public class OverlayRenderer : MonoBehaviour {
                                     icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                     add_Icon_sphere(icons_spheres_store[sphere_index]);
                                 }
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = atom_material[atom];
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
                                 sphere_index++;
                             }
                             add_Icon(
@@ -151,9 +155,9 @@ public class OverlayRenderer : MonoBehaviour {
                                 )
                             );
                         }
-                        //get ATOMS DESCRIPTION
-                        if(i == 0) p1_atomos.Add(new Atom(atom,j,i));
-                        else p2_atomos.Add(new Atom(atom, j, i)); ;
+                        ////get ATOMS DESCRIPTION
+                        //if(i == 0) p1_atomos.Add(new Atom(atom,j,i));
+                        //else p2_atomos.Add(new Atom(atom, j, i)); ;
 
                     }
                     else if (is_selected && ui.is_hovering)
@@ -162,7 +166,7 @@ public class OverlayRenderer : MonoBehaviour {
                         {
                             if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() || ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode())
                             {
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = atom_material[atom];
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                                 sphere_index++;
@@ -180,41 +184,56 @@ public class OverlayRenderer : MonoBehaviour {
 
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = atom_material[atom];
+                            //if(is_bad)
+                            //{
+                            //    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            //    add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            //    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = overlaping;
+                            //}
+                            //else
+                            //{
+                                if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
+                                {
+                                    //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
+                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
+                                }
+                                if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
+                                {
+                                    //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
+                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
+                                }
+
+                                if (is_bad)
+                                    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
+                                else
+                                    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material[atom] : P2atom_material[atom];
+
+                            //}
+                            
                             sphere_index++;
                         }
                     }
                 }
             }
 
-            if (ui.p1_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
-            {
-                ui.P1CreateAtomButtons(p1_atomos);
-                ui.p1_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
-            }
+            //if (ui.p1_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
+            //{
+            //    ui.P1CreateAtomButtons(p1_atomos);
+            //    ui.p1_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
+            //}
 
-            if (ui.p2_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
-            {
-                ui.P2CreateAtomButtons(p2_atomos);
-                ui.p2_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
-            }
+            //if (ui.p2_atom_status == UIController.p_atom_status_enum.find_atoms.GetHashCode())
+            //{
+            //    ui.P2CreateAtomButtons(p2_atomos);
+            //    ui.p2_atom_status = UIController.p_atom_status_enum.done.GetHashCode();
+            //}
 
-            p1_atomos.Clear();
-            p2_atomos.Clear();
+            //p1_atomos.Clear();
+            //p2_atomos.Clear();
         }
 
         if (lookat_camera == null) {

@@ -16,6 +16,7 @@ public class PDB_molecule
 
     public Tuple<int,int>[] pairedLabels=new Tuple<int, int>[0];
     public int[] names;
+    public string[] atomNames;
     public int[] residues;
     public int[] N_atoms;
     public Vector3 pos;

@@ -387,22 +387,25 @@ public class PDB_mesh : MonoBehaviour {
     // call this to select an amino acid
     public void SelectAminoAcid(int acid_number)
     {
+
+        //CLEAN THE BUTTONS
+        if (protein_id == 0)
+            uIController.P1CleanAtomButtons();
+        else
+            uIController.P2CleanAtomButtons();
+
         selected_atoms = mol.aminoAcidsAtomIds[acid_number];
         //Debug.Log("Aminoacids selected:" + acid_number);
         //go through the atoms of the amino acids
         for (int i = 0; i != selected_atoms.Length; ++i)
         {
-            //Debug.Log("amino acid atoms id:" + selected_atoms[i]);
-            //DECODER
-            int remainder1;
-            int quotient1 = Math.DivRem(mol.names[selected_atoms[i]], Convert.ToInt32(0x1000000), out remainder1);
-            int remainder2;
-            int quotient2 = Math.DivRem(remainder1, Convert.ToInt32(0x10000), out remainder2);
-            int remainder3;
-            int quotient3 = Math.DivRem(remainder2, Convert.ToInt32(0x100), out remainder3);
-            string atom_name = string.Concat(Convert.ToChar(quotient1), Convert.ToChar(quotient2), Convert.ToChar(quotient3), Convert.ToChar(remainder3)).Trim();
+            int name = mol.names[selected_atoms[i]];
+            int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+            if (protein_id == 0)
+                uIController.P1CreateAtomButtons(selected_atoms[i],protein_id, mol.atomNames[selected_atoms[i]],atom);
+            else
+                uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]],atom);
 
-            //Debug.Log("atom_name: " + atom_name);
         }
     }
 

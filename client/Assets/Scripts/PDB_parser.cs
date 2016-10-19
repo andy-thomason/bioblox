@@ -70,6 +70,7 @@ public class PDB_parser {
         List<float> atom_radii = new List<float>();
         List<Color> atom_colours = new List<Color>();
         List<int> names = new List<int>();
+        List<string> atomNames = new List<string>();
         List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
         List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
         List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
@@ -146,6 +147,8 @@ public class PDB_parser {
 
                         int name = PDB_molecule.encode(line[76], line[77]);
                         names.Add(name);
+                        atomNames.Add(line.Substring(12, 4).Trim());
+
 
                         if (serial >= 0)
                         {
@@ -203,6 +206,8 @@ public class PDB_parser {
 
 
         cur.names = names.ToArray();
+        cur.atomNames = atomNames.ToArray();
+
 
         // pos is 
         cur.pos.x = (maxx + minx) * 0.5f;

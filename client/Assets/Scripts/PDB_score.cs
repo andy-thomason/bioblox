@@ -2027,7 +2027,7 @@ public class PDB_score {
             // if large amino acid
             if (smallAminoAcids.Contains(aaName)) {
                 for (int j = 0; j != ids.Length; ++j) {
-                    string atomName = decode(mol.names[ids[j]]);
+                    string atomName = mol.atomNames[ids[j]];
                     atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
                     //discard hydrogens
                     if (!atomName.StartsWith("H")) {
@@ -2050,7 +2050,7 @@ public class PDB_score {
             // if small amino acid
             } else if (largeAminoAcids.Contains(aaName)) {
                 for (int j = 0; j != ids.Length; ++j) {
-                    string atomName = decode(mol.names[ids[j]]);
+                    string atomName = mol.atomNames[ids[j]];
                     atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
                     //discard hydrogens
                     if (!atomName.StartsWith("H")) {
@@ -2086,7 +2086,7 @@ public class PDB_score {
             } else if (aaName == "GLY") {
                 //Debug.Log (threeLetterToOneLetterAminoAcid[name]);
                 for (int j = 0; j != ids.Length; ++j) {
-                    string atomName = decode(mol.names[ids[j]]);                    
+                    string atomName = mol.atomNames[ids[j]];
                     atomName = Regex.Replace (atomName, @"^\d+", string.Empty);
                     //discard hydrogens
                     if (!atomName.StartsWith("H")) {
