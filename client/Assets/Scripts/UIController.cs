@@ -216,7 +216,7 @@ public class UIController : MonoBehaviour {
                     if (atom_id_molecule >= 0)
                     {
                         atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
-                        BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule);
+                        BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule,false);
                         is_hovering = true;
                     }
                     else
@@ -884,7 +884,6 @@ public class UIController : MonoBehaviour {
 
     public void P2CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type)
     {
-
         atom_button_temp = Instantiate(atom_buttons[element_type]);
         atom_button_temp.transform.SetParent(p2_atom_holder);
         atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;

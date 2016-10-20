@@ -34,12 +34,12 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     {
         if (transform.parent.name == "ContentPanelA2")
 		{
-            bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
             ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
 		else
 		{
-            bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
             ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
         aminoSli.ChangeAminoAcidSelection (gameObject);
@@ -50,13 +50,13 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         sfx.PlayTrack(SFX.sound_index.amino_click);
         if (transform.parent.name == "ContentPanelA2")
 		{
-			bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+			bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
             aminoSli.UpdateCurrentButtonA2(AminoButtonID);
             ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
 		}
 		else
 		{			
-			bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+			bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
             aminoSli.UpdateCurrentButtonA1(AminoButtonID);
             ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }

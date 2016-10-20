@@ -131,9 +131,11 @@ public class ConnectionManager : MonoBehaviour
 
 	public AtomConnection CreateAminoAcidLink(PDB_mesh mol1, int amino_acid_index1, PDB_mesh mol2, int amino_acid_index2) {
 		int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
+        //picking the last atom of the chain of the amino acid 1
 		int index1 = atoms1 [atoms1.Length - 1];
 		int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];
-		int index2 = atoms2 [atoms2.Length - 1];
+        //picking the last atom of the chain of the amino acid 2
+        int index2 = atoms2 [atoms2.Length - 1];
 		return CreateLink (mol1, index1, mol2, index2);
 	}
 

@@ -49,6 +49,7 @@ public class AminoSliderController : MonoBehaviour {
 	//linked
 	public GameObject LinkedGameObject;
 	GameObject LinkedGameObjectReference;
+    public GameObject LinkedAtom;
 	ButtonStructure buttonStructure;
     UIController uIController;
 
@@ -117,6 +118,13 @@ public class AminoSliderController : MonoBehaviour {
     #region ATOM TO ATOM CONNECTION
     public int atom_selected_p1 = -1;
     public int atom_selected_p2 = -1;
+    public GameObject[] atom_conn;
+    PDB_molecule P1_mol;
+    PDB_molecule P2_mol;
+    PDB_mesh P1_mesh;
+    PDB_mesh P2_mesh;
+    public Transform P1AtomsHolder;
+    public Transform P2AtomsHolder;
     #endregion
 
     void Awake()
@@ -130,10 +138,14 @@ public class AminoSliderController : MonoBehaviour {
     {
         EmptyAminoSliders();
         BioBloxReference = GameObject.Find("BioBlox").GetComponent<BioBlox>();
-        aminoAcidsNames[0] = BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsNames;
-        aminoAcidsNames[1] = BioBloxReference.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsNames;
-        aminoAcidsTags[0] = BioBloxReference.molecules[0].GetComponent<PDB_mesh>().mol.aminoAcidsTags;
-        aminoAcidsTags[1] = BioBloxReference.molecules[1].GetComponent<PDB_mesh>().mol.aminoAcidsTags;
+        P1_mesh = BioBloxReference.molecules[0].GetComponent<PDB_mesh>();
+        P2_mesh = BioBloxReference.molecules[1].GetComponent<PDB_mesh>();
+        P1_mol = P1_mesh.mol;
+        P2_mol = P2_mesh.mol;
+        aminoAcidsNames[0] = P1_mol.aminoAcidsNames;
+        aminoAcidsNames[1] = P2_mol.aminoAcidsNames;
+        aminoAcidsTags[0] = P1_mol.aminoAcidsTags;
+        aminoAcidsTags[1] = P2_mol.aminoAcidsTags;
 
 
         for (int i = 0; i < aminoAcidsNames[0].Count; ++i)
@@ -489,15 +501,12 @@ public class AminoSliderController : MonoBehaviour {
 	{
 		GameObject AminoLinkPanelReference;
 		//activate the linked image
-		LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);		
+		LinkedGameObjectReference = Instantiate(LinkedGameObject);		
 		LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform,false);		
-		LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);		
+		LinkedGameObjectReference = Instantiate(LinkedGameObject);		
 		LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform,false);
 
-		//ButtonPickedA1.transform.GetChild (2).gameObject.SetActive (true);
-		//ButtonPickedA2.transform.GetChild (2).gameObject.SetActive (true);
-		//ButtonPickedA2.GetComponent<AminoButtonController> ().activateLinkedImage ();
-		AminoLinkPanelReference = Instantiate<GameObject>(AminoLinkPanel);
+		AminoLinkPanelReference = Instantiate(AminoLinkPanel);
 		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
 		AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().connection = connection;
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
@@ -505,11 +514,44 @@ public class AminoSliderController : MonoBehaviour {
 
 		//UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount);
 
-		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform);
-		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1, AminoLinkPanelReference.transform.GetChild(0).transform);
-	}
+		FixButton (ButtonPickedA1,AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform,0);
+		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1, AminoLinkPanelReference.transform.GetChild(0).transform,1);
 
-	bool CheckIfConnectionExist(GameObject A1, GameObject A2)
+        //get the atom connected
+        int[] A_atoms = P1_mol.aminoAcidsAtomIds[ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID];
+        //picking the last atom of the chain of the amino acid 1
+        string A_atom = P1_mol.atomNames[A_atoms[A_atoms.Length - 1]];
+        //check element A1
+        int name = P1_mol.names[A_atoms[A_atoms.Length - 1]];
+        int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+
+        //INSTIATE THE ELEMENT
+        GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
+        temp_reference.GetComponentInChildren<Text>().text = A_atom;
+        temp_reference.transform.SetParent(AminoLinkPanelReference.transform.GetChild(0).transform.GetChild(2).transform, false);
+        //mark the atom	
+        LinkedGameObjectReference = Instantiate(LinkedAtom);
+        LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
+
+        //get the atom connected
+        A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID];
+        //picking the last atom of the chain of the amino acid 1
+        A_atom = P2_mol.atomNames[A_atoms[A_atoms.Length - 1]];
+        //check element A1
+        name = P2_mol.names[A_atoms[A_atoms.Length - 1]];
+        A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+
+        //INSTIATE THE ELEMENT
+        temp_reference = Instantiate(atom_conn[A_atom_element]);
+        temp_reference.GetComponentInChildren<Text>().text = A_atom;
+        temp_reference.transform.SetParent(AminoLinkPanelReference.transform.GetChild(0).transform.GetChild(3).transform, false);
+        //mark the atom	
+        LinkedGameObjectReference = Instantiate(LinkedAtom);
+        LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
+
+    }
+
+    bool CheckIfConnectionExist(GameObject A1, GameObject A2)
 	{
 		int A1ID = A1.GetComponent<AminoButtonController> ().AminoButtonID;
 		int A2ID = A2.GetComponent<AminoButtonController> ().AminoButtonID;
@@ -535,9 +577,9 @@ public class AminoSliderController : MonoBehaviour {
 		}
 	}
 
-	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i, Transform PanelParent)
+	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i, Transform PanelParent,int child)
 	{
-		GameObject AminoButtonReference = Instantiate<GameObject>(AminoButton);
+		GameObject AminoButtonReference = Instantiate(AminoButton);
 		AminoButtonReference.SetActive (true);
 		AminoButtonReference.transform.position = Vector3.zero;
 		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
@@ -547,13 +589,13 @@ public class AminoSliderController : MonoBehaviour {
         //deactivate the linked image
         Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
 
-		AminoButtonReference.transform.SetParent(PanelParent, false);
+		AminoButtonReference.transform.SetParent(PanelParent.GetChild(child), false);
 		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
 		AminoButtonRect.anchorMin = new Vector2(0.5f,0.5f);
 		AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
 		AminoButtonRect.pivot = new Vector2(0.5f,0.5f);
 		AminoButtonRect.sizeDelta = new Vector2(25, 25);
-		AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
+		//AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
 	}
 
 	public void RestoreDeletedAminoButtons(int B1, int B2)
@@ -748,34 +790,82 @@ public class AminoSliderController : MonoBehaviour {
             DeactivateAddConnectionButton();
         }
     }*/
+    AtomConnection connection;
+    GameObject ButtonPickedA1_Modification;
+    GameObject ButtonPickedA2_Modification;
+    Transform HolderPanelFather;
 
-    public void ModifyConnectionHolder(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2,Transform HolderPanelFather)
+    public void SetUp_ModifyConnectionHolder(AtomConnection connection_temp, GameObject ButtonPickedA1_temp, GameObject ButtonPickedA2_temp, Transform HolderPanelFather_temp)
     {
-        //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
-        //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
-        //normal size for link manger
-        ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
-        ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
+
+        connection = connection_temp;
+        ButtonPickedA1_Modification = ButtonPickedA1_temp;
+        ButtonPickedA2_Modification = ButtonPickedA2_temp;
+        HolderPanelFather = HolderPanelFather_temp;
+        //hightlight th mesh
+        P2_mesh.SelectAminoAcid(ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID, true);
+        P1_mesh.SelectAminoAcid(ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID, true);
+    }
+
+    public void ModifyConnectionHolder()
+    {
+
+        ButtonPickedA1_Modification.transform.localScale = new Vector3(1, 1, 1);
+        ButtonPickedA2_Modification.transform.localScale = new Vector3(1, 1, 1);
         //activate the linked image
-        LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);
-        LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform, false);
-        LinkedGameObjectReference = Instantiate<GameObject>(LinkedGameObject);
-        LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform, false);
+        LinkedGameObjectReference = Instantiate(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA1_Modification.transform.GetChild(2).transform, false);
+        LinkedGameObjectReference = Instantiate(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA2_Modification.transform.GetChild(2).transform, false);
         //connection mpdifi
-        GameObject AminoHolderReference = Instantiate<GameObject>(AminoHolderConnection);
+        GameObject AminoHolderReference = Instantiate(AminoHolderConnection);
         AminoHolderReference.transform.SetParent(HolderPanelFather, false);
         AminoHolderReference.GetComponent<AminoConnectionHolder>().connection = connection;
-        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID;
-        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1_Modification.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2_Modification.GetComponent<AminoButtonController>().AminoButtonID;
 
         //UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount);
 
-        FixButton(ButtonPickedA1, AminoHolderReference, 0, AminoHolderReference.transform);
-        FixButton(ButtonPickedA2, AminoHolderReference, 1, AminoHolderReference.transform);
+        FixButton(ButtonPickedA1_Modification, AminoHolderReference, 0, AminoHolderReference.transform,0);
+        FixButton(ButtonPickedA2_Modification, AminoHolderReference, 1, AminoHolderReference.transform,1);
 
-        //hightlight th mesh
-        FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID);
-        FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID);
+        //get the atom connected
+        int[] A_atoms = P1_mol.aminoAcidsAtomIds[ButtonPickedA1_Modification.GetComponent<AminoButtonController>().AminoButtonID];
+        //picking the last atom of the chain of the amino acid 1
+        string A_atom = P1_mol.atomNames[A_atoms[A_atoms.Length - 1]];
+        //check element A1
+        int name = P1_mol.names[A_atoms[A_atoms.Length - 1]];
+        int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+
+        //INSTIATE THE ELEMENT
+        GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
+        temp_reference.GetComponentInChildren<Text>().text = A_atom;
+        temp_reference.transform.SetParent(AminoHolderReference.transform.GetChild(2).transform, false);
+        //mark the atom	
+        Debug.Log("P1: "+P1AtomsHolder.childCount);
+        Debug.Log(A_atoms.Length);
+        LinkedGameObjectReference = Instantiate(LinkedAtom);
+        LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
+        Debug.Log("P1 again: " + P1AtomsHolder.childCount);
+
+        //get the atom connected
+        A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2_Modification.GetComponent<AminoButtonController>().AminoButtonID];
+        //picking the last atom of the chain of the amino acid 1
+        A_atom = P2_mol.atomNames[A_atoms[A_atoms.Length - 1]];
+        //check element A1
+        name = P2_mol.names[A_atoms[A_atoms.Length - 1]];
+        A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+
+        //INSTIATE THE ELEMENT
+        temp_reference = Instantiate(atom_conn[A_atom_element]);
+        temp_reference.GetComponentInChildren<Text>().text = A_atom;
+        temp_reference.transform.SetParent(AminoHolderReference.transform.GetChild(3).transform, false);
+        //mark the atom	
+        Debug.Log("P2: " + P2AtomsHolder.childCount);
+        Debug.Log(A_atoms.Length);
+        LinkedGameObjectReference = Instantiate(LinkedAtom);
+        LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
+        Debug.Log("P2 again: " + P2AtomsHolder.childCount);
     }
 
 

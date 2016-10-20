@@ -385,7 +385,7 @@ public class PDB_mesh : MonoBehaviour {
     }
 
     // call this to select an amino acid
-    public void SelectAminoAcid(int acid_number)
+    public void SelectAminoAcid(int acid_number, bool isModification)
     {
 
         //CLEAN THE BUTTONS
@@ -405,7 +405,11 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P1CreateAtomButtons(selected_atoms[i],protein_id, mol.atomNames[selected_atoms[i]],atom);
             else
                 uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]],atom);
+        }
 
+        if(isModification)
+        {
+            aminoSliderController.ModifyConnectionHolder();
         }
     }
 
@@ -421,7 +425,7 @@ public class PDB_mesh : MonoBehaviour {
             {
                 if (ids[j] == atom)
                 {
-                    SelectAminoAcid(i);                    
+                    SelectAminoAcid(i,false);                    
                     aminoSliderController.HighLight3DMesh(i,protein_id);
                     return;
                 }
