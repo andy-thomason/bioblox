@@ -1655,6 +1655,7 @@ public void StartGame()
         ToggleGameMode();
         aminoSlider.DeleteAllAminoConnections();
         TutorialHand.position = new Vector3(6000.0f, 0, 0);
+        uiController.isOverUI = false;
     }
 
 //<<<<<<< HEAD

@@ -14,6 +14,7 @@ public class ConnectionManager : MonoBehaviour
     //int contractionKVal;
     BioBlox bb;
     LineRenderer line_renderer;
+    AminoSliderController asc;
 
     public float dampingFactor = 1.0f;
 	//public float force = 10.0f;
@@ -129,17 +130,35 @@ public class ConnectionManager : MonoBehaviour
 		return con;
 	}
 
-	public AtomConnection CreateAminoAcidLink(PDB_mesh mol1, int amino_acid_index1, PDB_mesh mol2, int amino_acid_index2) {
-		int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
+	public AtomConnection CreateAminoAcidLink(PDB_mesh mol1, int amino_acid_index1, PDB_mesh mol2, int amino_acid_index2)
+    {
+        int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
         //picking the last atom of the chain of the amino acid 1
-		int index1 = atoms1 [atoms1.Length - 1];
-		int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];
+        //if no atom clicked - normal
+		int index1 = asc.atom_selected_p1 == -1 ? atoms1 [0] : atoms1[asc.atom_selected_p1];
+
+        int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];
         //picking the last atom of the chain of the amino acid 2
-        int index2 = atoms2 [atoms2.Length - 1];
+        //if no atom clicked - normal
+        int index2 = asc.atom_selected_p2 == -1 ? atoms2 [0] : atoms2[asc.atom_selected_p2];
 		return CreateLink (mol1, index1, mol2, index2);
 	}
 
-	public void DeleteAminoAcidLink(AtomConnection con) {
+    public AtomConnection CreateAminoAcidLink_atom_modification(PDB_mesh mol1, int amino_acid_index1, int atom_index1, PDB_mesh mol2, int amino_acid_index2, int atom_index2)
+    {
+        int[] atoms1 = mol1.mol.aminoAcidsAtomIds[amino_acid_index1];
+        //picking the last atom of the chain of the amino acid 1
+        //if no atom clicked - normal
+        int index1 = atoms1[atom_index1];
+
+        int[] atoms2 = mol2.mol.aminoAcidsAtomIds[amino_acid_index2];
+        //picking the last atom of the chain of the amino acid 2
+        //if no atom clicked - normal
+        int index2 = atoms2[atom_index2];
+        return CreateLink(mol1, index1, mol2, index2);
+    }
+
+    public void DeleteAminoAcidLink(AtomConnection con) {
 		connections.Remove (con);
 	}
 
@@ -185,6 +204,7 @@ public class ConnectionManager : MonoBehaviour
         bb = FindObjectOfType<BioBlox>();
         line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
         sfx = FindObjectOfType<SFX>();
+        asc = FindObjectOfType<AminoSliderController>();
     }
 
 

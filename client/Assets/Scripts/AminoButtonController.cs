@@ -34,13 +34,13 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     {
         if (transform.parent.name == "ContentPanelA2")
 		{
-            bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
-            ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+            bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
 		else
 		{
-            bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
-            ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+            bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
         aminoSli.ChangeAminoAcidSelection (gameObject);
 	}
@@ -50,16 +50,22 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         sfx.PlayTrack(SFX.sound_index.amino_click);
         if (transform.parent.name == "ContentPanelA2")
 		{
-			bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
+			bb.molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA2(AminoButtonID);
-            ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+            //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
 		}
 		else
 		{			
-			bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID,false);
+			bb.molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA1(AminoButtonID);
-            ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+            //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
         aminoSli.ChangeAminoAcidSelection (gameObject);
+    }
+
+    //was calling twice the aminoacidssleection function
+    public void SetGameObject()
+    {
+        aminoSli.ChangeAminoAcidSelection(gameObject);
     }
 }

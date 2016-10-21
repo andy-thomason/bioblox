@@ -222,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1000010253999226
 GameObject:
   m_ObjectHideFlags: 1
@@ -270,6 +270,7 @@ GameObject:
   - 222: {fileID: 222000012752539440}
   - 114: {fileID: 114000014147996052}
   - 114: {fileID: 114000012146590366}
+  - 114: {fileID: 114000012706203968}
   m_Layer: 5
   m_Name: Atom2L
   m_TagString: Untagged
@@ -324,6 +325,7 @@ GameObject:
   - 222: {fileID: 222000012680490048}
   - 114: {fileID: 114000013169004500}
   - 114: {fileID: 114000011655266196}
+  - 114: {fileID: 114000012971310826}
   m_Layer: 5
   m_Name: Atom1L
   m_TagString: Untagged
@@ -434,7 +436,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1000012895731598
 GameObject:
   m_ObjectHideFlags: 1
@@ -446,6 +448,7 @@ GameObject:
   - 222: {fileID: 222000011552246316}
   - 114: {fileID: 114000010662652162}
   - 114: {fileID: 114000010896068164}
+  - 114: {fileID: 114000011974336796}
   m_Layer: 5
   m_Name: Atom2R
   m_TagString: Untagged
@@ -453,6 +456,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1000013125074806
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 4000010324273462}
+  m_Layer: 5
+  m_Name: ButtonsExpert
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
 --- !u!1 &1000013425894750
 GameObject:
   m_ObjectHideFlags: 1
@@ -481,6 +499,7 @@ GameObject:
   - 222: {fileID: 222000014019211266}
   - 114: {fileID: 114000010039839800}
   - 114: {fileID: 114000013369424534}
+  - 114: {fileID: 114000012085216488}
   m_Layer: 5
   m_Name: Atom1R
   m_TagString: Untagged
@@ -617,6 +636,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 224000011147063318}
   m_RootOrder: 1
+--- !u!4 &4000010324273462
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013125074806}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 224000011543187232}
+  - {fileID: 224000013475981066}
+  - {fileID: 224000011222352598}
+  - {fileID: 224000013070926052}
+  m_Father: {fileID: 224000011147063318}
+  m_RootOrder: 4
 --- !u!4 &4000011378014246
 Transform:
   m_ObjectHideFlags: 1
@@ -1232,6 +1268,36 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114000011974336796
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012895731598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114000013936900258}
+          m_MethodName: AT2R
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114000012032852290
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1283,6 +1349,36 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 114000013936900258}
           m_MethodName: DeleteLink
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
+--- !u!114 &114000012085216488
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013430545452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114000013936900258}
+          m_MethodName: AT1R
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -1537,6 +1633,36 @@ MonoBehaviour:
       m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
         Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   delegates: []
+--- !u!114 &114000012706203968
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011036907426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114000013936900258}
+          m_MethodName: AT2L
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114000012724633100
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1564,6 +1690,36 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114000012971310826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000011176258982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1862395651, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 114000013936900258}
+          m_MethodName: AT1L
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+      m_TypeName: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI,
+        Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  delegates: []
 --- !u!114 &114000013169004500
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1672,6 +1828,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID_button1: 0
   ID_button2: 0
+  AT1_index: 0
+  A1_number_of_atoms: 0
+  AT2_index: 0
+  A2_number_of_atoms: 0
 --- !u!114 &114000014017889616
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1862,7 +2022,7 @@ RectTransform:
   m_Children:
   - {fileID: 224000011358007312}
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 20.2, y: -3.6}
@@ -1937,6 +2097,7 @@ RectTransform:
   - {fileID: 4000010086697914}
   - {fileID: 4000011455174562}
   - {fileID: 4000011441061974}
+  - {fileID: 4000010324273462}
   - {fileID: 224000011812965308}
   - {fileID: 224000011285793102}
   - {fileID: 224000013331973734}
@@ -1944,10 +2105,6 @@ RectTransform:
   - {fileID: 224000013154952938}
   - {fileID: 224000012352682134}
   - {fileID: 224000010045879766}
-  - {fileID: 224000011543187232}
-  - {fileID: 224000013475981066}
-  - {fileID: 224000011222352598}
-  - {fileID: 224000013070926052}
   m_Father: {fileID: 22459726}
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -1967,8 +2124,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000010597011050}
-  m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 13
+  m_Father: {fileID: 4000010324273462}
+  m_RootOrder: 2
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 20.2, y: -18.9}
@@ -1986,7 +2143,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -5.9, y: -33.3}
@@ -2040,8 +2197,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000012806249470}
-  m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 11
+  m_Father: {fileID: 4000010324273462}
+  m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -20.5, y: 17.2}
@@ -2059,7 +2216,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -5.5, y: -43.9}
@@ -2078,7 +2235,7 @@ RectTransform:
   m_Children:
   - {fileID: 224000011071614440}
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 9
+  m_RootOrder: 10
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 20.2, y: 33.2}
@@ -2115,7 +2272,7 @@ RectTransform:
   m_Children:
   - {fileID: 224000010381360552}
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -20.5, y: 33.2}
@@ -2151,8 +2308,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000013219884192}
-  m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 14
+  m_Father: {fileID: 4000010324273462}
+  m_RootOrder: 3
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -20.5, y: -18.9}
@@ -2171,7 +2328,7 @@ RectTransform:
   m_Children:
   - {fileID: 224000011301657672}
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -20.5, y: -3.6}
@@ -2207,7 +2364,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 20.7, y: -41}
@@ -2225,8 +2382,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 224000012998159968}
-  m_Father: {fileID: 224000011147063318}
-  m_RootOrder: 12
+  m_Father: {fileID: 4000010324273462}
+  m_RootOrder: 1
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 20.2, y: 17.2}

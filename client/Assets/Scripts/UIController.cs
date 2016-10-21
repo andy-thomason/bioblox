@@ -160,6 +160,9 @@ public class UIController : MonoBehaviour {
     GameObject space_ship;
     public Animator FadeCanvasToExplore;
     #endregion
+    public GameObject AtomHolder;
+    public Transform P1AtomInfo;
+    public Transform P2AtomInfo;
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -216,7 +219,7 @@ public class UIController : MonoBehaviour {
                     if (atom_id_molecule >= 0)
                     {
                         atom_name_firstperson.text = BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsNames[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)] + " - " + BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().mol.aminoAcidsTags[BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().return_atom_id(atom_id_molecule)];
-                        BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule,false);
+                        BioBloxReference.molecules[protein_raycast].GetComponent<PDB_mesh>().SelectAminoAcid(atom_id_molecule);
                         is_hovering = true;
                     }
                     else
@@ -868,32 +871,50 @@ public class UIController : MonoBehaviour {
 
     GameObject atom_button_temp;
 
-    public void P1CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type)
+    public void P1CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type, int amino_acid_index, int atom_index)
     {
         atom_button_temp = Instantiate(atom_buttons[element_type]);
         atom_button_temp.transform.SetParent(p1_atom_holder);
         atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().amino_acid_index = amino_acid_index;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_child_index = atom_index;
     }
+
+    GameObject temp_reference;
 
     public void P1CleanAtomButtons()
     {
-        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
+        //DESTROY TAKES A FRAME, CREATE A NEW REFEFERENCE AND DUMP THE OTHER
+        temp_reference = Instantiate(AtomHolder);
+        temp_reference.transform.SetParent(P1AtomInfo, false);
+        Destroy(p1_atom_holder.gameObject);
+        p1_atom_holder = temp_reference.transform;
+        aminoSliderController.P1AtomsHolder = temp_reference.transform;
     }
 
-    public void P2CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type)
+    public void P2CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type, int amino_acid_index, int atom_index)
     {
         atom_button_temp = Instantiate(atom_buttons[element_type]);
         atom_button_temp.transform.SetParent(p2_atom_holder);
         atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
+        atom_button_temp.GetComponent<AtomConnectionController>().amino_acid_index = amino_acid_index;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_child_index = atom_index;
     }
 
     public void P2CleanAtomButtons()
     {
-        foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
+        //while (p2_atom_holder.childCount != 0)
+        //    DestroyImmediate(p2_atom_holder.transform.GetChild(0).gameObject);
+
+        temp_reference = Instantiate(AtomHolder);
+        temp_reference.transform.SetParent(P2AtomInfo, false);
+        Destroy(p2_atom_holder.gameObject);
+        p2_atom_holder = temp_reference.transform;
+        aminoSliderController.P2AtomsHolder = temp_reference.transform;
     }
 
     void DeselectAtoms()
@@ -941,6 +962,12 @@ public class UIController : MonoBehaviour {
             button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
             OffExpert.colors = button_color;
             #endregion
+            foreach(Transform child in AminoLinkPanel.transform)
+            {
+                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+            }
         }
     }
 
@@ -967,6 +994,12 @@ public class UIController : MonoBehaviour {
             button_color.pressedColor = Color.white;
             OffExpert.colors = button_color;
             #endregion
+            foreach (Transform child in AminoLinkPanel.transform)
+            {
+                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
+            }
         }
     }
     #endregion
@@ -1125,5 +1158,5 @@ public class UIController : MonoBehaviour {
         or.atom_3d_overlay = !or.atom_3d_overlay;
     }
     #endregion
-
+   
 }

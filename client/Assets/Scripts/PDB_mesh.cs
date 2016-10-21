@@ -25,6 +25,8 @@ public class PDB_mesh : MonoBehaviour {
     SFX sfx;
     int last_atom_scanned = -1;
 
+    public int number_of_current_atoms;
+
     //public bool hasCollided=false;
 
     // Use this for initialization
@@ -384,17 +386,25 @@ public class PDB_mesh : MonoBehaviour {
         return result;
     }
 
-    // call this to select an amino acid
-    public void SelectAminoAcid(int acid_number, bool isModification)
-    {
+    int P1_atom_index;
+    int P2_atom_index;
 
+    // call this to select an amino acid
+    public void SelectAminoAcid(int acid_number)
+    {
+        selected_atoms = mol.aminoAcidsAtomIds[acid_number];
+        P1_atom_index = P2_atom_index = 0;
         //CLEAN THE BUTTONS
         if (protein_id == 0)
+        {
+            aminoSliderController.atom_selected_p1 = -1;
             uIController.P1CleanAtomButtons();
+        }
         else
+        {
+            aminoSliderController.atom_selected_p2 = -1;
             uIController.P2CleanAtomButtons();
-
-        selected_atoms = mol.aminoAcidsAtomIds[acid_number];
+        }
         //Debug.Log("Aminoacids selected:" + acid_number);
         //go through the atoms of the amino acids
         for (int i = 0; i != selected_atoms.Length; ++i)
@@ -402,14 +412,15 @@ public class PDB_mesh : MonoBehaviour {
             int name = mol.names[selected_atoms[i]];
             int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
             if (protein_id == 0)
-                uIController.P1CreateAtomButtons(selected_atoms[i],protein_id, mol.atomNames[selected_atoms[i]],atom);
+            {
+                uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
+                P1_atom_index++;
+            }
             else
-                uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]],atom);
-        }
-
-        if(isModification)
-        {
-            aminoSliderController.ModifyConnectionHolder();
+            {
+                uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
+                P2_atom_index++;
+            }
         }
     }
 
@@ -425,7 +436,7 @@ public class PDB_mesh : MonoBehaviour {
             {
                 if (ids[j] == atom)
                 {
-                    SelectAminoAcid(i,false);                    
+                    SelectAminoAcid(i);                    
                     aminoSliderController.HighLight3DMesh(i,protein_id);
                     return;
                 }

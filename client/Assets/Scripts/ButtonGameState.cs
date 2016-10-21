@@ -72,7 +72,7 @@ public class ButtonGameState : MonoBehaviour, IPointerClickHandler {
                 //turn to normal
                 aminoSliderController.SliderMol[0].transform.Find(((int)amino_acids[i].x).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
                 aminoSliderController.SliderMol[1].transform.Find(((int)amino_acids[i].y).ToString()).gameObject.transform.localScale = new Vector3(1, 1, 1);
-                aminoSliderController.AminoAcidsLinkPanel(bb.GetComponent<ConnectionManager>().CreateAminoAcidLink(bb.molecules[0].GetComponent<PDB_mesh>(), (int)amino_acids[i].x, bb.molecules[1].GetComponent<PDB_mesh>(), (int)amino_acids[i].y), aminoSliderController.SliderMol[0].transform.Find(((int)amino_acids[i].x).ToString()).gameObject, aminoSliderController.SliderMol[1].transform.Find(((int)amino_acids[i].y).ToString()).gameObject);
+                aminoSliderController.AminoAcidsLinkPanel_load_score(bb.GetComponent<ConnectionManager>().CreateAminoAcidLink(bb.molecules[0].GetComponent<PDB_mesh>(), (int)amino_acids[i].x, bb.molecules[1].GetComponent<PDB_mesh>(), (int)amino_acids[i].y), aminoSliderController.SliderMol[0].transform.Find(((int)amino_acids[i].x).ToString()).gameObject, aminoSliderController.SliderMol[1].transform.Find(((int)amino_acids[i].y).ToString()).gameObject);
             }
             FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
             //set the rotation of the molecuels
