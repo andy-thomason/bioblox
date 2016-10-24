@@ -42,8 +42,7 @@ public class ShipController : MonoBehaviour {
 
     float time_rotation = 1;
     float time_rotation_acu = 0;
-
-    ExploreController explorerController;
+    
     UIController uI;
     SFX sfx;
     AminoSliderController aminoSlider;
@@ -51,26 +50,15 @@ public class ShipController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        speed = cruiseSpeed;
-        //rb = GetComponent<Rigidbody>();
         bb = FindObjectOfType<BioBlox>();
-        explorerController = FindObjectOfType<ExploreController>();
         uI = FindObjectOfType<UIController>();
         RayCastingCamera = transform.GetChild(0).GetComponent<Camera>();
         sfx = FindObjectOfType<SFX>();
-        aminoSlider = FindObjectOfType<AminoSliderController>();
         //SwitchCameraInside();
         //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
         bb.molecules[0].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
         bb.molecules[1].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
         uI.atom_name = transform.GetChild(2).transform.GetChild(1).GetComponent<Text>();
-    }
-	
-	// Update is called once per frame
-	void FixedUpdate ()
-    {
-        
-
     }
 
     void Update()

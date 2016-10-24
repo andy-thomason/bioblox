@@ -163,12 +163,14 @@ public class UIController : MonoBehaviour {
     public GameObject AtomHolder;
     public Transform P1AtomInfo;
     public Transform P2AtomInfo;
+    LineRenderer lr;
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.GetComponent<Camera>();
+        lr = FindObjectOfType<LineRenderer>();
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
@@ -1115,6 +1117,8 @@ public class UIController : MonoBehaviour {
         temp_ship.tag = "space_ship";
         //temp.transform.SetParent(transform, false);
         temp_ship.transform.position = new Vector3(0, 0, -60);
+        //set the camera
+        lr.lookat_camera = temp_ship.transform.GetChild(0).GetComponent<Camera>();
     }
 
     public void EndExplore()
@@ -1124,6 +1128,8 @@ public class UIController : MonoBehaviour {
         if (explorerController.beacon_holder.Count > 0)
             ToggleBeacon.isOn = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
+        //set the camera
+        lr.lookat_camera = MainCameraComponent;
         SaveButton.SetActive(true);
         Destroy(temp_ship);
     }

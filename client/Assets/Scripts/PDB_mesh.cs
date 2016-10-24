@@ -399,29 +399,30 @@ public class PDB_mesh : MonoBehaviour {
         {
             aminoSliderController.atom_selected_p1 = -1;
             uIController.P1CleanAtomButtons();
+            //go through the atoms of the amino acids
+            for (int i = 0; i != selected_atoms.Length; ++i)
+            {
+                int name = mol.names[selected_atoms[i]];
+                int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+                uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
+                P1_atom_index++;
+            }
         }
         else
         {
             aminoSliderController.atom_selected_p2 = -1;
             uIController.P2CleanAtomButtons();
-        }
-        //Debug.Log("Aminoacids selected:" + acid_number);
-        //go through the atoms of the amino acids
-        for (int i = 0; i != selected_atoms.Length; ++i)
-        {
-            int name = mol.names[selected_atoms[i]];
-            int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
-            if (protein_id == 0)
+            //go through the atoms of the amino acids
+            for (int i = 0; i != selected_atoms.Length; ++i)
             {
-                uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
-                P1_atom_index++;
-            }
-            else
-            {
+                int name = mol.names[selected_atoms[i]];
+                int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
                 uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
                 P2_atom_index++;
             }
         }
+        //Debug.Log("Aminoacids selected:" + acid_number);
+       
     }
 
     // call this to deselect amino acids
