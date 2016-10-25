@@ -882,6 +882,8 @@ public class UIController : MonoBehaviour {
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().amino_acid_index = amino_acid_index;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_child_index = atom_index;
+        atom_button_temp.GetComponent<AtomConnectionController>().element_type = element_type;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_name = atom_name_temp;
     }
 
     GameObject temp_reference;
@@ -905,6 +907,8 @@ public class UIController : MonoBehaviour {
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().amino_acid_index = amino_acid_index;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_child_index = atom_index;
+        atom_button_temp.GetComponent<AtomConnectionController>().element_type = element_type;
+        atom_button_temp.GetComponent<AtomConnectionController>().atom_name = atom_name_temp;
     }
 
     public void P2CleanAtomButtons()

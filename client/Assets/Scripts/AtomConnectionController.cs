@@ -10,6 +10,8 @@ public class AtomConnectionController : MonoBehaviour, IPointerClickHandler {
     public int protein_id;
     public int atom_child_index;
     public int amino_acid_index;
+    public int element_type;
+    public string atom_name;
 
 	// Use this for initialization
 	void Start ()
