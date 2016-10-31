@@ -55,6 +55,15 @@ public class AminoConnectionHolder : MonoBehaviour {
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
     }
 
+    void HightlighClickForNextAtom()
+    {
+        FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button2);
+        asc.UpdateCurrentButtonA2(ID_button2);
+        FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button1);
+        asc.UpdateCurrentButtonA1(ID_button1);
+        asc.HighLight3DMeshAll(ID_button1, ID_button2);
+    }
+
     public void HighlightWhenMovingThroughAtomsA1()
     {
         FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>().SelectAminoAcid(ID_button1);
@@ -177,29 +186,40 @@ public class AminoConnectionHolder : MonoBehaviour {
     }
 
     //SLIDER atom BUTTONS
-
+    bool atom_exist;
     public void AT1L()
     {
         if(AT1_index > 0)
         {
             sfx.PlayTrack(SFX.sound_index.amino_click);
+            //if false, no atoms are displayed
+            atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
 
-            if (asc.CurrentButtonA1 != ID_button1)
+            if(!atom_exist)
             {
-                HighlightWhenMovingThroughAtomsA1();
-                asc.HighlightAtomWhenConnectionClicked(0, 0);
+                HightlighClickForNextAtom();
             }
-            if (asc.CurrentButtonA2 != ID_button2)
+            else
             {
-                HighlightWhenMovingThroughAtomsA2();
-                asc.HighlightAtomWhenConnectionClicked(0, 1);
+                if (asc.CurrentButtonA1 != ID_button1)
+                {
+                    HighlightWhenMovingThroughAtomsA1();
+                    asc.HighlightAtomWhenConnectionClicked(0, 0);
+                    atom_exist = false;
+                }
+                if (asc.CurrentButtonA2 != ID_button2)
+                {
+                    HighlightWhenMovingThroughAtomsA2();
+                    asc.HighlightAtomWhenConnectionClicked(0, 1);
+                    atom_exist = false;
+                }
             }
 
             FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
             Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
 
             AT1_index--;
-            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0,gameObject);
+            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0,gameObject, atom_exist);
         }
     }
     public void AT1R()
@@ -207,23 +227,34 @@ public class AminoConnectionHolder : MonoBehaviour {
         if (AT1_index < A1_number_of_atoms-1)
         {
             sfx.PlayTrack(SFX.sound_index.amino_click);
+            //if false, no atoms are displayed
+            atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
 
-            if (asc.CurrentButtonA1 != ID_button1)
+            if (!atom_exist)
             {
-                HighlightWhenMovingThroughAtomsA1();
-                asc.HighlightAtomWhenConnectionClicked(0, 0);
+                HightlighClickForNextAtom();
             }
-            if (asc.CurrentButtonA2 != ID_button2)
+            else
             {
-                HighlightWhenMovingThroughAtomsA2();
-                asc.HighlightAtomWhenConnectionClicked(0, 1);
+                if (asc.CurrentButtonA1 != ID_button1)
+                {
+                    HighlightWhenMovingThroughAtomsA1();
+                    asc.HighlightAtomWhenConnectionClicked(0, 0);
+                    atom_exist = false;
+                }
+                if (asc.CurrentButtonA2 != ID_button2)
+                {
+                    HighlightWhenMovingThroughAtomsA2();
+                    asc.HighlightAtomWhenConnectionClicked(0, 1);
+                    atom_exist = false;
+                }
             }
 
             FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
             Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
 
             AT1_index++;
-            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject);
+            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject, atom_exist);
         }
     }
     public void AT2L()
@@ -232,23 +263,34 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
 
             sfx.PlayTrack(SFX.sound_index.amino_click);
+            //if false, no atoms are displayed
+            atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
 
-            if (asc.CurrentButtonA1 != ID_button1)
+            if (!atom_exist)
             {
-                HighlightWhenMovingThroughAtomsA1();
-                asc.HighlightAtomWhenConnectionClicked(0, 0);
+                HightlighClickForNextAtom();
             }
-            if (asc.CurrentButtonA2 != ID_button2)
+            else
             {
-                HighlightWhenMovingThroughAtomsA2();
-                asc.HighlightAtomWhenConnectionClicked(0, 1);
+                if (asc.CurrentButtonA1 != ID_button1)
+                {
+                    HighlightWhenMovingThroughAtomsA1();
+                    asc.HighlightAtomWhenConnectionClicked(0, 0);
+                    atom_exist = false;
+                }
+                if (asc.CurrentButtonA2 != ID_button2)
+                {
+                    HighlightWhenMovingThroughAtomsA2();
+                    asc.HighlightAtomWhenConnectionClicked(0, 1);
+                    atom_exist = false;
+                }
             }
 
             FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
             Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
 
             AT2_index--;
-            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject);
+            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject, atom_exist);
         }
     }
     public void AT2R()
@@ -257,23 +299,34 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
 
             sfx.PlayTrack(SFX.sound_index.amino_click);
+            //if false, no atoms are displayed
+            atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
 
-            if (asc.CurrentButtonA1 != ID_button1)
+            if (!atom_exist)
             {
-                HighlightWhenMovingThroughAtomsA1();
-                asc.HighlightAtomWhenConnectionClicked(0, 0);
+                HightlighClickForNextAtom();
             }
-            if (asc.CurrentButtonA2 != ID_button2)
+            else
             {
-                HighlightWhenMovingThroughAtomsA2();
-                asc.HighlightAtomWhenConnectionClicked(0, 1);
+                if (asc.CurrentButtonA1 != ID_button1)
+                {
+                    HighlightWhenMovingThroughAtomsA1();
+                    asc.HighlightAtomWhenConnectionClicked(0, 0);
+                    atom_exist = false;
+                }
+                if (asc.CurrentButtonA2 != ID_button2)
+                {
+                    HighlightWhenMovingThroughAtomsA2();
+                    asc.HighlightAtomWhenConnectionClicked(0, 1);
+                    atom_exist = false;
+                }
             }
 
             FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
             Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
 
             AT2_index++;
-            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject);
+            asc.ModifyConnectionHolder_atomic(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink_atom_modification(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1, AT1_index, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject, atom_exist);
         }
     }
 

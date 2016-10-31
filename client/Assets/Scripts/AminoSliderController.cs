@@ -284,7 +284,7 @@ public class AminoSliderController : MonoBehaviour {
         CurrentButtonA2 = index;
 		A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
     }
-
+    
     public void DeselectAmino()
     {
         //amino buttons
@@ -876,14 +876,18 @@ public class AminoSliderController : MonoBehaviour {
         P2AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
     }
 
-    public void ModifyConnectionHolder_atomic(AtomConnection connection_temp, int A1_atom_index, int A1_atom_index_previous, int A2_atom_index, int A2_atom_index_previous, int protein_id_temp, GameObject current_panel)
+    public void ModifyConnectionHolder_atomic(AtomConnection connection_temp, int A1_atom_index, int A1_atom_index_previous, int A2_atom_index, int A2_atom_index_previous, int protein_id_temp, GameObject current_panel, bool atom_exist)
     {
         GameObject temp_reference;
         if (protein_id_temp == 0 )
         {
-            //UNmark the atoM
-            P1AtomsHolder.GetChild(A1_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
-            Destroy(P1AtomsHolder.GetChild(A1_atom_index_previous).transform.GetChild(2).gameObject);
+            if(atom_exist)
+            {
+                //UNmark the atoM
+                P1AtomsHolder.GetChild(A1_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
+                Destroy(P1AtomsHolder.GetChild(A1_atom_index_previous).transform.GetChild(2).gameObject);
+            }
+            
             //P1_mesh.SelectAminoAcid(ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID);
             current_panel.GetComponent<AminoConnectionHolder>().AT1_index = A1_atom_index;
             temp_reference = Instantiate(atom_conn[P1AtomsHolder.GetChild(A1_atom_index).GetComponent<AtomConnectionController>().element_type]);
@@ -898,9 +902,14 @@ public class AminoSliderController : MonoBehaviour {
 
         }
         else
-        { //UNmark the atoM
-            P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
-            Destroy(P2AtomsHolder.GetChild(A2_atom_index_previous).transform.GetChild(2).gameObject);
+        {
+            if (atom_exist)
+            {
+                //UNmark the atoM
+                P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
+                Destroy(P2AtomsHolder.GetChild(A2_atom_index_previous).transform.GetChild(2).gameObject);
+            }
+            
             //P2_mesh.SelectAminoAcid(ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID);
             current_panel.GetComponent<AminoConnectionHolder>().AT2_index = A2_atom_index;
             temp_reference = Instantiate(atom_conn[P2AtomsHolder.GetChild(A2_atom_index).GetComponent<AtomConnectionController>().element_type]);
