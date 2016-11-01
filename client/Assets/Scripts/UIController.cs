@@ -791,7 +791,6 @@ public class UIController : MonoBehaviour {
         if (BioBloxReference.current_level == 0)
             BioBloxReference.ToggleMode.isOn = true;
         isOverUI = false;
-        DeleteHarpoons();
 
         sfx.StopTrack(SFX.sound_index.warning);
     }
@@ -805,6 +804,7 @@ public class UIController : MonoBehaviour {
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
+        ExpertModeOff();
     }
 
     //tool panel

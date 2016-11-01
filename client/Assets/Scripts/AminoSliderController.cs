@@ -895,11 +895,11 @@ public class AminoSliderController : MonoBehaviour {
             temp_reference.transform.SetParent(current_panel.transform.GetChild(2).transform, false);
             //mark the atom	
             HighlightAtomWhenConnectionClicked(A1_atom_index,0);
+            //HighlightAtomWhenConnectionClicked(A2_atom_index, 1);
             //LinkedGameObjectReference = Instantiate(LinkedAtom);
             //LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A1_atom_index).transform, false);
             ////animation
             //P1AtomsHolder.GetChild(A1_atom_index).GetComponent<Animator>().SetBool("High", true);
-
         }
         else
         {
@@ -917,6 +917,7 @@ public class AminoSliderController : MonoBehaviour {
             temp_reference.transform.SetParent(current_panel.transform.GetChild(3).transform, false);
             //mark the atom	
             HighlightAtomWhenConnectionClicked(A2_atom_index,1);
+            //HighlightAtomWhenConnectionClicked(A1_atom_index, 0);
             //LinkedGameObjectReference = Instantiate(LinkedAtom);
             //LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A2_atom_index).transform, false);
             ////animation
