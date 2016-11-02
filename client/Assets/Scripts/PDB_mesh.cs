@@ -18,7 +18,6 @@ public class PDB_mesh : MonoBehaviour {
     float t=0;
     AminoSliderController aminoSliderController;
     public int atom;
-    public Camera ship_camera;
 
     // add atom indices to here to display them selected
     public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -205,7 +204,7 @@ public class PDB_mesh : MonoBehaviour {
     Vector3 lastMousePos;
     bool rotating = false;
     bool has_rotated = false;
-    Camera cam;
+    public Camera cam;
     Ray ray;
     BioBlox bb;
     ButtonStructure buttonStructure;
@@ -348,7 +347,7 @@ public class PDB_mesh : MonoBehaviour {
         }
         else if (Input.GetMouseButton(1) && uIController.explore_view)
         {
-            Ray r = ship_camera.ScreenPointToRay(Input.mousePosition);
+            Ray r = cam.ScreenPointToRay(Input.mousePosition);
             atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
             if (atom != -1 && last_atom_scanned != atom)
             {

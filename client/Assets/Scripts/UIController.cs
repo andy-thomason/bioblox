@@ -1099,6 +1099,8 @@ public class UIController : MonoBehaviour {
             button_color.highlightedColor = Color.white;
             button_color.pressedColor = Color.white;
             OffExplorer.colors = button_color;
+            BioBloxReference.molecules[0].GetComponent<PDB_mesh>().cam = MainCameraComponent;
+            BioBloxReference.molecules[1].GetComponent<PDB_mesh>().cam = MainCameraComponent;
         }
     }
 

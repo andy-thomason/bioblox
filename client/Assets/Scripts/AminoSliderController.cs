@@ -192,8 +192,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (CurrentButtonA1 >= 0)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
-                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                   // A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
+                    //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
                     A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
                 }
@@ -214,8 +214,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (A1Buttons.Count > CurrentButtonA1)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
-                    A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                    //A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
+                   // A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino1.value = (float)A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
                     A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
                 }
@@ -235,8 +235,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (CurrentButtonA2 >= 0)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
-                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    //A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
+                   // A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
                     A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
                 }
@@ -256,8 +256,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (A2Buttons.Count > CurrentButtonA2)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
-                    A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    //A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
+                    //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
                     ScrollbarAmino2.value = (float)A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
                     A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();
                 }
@@ -272,24 +272,24 @@ public class AminoSliderController : MonoBehaviour {
 
 	public void UpdateCurrentButtonA1(int index)
 	{
-		A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+		//A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
         CurrentButtonA1 = index;
-		A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+		//A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
 
     }
 
 	public void UpdateCurrentButtonA2(int index)
 	{
-		A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+		//A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
         CurrentButtonA2 = index;
-		A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+		//A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
     }
     
     public void DeselectAmino()
     {
         //amino buttons
-        A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-        A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+       // A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+        //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
         ButtonPickedA1 = null;
         ButtonPickedA2 = null;
         AddConnection.interactable = false;
@@ -297,20 +297,22 @@ public class AminoSliderController : MonoBehaviour {
 
 	public void HighLight3DMesh(int index, int molecule)
 	{
-		if (molecule == 0) {			
-			A1Buttons [CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+		if (molecule == 0) {
+            //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
             CurrentButtonA1 = index;
-			A1Buttons [CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+            ChangeAminoAcidSelection(A1Buttons[CurrentButtonA1].gameObject);
+            //A1Buttons [CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
             ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
-			A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
+			//A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
 		}
         else
-		{
-			A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+        {
+            //A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
             CurrentButtonA2 = index;
-			A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+            ChangeAminoAcidSelection(A2Buttons[CurrentButtonA2].gameObject);
+            //A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
             ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
-			A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
+			//A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
 		}
 	}
 
@@ -437,7 +439,7 @@ public class AminoSliderController : MonoBehaviour {
             //ScrollbarAmino2.value = (float)ButtonSelected.GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
         }
 
-		if (ButtonPickedA1 != null && ButtonPickedA2 != null && ButtonPickedA1.GetComponent<Button> ().interactable == true && ButtonPickedA2.GetComponent<Button> ().interactable == true) {
+		if (ButtonPickedA1 != null && ButtonPickedA2 != null) {
             //AddConnection.GetComponent<Animator> ().enabled = true;
             AddConnection.interactable = true;
         }
@@ -473,8 +475,8 @@ public class AminoSliderController : MonoBehaviour {
             //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
             //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
-            ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
-			ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
+           // ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
+			//ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
 			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
 			//ButtonPickedA1 = ButtonPickedA2 = null;
 			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
@@ -488,14 +490,14 @@ public class AminoSliderController : MonoBehaviour {
         }
 	}
 
-	void DeactivateAddConnectionButton()
-	{
-		AddConnection.GetComponent<Animator>().enabled = false;
-		AddConnection.GetComponent<Button> ().enabled = false;
-		Color c = AddConnection.GetComponent<Image>().color;
-		c.a = 0.3f;
-		AddConnection.GetComponent<Image> ().color = c;
-	}
+	//void DeactivateAddConnectionButton()
+	//{
+	//	AddConnection.GetComponent<Animator>().enabled = false;
+	//	AddConnection.GetComponent<Button> ().enabled = false;
+	//	Color c = AddConnection.GetComponent<Image>().color;
+	//	c.a = 0.3f;
+	//	AddConnection.GetComponent<Image> ().color = c;
+	//}
 
 	public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
 	{
@@ -540,7 +542,7 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A_atom_index).transform, false);
         //animation
-        P1AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
+       // P1AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
 
         //get the atom connected
         A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID];
@@ -564,7 +566,7 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A_atom_index).transform, false);
         //animation
-        P2AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
+       // P2AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
     }
 
     bool CheckIfConnectionExist(GameObject A1, GameObject A2)
@@ -853,7 +855,7 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(0).transform, false);
         //animation
-        P1AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
+        //P1AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
 
         //get the atom connected
         A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID];
@@ -873,7 +875,7 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(0).transform, false);
         //animation
-        P2AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
+       // P2AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
     }
 
     public void ModifyConnectionHolder_atomic(AtomConnection connection_temp, int A1_atom_index, int A1_atom_index_previous, int A2_atom_index, int A2_atom_index_previous, int protein_id_temp, GameObject current_panel, bool atom_exist)
@@ -884,7 +886,7 @@ public class AminoSliderController : MonoBehaviour {
             if(atom_exist)
             {
                 //UNmark the atoM
-                P1AtomsHolder.GetChild(A1_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
+                //P1AtomsHolder.GetChild(A1_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
                 Destroy(P1AtomsHolder.GetChild(A1_atom_index_previous).transform.GetChild(2).gameObject);
             }
             
@@ -906,7 +908,7 @@ public class AminoSliderController : MonoBehaviour {
             if (atom_exist)
             {
                 //UNmark the atoM
-                P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
+               // P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
                 Destroy(P2AtomsHolder.GetChild(A2_atom_index_previous).transform.GetChild(2).gameObject);
             }
             
@@ -935,7 +937,7 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(atomholder_temp.GetChild(atom_id).transform, false);
         //animation
-        atomholder_temp.GetChild(atom_id).GetComponent<Animator>().SetBool("High", true);
+       // atomholder_temp.GetChild(atom_id).GetComponent<Animator>().SetBool("High", true);
     }
 
 

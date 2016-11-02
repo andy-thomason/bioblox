@@ -56,8 +56,8 @@ public class ShipController : MonoBehaviour {
         sfx = FindObjectOfType<SFX>();
         //SwitchCameraInside();
         //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
-        bb.molecules[0].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
-        bb.molecules[1].GetComponent<PDB_mesh>().ship_camera = transform.GetChild(0).GetComponent<Camera>();
+        bb.molecules[0].GetComponent<PDB_mesh>().cam = transform.GetChild(0).GetComponent<Camera>();
+        bb.molecules[1].GetComponent<PDB_mesh>().cam = transform.GetChild(0).GetComponent<Camera>();
         uI.atom_name = transform.GetChild(2).transform.GetChild(1).GetComponent<Text>();
     }
 
