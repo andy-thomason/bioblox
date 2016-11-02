@@ -22,7 +22,6 @@ GameObject:
   - 114: {fileID: 114000013938350184}
   - 114: {fileID: 114000011141845558}
   - 114: {fileID: 114000014092553530}
-  - 95: {fileID: 95000013353240012}
   m_Layer: 5
   m_Name: Sulfur
   m_TagString: Untagged
@@ -64,23 +63,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!95 &95000013353240012
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010458271396}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 872a6886c2b3bd54c9a23352947c9843, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114000010961829822
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -129,6 +111,8 @@ MonoBehaviour:
   protein_id: 0
   atom_child_index: 0
   amino_acid_index: 0
+  element_type: 0
+  atom_name: 
 --- !u!114 &114000013916817024
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -129,12 +129,8 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if ((ID_button1 - 1) >= 0)
             {
-                AminoPanel2.transform.GetChild(ID_button2).GetComponent<Animator>().SetBool("High", false);
-                AminoPanel1.transform.GetChild(ID_button1).GetComponent<Animator>().SetBool("High", false);
                 asc.ModifyConnectionHolder(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1 + A1, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
                 FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
-                AminoPanel2.transform.GetChild(ID_button2 + A2).GetComponent<Animator>().SetBool("High", true);
-                AminoPanel1.transform.GetChild(ID_button1 + A1).GetComponent<Animator>().SetBool("High", true);
                 UpdateLink();
             }
         }
@@ -142,12 +138,8 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if ((ID_button2 - 1) >= 0)
             {
-                AminoPanel2.transform.GetChild(ID_button2).GetComponent<Animator>().SetBool("High", false);
-                AminoPanel1.transform.GetChild(ID_button1).GetComponent<Animator>().SetBool("High", false);
                 asc.ModifyConnectionHolder(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1 + A1, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
                 FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
-                AminoPanel2.transform.GetChild(ID_button2 + A2).GetComponent<Animator>().SetBool("High", true);
-                AminoPanel1.transform.GetChild(ID_button1 + A1).GetComponent<Animator>().SetBool("High", true);
                 UpdateLink();
             }
         }
@@ -161,12 +153,8 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if (AminoPanel1.transform.childCount > (ID_button1 + 1))
             {
-                AminoPanel2.transform.GetChild(ID_button2).GetComponent<Animator>().SetBool("High", false);
-                AminoPanel1.transform.GetChild(ID_button1).GetComponent<Animator>().SetBool("High", false);
                 asc.ModifyConnectionHolder(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1 + A1, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
                 FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
-                AminoPanel2.transform.GetChild(ID_button2 + A2).GetComponent<Animator>().SetBool("High", true);
-                AminoPanel1.transform.GetChild(ID_button1 + A1).GetComponent<Animator>().SetBool("High", true);
                 UpdateLink();
             }
         }
@@ -174,12 +162,8 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if (AminoPanel2.transform.childCount > (ID_button2 + 1))
             {
-                AminoPanel2.transform.GetChild(ID_button2).GetComponent<Animator>().SetBool("High", false);
-                AminoPanel1.transform.GetChild(ID_button1).GetComponent<Animator>().SetBool("High", false);
                 asc.ModifyConnectionHolder(FindObjectOfType<ConnectionManager>().CreateAminoAcidLink(FindObjectOfType<BioBlox>().molecules[0].GetComponent<PDB_mesh>(), ID_button1 + A1, FindObjectOfType<BioBlox>().molecules[1].GetComponent<PDB_mesh>(), ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
                 FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
-                AminoPanel2.transform.GetChild(ID_button2 + A2).GetComponent<Animator>().SetBool("High", true);
-                AminoPanel1.transform.GetChild(ID_button1 + A1).GetComponent<Animator>().SetBool("High", true);
                 UpdateLink();
             }
         }

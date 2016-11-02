@@ -39,7 +39,6 @@ GameObject:
   - 114: {fileID: 114000011060407444}
   - 114: {fileID: 114000014103010592}
   - 114: {fileID: 114000010883374948}
-  - 95: {fileID: 95000013288465102}
   m_Layer: 5
   m_Name: Carbon
   m_TagString: Untagged
@@ -64,23 +63,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!95 &95000013288465102
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012257277398}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: dea95a4667b2bbe49b2539b08ab1e087, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114000010807532960
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -185,6 +167,8 @@ MonoBehaviour:
   protein_id: 0
   atom_child_index: 0
   amino_acid_index: 0
+  element_type: 0
+  atom_name: 
 --- !u!222 &222000010541456526
 CanvasRenderer:
   m_ObjectHideFlags: 1

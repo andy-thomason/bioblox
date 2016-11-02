@@ -27,6 +27,9 @@ public class IntroController : MonoBehaviour {
 
     void Awake()
     {
+#if UNITY_WEBGL
+        Application.targetFrameRate = -1;
+#endif
         IntroCamera.SetActive(true);
         //PlayButton.worldCamera = IntroCamera.GetComponent<Camera>();
         // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();

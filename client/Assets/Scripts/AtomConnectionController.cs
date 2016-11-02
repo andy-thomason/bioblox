@@ -24,19 +24,9 @@ public class AtomConnectionController : MonoBehaviour, IPointerClickHandler {
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         if (protein_id == 0)
-        {
-            if(asc.atom_selected_p1 != -1)
-                transform.parent.GetChild(asc.atom_selected_p1).GetComponent<Animator>().SetBool("High", false);
             asc.atom_selected_p1 = atom_child_index;
-        }
         else
-        {
-            if (asc.atom_selected_p2 != -1)
-                transform.parent.GetChild(asc.atom_selected_p2).GetComponent<Animator>().SetBool("High", false);
             asc.atom_selected_p2 = atom_child_index;
-        }
-
-        GetComponent<Animator>().SetBool("High", true);
     }
 
 

@@ -22,7 +22,6 @@ GameObject:
   - 114: {fileID: 114000012322813606}
   - 114: {fileID: 114000012475161168}
   - 114: {fileID: 114000011470971850}
-  - 95: {fileID: 95000012792503262}
   m_Layer: 5
   m_Name: Oxygen
   m_TagString: Untagged
@@ -64,23 +63,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!95 &95000012792503262
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010419029504}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 094a25f8eea384f40bcb994c0247ed09, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114000010000889616
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -152,6 +134,8 @@ MonoBehaviour:
   protein_id: 0
   atom_child_index: 0
   amino_acid_index: 0
+  element_type: 0
+  atom_name: 
 --- !u!114 &114000012589833934
 MonoBehaviour:
   m_ObjectHideFlags: 1

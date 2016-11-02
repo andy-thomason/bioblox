@@ -320,7 +320,6 @@ public class UIController : MonoBehaviour {
 
     public void RestartCameraFromIntro()
     {
-        Debug.Log("camera_distance: " + camera_distance);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
         MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
@@ -394,44 +393,7 @@ public class UIController : MonoBehaviour {
 			AminoButton.SetActive(status);
 		}
 	}
-
-   public void DropDownProteinView(int molecule)
-    {
-        if(molecule == 0)
-        {
-            switch(DropDownProtein1.value)
-            {
-                case 0:
-                    BioBloxReference.SolidClicked(0);
-                    break;
-                case 1:
-                    BioBloxReference.PointClicked(0);
-                    break;
-                case 2:
-                    BioBloxReference.WireClicked(0);
-                    break;
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            switch (DropDownProtein2.value)
-            {
-                case 0:
-                    BioBloxReference.SolidClicked(1);
-                    break;
-                case 1:
-                    BioBloxReference.PointClicked(1);
-                    break;
-                case 2:
-                    BioBloxReference.WireClicked(1);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
+    
 
     /*public void DropDownSliderView()
     {
@@ -828,7 +790,6 @@ public class UIController : MonoBehaviour {
 
     public void SetHintImage(string level_name)
     {
-        Debug.Log(level_name);
         HintImage.sprite = Sprite.Create(Resources.Load<Texture2D>("hint/"+ level_name), HintImage.sprite.rect, HintImage.sprite.pivot);
     }
 

@@ -94,6 +94,7 @@ public class BioBlox : MonoBehaviour
     //public GameObject[] prefab_molecules_bs;
     // the molecules in the scene
     public GameObject[] molecules;
+    public PDB_mesh[] molecules_PDB_mesh;
     public BitArray[] atoms_touching;
     public BitArray[] atoms_bad;
 
@@ -293,7 +294,6 @@ public void StartGame()
         colorPool.Add(Color.gray);
         colorPool.Add(new Color(1.0f, 0.5f, 0.1f));
         //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
-        Debug.Log("Start");
         //filenames.Add ("jigsawBlue");
 
         //filenames.Add ("2W9G");
@@ -327,8 +327,8 @@ public void StartGame()
         }
         aminoSlider.init();
 
-        molecules[0].GetComponent<PDB_mesh>().DeselectAminoAcid();
-        molecules[1].GetComponent<PDB_mesh>().DeselectAminoAcid();
+        molecules_PDB_mesh[0].DeselectAminoAcid();
+        molecules_PDB_mesh[1].DeselectAminoAcid();
         aminoSlider.DeselectAmino();
 
         //UI INIT
@@ -705,21 +705,6 @@ public void StartGame()
             game_state = GameState.Locked;
         }
     }
-    
-    public void SolidClicked(int molecule_id)
-    {
-        make_moleculesT (false, MeshTopology.Triangles, molecules[molecule_id].name,molecule_id);
-    }
-    
-    public void PointClicked(int molecule_id)
-    {
-        make_moleculesT (false, MeshTopology.Points, molecules[molecule_id].name,molecule_id);
-    }
-    
-    public void WireClicked(int molecule_id)
-    {
-        make_moleculesT (false, MeshTopology.Lines, molecules[molecule_id].name,molecule_id);
-    }
 
 
     
@@ -1031,8 +1016,12 @@ public void StartGame()
 
         if (init) {
             molecules = new GameObject[2];
+            molecules_PDB_mesh = new PDB_mesh[2];
             molecules [0] = mol1.gameObject;
             molecules [1] = mol2.gameObject;
+            molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+            molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
             Vector3 xoff = new Vector3(level.separation, 0, 0);
 
             reset_molecule(molecules[0], 0, level.offset - xoff);
@@ -1058,7 +1047,6 @@ public void StartGame()
             // for each level
             for (;;)
             {
-                Debug.Log("start level " + current_level);
                 //if true, we have no more levels listed in the vector
                 //to be replaced with level selection. Talk to andy on PDB file selection
                 if (current_level >= levels.Length)
@@ -1081,21 +1069,18 @@ public void StartGame()
                 originPosition[0] = mol1.transform.position;
                 originPosition[1] = mol2.transform.position;
 
-                PDB_mesh p1 = mol1.GetComponent<PDB_mesh>();
-                PDB_mesh p2 = mol2.GetComponent<PDB_mesh>();
-
                 //create the win condition from the file specified paired atoms
-                for (int i = 0; i < p1.mol.pairedLabels.Length; ++i)
+                for (int i = 0; i < molecules_PDB_mesh[0].mol.pairedLabels.Length; ++i)
                 {
-                    winCondition.Add(new Tuple<int, int>(p1.mol.pairedLabels[i].First,
-                                     p1.mol.pairedLabels[i].Second));
+                    winCondition.Add(new Tuple<int, int>(molecules_PDB_mesh[0].mol.pairedLabels[i].First,
+                                      molecules_PDB_mesh[0].mol.pairedLabels[i].Second));
                 }
                 //debug 3D texture
                 //GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
-                p1.other = p2.gameObject;
-                p2.other = p1.gameObject;
-                p1.gameObject.SetActive(false);
-                p2.gameObject.SetActive(false);
+                molecules_PDB_mesh[0].other = molecules_PDB_mesh[1].gameObject;
+                molecules_PDB_mesh[1].other = molecules_PDB_mesh[0].gameObject;
+                molecules_PDB_mesh[0].gameObject.SetActive(false);
+                molecules_PDB_mesh[1].gameObject.SetActive(false);
 
                 //pop the molecules in for a visually pleasing effect
                 PopInSound(mol1.gameObject);

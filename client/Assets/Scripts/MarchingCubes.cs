@@ -442,8 +442,6 @@ public class MarchingCubes
 				indices = new int[num_idx];
             }
 		}
-		//debug.Flush();
-		Debug.Log (DateTime.Now - start_time + "s to make mesh");
 	}
 };
 

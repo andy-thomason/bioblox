@@ -321,7 +321,6 @@ end_header
                 }
             }
         }
-        Debug.Log (DateTime.Now - start_time + "s to make values");
 
         //MarchingCubes(int x0, int y0, int z0, int xdim, int ydim, int zdim, float grid_spacing, float[] mc_values, Vector3[] mc_normals, Color[] mc_colours) {
         MarchingCubes mc = new MarchingCubes(x0, y0, z0, xdim, ydim, zdim, grid_spacing, mc_values, mc_normals, mc_colours);
