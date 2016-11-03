@@ -1,15 +1,27 @@
 fileFormatVersion: 2
-guid: e2af41e96018cff4780d079d8511f78e
-timeCreated: 1473180338
+guid: 037b86e00df440b4ba4324d9cd744a9b
+timeCreated: 1478188854
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
+    100002: Cube_MeshPart0
+    100004: Cube_MeshPart1
+    100006: Cube_MeshPart2
     400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: Cube
+    400002: Cube_MeshPart0
+    400004: Cube_MeshPart1
+    400006: Cube_MeshPart2
+    2300000: Cube_MeshPart0
+    2300002: Cube_MeshPart1
+    2300004: Cube_MeshPart2
+    3300000: Cube_MeshPart0
+    3300002: Cube_MeshPart1
+    3300004: Cube_MeshPart2
+    4300000: Cube_MeshPart0
+    4300002: Cube_MeshPart1
+    4300004: Cube_MeshPart2
   materials:
     importMaterials: 1
     materialName: 0
@@ -72,5 +84,5 @@ ModelImporter:
   humanoidOversampling: 1
   additionalBone: 0
   userData: 
-  assetBundleName: 
+  assetBundleName: molecules
   assetBundleVariant: 

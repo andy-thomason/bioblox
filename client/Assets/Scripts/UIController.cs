@@ -116,7 +116,7 @@ public class UIController : MonoBehaviour {
 
     //cutaway wall
     public Transform cutaway_wall;
-    float camera_distance;
+    float camera_distance = 240.0f;
 
     public GameObject EndLevelPanel;
     public Text number_atoms_end_level;
@@ -307,12 +307,20 @@ public class UIController : MonoBehaviour {
         OpenToolImage.SetActive(!tool_panel_status);
     }
 
-	public void RestartCamera()
+    public void ToogleToolMenuStart()
+    {
+        tool_panel_status = !tool_panel_status;
+        ToolPanel.SetBool("Open", tool_panel_status);
+        CloseToolImage.SetActive(tool_panel_status);
+        OpenToolImage.SetActive(!tool_panel_status);
+    }
+
+    public void RestartCamera()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         Debug.Log("camera_distance: "+ camera_distance);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
@@ -321,7 +329,7 @@ public class UIController : MonoBehaviour {
     public void RestartCameraFromIntro()
     {
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
@@ -330,7 +338,7 @@ public class UIController : MonoBehaviour {
     public void RepositionCameraWOMovement()
     {
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = -camera_distance;
+        MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
     }
 
@@ -509,10 +517,7 @@ public class UIController : MonoBehaviour {
     public void LoadLevelDescription(int level_temp, int mesh_temp1, int mesh_temp2, int camera_zoom)
     {
         BioBloxReference.current_level = level_temp;
-//<<<<<<< HEAD
         previous_level = BioBloxReference.current_level;
-        //BioBloxReference.mesh_offset_1 = mesh_offset_temp_1 = mesh_temp1;
-        //BioBloxReference.mesh_offset_2 = mesh_offset_temp_2 = mesh_temp2;
        
         MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_zoom;
         camera_distance = -camera_zoom;
@@ -521,10 +526,6 @@ public class UIController : MonoBehaviour {
 
     public void LoadLevelDescriptionIntro(string temp_title, string temp_description, Sprite temp_image, int level_temp)
     {
-//=======
-        //BioBloxReference.mesh_offset_1 = mesh_temp1;
-        //BioBloxReference.mesh_offset_2 = mesh_temp2;
-//>>>>>>> chains
         level_description.text = temp_description;
         level_title.text = temp_title;
         image_description.sprite = temp_image;
@@ -759,14 +760,13 @@ public class UIController : MonoBehaviour {
 
     public void Reset_UI()
     {
-        DropDownP1.value = protein_render.normal.GetHashCode();
-        DropDownP2.value = protein_render.normal.GetHashCode();
         tool_panel_status = true;
-        ToogleToolMenu();
+        ToogleToolMenuStart();
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
-        ExpertModeOff();
+        ExpertModeOffStart();
+        RestartCameraFromIntro();
     }
 
     //tool panel
@@ -944,6 +944,37 @@ public class UIController : MonoBehaviour {
         if (expert_mode)
         {
             sfx.PlayTrack(SFX.sound_index.button_click);
+            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            score_panel_alpha.alpha = expert_mode ? 0 : 1;
+            expert_mode = !expert_mode;
+            #region set the color OF THE BUTTON ON/OFF
+            //set the color
+            button_color = OnExpert.colors;
+            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+            OnExpert.colors = button_color;
+            //off
+            button_color = OffExpert.colors;
+            button_color.normalColor = Color.white;
+            button_color.highlightedColor = Color.white;
+            button_color.pressedColor = Color.white;
+            OffExpert.colors = button_color;
+            #endregion
+            foreach (Transform child in AminoLinkPanel.transform)
+            {
+                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void ExpertModeOffStart()
+    {
+        if (expert_mode)
+        {
             p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
             p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
             score_panel_alpha.alpha = expert_mode ? 0 : 1;

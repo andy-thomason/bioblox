@@ -27,9 +27,6 @@ public class IntroController : MonoBehaviour {
 
     void Awake()
     {
-#if UNITY_WEBGL
-        Application.targetFrameRate = -1;
-#endif
         IntroCamera.SetActive(true);
         //PlayButton.worldCamera = IntroCamera.GetComponent<Camera>();
         // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
@@ -37,8 +34,6 @@ public class IntroController : MonoBehaviour {
         bb = FindObjectOfType<BioBlox>();
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
-        bb.game_status = BioBlox.GameStatus.MainScreen;
-        sfx.PlayTrack(SFX.sound_index.amb);
         //sfx.PlayTrack(SFX.sound_index.main_audio);
         SFXAnimator.SetBool("Start", true);
     }

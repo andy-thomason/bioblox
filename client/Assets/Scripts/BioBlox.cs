@@ -191,6 +191,8 @@ public class BioBlox : MonoBehaviour
     public Transform Molecules;
     public Toggle ToggleMode;
 
+    string BundleURL = "http://www.quiley.com/BB/AssetBundles/molecules";
+
     public enum GameState
     {
         Setup,
@@ -217,51 +219,30 @@ public class BioBlox : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
+        #if UNITY_WEBGL
+                Application.targetFrameRate = -1;
+        #endif
+
+        game_status = BioBlox.GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
-        //filenames 
-        /*filename_levels.Add("2PTC");
-        filename_levels.Add("4KC3");
-        filename_levels.Add("1FSS");
-        filename_levels.Add("1EMV");
-        filename_levels.Add("1GRN");
-        filename_levels.Add("1OHZ"); 
-        filename_levels.Add("2VIR");
-        //fill the levels
 
-        //name of the meshes in Resources/Mesh - normal one with cutaway material
-        level_mesh_default.Add(new Tuple<string, string>("0", "1"));
-        level_mesh_default.Add(new Tuple<string, string>("4KC3_A_se_1", "4KC3_B_se_1"));
-        level_mesh_default.Add(new Tuple<string, string>("1FSS_A_se_1", "1FSS_B_se_1"));
-        level_mesh_default.Add(new Tuple<string, string>("1EMV_A_se_1", "1EMV_B_se_1"));
-        level_mesh_default.Add(new Tuple<string, string>("1GRN_A_se_1", "1GRN_B_se_1"));
-        level_mesh_default.Add(new Tuple<string, string>("1OHZ_A_se_1", "1OHZ_B_se_1"));
-        level_mesh_default.Add(new Tuple<string, string>("2VIR_AB_se_1", "2VIR_C_se_1"));
+        eventSystem = EventSystem.current;
+        //update
+        line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+        camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        //first eprson
+        aminoSlider = FindObjectOfType<AminoSliderController>();
 
-        //name of the meshes in Resources/Mesh - ball and stick renderer
-        level_mesh_bs.Add(new Tuple<string, string>("2PTC_E_bs_1", "2PTC_I_bs_1"));
-        level_mesh_bs.Add(new Tuple<string, string>("4KC3_A_bs_1", "4KC3_B_bs_1"));
-        level_mesh_bs.Add(new Tuple<string, string>("1FSS_A_bs_1", "1FSS_B_bs_1"));
-        level_mesh_bs.Add(new Tuple<string, string>("1EMV_A_bs_1", "1EMV_B_bs_1"));
-        level_mesh_bs.Add(new Tuple<string, string>("1GRN_A_bs_1", "1GRN_B_bs_1"));
-        level_mesh_bs.Add(new Tuple<string, string>("1OHZ_A_bs_1", "1OHZ_B_bs_1"));
-<<<<<<< HEAD
-        level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));
-        //name of the meshes in Resources/Mesh - ball and stick renderer
-        level_mesh_carbon.Add(new Tuple<string, string>("2PTC_E_ca_1", "2PTC_I_ca_1"));
-        level_mesh_carbon.Add(new Tuple<string, string>("4KC3_A_ca_1", "4KC3_B_ca_1"));
-        level_mesh_carbon.Add(new Tuple<string, string>("1FSS_A_ca_1", "1FSS_B_ca_1"));
-        level_mesh_carbon.Add(new Tuple<string, string>("1EMV_A_ca_1", "1EMV_B_ca_1"));
-        level_mesh_carbon.Add(new Tuple<string, string>("1GRN_A_ca_1", "1GRN_B_ca_1"));
-        level_mesh_carbon.Add(new Tuple<string, string>("1OHZ_A_ca_1", "1OHZ_B_ca_1"));
-        //level_mesh_carbon.Add(new Tuple<string, string>("2VIR_AB_ca_1", "2VIR_C_ca_1"));
-=======
-        level_mesh_bs.Add(new Tuple<string, string>("2VIR_AB_bs_1", "2VIR_C_bs_1"));*/
-    //>>>>>>> chains
-}
 
-public void StartGame()
+        //set the trypsin fiesr level temp
+        current_level = 0;
+        StartGame();
+    }
+
+    public void StartGame()
     {
+        Reset();
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
         uiController.ToggleHintFromIntro();
@@ -270,61 +251,15 @@ public void StartGame()
             ToggleMode.isOn = true;
         else
             ToggleMode.isOn = false;
-
-        //if (uiController.previous_level == level)
-        //    uiController.RestartLevel();
-
+        
         game_time = 0;
         playing = true;
-        //winSplash.SetActive (false);
-        //looseSplash.SetActive (false);
-        //goSplash.SetActive (false);
 
         game_state = GameState.Setup;
 
-        Time.fixedDeltaTime = 0.033f;
-
-        colorPool.Add(Color.red);
-        colorPool.Add(Color.blue);
-        colorPool.Add(Color.cyan);
-        colorPool.Add(Color.green);
-        colorPool.Add(Color.magenta);
-        colorPool.Add(Color.yellow);
-        colorPool.Add(Color.white);
-        colorPool.Add(Color.gray);
-        colorPool.Add(new Color(1.0f, 0.5f, 0.1f));
-        //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
-        //filenames.Add ("jigsawBlue");
-
-        //filenames.Add ("2W9G");
-
-        //filenames.Add ("betabarrel_b");
-        //filenames.Add("2ptc_u_new_edited");
-        //empty fiels name
-//<<<<<<< HEAD
-        //filenames.Clear();
-        ////set the fielanem
-        //filenames.Add(filename_levels[level]);
-        //set the hint image
-//=======
-        //filenames.Clear();
-        //filenames.Add(filename_levels[level]);
-//>>>>>>> chains
-
-
         StartCoroutine(game_loop());
 
-        if (first_time)
-        {
-
-            eventSystem = EventSystem.current;
-            //update
-            line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
-            camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-            //first eprson
-            aminoSlider = FindObjectOfType<AminoSliderController>();
-            first_time = false;
-        }
+        
         aminoSlider.init();
 
         molecules_PDB_mesh[0].DeselectAminoAcid();
@@ -576,127 +511,6 @@ public void StartGame()
         t.position = pos;
         t.rotation = Quaternion.LookRotation (-dir, Vector3.up);
     }
-
-
-    /*public void ManageSliders()
-    {
-        ConnectionManager conMan = this.GetComponent<ConnectionManager> ();
-
-        bool allInPickZone = true;
-        if (overrideSlider.gameObject.activeSelf && conMan.connectionMinDistances.Length == dockSliders.Count) {
-            float slider_pos = overrideSlider.value - dockOverrideOffset;
-
-            // see if the sliders are in the "sticky" region near the constrainer
-            float val0 = dockSliders[0].value;
-            bool all_together = true;
-            for (int i = 1; i < dockSliders.Count; ++i)
-            {
-                all_together = all_together && dockSliders[i].value == val0;
-            }
-
-            if (true || all_together && val0 >= slider_pos - 2)
-            {
-                // all sliders are being moved by the master
-                for (int i = 0; i < dockSliders.Count; ++i)
-                {
-                    dockSliders[i].value = slider_pos;
-                    conMan.connectionMinDistances[i] = dockSliders[i].value;
-                }
-            } else
-            {
-                // sliders are individual.
-                for (int i = 0; i < dockSliders.Count; ++i)
-                {
-                    if (dockSliders[i].value >= slider_pos)
-                    {
-                        dockSliders[i].value = slider_pos;
-                    }
-                    conMan.connectionMinDistances[i] = dockSliders[i].value;
-                }
-            }
-
-            // Return to pick state if all on the right.
-            for (int i = 1; i < dockSliders.Count; ++i)
-            {
-                if (dockSliders[i].value < dockSliders[i].maxValue-5)
-                {
-                    allInPickZone = false;
-                }
-            }
-        }
-    }*/
-    /*
-    //creates a err label. The label object contains a atom id and name used to name the instance
-    void CreateLabel (PDB_molecule.Label argLabel, int molNum, string labelName, PDB_molecule mol)
-    {
-        GameObject newLabel = GameObject.Instantiate<GameObject> (prefabLabel);
-        if (!newLabel) {
-            Debug.Log ("Could not create Label");
-        }
-
-        LabelScript laSc = newLabel.GetComponent<LabelScript> ();
-        newLabel.name = labelName + laSc.labelID;
-
-        //assigned the label a new color from a random range
-        newLabel.GetComponent<Image> ().color = colorPool [(argLabel.uniqueLabelID + randomColorPoolOffset) % colorPool.Count];
-        newLabel.GetComponent<Light> ().color = newLabel.GetComponent<Image> ().color;
-        laSc.atomIds = argLabel.atomIds;
-        laSc.moleculeNumber = molNum;
-
-        laSc.owner = this;
-        laSc.labelID = argLabel.uniqueLabelID;
-        //3D and 2D arrows see LabelScript
-        laSc.cloudIs3D = true;
-        //GameObject foundObject = GameObject.Find ("Label" + (activeLabels.Count + 1));
-        //newLabel.transform.position = foundObject.transform.position;
-
-        //we group all the labels under a single empty transform for convienence in the unity hierarchy
-        GameObject canvas = GameObject.Find ("Labels");
-        newLabel.transform.SetParent (canvas.transform);
-
-        laSc.Init (mol);
-        laSc.gameObject.SetActive (false);
-        while (activeLabels.Count < argLabel.uniqueLabelID + 1) {
-            activeLabels.Add (null);
-        }
-
-        activeLabels [argLabel.uniqueLabelID] = laSc;
-    }*/
-
-    // The pick button resets the sliders to the right.
-    /*public void Pick()
-    {
-        if (game_state == GameState.Picking || game_state == GameState.Docking) {
-            ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-        
-            overrideSlider.value = conMan.maxDistance;
-            for (int i = 0; i < dockSliders.Count; ++i) {
-                dockSliders [i].value = conMan.maxDistance;
-            }
-
-            //conMan.Reset ();
-
-            //selectedLabel [0] = null;
-            //selectedLabel [1] = null;
-            //game_state = GameState.Picking;
-
-            ManageSliders ();
-        }
-    }
-    
-    // The dock button resets the sliders to the middle.
-    public void Dock()
-    {
-        if (game_state == GameState.Picking || game_state == GameState.Docking) {
-            ConnectionManager conMan = gameObject.GetComponent<ConnectionManager> ();
-            
-            overrideSlider.value = conMan.maxDistance * 0.5f;
-            for (int i = 0; i < dockSliders.Count; ++i) {
-                dockSliders [i].value = conMan.maxDistance * 0.5f;
-            }
-            ManageSliders ();
-        }
-    }*/
     
     // The lock button establishes the Locked state.
     public void Lock()
@@ -710,31 +524,26 @@ public void StartGame()
     
     public void Reset ()
     {
-        //clears the molecules and re-randomizes the colour range
-        //randomColorPoolOffset = 0; //Random.Range (0, colorPool.Count - 1);
-        //GameObject.Destroy (molecules [0].gameObject);
-        //GameObject.Destroy (molecules [1].gameObject);
         foreach(Transform proteins in Molecules)
         {
             Destroy(proteins.gameObject);
         }
 
-        ////clear the old win condition
-        //winCondition.Clear ();
-
-        //game_state = GameState.Picking;
-
-        ////Clear score
-        //LennardScore.text = "0";
-        //ElectricScore.text = "0";
         aminoSlider.Reset();
         gameObject.GetComponent<ConnectionManager>().Reset();
-        //molecules = null;
-        //heuristicScore.fillAmount = 0;
-        //GameScoreValue.text = "0";
-        //MainCamera.fieldOfView = 60;
+        
+       // IntroCamera.SetActive(false);
 
-        //GetComponent<AminoSliderController> ().init ();
+        //FindObjectOfType<ConnectionManager>().DisableSlider();
+       // IntroCanvas.interactable = false;
+        //IntroCanvas.blocksRaycasts = false;
+
+        //ui.LevelClickled.GetComponent<LevelInfo>().SendData();
+
+        uiController.Reset_UI();
+        uiController.EndLevelPanel.SetActive(false);
+        
+        sfx.StopTrack(SFX.sound_index.warning);
     }
 
     //since a molecule may be too large for one mesh we may have to make several
@@ -867,12 +676,6 @@ public void StartGame()
 
         uiController.SetHintImage(level.pdbFile); //HINT
 
-        //<<<<<<< HEAD
-        //        GameObject mol1 = make_molecule (file + ".1", "Proto1", 7, mesh_type,0);
-        //        mol1.transform.SetParent(Molecules);
-        //        GameObject mol2 = make_molecule (file + ".2", "Proto2", 7, mesh_type,1);
-        //        mol2.transform.SetParent(Molecules);
-        //=======
         // These filenames refer to the prefabs in Assets/Resources/Mesh
         string mol1_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
         string mol2_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
@@ -931,89 +734,7 @@ public void StartGame()
         //mol2_mesh.name = "transparent_p1";
         FixTransparentMolecule(mol2_mesh, 1);
         mol2_mesh.SetActive(false);
-
-//        //<<<<<<< HEAD
-//        //ball and stick 1
-//        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_bs[level].First)) as GameObject;
-////=======
-//        // transparent 1
-//        mol1_mesh = Instantiate(Resources.Load(mol1_se_filename)) as GameObject;
-//        mol1_mesh.transform.SetParent(mol1.transform);
-//        mol1_mesh.name = "transparent_p1";
-//        FixTransparentMolecule(mol1_mesh);
-//        mol1_mesh.SetActive(false);
-
-//        // transparent 2
-//        mol2_mesh = Instantiate(Resources.Load(mol2_se_filename)) as GameObject;
-//        mol2_mesh.transform.SetParent(mol2.transform);
-//        mol2_mesh.name = "transparent_p2";
-//        FixTransparentMolecule(mol2_mesh);
-//        mol2_mesh.SetActive(false);
-
-//        // ball and stick 1
-//        mol1_mesh = Instantiate(Resources.Load(mol1_bs_filename)) as GameObject;
-////>>>>>>> chains
-//        mol1_mesh.transform.SetParent(mol1.transform);
-//        mol1_mesh.name = "bs_p1";
-//        mol1_mesh.SetActive(false);
-
-//        // ball and stick 2
-//        mol2_mesh = Instantiate(Resources.Load(mol2_bs_filename)) as GameObject;
-//        mol2_mesh.transform.SetParent(mol2.transform);
-//        mol2_mesh.name = "bs_p2";
-//        mol2_mesh.SetActive(false);
-//        //carbon 1
-//        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_carbon[level].First)) as GameObject;
-//        mol1_mesh.transform.SetParent(mol1.transform);
-//        mol1_mesh.name = "c_p1";
-//        mol1_mesh.SetActive(false);
-//        //carbon 2
-//        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_carbon[level].Second)) as GameObject;
-//        mol2_mesh.transform.SetParent(mol2.transform);
-//        mol2_mesh.name = "c_p2";
-//        mol2_mesh.SetActive(false);
-//        //transpant 1
-//        mol1_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].First)) as GameObject;
-//        mol1_mesh.transform.SetParent(mol1.transform);
-//        mol1_mesh.name = "transparent_p1";
-//        FixTransparentMolecule(mol1_mesh,0);
-//        mol1_mesh.SetActive(false);
-//        //transpant 2
-//        mol2_mesh = Instantiate(Resources.Load("Mesh/" + level_mesh_default[level].Second)) as GameObject;
-//        mol2_mesh.transform.SetParent(mol2.transform);
-//        mol2_mesh.name = "transparent_p2";
-//        FixTransparentMolecule(mol2_mesh,1);
-//        mol2_mesh.SetActive(false);
-
-        //GameObject mol1_mesh = Instantiate(prefab_molecules[0]);
-        //mol1_mesh.transform.SetParent(mol1.transform);
-
-        //GameObject mol2_mesh= Instantiate(prefab_molecules[1]);
-        //mol2_mesh.transform.SetParent(mol2.transform);
-
-        ////Ioannis
-        //scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
-
-        ////transpant 1
-        //mol1_mesh = Instantiate(prefab_molecules[0]);
-        //mol1_mesh.transform.SetParent(mol1.transform);
-        //mol1_mesh.name = "transparent_p1";
-        //FixTransparentMolecule(mol1_mesh);
-        ////transpant 2
-        //mol2_mesh = Instantiate(prefab_molecules[1]);
-        //mol2_mesh.transform.SetParent(mol2.transform);
-        //mol2_mesh.name = "transparent_p2";
-        //FixTransparentMolecule(mol2_mesh);
-        ////ball and stick 1
-        //mol1_mesh = Instantiate(prefab_molecules_bs[0]);
-        //mol1_mesh.transform.SetParent(mol1.transform);
-        //mol1_mesh.name = "bs_p1";
-        ////ball and stick 2
-        //mol2_mesh = Instantiate(prefab_molecules_bs[1]);
-        //mol2_mesh.transform.SetParent(mol2.transform);
-        //mol2_mesh.name = "bs_p2";
-
-
+        
         if (init) {
             molecules = new GameObject[2];
             molecules_PDB_mesh = new PDB_mesh[2];
@@ -1060,7 +781,8 @@ public void StartGame()
                     //lockButton.gameObject.SetActive(false);
                     //lockButton.interactable = false;
                 }
-                make_molecules(true, MeshTopology.Triangles);
+                StartCoroutine("DownloadMolecules");
+                //make_molecules(true, MeshTopology.Triangles);
 
                 // This is very grubby, must generalise.
                 GameObject mol1 = molecules[0];
@@ -1660,5 +1382,102 @@ public void StartGame()
             molecule_renderer.GetComponent<MeshRenderer>().reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
         }
     }
+
+    #region DOWNLOAD ASSETS FROM BUNDLE
+    IEnumerator DownloadMolecules()
+    {
+        Level level = levels[current_level];
+
+        uiController.SetHintImage(level.pdbFile); //HINT
+
+        // These filenames refer to the fbx in the asset bundle in the server
+        string mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".fbx";
+        string mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".fbx";
+        string mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod + ".fbx";
+        string mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod + ".fbx";
+       // string mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod + ".fbx";
+        //string mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod + ".fbx";
+
+        // Download the file from the URL. It will not be saved in the Cache
+        using (WWW www = new WWW(BundleURL))
+        {
+            yield return www;
+
+            if (www.error != null)
+                throw new System.Exception("WWW download had an error:" + www.error);
+
+            AssetBundle bundle = www.assetBundle;
+
+            // Make two PDB_mesh instances from the PDB file and a chain selection.
+            GameObject mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
+            mol1.transform.SetParent(Molecules);
+            GameObject mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
+            mol2.transform.SetParent(Molecules);
+
+            //DEFAULT
+            GameObject mol1_mesh = Instantiate(bundle.LoadAsset(mol1_se_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+
+            GameObject mol2_mesh = Instantiate(bundle.LoadAsset(mol2_se_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+
+            // Ioannis
+            scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
+
+            //BALLS AND STICK 1
+            mol1_mesh = Instantiate(bundle.LoadAsset(mol1_bs_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+            //mol1_mesh.name = "bs_p1";
+            mol1_mesh.SetActive(false);
+            //BALLS AND STICK 1
+            mol2_mesh = Instantiate(bundle.LoadAsset(mol2_bs_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+            //mol2_mesh.name = "bs_p2";
+            mol2_mesh.SetActive(false);
+
+            ////CARBON ALPHA 1
+            //mol1_mesh = Instantiate(Resources.Load(mol1_ca_filename)) as GameObject;
+            //mol1_mesh.transform.SetParent(mol1.transform);
+            ////mol1_mesh.name = "ca_p1";
+            //mol1_mesh.SetActive(false);
+            ////CARBON ALPHA 2
+            //mol2_mesh = Instantiate(Resources.Load(mol2_ca_filename)) as GameObject;
+            //mol2_mesh.transform.SetParent(mol2.transform);
+            ////mol2_mesh.name = "ca_p2";
+            //mol2_mesh.SetActive(false);
+
+            //TRANSPARENT 1
+            mol1_mesh = Instantiate(bundle.LoadAsset(mol1_se_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+            // mol1_mesh.name = "transparent_p1";
+            FixTransparentMolecule(mol1_mesh, 0);
+            mol1_mesh.SetActive(false);
+            //TRANSPARENT 2
+            mol2_mesh = Instantiate(bundle.LoadAsset(mol2_se_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+            //mol2_mesh.name = "transparent_p1";
+            FixTransparentMolecule(mol2_mesh, 1);
+            mol2_mesh.SetActive(false);
+
+            
+            molecules = new GameObject[2];
+            molecules_PDB_mesh = new PDB_mesh[2];
+            molecules[0] = mol1.gameObject;
+            molecules[1] = mol2.gameObject;
+            molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+            molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+            Vector3 xoff = new Vector3(level.separation, 0, 0);
+
+            reset_molecule(molecules[0], 0, level.offset - xoff);
+            reset_molecule(molecules[1], 1, level.offset + xoff);
+            
+
+            // Unload the AssetBundles compressed contents to conserve memory
+            bundle.Unload(false);
+
+        } // memory is freed from the web stream (www.Dispose() gets called implicitly)
+    }
+    #endregion
 }
 
