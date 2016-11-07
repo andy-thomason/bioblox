@@ -32912,6 +32912,8 @@ MonoBehaviour:
   work_done: 0
   transparent_0: {fileID: 2100000, guid: 9e72a4f45526f3e4c85c1dc68e794eae, type: 2}
   transparent_1: {fileID: 2100000, guid: 68e9fc130e3f8464fa1ff81baad4ac4d, type: 2}
+  normal_0: {fileID: 2100000, guid: 386261b96f9040147a510e241436c36c, type: 2}
+  normal_1: {fileID: 2100000, guid: 3c716b1055dbfb94ca7c655b4ffec05d, type: 2}
 --- !u!114 &913013348
 MonoBehaviour:
   m_ObjectHideFlags: 0
