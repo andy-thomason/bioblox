@@ -23,7 +23,7 @@ public class BioBlox : MonoBehaviour
     //public List<string> filenames = new List<string> ();
 
     // the level we are currently on, incremented at the end of a level
-    public int current_level = 0;
+    public int current_level;
 
     struct Level {
       public string pdbFile;
@@ -191,7 +191,6 @@ public class BioBlox : MonoBehaviour
     public Transform Molecules;
     public Toggle ToggleMode;
 
-    string BundleURL = "http://www.quiley.com/BB/AssetBundles/mole";
     bool loaded = false;
 
     public enum GameState
@@ -1416,6 +1415,9 @@ public class BioBlox : MonoBehaviour
     IEnumerator DownloadMolecules()
     {
         Level level = levels[current_level];
+        
+        string BundleURL = "http://www.quiley.com/BB/AssetBundles/"+ level.pdbFile.ToLower();
+        Debug.Log(BundleURL);
 
         uiController.SetHintImage(level.pdbFile); //HINT
 
@@ -1513,5 +1515,24 @@ public class BioBlox : MonoBehaviour
         StartGame();
     }
     #endregion
+
+    public void ChangeLevel()
+    {
+        game_status = BioBlox.GameStatus.MainScreen;
+        Reset();
+        uiController.Reset_UI();
+        //ui.EndLevelPanel.SetActive(false);
+        //intro_light.enabled = true;
+        //GameCanvas.alpha = 0;
+        //GameCanvas.blocksRaycasts = false;
+        //IntroCamera.SetActive(true);
+        //FadeCanvas.SetBool("Fade", false);
+        //IntroCanvas.interactable = true;
+        //IntroCanvas.blocksRaycasts = true;
+        //sfx.StopTrack(SFX.sound_index.warning);
+
+        current_level = 4;
+        StartCoroutine(DownloadMolecules());
+    }
 }
 

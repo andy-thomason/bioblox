@@ -24,6 +24,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
     Vector3 negDistance;
     Vector3 position;
     Quaternion rotation;
+    UIController ui;
 
     float x = 0.0f;
     float y = 0.0f;
@@ -31,6 +32,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        ui = FindObjectOfType<UIController>();
         Init();
     }
 
@@ -57,28 +59,31 @@ public class MouseOrbitImproved_main : MonoBehaviour
 
     void LateUpdate()
     {
-        if (Input.GetMouseButton(1))
+        if(!ui.isOverUI)
         {
-            Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
-            x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
-            y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
+            if (Input.GetMouseButton(1))
+            {
+                Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
+                x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
+                y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
+
+                y = ClampAngle(y, yMinLimit, yMaxLimit);
+            }
+            else
+            {
+                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            }
+
+            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * scroll_speed, distanceMin, distanceMax);
 
             y = ClampAngle(y, yMinLimit, yMaxLimit);
+            rotation = Quaternion.Euler(y, x, 0);
+            negDistance = new Vector3(0.0f, 0.0f, -distance);
+            position = rotation * negDistance + target;
+
+            transform.rotation = rotation;
+            transform.position = position;
         }
-        else
-        {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-        }
-
-        distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * scroll_speed, distanceMin, distanceMax);
-
-        y = ClampAngle(y, yMinLimit, yMaxLimit);
-        rotation = Quaternion.Euler(y, x, 0);
-        negDistance = new Vector3(0.0f, 0.0f, -distance);
-        position = rotation * negDistance + target;
-
-        transform.rotation = rotation;
-        transform.position = position;
 
     }
 
