@@ -191,7 +191,7 @@ public class BioBlox : MonoBehaviour
     public Transform Molecules;
     public Toggle ToggleMode;
 
-    string BundleURL = "http://www.quiley.com/BB/AssetBundles/molecules";
+    string BundleURL = "http://www.quiley.com/BB/AssetBundles/mole";
     bool loaded = false;
 
     public enum GameState
@@ -1370,6 +1370,8 @@ public class BioBlox : MonoBehaviour
     public Material transparent_1;
     public Material normal_0;
     public Material normal_1;
+    public Material bs_0;
+    public Material bs_1;
     bool switch_material = true;
     //bool switch_material = true;
 //>>>>>>> chains
@@ -1391,6 +1393,22 @@ public class BioBlox : MonoBehaviour
         foreach (Transform molecule_renderer in protein.transform)
         {
             molecule_renderer.GetComponent<Renderer>().material = id_protein == 0 ? normal_0 : normal_1;
+        }
+    }
+
+    //fix the transparent molecule
+    public void FixBSMolecule(GameObject protein, int id_protein)
+    {
+        if(protein.transform.childCount != 0)
+        {
+            foreach (Transform molecule_renderer in protein.transform)
+            {
+                molecule_renderer.GetComponent<Renderer>().material = id_protein == 0 ? bs_0 : bs_1;
+            }
+        }
+        else
+        {
+            protein.GetComponent<Renderer>().material = id_protein == 0 ? bs_0 : bs_1;
         }
     }
 
@@ -1426,65 +1444,67 @@ public class BioBlox : MonoBehaviour
             mol2.transform.SetParent(Molecules);
 
             //DEFAULT
-           Instantiate(bundle.LoadAsset(mol1_se_filename));
-            //mol1_mesh.transform.SetParent(mol1.transform);
-            //FixNormalMolecule(mol1_mesh, 0);
+            GameObject mol1_mesh = Instantiate(bundle.LoadAsset(mol1_se_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+            FixNormalMolecule(mol1_mesh, 0);
 
-            Instantiate(bundle.LoadAsset(mol2_se_filename));
-            //mol2_mesh.transform.SetParent(mol2.transform);
-            //FixNormalMolecule(mol2_mesh, 1);
+            GameObject mol2_mesh = Instantiate(bundle.LoadAsset(mol2_se_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+            FixNormalMolecule(mol2_mesh, 1);
 
             // Ioannis
             scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
 
-            ////BALLS AND STICK 1
-            //mol1_mesh = Instantiate(bundle.LoadAsset(mol1_bs_filename)) as GameObject;
+            //BALLS AND STICK 1
+            mol1_mesh = Instantiate(bundle.LoadAsset(mol1_bs_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+            FixBSMolecule(mol1_mesh, 0);
+            //mol1_mesh.name = "bs_p1";
+            mol1_mesh.SetActive(false);
+            //BALLS AND STICK 1
+            mol2_mesh = Instantiate(bundle.LoadAsset(mol2_bs_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+            FixBSMolecule(mol2_mesh, 1);
+            //mol2_mesh.name = "bs_p2";
+            mol2_mesh.SetActive(false);
+
+            ////CARBON ALPHA 1
+            //mol1_mesh = Instantiate(Resources.Load(mol1_ca_filename)) as GameObject;
             //mol1_mesh.transform.SetParent(mol1.transform);
-            ////mol1_mesh.name = "bs_p1";
+            ////mol1_mesh.name = "ca_p1";
             //mol1_mesh.SetActive(false);
-            ////BALLS AND STICK 1
-            //mol2_mesh = Instantiate(bundle.LoadAsset(mol2_bs_filename)) as GameObject;
+            ////CARBON ALPHA 2
+            //mol2_mesh = Instantiate(Resources.Load(mol2_ca_filename)) as GameObject;
             //mol2_mesh.transform.SetParent(mol2.transform);
-            ////mol2_mesh.name = "bs_p2";
+            ////mol2_mesh.name = "ca_p2";
             //mol2_mesh.SetActive(false);
 
-            //////CARBON ALPHA 1
-            ////mol1_mesh = Instantiate(Resources.Load(mol1_ca_filename)) as GameObject;
-            ////mol1_mesh.transform.SetParent(mol1.transform);
-            //////mol1_mesh.name = "ca_p1";
-            ////mol1_mesh.SetActive(false);
-            //////CARBON ALPHA 2
-            ////mol2_mesh = Instantiate(Resources.Load(mol2_ca_filename)) as GameObject;
-            ////mol2_mesh.transform.SetParent(mol2.transform);
-            //////mol2_mesh.name = "ca_p2";
-            ////mol2_mesh.SetActive(false);
+            //TRANSPARENT 1
+            mol1_mesh = Instantiate(bundle.LoadAsset(mol1_se_filename)) as GameObject;
+            mol1_mesh.transform.SetParent(mol1.transform);
+            // mol1_mesh.name = "transparent_p1";
+            FixTransparentMolecule(mol1_mesh, 0);
+            mol1_mesh.SetActive(false);
+            //TRANSPARENT 2
+            mol2_mesh = Instantiate(bundle.LoadAsset(mol2_se_filename)) as GameObject;
+            mol2_mesh.transform.SetParent(mol2.transform);
+            //mol2_mesh.name = "transparent_p1";
+            FixTransparentMolecule(mol2_mesh, 1);
+            mol2_mesh.SetActive(false);
 
-            ////TRANSPARENT 1
-            //mol1_mesh = Instantiate(bundle.LoadAsset(mol1_se_filename)) as GameObject;
-            //mol1_mesh.transform.SetParent(mol1.transform);
-            //// mol1_mesh.name = "transparent_p1";
-            //FixTransparentMolecule(mol1_mesh, 0);
-            //mol1_mesh.SetActive(false);
-            ////TRANSPARENT 2
-            //mol2_mesh = Instantiate(bundle.LoadAsset(mol2_se_filename)) as GameObject;
-            //mol2_mesh.transform.SetParent(mol2.transform);
-            ////mol2_mesh.name = "transparent_p1";
-            //FixTransparentMolecule(mol2_mesh, 1);
-            //mol2_mesh.SetActive(false);
 
-            
-            //molecules = new GameObject[2];
-            //molecules_PDB_mesh = new PDB_mesh[2];
-            //molecules[0] = mol1.gameObject;
-            //molecules[1] = mol2.gameObject;
-            //molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
-            //molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+            molecules = new GameObject[2];
+            molecules_PDB_mesh = new PDB_mesh[2];
+            molecules[0] = mol1.gameObject;
+            molecules[1] = mol2.gameObject;
+            molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+            molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
 
-            //Vector3 xoff = new Vector3(level.separation, 0, 0);
+            Vector3 xoff = new Vector3(level.separation, 0, 0);
 
-            //reset_molecule(molecules[0], 0, level.offset - xoff);
-            //reset_molecule(molecules[1], 1, level.offset + xoff);
-            
+            reset_molecule(molecules[0], 0, level.offset - xoff);
+            reset_molecule(molecules[1], 1, level.offset + xoff);
+
 
             // Unload the AssetBundles compressed contents to conserve memory
             bundle.Unload(false);

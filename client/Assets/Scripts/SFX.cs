@@ -88,4 +88,17 @@ public class SFX : MonoBehaviour {
     {
         audioSource[index.GetHashCode()].PlayDelayed(delay);
     }
+
+    public void MuteAll(bool status)
+    {
+        foreach(AudioSource aus in audioSource)
+        {
+            aus.mute = status;
+        }
+
+        foreach (AudioSource aus in audioSource_collision)
+        {
+            aus.mute = status;
+        }
+    }
 }
