@@ -1,4 +1,4 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Custom/MoleculeCGShader" {
     Properties{
@@ -340,8 +340,40 @@ Shader "Custom/MoleculeCGShader" {
                 float3 worldPos;
             };
 
+            // This is a transform to get the centre and axis aligned
+		        float4 _X;
+		        float4 _Y;
+		        float4 _Z;
+		        float4 _W;
+
+            // This transform undoes the previous one.
+		        float4 _IX;
+		        float4 _IY;
+		        float4 _IZ;
+		        float4 _IW;
+
+            // This is the bend angle in radians.
+		        float _Bend;
+
             void vert(inout appdata_full v, out Input o)
             {
+                // Apply "Bend" by selectively rotating half of the molecule
+
+			          // transform into axis space
+			          float4 pos = v.vertex.x * _X + v.vertex.y * _Y + v.vertex.z * _Z  + _W;
+
+                if (pos.y > 0) {
+                  float sinBend = sin(_Bend);
+                  float cosBend = cos(_Bend);
+                  float dz =  pos.y * sinBend + pos.z * cosBend;
+                  float dy =  pos.y * cosBend - pos.z * sinBend;
+                  pos.z = dz;
+                  pos.y = dy;
+                }
+
+			          // transform back to model space
+			          v.vertex = pos.x * _IX + pos.y * _IY + pos.z * _IZ + _IW;
+
                 UNITY_INITIALIZE_OUTPUT(Input,o);
                 o.vertexColor = v.color; // Save the Vertex Color in the Input for the surf() method
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
