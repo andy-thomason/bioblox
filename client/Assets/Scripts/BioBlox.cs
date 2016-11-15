@@ -1416,7 +1416,7 @@ public class BioBlox : MonoBehaviour
     {
         Level level = levels[current_level];
         
-        string BundleURL = "http://www.quiley.com/BB/AssetBundles/"+ level.pdbFile.ToLower();
+        string BundleURL = "https://ageofalgo.com/BB/AssetBundles/" + level.pdbFile.ToLower();
         Debug.Log(BundleURL);
 
         uiController.SetHintImage(level.pdbFile); //HINT
@@ -1516,11 +1516,11 @@ public class BioBlox : MonoBehaviour
     }
     #endregion
 
-    public void ChangeLevel()
+    public void ChangeLevel(int level_selected)
     {
         game_status = BioBlox.GameStatus.MainScreen;
         Reset();
-        uiController.Reset_UI();
+        //uiController.Reset_UI();
         //ui.EndLevelPanel.SetActive(false);
         //intro_light.enabled = true;
         //GameCanvas.alpha = 0;
@@ -1531,7 +1531,7 @@ public class BioBlox : MonoBehaviour
         //IntroCanvas.blocksRaycasts = true;
         //sfx.StopTrack(SFX.sound_index.warning);
 
-        current_level = 4;
+        current_level = level_selected;
         StartCoroutine(DownloadMolecules());
     }
 }
