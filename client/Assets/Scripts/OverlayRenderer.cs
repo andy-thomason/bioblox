@@ -125,7 +125,7 @@ public class OverlayRenderer : MonoBehaviour {
                     }
                     //show selected always and only in the protein which the camera is when first eprson
                     //HERE TO SYNC THE PDB WITH THE MESH - is_selected && 
-                    if (!is_selected)
+                    if (is_selected)
                     {
                         if (!(ui.first_person && ui.first_person_protein != i))
                         {
