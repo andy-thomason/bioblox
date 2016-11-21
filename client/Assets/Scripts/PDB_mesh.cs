@@ -30,7 +30,7 @@ public class PDB_mesh : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        mol = PDB_parser.get_molecule(this.name);
+        //mol = PDB_parser.get_molecule(this.name);
         aminoSliderController = FindObjectOfType<AminoSliderController> ();
         meshes = GetComponentsInChildren<MeshRenderer>();
         sfx = FindObjectOfType<SFX>();

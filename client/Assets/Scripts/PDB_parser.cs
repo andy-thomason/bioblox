@@ -73,7 +73,7 @@ public class PDB_parser {
         List<string> atomNames = new List<string>();
         List<Tuple<int,int>> pairs = new List<Tuple<int,int>> ();
         List<Tuple<int,int>> springPairs = new List<Tuple<int,int>> ();
-        List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
+        //List<List<PDB_molecule.Label>> labels = new List<List<PDB_molecule.Label>>();
         List<string> aminoAcidName = new List<string>();
         List<string> aminoAcidTag = new List<string>();
         List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
@@ -189,17 +189,17 @@ public class PDB_parser {
                     int labelIndex = int.Parse(line.Substring(7, 4));
                     int atomSerial = int.Parse(line.Substring(12, 4));
                     int molNumber = int.Parse(line.Substring(17, 4));
-                    //string tag = line.Substring(22, 4);
-                    while(labels.Count < molNumber + 1)
-                    {
-                        labels.Add(new List<PDB_molecule.Label>());
-                    }
-                    while(labels[molNumber].Count < labelIndex + 1)
-                    {
-                        labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
-                    }
-                    //Debug.Log( atomSerial + " added to " + labelIndex);
-                    labels[molNumber][labelIndex].atomIds.Add(atomSerial);
+                    ////string tag = line.Substring(22, 4);
+                    //while(labels.Count < molNumber + 1)
+                    //{
+                    //    labels.Add(new List<PDB_molecule.Label>());
+                    //}
+                    //while(labels[molNumber].Count < labelIndex + 1)
+                    //{
+                    //    labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
+                    //}
+                    ////Debug.Log( atomSerial + " added to " + labelIndex);
+                    //labels[molNumber][labelIndex].atomIds.Add(atomSerial);
                 } 
             }
         }

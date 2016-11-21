@@ -218,6 +218,9 @@ public class BioBlox : MonoBehaviour
 
     public int hint_stage = 0;
 
+    public GameObject loading_panel;
+    public GameObject loading_panel_start;
+
     //scoring
     PDB_score scoring;
 
@@ -239,7 +242,8 @@ public class BioBlox : MonoBehaviour
         //first eprson
         aminoSlider = FindObjectOfType<AminoSliderController>();
 
-
+        molecules = new GameObject[2];
+        molecules_PDB_mesh = new PDB_mesh[2];
         //set the trypsin fiesr level temp
         current_level = 0;
         StartCoroutine(DownloadMolecules());
@@ -270,6 +274,9 @@ public class BioBlox : MonoBehaviour
 
         //UI INIT
         uiController.init();
+
+        loading_panel.SetActive(false);
+        loading_panel_start.SetActive(false);
 
         StartCoroutine(game_loop());
 
@@ -547,7 +554,7 @@ public class BioBlox : MonoBehaviour
         uiController.Reset_UI();
         uiController.EndLevelPanel.SetActive(false);
         
-        sfx.StopTrack(SFX.sound_index.warning);
+        //sfx.StopTrack(SFX.sound_index.warning);
     }
 
     //since a molecule may be too large for one mesh we may have to make several
@@ -583,23 +590,15 @@ public class BioBlox : MonoBehaviour
     // Creates the molecule objects including the PDB_mesh script.
     GameObject make_molecule (string name, string proto, int layerNum, MeshTopology mesh_type, int index)
     {
-        GameObject obj = GameObject.Find (name);
-        if (obj == null) {
-            obj = new GameObject ();
-        }
+        GameObject obj = Instantiate(mesh_temp);
 
         obj.name = name;
-        obj.SetActive (true);
+       // obj.SetActive (true);
         //the layer numbers are to seperate the molecules in certain cameras
         obj.layer = layerNum;
 
         //just the one PDB_mesh component should be sufficient...
-        PDB_mesh p = obj.GetComponent<PDB_mesh>();
-        if (!p)
-        {
-            p = obj.AddComponent<PDB_mesh>();
-            //obj.AddComponent<FirstPerson>();
-        }
+        PDB_mesh p  = obj.AddComponent<PDB_mesh>();
 
         PDB_molecule mol = PDB_parser.get_molecule (name);
         p.mol = mol;
@@ -1520,50 +1519,164 @@ public class BioBlox : MonoBehaviour
     //    StartGame();
     //}
 
+    //IEnumerator DownloadMolecules()
+    //{
+    //    Level level = levels[current_level];
+
+    //    string BundleURL = "https://ageofalgo.com/BB/AssetBundles/" + level.pdbFile.ToLower();
+    //    //Debug.Log(BundleURL);
+
+    //    uiController.SetHintImage(level.pdbFile); //HINT
+
+    //    // These filenames refer to the fbx in the asset bundle in the server
+    //    string mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
+    //    string mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
+    //    string mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
+    //    string mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
+    //    // string mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod + ".fbx";
+    //    //string mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod + ".fbx";
+
+    //    // Make two PDB_mesh instances from the PDB file and a chain selection.
+    //    GameObject mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
+    //    mol1.transform.SetParent(Molecules);
+    //    GameObject mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
+    //    mol2.transform.SetParent(Molecules);
+
+    //    molecules = new GameObject[2];
+    //    molecules_PDB_mesh = new PDB_mesh[2];
+    //    molecules[0] = mol1.gameObject;
+    //    molecules[1] = mol2.gameObject;
+    //    molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+    //    molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+    //    Vector3 offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+    //    Vector3 offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+
+
+    //    //DEFAULT
+    //    GameObject parent_molecule = new GameObject();
+    //    parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+
+    //    //DEFAULT
+    //    GameObject parent_molecule_1 = new GameObject();
+    //    parent_molecule.name = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
+
+
+    //    // Download the file from the URL. It will not be saved in the Cache
+    //    using (WWW www = new WWW(BundleURL))
+    //    {
+    //        yield return www;
+
+    //        if (www.error != null)
+    //            throw new System.Exception("WWW download had an error:" + www.error);
+
+    //        AssetBundle bundle = www.assetBundle;
+
+    //        TextAsset txt = bundle.LoadAsset(mol1_se_filename, typeof(TextAsset)) as TextAsset;
+    //        byte[] bytes = txt.bytes;
+    //        Stream stream = new MemoryStream(bytes);
+    //        PLYDecoder(stream, parent_molecule.transform, 0, protein_view.normal);
+    //        GameObject transparency_0 = Instantiate(parent_molecule);
+    //        parent_molecule.transform.SetParent(mol1.transform);
+    //        parent_molecule.transform.Translate(offset_position_0);
+
+
+    //        txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
+    //        bytes = txt.bytes;
+    //        stream = new MemoryStream(bytes);
+    //        PLYDecoder(stream, parent_molecule_1.transform, 1, protein_view.normal);
+    //        GameObject transparency_1 = Instantiate(parent_molecule);
+    //        parent_molecule_1.transform.SetParent(mol2.transform);
+    //        parent_molecule_1.transform.Translate(offset_position_1);
+
+    //        // Ioannis
+    //        scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
+
+
+    //        //BALLS AND STICK 1
+    //        parent_molecule = new GameObject();
+    //        parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs;
+    //        txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
+    //        bytes = txt.bytes;
+    //        stream = new MemoryStream(bytes);
+    //        PLYDecoder(stream, parent_molecule.transform, 0, protein_view.bs);
+    //        parent_molecule.transform.SetParent(mol1.transform);
+    //        parent_molecule.SetActive(false);
+    //        parent_molecule.transform.Translate(offset_position_0);
+
+    //        //BALLS AND STICK 2
+    //        parent_molecule = new GameObject();
+    //        parent_molecule.name = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
+    //        txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
+    //        bytes = txt.bytes;
+    //        stream = new MemoryStream(bytes);
+    //        PLYDecoder(stream, parent_molecule.transform, 1, protein_view.bs);
+    //        parent_molecule.transform.SetParent(mol2.transform);
+    //        parent_molecule.SetActive(false);
+    //        parent_molecule.transform.Translate(offset_position_1);
+
+    //        //TRANSPARENT 1
+    //        transparency_0.transform.SetParent(mol1.transform);
+    //        // mol1_mesh.name = "transparent_p1";
+    //        FixTransparentMolecule(transparency_0, 0);
+    //        transparency_0.SetActive(false);
+    //        transparency_0.transform.Translate(offset_position_0);
+
+    //        //TRANSPARENT 2
+    //        transparency_1.transform.SetParent(mol2.transform);
+    //        // mol1_mesh.name = "transparent_p1";
+    //        FixTransparentMolecule(transparency_1, 1);
+    //        transparency_1.SetActive(false);
+    //        transparency_1.transform.Translate(offset_position_1);
+
+    //        Vector3 xoff = new Vector3(level.separation, 0, 0);
+
+    //        reset_molecule(molecules[0], 0, level.offset - xoff);
+    //        reset_molecule(molecules[1], 1, level.offset + xoff);
+
+
+    //        // Unload the AssetBundles compressed contents to conserve memory
+    //        bundle.Unload(false);
+    //    } // memory is freed from the web stream (www.Dispose() gets called implicitly)
+
+    //}
+    string mol1_se_filename;
+    string mol2_se_filename;
+    string mol1_bs_filename;
+    string mol2_bs_filename;
+    //string mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod + ".fbx";
+    //string mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod + ".fbx";
+
+    //creation of the files
+    TextAsset mol1_se_filename_txt;
+    TextAsset mol2_se_filename_txt;
+    TextAsset mol1_bs_filename_txt;
+    TextAsset mol2_bs_filename_txt;
+    byte[] txt_bytes;
+    Level level;
+    GameObject mol1;
+    GameObject mol2;
+    Vector3 offset_position_0;
+    Vector3 offset_position_1;
+    public GameObject parent_molecule;
+    GameObject parent_molecule_reference;
+    Stream stream;
+    GameObject transparency_0;
+    GameObject transparency_1;
+
+
     IEnumerator DownloadMolecules()
     {
-        Level level = levels[current_level];
+        level = levels[current_level];
 
         string BundleURL = "https://ageofalgo.com/BB/AssetBundles/" + level.pdbFile.ToLower();
-        //Debug.Log(BundleURL);
-
-        uiController.SetHintImage(level.pdbFile); //HINT
 
         // These filenames refer to the fbx in the asset bundle in the server
-        string mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
-        string mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
-        string mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
-        string mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
-        // string mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod + ".fbx";
-        //string mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod + ".fbx";
+        mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
+        mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
+        mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
+        mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
 
-        // Make two PDB_mesh instances from the PDB file and a chain selection.
-        GameObject mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
-        mol1.transform.SetParent(Molecules);
-        GameObject mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
-        mol2.transform.SetParent(Molecules);
-
-        molecules = new GameObject[2];
-        molecules_PDB_mesh = new PDB_mesh[2];
-        molecules[0] = mol1.gameObject;
-        molecules[1] = mol2.gameObject;
-        molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
-        molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
-
-        Vector3 offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
-        Vector3 offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
-
-
-        //DEFAULT
-        GameObject parent_molecule = new GameObject();
-        parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
-
-        //DEFAULT
-        GameObject parent_molecule_1 = new GameObject();
-        parent_molecule.name = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
-
-
-        // Download the file from the URL. It will not be saved in the Cache
         using (WWW www = new WWW(BundleURL))
         {
             yield return www;
@@ -1573,75 +1686,105 @@ public class BioBlox : MonoBehaviour
 
             AssetBundle bundle = www.assetBundle;
 
-            TextAsset txt = bundle.LoadAsset(mol1_se_filename, typeof(TextAsset)) as TextAsset;
-            byte[] bytes = txt.bytes;
-            Stream stream = new MemoryStream(bytes);
-            PLYDecoder(stream, parent_molecule.transform, 0, protein_view.normal);
-            GameObject transparency_0 = Instantiate(parent_molecule);
-            parent_molecule.transform.SetParent(mol1.transform);
-            parent_molecule.transform.Translate(offset_position_0);
+            mol1_se_filename_txt = bundle.LoadAsset(mol1_se_filename, typeof(TextAsset)) as TextAsset;
+            mol2_se_filename_txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
+            mol1_bs_filename_txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
+            mol2_bs_filename_txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
 
-            
-            txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
-            bytes = txt.bytes;
-            stream = new MemoryStream(bytes);
-            PLYDecoder(stream, parent_molecule_1.transform, 1, protein_view.normal);
-            GameObject transparency_1 = Instantiate(parent_molecule);
-            parent_molecule_1.transform.SetParent(mol2.transform);
-            parent_molecule_1.transform.Translate(offset_position_1);
-
-            // Ioannis
-            scoring = new PDB_score(mol1.GetComponent<PDB_mesh>().mol, mol1.gameObject.transform, mol2.GetComponent<PDB_mesh>().mol, mol2.gameObject.transform);
-
-
-            //BALLS AND STICK 1
-            parent_molecule = new GameObject();
-            parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs;
-            txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
-            bytes = txt.bytes;
-            stream = new MemoryStream(bytes);
-            PLYDecoder(stream, parent_molecule.transform, 0, protein_view.bs);
-            parent_molecule.transform.SetParent(mol1.transform);
-            parent_molecule.SetActive(false);
-            parent_molecule.transform.Translate(offset_position_0);
-
-            //BALLS AND STICK 2
-            parent_molecule = new GameObject();
-            parent_molecule.name = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
-            txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
-            bytes = txt.bytes;
-            stream = new MemoryStream(bytes);
-            PLYDecoder(stream, parent_molecule.transform, 1, protein_view.bs);
-            parent_molecule.transform.SetParent(mol2.transform);
-            parent_molecule.SetActive(false);
-            parent_molecule.transform.Translate(offset_position_1);
-
-            //TRANSPARENT 1
-            transparency_0.transform.SetParent(mol1.transform);
-            // mol1_mesh.name = "transparent_p1";
-            FixTransparentMolecule(transparency_0, 0);
-            transparency_0.SetActive(false);
-            transparency_0.transform.Translate(offset_position_0);
-
-            //TRANSPARENT 2
-            transparency_1.transform.SetParent(mol2.transform);
-            // mol1_mesh.name = "transparent_p1";
-            FixTransparentMolecule(transparency_1, 1);
-            transparency_1.SetActive(false);
-            transparency_1.transform.Translate(offset_position_1);
-
-            Vector3 xoff = new Vector3(level.separation, 0, 0);
-
-            reset_molecule(molecules[0], 0, level.offset - xoff);
-            reset_molecule(molecules[1], 1, level.offset + xoff);
-
-
-            // Unload the AssetBundles compressed contents to conserve memory
             bundle.Unload(false);
-        } // memory is freed from the web stream (www.Dispose() gets called implicitly)
+        }
+
+        // Make two PDB_mesh instances from the PDB file and a chain selection.
+        mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
+        mol1.transform.SetParent(Molecules);
+        mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
+        mol2.transform.SetParent(Molecules);
+
+        molecules[0] = mol1.gameObject;
+        molecules[1] = mol2.gameObject;
+        molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+        molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+        // Ioannis scoring
+        scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
+
+        offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+        offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+
+        System.GC.Collect();
+
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+        txt_bytes = mol1_se_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+        transparency_0 = Instantiate(parent_molecule_reference);
+        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.SetActive(true);
+        parent_molecule_reference.transform.Translate(offset_position_0);
+
+        //DEFAULT
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
+        txt_bytes = mol2_se_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
+        transparency_1 = Instantiate(parent_molecule_reference);
+        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.SetActive(true);
+        parent_molecule_reference.transform.Translate(offset_position_1);
+
+        //BALLS AND STICK 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs;
+        txt_bytes = mol1_bs_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.SetActive(false);
+        parent_molecule_reference.transform.Translate(offset_position_0);
+
+        //BALLS AND STICK 2
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
+        txt_bytes = mol2_bs_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.SetActive(false);
+        parent_molecule_reference.transform.Translate(offset_position_1);
+
+        //TRANSPARENT 1
+        transparency_0.transform.SetParent(mol1.transform);
+        // mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(transparency_0, 0);
+        transparency_0.SetActive(false);
+        transparency_0.transform.Translate(offset_position_0);
+
+        //TRANSPARENT 2
+        transparency_1.transform.SetParent(mol2.transform);
+        // mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(transparency_1, 1);
+        transparency_1.SetActive(false);
+        transparency_1.transform.Translate(offset_position_1);
+
+        Vector3 xoff = new Vector3(level.separation, 0, 0);
+
+        reset_molecule(molecules[0], 0, level.offset - xoff);
+        reset_molecule(molecules[1], 1, level.offset + xoff);
+
+        uiController.SetHintImage(level.pdbFile); //HINT
 
         StartGame();
+
+        //create_mesh_1();
+        //create_mesh_11();
+        //create_mesh2();
+        //StartGame();
     }
+
+    public GameObject mesh_temp;
+    GameObject mesh_reference;
 
     void PLYDecoder(Stream stream, Transform parent_molecule, int id_protein, protein_view protein_view )
     {
@@ -1650,21 +1793,22 @@ public class BioBlox : MonoBehaviour
 
         for (int i = 0; i != mesh.Length; ++i)
         {
-            GameObject g = new GameObject();
-            mesh[i].name = g.name = "mesh" + i;
-            MeshFilter mf = g.AddComponent<MeshFilter>();
+            //GameObject g = new GameObject();
+            mesh_reference = Instantiate(mesh_temp);
+            mesh[i].name = mesh_reference.name = "mesh" + i;
+            MeshFilter mf = mesh_reference.AddComponent<MeshFilter>();
             mf.mesh = mesh[i];
-            MeshRenderer mr = g.AddComponent<MeshRenderer>();
-            //if(id_protein == 0)
-            //{
-            //    mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_0 : protein_view == protein_view.bs ? bs_0 : transparent_0;
-            //}
-            //else
-            //{
-            //    mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_1 : protein_view == protein_view.bs ? bs_1 : transparent_1;
-            //}
-            g.transform.SetParent(parent_molecule);
-            System.GC.Collect();
+            MeshRenderer mr = mesh_reference.AddComponent<MeshRenderer>();
+            if (id_protein == 0)
+            {
+                mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_0 : protein_view == protein_view.bs ? bs_0 : transparent_0;
+            }
+            else
+            {
+                mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_1 : protein_view == protein_view.bs ? bs_1 : transparent_1;
+            }
+            mesh_reference.transform.SetParent(parent_molecule);
+           // System.GC.Collect();
         }
     }
     #endregion
@@ -1672,6 +1816,7 @@ public class BioBlox : MonoBehaviour
     public void ChangeLevel(int level_selected)
     {
         game_status = BioBlox.GameStatus.MainScreen;
+        loading_panel.SetActive(true);
         Reset();
         //uiController.Reset_UI();
         //ui.EndLevelPanel.SetActive(false);
@@ -1687,5 +1832,131 @@ public class BioBlox : MonoBehaviour
         current_level = level_selected;
         StartCoroutine(DownloadMolecules());
     }
+
+
+
+
+
+    public void download()
+    {
+        StartCoroutine(DownloadMolecules());
+    }
+
+    
+
+    //public void create_mesh_1()
+    //{
+
+    //    // Make two PDB_mesh instances from the PDB file and a chain selection.
+    //    mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
+    //    mol1.transform.SetParent(Molecules);
+    //    mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
+    //    mol2.transform.SetParent(Molecules);
+
+    //    molecules[0] = mol1.gameObject;
+    //    molecules[1] = mol2.gameObject;
+    //    molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+    //    molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+    //    // Ioannis scoring
+    //    scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
+
+    //    offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+    //    offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+
+    //    System.GC.Collect();
+    //}
+    
+    //public void create_mesh_11()
+    //{
+    //    parent_molecule_reference = Instantiate(parent_molecule);
+    //    parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+    //    txt_bytes = mol1_se_filename_txt.bytes;
+    //    stream = new MemoryStream(txt_bytes);
+    //    PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+    //    transparency_0 = Instantiate(parent_molecule_reference);
+    //    parent_molecule_reference.transform.SetParent(mol1.transform);
+    //    parent_molecule_reference.transform.Translate(offset_position_0);
+
+    //    //DEFAULT
+    //    parent_molecule_reference = Instantiate(parent_molecule);
+    //    parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
+    //    txt_bytes = mol2_se_filename_txt.bytes;
+    //    stream = new MemoryStream(txt_bytes);
+    //    PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
+    //    transparency_1 = Instantiate(parent_molecule_reference);
+    //    parent_molecule_reference.transform.SetParent(mol2.transform);
+    //    parent_molecule_reference.transform.Translate(offset_position_1);
+
+    //     //TRANSPARENT 1
+    //    transparency_0.transform.SetParent(mol1.transform);
+    //    // mol1_mesh.name = "transparent_p1";
+    //    FixTransparentMolecule(transparency_0, 0);
+    //    transparency_0.SetActive(false);
+    //    transparency_0.transform.Translate(offset_position_0);
+
+    //    //TRANSPARENT 2
+    //    transparency_1.transform.SetParent(mol2.transform);
+    //    // mol1_mesh.name = "transparent_p1";
+    //    FixTransparentMolecule(transparency_1, 1);
+    //    transparency_1.SetActive(false);
+    //    transparency_1.transform.Translate(offset_position_1);
+
+    //    Vector3 xoff = new Vector3(level.separation, 0, 0);
+
+    //    reset_molecule(molecules[0], 0, level.offset - xoff);
+    //    reset_molecule(molecules[1], 1, level.offset + xoff);
+
+    //    uiController.SetHintImage(level.pdbFile); //HINT
+
+    //    System.GC.Collect();
+    //}
+
+    //public void create_mesh2()
+    //{
+    //    //BALLS AND STICK 1
+    //    parent_molecule = new GameObject();
+    //    parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs;
+    //    txt_bytes = mol1_bs_filename_txt.bytes;
+    //    stream = new MemoryStream(txt_bytes);
+    //    PLYDecoder(stream, parent_molecule.transform, 0, protein_view.bs);
+    //    parent_molecule.transform.SetParent(mol1.transform);
+    //    parent_molecule.SetActive(false);
+    //    parent_molecule.transform.Translate(offset_position_0);
+
+    //    //BALLS AND STICK 2
+    //    parent_molecule = new GameObject();
+    //    parent_molecule.name = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
+    //    txt_bytes = mol2_bs_filename_txt.bytes;
+    //    stream = new MemoryStream(txt_bytes);
+    //    PLYDecoder(stream, parent_molecule.transform, 1, protein_view.bs);
+    //    parent_molecule.transform.SetParent(mol2.transform);
+    //    parent_molecule.SetActive(false);
+    //    parent_molecule.transform.Translate(offset_position_1);
+
+    //    System.GC.Collect();
+
+    //}
+
+    //public void start_juego()
+    //{
+    //    StartGame();
+    //}
+
+    //public void create_from_server()
+    //{
+    //    //DEFAULT
+    //    parent_molecule = new GameObject();
+    //    parent_molecule.name = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+    //    txt_bytes = mol1_se_filename_txt.bytes;
+    //    stream = new MemoryStream(txt_bytes);
+    //    PLYDecoder(stream,parent_molecule.transform, 0, protein_view.normal);
+    //    transparency_0 = Instantiate(parent_molecule);
+    //    parent_molecule.transform.SetParent(mol1.transform);
+    //    parent_molecule.transform.Translate(offset_position_0);
+
+    //    System.GC.Collect();
+
+    //}
 }
 

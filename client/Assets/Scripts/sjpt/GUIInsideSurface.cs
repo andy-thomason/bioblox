@@ -63,7 +63,7 @@ namespace CSG {
                     CSGControl.MinLev = CSGControl.MinLev = 7;
                 CSGControl.MaxLev = CSGControl.MinLev;
 
-                mol = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
+               // mol = PDB_parser.get_molecule("pdb2ptcWithTags.1");  // read the (cached) molecule data
 
                 // prepare and populate the metaball object
                 csgm = new CSGFMETA();

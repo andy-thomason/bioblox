@@ -684,33 +684,33 @@ end_header
         }
         build_bvh();
 
-        Vector3[] verts = new Vector3[0];
-        Vector3[] normals = new Vector3[0];
-        Vector2[] uvs = new Vector2[0];
-        Color[] color = new Color[0];
-        int[] index = new int[0];
-        if (mode == Mode.Ball) {
-            build_ball_mesh (out verts, out normals, out uvs, out color, out index);
-            construct_unity_meshes (verts, normals, uvs, color, index);
-        } else if (mode == Mode.Metasphere) {
-            build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
-            construct_unity_meshes (verts, normals, uvs, color, index);
-            //write_ply(verts, color, index);
-            /*
-            mesh = new Mesh[1];
-            mesh [0]= new Mesh();
-            mesh [0].Clear ();
-            mesh [0].name = "metasphere view" + 0;
-            mesh [0].vertices = verts;
-            mesh [0].normals = normals;
-            mesh [0].uv = uvs;
-            mesh [0].colors = color;
-            mesh [0].triangles = index;
-            */
-        }
-        else if (mode == Mode.Ribbon) {
-            build_ribbon_mesh();
-        }
+        //Vector3[] verts = new Vector3[0];
+        //Vector3[] normals = new Vector3[0];
+        //Vector2[] uvs = new Vector2[0];
+        //Color[] color = new Color[0];
+        //int[] index = new int[0];
+        //if (mode == Mode.Ball) {
+        //    build_ball_mesh (out verts, out normals, out uvs, out color, out index);
+        //    construct_unity_meshes (verts, normals, uvs, color, index);
+        //} else if (mode == Mode.Metasphere) {
+        //    build_metasphere_mesh(out verts,out normals,out uvs,out color,out index);
+        //    construct_unity_meshes (verts, normals, uvs, color, index);
+        //    //write_ply(verts, color, index);
+        //    /*
+        //    mesh = new Mesh[1];
+        //    mesh [0]= new Mesh();
+        //    mesh [0].Clear ();
+        //    mesh [0].name = "metasphere view" + 0;
+        //    mesh [0].vertices = verts;
+        //    mesh [0].normals = normals;
+        //    mesh [0].uv = uvs;
+        //    mesh [0].colors = color;
+        //    mesh [0].triangles = index;
+        //    */
+        //}
+        //else if (mode == Mode.Ribbon) {
+        //    build_ribbon_mesh();
+        //}
 
     }
 
