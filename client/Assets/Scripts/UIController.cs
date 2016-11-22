@@ -845,7 +845,7 @@ public class UIController : MonoBehaviour {
     public void P1CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type, int amino_acid_index, int atom_index)
     {
         atom_button_temp = Instantiate(atom_buttons[element_type]);
-        atom_button_temp.transform.SetParent(p1_atom_holder);
+        atom_button_temp.transform.SetParent(p1_atom_holder, false);
         atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
@@ -870,7 +870,7 @@ public class UIController : MonoBehaviour {
     public void P2CreateAtomButtons(int atom_id_temp, int protein_id_temp, string atom_name_temp, int element_type, int amino_acid_index, int atom_index)
     {
         atom_button_temp = Instantiate(atom_buttons[element_type]);
-        atom_button_temp.transform.SetParent(p2_atom_holder);
+        atom_button_temp.transform.SetParent(p2_atom_holder, false);
         atom_button_temp.GetComponentInChildren<Text>().text = atom_name_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().atom_id = atom_id_temp;
         atom_button_temp.GetComponent<AtomConnectionController>().protein_id = protein_id_temp;
@@ -919,8 +919,8 @@ public class UIController : MonoBehaviour {
         if(!expert_mode)
         {
             sfx.PlayTrack(SFX.sound_index.button_click);
-            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
-            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            P1AtomInfo.gameObject.SetActive(!expert_mode);
+            P2AtomInfo.gameObject.SetActive(!expert_mode);
             score_panel_alpha.alpha = expert_mode ? 0 : 1;
             expert_mode = !expert_mode;
             #region set the color OF THE BUTTON ON/OFF
@@ -951,8 +951,8 @@ public class UIController : MonoBehaviour {
         if (expert_mode)
         {
             sfx.PlayTrack(SFX.sound_index.button_click);
-            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
-            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+            P1AtomInfo.gameObject.SetActive(!expert_mode);
+            P2AtomInfo.gameObject.SetActive(!expert_mode);
             score_panel_alpha.alpha = expert_mode ? 0 : 1;
             expert_mode = !expert_mode;
             #region set the color OF THE BUTTON ON/OFF

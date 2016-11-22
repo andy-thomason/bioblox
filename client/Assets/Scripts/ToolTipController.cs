@@ -39,7 +39,7 @@ public class ToolTipController : MonoBehaviour {
         //assign the flexible size of the text to the image
         if (ToolTipReference != null)
         {
-            ToolTipReference.transform.FindChild("ToolTipBackground").GetComponent<RectTransform>().sizeDelta = new Vector2(ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width - 45, 12);
+            ToolTipReference.transform.FindChild("ToolTipBackground").GetComponent<RectTransform>().sizeDelta = new Vector2(ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width - 55, 12);
             //offset
             switch (CurrentButtom.GetComponent<ToolTipButtonData>().Tooltip_Offset)
             {
