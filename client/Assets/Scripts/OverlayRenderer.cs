@@ -100,7 +100,7 @@ public class OverlayRenderer : MonoBehaviour {
 
                 float c10 = Mathf.Cos(Time.time * 5.0f) * 0.5f + 0.5f;
                 float c20 = Mathf.Cos(Time.time * 20.0f) * 0.5f + 0.5f;
-                Color32 selected = new Color32(128, 128, 0, (byte)(63.0f*c10+192));
+                Color32 selected = new Color32(128, 128, 0, 240);
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
                 for (int j = 0; j != mol.names.Length; ++j)
@@ -151,7 +151,7 @@ public class OverlayRenderer : MonoBehaviour {
                             add_Icon(
                                 new Icon(
                                     t.TransformPoint(mol.atom_centres[j]),
-                                    mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f), selected
+                                    mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), selected
                                 )
                             );
                         }
