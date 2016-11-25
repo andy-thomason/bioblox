@@ -406,6 +406,7 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
                 P1_atom_index++;
             }
+            aminoSliderController.ScaleAtomAtGenerationP1();
         }
         else
         {
@@ -419,9 +420,10 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
                 P2_atom_index++;
             }
+            aminoSliderController.ScaleAtomAtGenerationP2();
         }
         //Debug.Log("Aminoacids selected:" + acid_number);
-       
+
     }
 
     // call this to deselect amino acids

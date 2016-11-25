@@ -86,6 +86,8 @@ public class AminoSliderController : MonoBehaviour {
     Vector3 len_protein1;
     Vector3 elec_protein0;
     Vector3 elec_protein1;
+    Vector3 normal_scale = new Vector3(1, 1, 1);
+    Vector3 selected_scale = new Vector3(1.2f, 1.2f, 1.2f);
 
     Text[] ButtonText;
 
@@ -192,8 +194,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (CurrentButtonA1 >= 0)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                   // A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
-                    //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                    A1Buttons[LastButtonA1].transform.localScale = normal_scale;
+                    A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
                     ScrollbarAmino1.value = (float)(CurrentButtonA1 + 1) / ((float)number_childs_A1 - 1);
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
@@ -214,8 +216,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (A1Buttons.Count > CurrentButtonA1)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    //A1Buttons[LastButtonA1].GetComponent<Animator>().SetBool("High", false);
-                   // A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+                    A1Buttons[LastButtonA1].transform.localScale = normal_scale;
+                    A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
                     ScrollbarAmino1.value = (float)(CurrentButtonA1 + 1) / ((float)number_childs_A1 - 1);
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
@@ -235,8 +237,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (CurrentButtonA2 >= 0)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    //A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
-                   // A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    A2Buttons[LastButtonA2].transform.localScale = normal_scale;
+                    A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
                     ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)number_childs_A2 - 1);
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
@@ -256,8 +258,8 @@ public class AminoSliderController : MonoBehaviour {
                 if (A2Buttons.Count > CurrentButtonA2)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
-                    //A2Buttons[LastButtonA2].GetComponent<Animator>().SetBool("High", false);
-                    //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+                    A2Buttons[LastButtonA2].transform.localScale = normal_scale;
+                    A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
                     ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)number_childs_A2 - 1);
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
@@ -272,24 +274,24 @@ public class AminoSliderController : MonoBehaviour {
 
 	public void UpdateCurrentButtonA1(int index)
 	{
-		//A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+		A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         CurrentButtonA1 = index;
-		//A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+		A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
 
     }
 
 	public void UpdateCurrentButtonA2(int index)
 	{
-		//A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+		A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         CurrentButtonA2 = index;
-		//A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+		A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
     }
     
     public void DeselectAmino()
     {
         //amino buttons
-       // A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
-        //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+        A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
+        A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         ButtonPickedA1 = null;
         ButtonPickedA2 = null;
         AddConnection.interactable = false;
@@ -298,19 +300,19 @@ public class AminoSliderController : MonoBehaviour {
 	public void HighLight3DMesh(int index, int molecule)
 	{
 		if (molecule == 0) {
-            //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+            A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
             CurrentButtonA1 = index;
             ChangeAminoAcidSelection(A1Buttons[CurrentButtonA1].gameObject);
-            //A1Buttons [CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+            A1Buttons [CurrentButtonA1].transform.localScale = selected_scale;
             ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
 			//A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
 		}
         else
         {
-            //A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+            A2Buttons [CurrentButtonA2].transform.localScale = normal_scale;
             CurrentButtonA2 = index;
             ChangeAminoAcidSelection(A2Buttons[CurrentButtonA2].gameObject);
-            //A2Buttons [CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+            A2Buttons [CurrentButtonA2].transform.localScale = selected_scale;
             ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
 			//A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
 		}
@@ -318,15 +320,15 @@ public class AminoSliderController : MonoBehaviour {
 
     public void HighLight3DMeshAll(int index_protein1, int index_protein2)
     {
-        //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", false);
+        A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         //CurrentButtonA1 = index_protein1;
-        //A1Buttons[CurrentButtonA1].GetComponent<Animator>().SetBool("High", true);
+        A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
         ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
         //A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
         
-        //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", false);
+        A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         //CurrentButtonA2 = index_protein2;
-        //A2Buttons[CurrentButtonA2].GetComponent<Animator>().SetBool("High", true);
+        A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
         ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
         //A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
     }
@@ -475,8 +477,8 @@ public class AminoSliderController : MonoBehaviour {
             //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
             //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
-           // ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
-			//ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
+            ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
+			ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
 			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
 			//ButtonPickedA1 = ButtonPickedA2 = null;
 			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
@@ -1108,6 +1110,38 @@ public class AminoSliderController : MonoBehaviour {
             P2_mesh.SelectAminoAcid(AminoButtonID_temp);
             UpdateCurrentButtonA2(AminoButtonID_temp);
         }
+    }
+
+    public void AtomSelected(int protein_id, int atom_child_index)
+    {
+        if(protein_id == 0)
+        {
+            if(atom_selected_p1 != -1)
+                P1AtomsHolder.GetChild(atom_selected_p1).transform.localScale = normal_scale;
+            else
+                P1AtomsHolder.GetChild(0).transform.localScale = normal_scale;
+            atom_selected_p1 = atom_child_index;
+            P1AtomsHolder.GetChild(atom_selected_p1).transform.localScale = selected_scale;
+        }
+        else
+        {
+            if (atom_selected_p2 != -1)
+                P2AtomsHolder.GetChild(atom_selected_p2).transform.localScale = normal_scale;
+            else
+                P2AtomsHolder.GetChild(0).transform.localScale = normal_scale;
+            atom_selected_p2 = atom_child_index;
+            P2AtomsHolder.GetChild(atom_selected_p2).transform.localScale = selected_scale;
+        }
+    }
+
+    public void ScaleAtomAtGenerationP1()
+    {
+        P1AtomsHolder.GetChild(0).transform.localScale = selected_scale;
+    }
+
+    public void ScaleAtomAtGenerationP2()
+    {
+        P2AtomsHolder.GetChild(0).transform.localScale = selected_scale;
     }
     #endregion
 

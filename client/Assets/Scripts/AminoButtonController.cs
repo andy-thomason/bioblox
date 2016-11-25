@@ -50,13 +50,13 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         sfx.PlayTrack(SFX.sound_index.amino_click);
         if (transform.parent.name == "ContentPanelA2")
 		{
-			bb.molecules_PDB_mesh[1].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+			bb.molecules_PDB_mesh[1].SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA2(AminoButtonID);
             //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
 		}
 		else
 		{
-            bb.molecules_PDB_mesh[0].GetComponent<PDB_mesh>().SelectAminoAcid(AminoButtonID);
+            bb.molecules_PDB_mesh[0].SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA1(AminoButtonID);
             //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }

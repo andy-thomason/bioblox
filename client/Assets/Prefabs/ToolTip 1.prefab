@@ -45,7 +45,7 @@ GameObject:
   - 224: {fileID: 22402744}
   - 225: {fileID: 22552698}
   m_Layer: 0
-  m_Name: ToolTip
+  m_Name: ToolTip 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
