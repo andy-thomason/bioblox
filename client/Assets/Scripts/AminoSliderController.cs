@@ -114,6 +114,7 @@ public class AminoSliderController : MonoBehaviour {
 	};
 
     SFX sfx;
+    OverlayRenderer or;
     int number_childs_A1 = 0;
     int number_childs_A2 = 0;
 
@@ -134,6 +135,7 @@ public class AminoSliderController : MonoBehaviour {
 		buttonStructure = FindObjectOfType<ButtonStructure> ();
         uIController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
+        or = FindObjectOfType<OverlayRenderer>();
     }
 
     public void init()
@@ -535,6 +537,8 @@ public class AminoSliderController : MonoBehaviour {
         //check element A1
         int name = P1_mol.names[A_atoms[A_atom_index]];
         int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting the atom index
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_atom_index = A_atoms[A_atom_index];
 
         //INSTIATE THE ELEMENT
         GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -560,6 +564,8 @@ public class AminoSliderController : MonoBehaviour {
         //check element A1
         name = P2_mol.names[A_atoms[A_atom_index]];
         A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting the atom index
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_atom_index = A_atoms[A_atom_index];
 
         //INSTIATE THE ELEMENT
         temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -941,7 +947,11 @@ public class AminoSliderController : MonoBehaviour {
         LinkedGameObjectReference = Instantiate(LinkedAtom);
         LinkedGameObjectReference.transform.SetParent(atomholder_temp.GetChild(atom_id).transform, false);
         //animation
-       // atomholder_temp.GetChild(atom_id).GetComponent<Animator>().SetBool("High", true);
+        atomholder_temp.GetChild(atom_id).transform.localScale = selected_scale;
+        //if (protein_id == 0)
+        //    or.P1_selected_atom_id = atom_index;
+        //else
+        //    or.P2_selected_atom_id = atom_index;
     }
 
 
@@ -1112,7 +1122,7 @@ public class AminoSliderController : MonoBehaviour {
         }
     }
 
-    public void AtomSelected(int protein_id, int atom_child_index)
+    public void AtomSelected(int protein_id, int atom_child_index, int atom_index)
     {
         if(protein_id == 0)
         {
@@ -1122,6 +1132,7 @@ public class AminoSliderController : MonoBehaviour {
                 P1AtomsHolder.GetChild(0).transform.localScale = normal_scale;
             atom_selected_p1 = atom_child_index;
             P1AtomsHolder.GetChild(atom_selected_p1).transform.localScale = selected_scale;
+            or.P1_selected_atom_id = atom_index;
         }
         else
         {
@@ -1131,6 +1142,7 @@ public class AminoSliderController : MonoBehaviour {
                 P2AtomsHolder.GetChild(0).transform.localScale = normal_scale;
             atom_selected_p2 = atom_child_index;
             P2AtomsHolder.GetChild(atom_selected_p2).transform.localScale = selected_scale;
+            or.P2_selected_atom_id = atom_index;
         }
     }
 

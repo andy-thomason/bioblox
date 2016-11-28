@@ -53,6 +53,7 @@ public class OverlayRenderer : MonoBehaviour {
     public GameObject Sphere_atom_holder;
     BioBlox bb;
     SFX sfx;
+    AminoSliderController asc;
     public Material[] P1atom_material;
     public Material[] P2atom_material;
     public Material[] P1atom_material_o;
@@ -62,6 +63,9 @@ public class OverlayRenderer : MonoBehaviour {
     //List<Atom> p2_atomos = new List<Atom>();
     public bool atom_2d_overlay = false;
     public bool atom_3d_overlay = false;
+
+    public int P1_selected_atom_id = -1;
+    public int P2_selected_atom_id = -1;
 
     // Use this for initialization
     void Start ()
@@ -74,6 +78,7 @@ public class OverlayRenderer : MonoBehaviour {
 		mf.mesh = mesh;
 		mesh.MarkDynamic ();
         MeshRenderer mr = GetComponent<MeshRenderer>();
+        asc = FindObjectOfType<AminoSliderController>();
         mr.material.renderQueue = 4000;
         get_spheres();
     }
@@ -103,15 +108,26 @@ public class OverlayRenderer : MonoBehaviour {
                 Color32 selected = new Color32(128, 128, 0, 240);
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
+                Color32 atom_color = new Color32(0, 255, 0, 240);
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
                     bool is_selected = j < sel.Length && sel[j];
                     bool is_touching = bb.atoms_touching != null && bb.atoms_touching[i][j];
                     bool is_bad = bb.atoms_bad != null && bb.atoms_bad[i][j];
+                    bool is_atom_selected = false;
+                    //is_bad = msh.selected_atoms[j] == asc.atom_selected_p1;
+                    //Debug.Log("msh.selected_atoms[j]: " + msh.selected_atoms[j] + " == " + asc.atom_selected_p1 + " :asc.atom_selected_p1");
                     int name = mol.names[j];
                     int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
                     int uvy = 3 - atom / 4;
                     int uvx = atom & 3;
+                    //higjlight the atom seleted in expoert mode
+                    if(ui.expert_mode && is_selected)
+                    {
+                        if (j == P1_selected_atom_id || j == P2_selected_atom_id)
+                            is_atom_selected = true;
+                    }
+
                     //2D OVERLAY
                     if ((is_touching || is_bad) && atom_2d_overlay)
                     {
@@ -151,14 +167,13 @@ public class OverlayRenderer : MonoBehaviour {
                             add_Icon(
                                 new Icon(
                                     t.TransformPoint(mol.atom_centres[j]),
-                                    mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), selected
+                                    mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), is_atom_selected ? atom_color : selected
                                 )
                             );
                         }
                         ////get ATOMS DESCRIPTION
                         //if(i == 0) p1_atomos.Add(new Atom(atom,j,i));
                         //else p2_atomos.Add(new Atom(atom, j, i)); ;
-
                     }
                     else if (is_selected && ui.is_hovering)
                     {

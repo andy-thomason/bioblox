@@ -17,6 +17,7 @@ public class PDB_mesh : MonoBehaviour {
     public bool shouldCollide = false;
     float t=0;
     AminoSliderController aminoSliderController;
+    OverlayRenderer or;
     public int atom;
 
     // add atom indices to here to display them selected
@@ -34,6 +35,7 @@ public class PDB_mesh : MonoBehaviour {
         aminoSliderController = FindObjectOfType<AminoSliderController> ();
         meshes = GetComponentsInChildren<MeshRenderer>();
         sfx = FindObjectOfType<SFX>();
+        or = FindObjectOfType<OverlayRenderer>();
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)
@@ -406,6 +408,7 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
                 P1_atom_index++;
             }
+            or.P1_selected_atom_id = selected_atoms[0];
             aminoSliderController.ScaleAtomAtGenerationP1();
         }
         else
@@ -420,10 +423,45 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
                 P2_atom_index++;
             }
+            or.P2_selected_atom_id = selected_atoms[0];
             aminoSliderController.ScaleAtomAtGenerationP2();
         }
-        //Debug.Log("Aminoacids selected:" + acid_number);
+    }
 
+    // call this to select an amino acid
+    public void SelectAminoAcid_when_connection_clicked(int acid_number, int atom_index)
+    {
+        selected_atoms = mol.aminoAcidsAtomIds[acid_number];
+        P1_atom_index = P2_atom_index = 0;
+        //CLEAN THE BUTTONS
+        if (protein_id == 0)
+        {
+            aminoSliderController.atom_selected_p1 = -1;
+            uIController.P1CleanAtomButtons();
+            //go through the atoms of the amino acids
+            for (int i = 0; i != selected_atoms.Length; ++i)
+            {
+                int name = mol.names[selected_atoms[i]];
+                int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+                uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
+                P1_atom_index++;
+            }
+            or.P1_selected_atom_id = atom_index;
+        }
+        else
+        {
+            aminoSliderController.atom_selected_p2 = -1;
+            uIController.P2CleanAtomButtons();
+            //go through the atoms of the amino acids
+            for (int i = 0; i != selected_atoms.Length; ++i)
+            {
+                int name = mol.names[selected_atoms[i]];
+                int atom = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+                uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
+                P2_atom_index++;
+            }
+            or.P2_selected_atom_id = atom_index;
+        }
     }
 
     // call this to deselect amino acids

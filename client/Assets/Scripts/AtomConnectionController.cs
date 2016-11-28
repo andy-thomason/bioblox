@@ -23,7 +23,7 @@ public class AtomConnectionController : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick(PointerEventData eventData)
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        asc.AtomSelected(protein_id, atom_child_index);
+        asc.AtomSelected(protein_id, atom_child_index, atom_id);
         //if (protein_id == 0)
         //    asc.atom_selected_p1 = atom_child_index;
         //else
