@@ -198,7 +198,8 @@ public class AminoConnectionHolder : MonoBehaviour {
             AT1_index--;
 
             //update the eatom highligght
-            or.P1_selected_atom_id = A1_atom_index - 1;
+            A1_atom_index--;
+            or.P1_selected_atom_id = A1_atom_index;
 
             if (!atom_exist)
             {
@@ -244,7 +245,8 @@ public class AminoConnectionHolder : MonoBehaviour {
             AT1_index++;
 
             //update the eatom highligght
-            or.P1_selected_atom_id = A1_atom_index + 1;
+            A1_atom_index++;
+            or.P1_selected_atom_id = A1_atom_index;
 
             if (!atom_exist)
             {
@@ -290,7 +292,8 @@ public class AminoConnectionHolder : MonoBehaviour {
             AT2_index--;
 
             //update the eatom highligght
-            or.P2_selected_atom_id = A2_atom_index - 1;
+            A2_atom_index--;
+            or.P2_selected_atom_id = A2_atom_index;
 
             if (!atom_exist)
             {
@@ -336,7 +339,8 @@ public class AminoConnectionHolder : MonoBehaviour {
             AT2_index++;
 
             //update the eatom highligght
-            or.P2_selected_atom_id = A2_atom_index + 1;
+            A2_atom_index++;
+            or.P2_selected_atom_id = A2_atom_index;
 
             if (!atom_exist)
             {

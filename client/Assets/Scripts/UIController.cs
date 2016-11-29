@@ -188,6 +188,8 @@ public class UIController : MonoBehaviour {
         p1_atom_status = 0;
         p2_atom_status = 0;
         transparent_render = BioBloxReference.molecules[0].transform.childCount - 1;
+        DropDownP1.value = 0;
+        DropDownP2.value = 0;
     }
 
 
@@ -577,7 +579,7 @@ public class UIController : MonoBehaviour {
                 ToggleBSMesh(0);
                 break;
             case 3:
-                //ToggleCMesh(0);
+                ToggleCMesh(0);
                 break;
         }
     }
@@ -597,7 +599,7 @@ public class UIController : MonoBehaviour {
                 ToggleBSMesh(1);
                 break;
             case 3:
-                //ToggleCMesh(1);
+                ToggleCMesh(1);
                 break;
         }
     }
@@ -679,7 +681,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        //BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 0);
         //CheckDefaultMesh(protein_index);
     }
@@ -688,8 +690,8 @@ public class UIController : MonoBehaviour {
     {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
-        //BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
         //CheckDefaultMesh(protein_index);
     }
 
@@ -697,8 +699,8 @@ public class UIController : MonoBehaviour {
     {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
-        //BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
         UpdateMeshCutaway(protein_index, 2);
         //CheckDefaultMesh(protein_index);
     }
@@ -707,7 +709,7 @@ public class UIController : MonoBehaviour {
     {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
-        //BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
         UpdateMeshCutaway(protein_index, 3);
         //CheckDefaultMesh(protein_index);
@@ -748,6 +750,7 @@ public class UIController : MonoBehaviour {
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         EndLevelPanel.SetActive(false);
+        isOverUI = false;
     }
     //for the button in the end level panel
     public void RestartLevel()

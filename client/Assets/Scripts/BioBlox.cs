@@ -687,6 +687,8 @@ public class BioBlox : MonoBehaviour
         string mol1_ca_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod;
         string mol2_ca_filename = "Mesh/" + level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod;
 
+        Debug.Log(mol1_bs_filename);
+
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         GameObject mol1 = make_molecule (level.pdbFile + "." + level.chainsA, "Proto1", 7, mesh_type, 0);
         mol1.transform.SetParent(Molecules);
@@ -1641,6 +1643,8 @@ public class BioBlox : MonoBehaviour
     string mol2_se_filename;
     string mol1_bs_filename;
     string mol2_bs_filename;
+    string mol1_ca_filename;
+    string mol2_ca_filename;
     //string mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod + ".fbx";
     //string mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod + ".fbx";
 
@@ -1649,6 +1653,8 @@ public class BioBlox : MonoBehaviour
     TextAsset mol2_se_filename_txt;
     TextAsset mol1_bs_filename_txt;
     TextAsset mol2_bs_filename_txt;
+    TextAsset mol1_ca_filename_txt;
+    TextAsset mol2_ca_filename_txt;
     byte[] txt_bytes;
     Level level;
     GameObject mol1;
@@ -1673,6 +1679,8 @@ public class BioBlox : MonoBehaviour
         mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
         mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
         mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
+        mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs + ".bytes";
+        mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs + ".bytes";
 
         using (WWW www = new WWW(BundleURL))
         {
@@ -1687,6 +1695,8 @@ public class BioBlox : MonoBehaviour
             mol2_se_filename_txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
             mol1_bs_filename_txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
             mol2_bs_filename_txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
+            mol1_ca_filename_txt = bundle.LoadAsset(mol1_ca_filename, typeof(TextAsset)) as TextAsset;
+            mol2_ca_filename_txt = bundle.LoadAsset(mol2_ca_filename, typeof(TextAsset)) as TextAsset;
 
             bundle.Unload(false);
         }
@@ -1747,6 +1757,26 @@ public class BioBlox : MonoBehaviour
         txt_bytes = mol2_bs_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.SetActive(false);
+        parent_molecule_reference.transform.Translate(offset_position_1);
+
+        //C&A 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs;
+        txt_bytes = mol1_ca_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.SetActive(false);
+        parent_molecule_reference.transform.Translate(offset_position_0);
+
+        //C&A 2
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs;
+        txt_bytes = mol2_ca_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
         parent_molecule_reference.transform.SetParent(mol2.transform);
         parent_molecule_reference.SetActive(false);
         parent_molecule_reference.transform.Translate(offset_position_1);

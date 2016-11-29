@@ -108,7 +108,7 @@ public class OverlayRenderer : MonoBehaviour {
                 Color32 selected = new Color32(128, 128, 0, 240);
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
-                Color32 atom_color = new Color32(0, 255, 0, 240);
+                Color32 atom_color = new Color32(0, 0, 0, 255);
                 for (int j = 0; j != mol.names.Length; ++j)
                 {
                     bool is_selected = j < sel.Length && sel[j];
