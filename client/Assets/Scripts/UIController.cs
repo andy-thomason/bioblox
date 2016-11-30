@@ -777,6 +777,8 @@ public class UIController : MonoBehaviour {
         CutAway.value = CutAway.minValue;
         ExpertModeOffStart();
         RestartCameraFromIntro();
+        DropDownP1.value = 0;
+        DropDownP2.value = 0;
     }
 
     //tool panel

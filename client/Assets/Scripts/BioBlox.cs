@@ -141,7 +141,6 @@ public class BioBlox : MonoBehaviour
     //public Slider overrideSlider;
     public Slider cutawaySlider;
     public Slider thicknessSlider;
-    public GameObject invalidDockText;
     public GameObject InvalidDockScore;
     //public List<Slider> dockSliders = new List<Slider> ();
     public float dockOverrideOffset = 0.0f;
@@ -1047,8 +1046,7 @@ public class BioBlox : MonoBehaviour
                 //Debug.Log ("num_invalid: "+num_invalid);
 
             }
-
-            invalidDockText.SetActive(num_invalid != 0);
+            
             InvalidDockScore.SetActive(num_invalid != 0);
             is_score_valid = num_invalid == 0;
             //if (num_invalid != 0 && !sfx.isPlaying(SFX.sound_index.warning))
@@ -1338,7 +1336,14 @@ public class BioBlox : MonoBehaviour
         ExitTutorialButton.SetActive(status);
 
         if (!status)
+        {
             TutorialHand.position = new Vector3(5000.0f, 0, 0);
+            TutorialHand.gameObject.SetActive(false);
+        }
+        else
+        {
+            TutorialHand.gameObject.SetActive(true);
+        }
 
         Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
         Transform Amino2 = GameObject.Find("ContentPanelA2").transform;

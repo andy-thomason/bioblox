@@ -57,7 +57,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
         transform.position = position;
     }
 
-    void LateUpdate()
+    void Update()
     {
         if(!ui.isOverUI)
         {
@@ -84,6 +84,19 @@ public class MouseOrbitImproved_main : MonoBehaviour
             transform.rotation = rotation;
             transform.position = position;
         }
+
+
+        if (Input.GetKey(KeyCode.UpArrow))
+            target.y++;
+
+        if (Input.GetKey(KeyCode.DownArrow))
+            target.y--;
+        
+        if (Input.GetKey(KeyCode.LeftArrow))
+            target.x--;
+
+        if (Input.GetKey(KeyCode.RightArrow))
+            target.x++;
 
     }
 

@@ -130,6 +130,9 @@ public class AminoSliderController : MonoBehaviour {
     public Transform P2AtomsHolder;
     #endregion
 
+    float step_for_A1;
+    float step_for_A2;
+
     void Awake()
 	{
 		buttonStructure = FindObjectOfType<ButtonStructure> ();
@@ -171,6 +174,9 @@ public class AminoSliderController : MonoBehaviour {
         GetNumberOfAmino_1();
         //create a custom state
         GameObject.FindGameObjectWithTag("data_1").GetComponent<ButtonGameState>().SaveCustom();
+
+        step_for_A1 = 1.0f / number_childs_A1;
+        step_for_A2 = 1.0f / number_childs_A2;
     }
 
     public void Reset()
@@ -198,7 +204,7 @@ public class AminoSliderController : MonoBehaviour {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     A1Buttons[LastButtonA1].transform.localScale = normal_scale;
                     A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
-                    ScrollbarAmino1.value = (float)(CurrentButtonA1 + 1) / ((float)number_childs_A1 - 1);
+                    ScrollbarAmino1.value = ScrollbarAmino1.value - step_for_A1;
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
                 else
@@ -220,7 +226,7 @@ public class AminoSliderController : MonoBehaviour {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     A1Buttons[LastButtonA1].transform.localScale = normal_scale;
                     A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
-                    ScrollbarAmino1.value = (float)(CurrentButtonA1 + 1) / ((float)number_childs_A1 - 1);
+                    ScrollbarAmino1.value = ScrollbarAmino1.value + step_for_A1;
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
                 else
@@ -228,7 +234,7 @@ public class AminoSliderController : MonoBehaviour {
                     CurrentButtonA1--;
                     ScrollbarAmino1.value = 1;
                 }
-        }
+            }
 
             if (ButtonA2LDown)
             {
@@ -241,7 +247,7 @@ public class AminoSliderController : MonoBehaviour {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     A2Buttons[LastButtonA2].transform.localScale = normal_scale;
                     A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
-                    ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)number_childs_A2 - 1);
+                    ScrollbarAmino2.value = ScrollbarAmino2.value - step_for_A2;
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
                 else
@@ -262,7 +268,7 @@ public class AminoSliderController : MonoBehaviour {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     A2Buttons[LastButtonA2].transform.localScale = normal_scale;
                     A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
-                    ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)number_childs_A2 - 1);
+                    ScrollbarAmino2.value = ScrollbarAmino2.value + step_for_A2;
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
                 else
