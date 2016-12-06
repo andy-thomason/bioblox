@@ -408,8 +408,8 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P1CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P1_atom_index);
                 P1_atom_index++;
             }
-            or.P1_selected_atom_id = selected_atoms[0];
-            aminoSliderController.ScaleAtomAtGenerationP1();
+            or.P1_selected_atom_id = selected_atoms[selected_atoms.Length - 1];
+            aminoSliderController.ScaleAtomAtGenerationP1(selected_atoms.Length - 1);
         }
         else
         {
@@ -423,8 +423,8 @@ public class PDB_mesh : MonoBehaviour {
                 uIController.P2CreateAtomButtons(selected_atoms[i], protein_id, mol.atomNames[selected_atoms[i]], atom, acid_number, P2_atom_index);
                 P2_atom_index++;
             }
-            or.P2_selected_atom_id = selected_atoms[0];
-            aminoSliderController.ScaleAtomAtGenerationP2();
+            or.P2_selected_atom_id = selected_atoms[selected_atoms.Length - 1];
+            aminoSliderController.ScaleAtomAtGenerationP2(selected_atoms.Length - 1);
         }
     }
 

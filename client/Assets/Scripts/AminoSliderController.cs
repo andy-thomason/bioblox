@@ -535,7 +535,7 @@ public class AminoSliderController : MonoBehaviour {
         //set the number of childs
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_number_of_atoms = A_atoms.Length;
         //is the last one by default or the user selected an atom???
-        int A_atom_index = atom_selected_p1 == -1 ? 0 : atom_selected_p1;
+        int A_atom_index = atom_selected_p1 == -1 ? A_atoms.Length - 1 : atom_selected_p1;
         //SET THE ATOM ID
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT1_index = A_atom_index;
         //picking the last atom of the chain of the amino acid 1 or the selected one
@@ -562,7 +562,7 @@ public class AminoSliderController : MonoBehaviour {
         //set the number of childs
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_number_of_atoms = A_atoms.Length;
         //is the last one by default or the user selected an atom???
-        A_atom_index = atom_selected_p2 == -1 ? 0 : atom_selected_p2;
+        A_atom_index = atom_selected_p2 == -1 ? A_atoms.Length - 1 : atom_selected_p2;
         //SET THE ATOM ID
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT2_index = A_atom_index;
         //picking the last atom of the chain of the amino acid 1
@@ -1152,14 +1152,14 @@ public class AminoSliderController : MonoBehaviour {
         }
     }
 
-    public void ScaleAtomAtGenerationP1()
+    public void ScaleAtomAtGenerationP1(int atom_index)
     {
-        P1AtomsHolder.GetChild(0).transform.localScale = selected_scale;
+        P1AtomsHolder.GetChild(atom_index).transform.localScale = selected_scale;
     }
 
-    public void ScaleAtomAtGenerationP2()
+    public void ScaleAtomAtGenerationP2(int atom_index)
     {
-        P2AtomsHolder.GetChild(0).transform.localScale = selected_scale;
+        P2AtomsHolder.GetChild(atom_index).transform.localScale = selected_scale;
     }
     #endregion
 

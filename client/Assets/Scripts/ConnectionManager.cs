@@ -122,7 +122,7 @@ public class ConnectionManager : MonoBehaviour
 
 		connectionMinDistances = new float[connections.Count];
 		for (int i = 0; i < connectionMinDistances.Length; ++i) {
-			connectionMinDistances[i] = maxDistance * SliderStrings.value;;
+			connectionMinDistances[i] = maxDistance * SliderStrings.value;
 		}
 		
 		shouldContract = true;
@@ -135,12 +135,12 @@ public class ConnectionManager : MonoBehaviour
         int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
         //picking the last atom of the chain of the amino acid 1
         //if no atom clicked - normal
-		int index1 = asc.atom_selected_p1 == -1 ? atoms1 [0] : atoms1[asc.atom_selected_p1];
+		int index1 = asc.atom_selected_p1 == -1 ? atoms1 [atoms1.Length - 1] : atoms1[asc.atom_selected_p1];
 
         int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];
         //picking the last atom of the chain of the amino acid 2
         //if no atom clicked - normal
-        int index2 = asc.atom_selected_p2 == -1 ? atoms2 [0] : atoms2[asc.atom_selected_p2];
+        int index2 = asc.atom_selected_p2 == -1 ? atoms2 [atoms2.Length - 1] : atoms2[asc.atom_selected_p2];
 		return CreateLink (mol1, index1, mol2, index2);
 	}
 

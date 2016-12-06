@@ -216,12 +216,28 @@ public class BioBlox : MonoBehaviour
     public GameStatus game_status;
 
     public int hint_stage = 0;
-
-    public GameObject loading_panel;
-    public GameObject loading_panel_start;
+    
 
     //scoring
     PDB_score scoring;
+
+    public GameObject GameManager;
+    public GameObject MenuButtons;
+
+    void Awake()
+    {
+        //creatt ehe sene manager to keep track of the level
+        if(GameObject.FindGameObjectWithTag("GameManager") == null)
+        {
+            Instantiate(GameManager);
+            MenuButtons.SetActive(false);
+        }
+    }
+
+    //public void cacaca()
+    //{
+    //    SceneManager.LoadScene(0, LoadSceneMode.Single);
+    //}
 
     // Use this for initialization
     void Start ()
@@ -244,8 +260,12 @@ public class BioBlox : MonoBehaviour
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
         //set the trypsin fiesr level temp
-        current_level = 0;
-        StartCoroutine(DownloadMolecules());
+        current_level = FindObjectOfType<GameManager>().current_level;
+        
+        if (current_level != -1)
+            StartCoroutine(DownloadMolecules());
+        else
+            uiController.EndLevel();
     }
 
     public void StartGame()
@@ -274,8 +294,8 @@ public class BioBlox : MonoBehaviour
         //UI INIT
         uiController.init();
 
-        loading_panel.SetActive(false);
-        loading_panel_start.SetActive(false);
+        FindObjectOfType<GameManager>().loading_panel.SetActive(false);
+        //loading_panel_start.SetActive(false);
 
         StartCoroutine(game_loop());
 
@@ -1677,7 +1697,13 @@ public class BioBlox : MonoBehaviour
     {
         level = levels[current_level];
 
-        string BundleURL = "https://ageofalgo.com/BB/AssetBundles/" + level.pdbFile.ToLower();
+#if UNITY_WEBGL
+        string BundleURL = "http://bioblox3d.org/Asset/AssetBundlesWebGL/" + level.pdbFile.ToLower();
+#endif
+
+#if UNITY_STANDALONE
+        string BundleURL = "http://bioblox3d.org/Asset/AssetBundlesWindows/" + level.pdbFile.ToLower();
+#endif
 
         // These filenames refer to the fbx in the asset bundle in the server
         mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
@@ -1843,27 +1869,9 @@ public class BioBlox : MonoBehaviour
            // System.GC.Collect();
         }
     }
-    #endregion
+#endregion
 
-    public void ChangeLevel(int level_selected)
-    {
-        game_status = BioBlox.GameStatus.MainScreen;
-        loading_panel.SetActive(true);
-        Reset();
-        //uiController.Reset_UI();
-        //ui.EndLevelPanel.SetActive(false);
-        //intro_light.enabled = true;
-        //GameCanvas.alpha = 0;
-        //GameCanvas.blocksRaycasts = false;
-        //IntroCamera.SetActive(true);
-        //FadeCanvas.SetBool("Fade", false);
-        //IntroCanvas.interactable = true;
-        //IntroCanvas.blocksRaycasts = true;
-        //sfx.StopTrack(SFX.sound_index.warning);
-
-        current_level = level_selected;
-        StartCoroutine(DownloadMolecules());
-    }
+    
 
 
 

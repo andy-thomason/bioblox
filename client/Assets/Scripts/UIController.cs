@@ -1176,25 +1176,8 @@ public class UIController : MonoBehaviour {
     }
     #endregion
 
-    public void ExitGame()
+    public void GoToWebsite()
     {
-        Application.Quit();
+        Application.OpenURL("http://bioblox.org/");
     }
-
-    #region MUTE BUTTON
-    bool is_audio_playing = true;
-    public Sprite audio_off;
-    public Sprite audio_on;
-    public Image audio_mute_image;
-
-    public void MuteAllSounds()
-    {
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        sfx.MuteAll(is_audio_playing);
-
-        is_audio_playing = !is_audio_playing;
-
-        audio_mute_image.sprite = is_audio_playing ? audio_on : audio_off;
-    }
-    #endregion
 }

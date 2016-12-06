@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class SFX : MonoBehaviour {
 
@@ -15,12 +16,23 @@ public class SFX : MonoBehaviour {
         audioSource = GetComponents<AudioSource>();
         audioSource_collision = transform.GetChild(0).GetComponents<AudioSource>();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    #region MUTE BUTTON
+    bool is_audio_playing = true;
+    public Sprite audio_off;
+    public Sprite audio_on;
+    public Image audio_mute_image;
+
+    public void MuteAllSounds()
     {
-	
-	}
+        PlayTrack(SFX.sound_index.button_click);
+        MuteAll(is_audio_playing);
+
+        is_audio_playing = !is_audio_playing;
+
+        audio_mute_image.sprite = is_audio_playing ? audio_on : audio_off;
+    }
+    #endregion
 
     public void PlayTrack(sound_index index)
     {

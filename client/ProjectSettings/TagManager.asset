@@ -15,6 +15,7 @@ TagManager:
   - arpon
   - overlay_renderer
   - floor
+  - GameManager
   layers:
   - Default
   - TransparentFX
