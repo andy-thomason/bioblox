@@ -116,7 +116,7 @@ public class UIController : MonoBehaviour {
 
     //cutaway wall
     public Transform cutaway_wall;
-    float camera_distance = 240.0f;
+    float camera_distance = 200.0f;
 
     public GameObject EndLevelPanel;
     public Text number_atoms_end_level;
@@ -172,7 +172,7 @@ public class UIController : MonoBehaviour {
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
         explorerController = FindObjectOfType<ExploreController>();
-        MainCameraComponent = MainCamera.GetComponent<Camera>();
+        MainCameraComponent = MainCamera.transform.GetChild(0).GetComponent<Camera>();
         lr = FindObjectOfType<LineRenderer>();
         button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         xml = FindObjectOfType<XML>();
@@ -333,6 +333,7 @@ public class UIController : MonoBehaviour {
         MainCamera.transform.rotation = Quaternion.identity;
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
         MainCamera.GetComponent<MouseOrbitImproved_main>().Init();
+        MainCamera.transform.GetChild(0).localPosition = Vector3.zero;
     }
 
     public void RestartCameraFromIntro()

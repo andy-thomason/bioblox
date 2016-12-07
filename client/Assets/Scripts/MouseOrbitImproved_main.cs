@@ -85,19 +85,6 @@ public class MouseOrbitImproved_main : MonoBehaviour
             transform.position = position;
         }
 
-
-        if (Input.GetKey(KeyCode.UpArrow))
-            target.y++;
-
-        if (Input.GetKey(KeyCode.DownArrow))
-            target.y--;
-        
-        if (Input.GetKey(KeyCode.LeftArrow))
-            target.x--;
-
-        if (Input.GetKey(KeyCode.RightArrow))
-            target.x++;
-
     }
 
     public static float ClampAngle(float angle, float min, float max)
