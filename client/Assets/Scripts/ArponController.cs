@@ -39,7 +39,6 @@ public class ArponController : MonoBehaviour {
             transform.SetParent(bb.molecules[protein_to_shot].transform);
             // Destroy(gameObject);
             //deactivate/activate delete button
-            UI.button_erase_connections_1p_button.interactable = true;
         }
 
         //realistic flying

@@ -103,9 +103,7 @@ public class UIController : MonoBehaviour {
 
     public Transform AddConnectionButton;
     public Text atom_name_firstperson;
-
-    public GameObject button_erase_connections_1p;
-    public Button button_erase_connections_1p_button;
+   
 
     bool switch_material = true;
 
@@ -174,7 +172,7 @@ public class UIController : MonoBehaviour {
         explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.transform.GetChild(0).GetComponent<Camera>();
         lr = FindObjectOfType<LineRenderer>();
-        button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
+        //button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
         xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
@@ -327,7 +325,7 @@ public class UIController : MonoBehaviour {
     public void RestartCamera()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        Debug.Log("camera_distance: "+ camera_distance);
+        //Debug.Log("camera_distance: "+ camera_distance);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
         MainCamera.GetComponent<MouseOrbitImproved_main>().distance = camera_distance;
         MainCamera.transform.rotation = Quaternion.identity;
@@ -441,7 +439,6 @@ public class UIController : MonoBehaviour {
         //show the slider of more than 3 conenction
         ScrollbarLinks.alpha = !first_person ? 1 : 0;
         //erase connections
-        button_erase_connections_1p.SetActive(first_person);
         ExplorerButton.interactable = !first_person;
         SaveButton.SetActive(!first_person);
         MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = !first_person ? true : false;
@@ -457,8 +454,6 @@ public class UIController : MonoBehaviour {
             //change the overlay renderer camera to default one
             //MainCamera.transform.GetComponentInChildren<OverlayRenderer>().lookat_camera = MainCameraComponent;
             //check conenctions
-            if (aminoSliderController.ReturnNumberOfConnection() > 0)
-                button_erase_connections_1p_button.interactable = true;
             sfx.PlayTrack(SFX.sound_index.camera_shrink);
         }
         else

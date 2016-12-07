@@ -1047,13 +1047,13 @@ public class BioBlox : MonoBehaviour
                         if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
                     }
                     if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
-                    if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
+                    //if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
                 }
                 else
                 {
                     ElectricScore.text = LennardScore.text = "0.0";
                     NumberOfAtoms.text = "0";
-                    SimpleScore.text = "Score: 0 atoms touching.";
+                    //SimpleScore.text = "Score: 0 atoms touching.";
                 }
 
                 //heuristicScoreSlider.value = num_invalid != 0 ? 1.0f : 1.0f - (num_touching_0 + num_touching_1) * 0.013f;
