@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour {
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
+        Application.ExternalCall("SendUserData");
     }
     
     public void ChangeLevel(int level)

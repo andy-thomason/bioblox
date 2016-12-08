@@ -1176,4 +1176,16 @@ public class UIController : MonoBehaviour {
     {
         Application.OpenURL("http://bioblox.org/");
     }
+
+    #region
+    public void StopReel()
+    {
+        sfx.StopReel();
+    }
+
+    public void SliderMouseIn()
+    {
+        sfx.SliderMouseIn();
+    }
+    #endregion
 }

@@ -1698,11 +1698,11 @@ public class BioBlox : MonoBehaviour
         level = levels[current_level];
 
 #if UNITY_WEBGL
-        string BundleURL = "http://bioblox3d.org/game/Asset/AssetBundlesWebGL/" + level.pdbFile.ToLower();
+        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWebGL/" + level.pdbFile.ToLower();
 #endif
 
 #if UNITY_STANDALONE
-        string BundleURL = "http://bioblox3d.org/game/Asset/AssetBundlesWindows/" + level.pdbFile.ToLower();
+        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWindows/" + level.pdbFile.ToLower();
 #endif
 
         // These filenames refer to the fbx in the asset bundle in the server
