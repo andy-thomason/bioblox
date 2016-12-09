@@ -219,7 +219,7 @@ public class BioBlox : MonoBehaviour
     
 
     //scoring
-    PDB_score scoring;
+    public PDB_score scoring;
 
     public GameObject GameManager;
     public GameObject MenuButtons;
@@ -399,7 +399,9 @@ public class BioBlox : MonoBehaviour
             molecules [molNum].GetComponent<PDB_mesh> ().mol.atom_centres [atomID]
         );
     }
-    
+
+    float time_valid_score = 0;
+    public Button SubmitButton;
 
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
@@ -419,6 +421,20 @@ public class BioBlox : MonoBehaviour
             if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
                 UpdateHint();
         }
+
+        //check if score is valid
+        if(is_score_valid)
+        {
+            time_valid_score += Time.deltaTime;
+        }
+        else
+        {
+            time_valid_score = 0;
+            SubmitButton.interactable = false;
+        }
+
+        if (time_valid_score > 5.0f)
+            SubmitButton.interactable = true;
     }
 
     void PopInSound (GameObject g)

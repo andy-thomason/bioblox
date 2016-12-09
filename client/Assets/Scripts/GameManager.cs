@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
 
     public int current_level = -1;
     public GameObject loading_panel;
+    public int id_user;
 
     void Awake()
     {
