@@ -226,8 +226,8 @@ public class UIController : MonoBehaviour {
         {
             BioBloxReference.scoring.calcScore();
             n_atoms.text = BioBloxReference.NumberOfAtoms.text;
-            lpj.text = (BioBloxReference.scoring.vdwScore).ToString("F1");
-            ei.text = (BioBloxReference.scoring.elecScore).ToString("F1");
+            lpj.text = (BioBloxReference.scoring.vdwScore).ToString("F3");
+            ei.text = (BioBloxReference.scoring.elecScore).ToString("F3");
         }
         
 

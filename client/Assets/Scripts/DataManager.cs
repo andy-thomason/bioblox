@@ -7,6 +7,7 @@ public class DataManager : MonoBehaviour {
     BioBlox bb;
     GameManager gm;
     WWWForm www_form;
+    public string id_user;
 
     // Use this for initialization
     void Start ()
@@ -23,10 +24,8 @@ public class DataManager : MonoBehaviour {
     void SendUserData(string user_data)
     {
         string[] splitArray = user_data.Split('+');
-        string id_user = splitArray[0];
+        id_user = splitArray[0];
         string username = splitArray[1];
-
-        gm.id_user = int.Parse(id_user);
 
         www_form = new WWWForm();
         www_form.AddField("id_user", id_user);
@@ -38,6 +37,7 @@ public class DataManager : MonoBehaviour {
     {
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
+        gm.SetID();
     }
 
     public void SendSaveData(string n_atoms, string lpj, string ei)
