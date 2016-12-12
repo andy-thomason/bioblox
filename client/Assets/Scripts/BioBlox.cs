@@ -402,6 +402,7 @@ public class BioBlox : MonoBehaviour
 
     float time_valid_score = 0;
     public Button SubmitButton;
+    public GameObject validating_holder;
 
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
@@ -430,11 +431,15 @@ public class BioBlox : MonoBehaviour
         else
         {
             time_valid_score = 0;
-            SubmitButton.interactable = false;
+            SubmitButton.gameObject.SetActive(false);
+            validating_holder.SetActive(true);
         }
 
         if (time_valid_score > 5.0f)
-            SubmitButton.interactable = true;
+        {
+            validating_holder.SetActive(false);
+            SubmitButton.gameObject.SetActive(true);
+        }
     }
 
     void PopInSound (GameObject g)

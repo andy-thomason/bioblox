@@ -163,6 +163,7 @@ public class UIController : MonoBehaviour {
     public Transform P2AtomInfo;
     LineRenderer lr;
     DataManager dm;
+    ConnectionManager cm;
 
     int transparent_render;
 
@@ -178,6 +179,7 @@ public class UIController : MonoBehaviour {
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
         dm = FindObjectOfType<DataManager>();
+        cm = FindObjectOfType<ConnectionManager>();
 
     }
 
@@ -1134,7 +1136,10 @@ public class UIController : MonoBehaviour {
     public Text ei;
     public GameObject SavePanel;
     public GameObject Tick;
-    
+    string P1_connections;
+    string P2_connections;
+    AminoConnectionHolder ach;
+
     public void OpenSavePanel()
     {
         SavePanel.SetActive(true);
@@ -1148,8 +1153,19 @@ public class UIController : MonoBehaviour {
 
     public void SubmitSaveToServer()
     {
-        BioBloxReference.SubmitButton.gameObject.SetActive(false);
-        dm.SendSaveData(n_atoms.text, lpj.text, ei.text);
+        BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 0;
+
+        P1_connections = "";
+        P2_connections = "";
+
+        foreach (Transform AminoLinkChild in AminoLinkPanel.transform)
+        {
+            ach = AminoLinkChild.GetChild(0).GetComponent<AminoConnectionHolder>();
+            P1_connections += ach.A1_name + "-" + ach.AT1_name + " / ";
+            P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
+        }
+
+        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, P1_connections, P2_connections, cm.SliderStrings.value);
         Tick.SetActive(true);
         StartCoroutine(WaitForSec());
     }
@@ -1159,9 +1175,24 @@ public class UIController : MonoBehaviour {
         yield return new WaitForSeconds(2);
         SavePanel.SetActive(false);
         Tick.SetActive(false);
-        BioBloxReference.SubmitButton.gameObject.SetActive(true);
+        BioBloxReference.validating_holder.SetActive(true);
+        BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 1;
         isOverUI = false;
     }
+
+    //void GetAminoAtoms()
+    //{
+    //    P1_connections = "";
+    //    P2_connections = "";
+
+    //    foreach (Transform AminoLinkChild in AminoLinkPanel.transform)
+    //    {
+    //        ach = AminoLinkChild.GetChild(0).GetComponent<AminoConnectionHolder>();
+    //        P1_connections += ach.A1_name + "-" + ach.AT1_name + " / ";
+    //        P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
+    //    }
+
+    //}
 
     #endregion
 }

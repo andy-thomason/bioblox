@@ -4,53 +4,54 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using AssemblyCSharp;
 
-public class AminoSliderController : MonoBehaviour {
+public class AminoSliderController : MonoBehaviour
+{
 
-	public GameObject AminoButton;
-	public GameObject AminoButtonReference;
-
-    // todo: put these in an array	
-	public GameObject[] SliderMol = new GameObject[2];
+    public GameObject AminoButton;
+    public GameObject AminoButtonReference;
 
     // todo: put these in an array	
-	public List<string>[] aminoAcidsNames = new List<string>[2];
-	public List<string>[] aminoAcidsTags = new List<string>[2];
+    public GameObject[] SliderMol = new GameObject[2];
 
-	// Currently selected buttons.
     // todo: put these in an array	
-	public GameObject ButtonPickedA1;
-	public GameObject ButtonPickedA2;
+    public List<string>[] aminoAcidsNames = new List<string>[2];
+    public List<string>[] aminoAcidsTags = new List<string>[2];
 
-	// Amino acid links panel.
-	public GameObject AminoLinkPanel;
-	public GameObject AminoLinkPanelParent;
-	public RectTransform AminoLinkBackground;
-	float[] button_displace = {22.7f,-3.7f};
-	BioBlox BioBloxReference;
-	public List<AtomConnection> connections = new List<AtomConnection> ();
-	public CanvasGroup AddConnection;
+    // Currently selected buttons.
+    // todo: put these in an array	
+    public GameObject ButtonPickedA1;
+    public GameObject ButtonPickedA2;
 
-	//slider buttons
+    // Amino acid links panel.
+    public GameObject AminoLinkPanel;
+    public GameObject AminoLinkPanelParent;
+    public RectTransform AminoLinkBackground;
+    float[] button_displace = { 22.7f, -3.7f };
+    BioBlox BioBloxReference;
+    public List<AtomConnection> connections = new List<AtomConnection>();
+    public CanvasGroup AddConnection;
+
+    //slider buttons
     // todo: put these in an array	
-	bool ButtonA1LDown, ButtonA1RDown, ButtonA2LDown, ButtonA2RDown = false;	
+    bool ButtonA1LDown, ButtonA1RDown, ButtonA2LDown, ButtonA2RDown = false;
     // todo: put these in an array	
-	public Scrollbar ScrollbarAmino1;
-	public Scrollbar ScrollbarAmino2;
+    public Scrollbar ScrollbarAmino1;
+    public Scrollbar ScrollbarAmino2;
     // todo: put these in an array	
     public List<AminoButtonController> A1Buttons;
     public List<AminoButtonController> A2Buttons;
 
-	//current button
-	public int CurrentButtonA1, CurrentButtonA2, LastButtonA1, LastButtonA2 = 0;
+    //current button
+    public int CurrentButtonA1, CurrentButtonA2, LastButtonA1, LastButtonA2 = 0;
 
-	//text to link when there is the free camera
-	public Animator ConnectionExistMessage;
+    //text to link when there is the free camera
+    public Animator ConnectionExistMessage;
 
-	//linked
-	public GameObject LinkedGameObject;
-	GameObject LinkedGameObjectReference;
+    //linked
+    public GameObject LinkedGameObject;
+    GameObject LinkedGameObjectReference;
     public GameObject LinkedAtom;
-	ButtonStructure buttonStructure;
+    ButtonStructure buttonStructure;
     UIController uIController;
 
     //local score
@@ -93,25 +94,25 @@ public class AminoSliderController : MonoBehaviour {
 
     public GameObject AminoHolderConnection;
 
-	//dictionary for the function types of aunoacids
-	//protein 1
-	public List<GameObject> A1Positive = new List<GameObject>();
-	public List<GameObject> A1Negative = new List<GameObject>();
-	public List<GameObject> A1Hydro = new List<GameObject>();
-	public List<GameObject> A1Polar = new List<GameObject>();
-	public List<GameObject> A1Other = new List<GameObject>();
-	//protein 2
-	public List<GameObject> A2Positive = new List<GameObject>();
-	public List<GameObject> A2Negative = new List<GameObject>();
-	public List<GameObject> A2Hydro = new List<GameObject>();
-	public List<GameObject> A2Polar = new List<GameObject>();
-	public List<GameObject> A2Other = new List<GameObject>();
-	public Dictionary<string, string> FunctionTypes = new Dictionary<string, string>{
-		{"ALA",  "Hydro"}, {"ARG",  "Positive"}, {"ASN",  "Polar"}, {"ASP",  "Negative"}, {"CYS",  "Other"}, {"GLU",  "Negative"},
-		{"GLY",  "Other"}, {"HIS",  "Positive"}, {"ILE",  "Hydro"}, {"LEU",  "Hydro"}, {"LYS",  "Positive"}, {"MET",  "Hydro"},
-		{"PHE",  "Hydro"},	{"PRO",  "Other"}, {"SER",  "Polar"}, {"THR",  "Polar"}, {"GLN", "Polar"}, {"TRP",  "Hydro"},
-		{"TYR",  "Hydro"}, {"VAL",  "Hydro"},
-	};
+    //dictionary for the function types of aunoacids
+    //protein 1
+    public List<GameObject> A1Positive = new List<GameObject>();
+    public List<GameObject> A1Negative = new List<GameObject>();
+    public List<GameObject> A1Hydro = new List<GameObject>();
+    public List<GameObject> A1Polar = new List<GameObject>();
+    public List<GameObject> A1Other = new List<GameObject>();
+    //protein 2
+    public List<GameObject> A2Positive = new List<GameObject>();
+    public List<GameObject> A2Negative = new List<GameObject>();
+    public List<GameObject> A2Hydro = new List<GameObject>();
+    public List<GameObject> A2Polar = new List<GameObject>();
+    public List<GameObject> A2Other = new List<GameObject>();
+    public Dictionary<string, string> FunctionTypes = new Dictionary<string, string>{
+        {"ALA",  "Hydro"}, {"ARG",  "Positive"}, {"ASN",  "Polar"}, {"ASP",  "Negative"}, {"CYS",  "Other"}, {"GLU",  "Negative"},
+        {"GLY",  "Other"}, {"HIS",  "Positive"}, {"ILE",  "Hydro"}, {"LEU",  "Hydro"}, {"LYS",  "Positive"}, {"MET",  "Hydro"},
+        {"PHE",  "Hydro"},  {"PRO",  "Other"}, {"SER",  "Polar"}, {"THR",  "Polar"}, {"GLN", "Polar"}, {"TRP",  "Hydro"},
+        {"TYR",  "Hydro"}, {"VAL",  "Hydro"},
+    };
 
     SFX sfx;
     OverlayRenderer or;
@@ -134,8 +135,8 @@ public class AminoSliderController : MonoBehaviour {
     float step_for_A2;
 
     void Awake()
-	{
-		buttonStructure = FindObjectOfType<ButtonStructure> ();
+    {
+        buttonStructure = FindObjectOfType<ButtonStructure>();
         uIController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
@@ -145,8 +146,8 @@ public class AminoSliderController : MonoBehaviour {
     {
         EmptyAminoSliders();
         BioBloxReference = GameObject.Find("BioBlox").GetComponent<BioBlox>();
-        P1_mesh = BioBloxReference.molecules[0].GetComponent<PDB_mesh>();
-        P2_mesh = BioBloxReference.molecules[1].GetComponent<PDB_mesh>();
+        P1_mesh = BioBloxReference.molecules_PDB_mesh[0];
+        P2_mesh = BioBloxReference.molecules_PDB_mesh[1];
         P1_mol = P1_mesh.mol;
         P2_mol = P2_mesh.mol;
         aminoAcidsNames[0] = P1_mol.aminoAcidsNames;
@@ -188,7 +189,7 @@ public class AminoSliderController : MonoBehaviour {
 
 
     void Update()
-	{
+    {
         if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
 
@@ -220,7 +221,7 @@ public class AminoSliderController : MonoBehaviour {
                 LastButtonA1 = CurrentButtonA1;
 
                 CurrentButtonA1++;
-            //CHECK IF EXIST
+                //CHECK IF EXIST
                 if (A1Buttons.Count > CurrentButtonA1)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
@@ -230,7 +231,7 @@ public class AminoSliderController : MonoBehaviour {
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
                 else
-                { 
+                {
                     CurrentButtonA1--;
                     ScrollbarAmino1.value = 1;
                 }
@@ -278,23 +279,23 @@ public class AminoSliderController : MonoBehaviour {
                 }
             }
         }
-	}
+    }
 
-	public void UpdateCurrentButtonA1(int index)
-	{
-		A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
+    public void UpdateCurrentButtonA1(int index)
+    {
+        A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         CurrentButtonA1 = index;
-		A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
+        A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
 
     }
 
-	public void UpdateCurrentButtonA2(int index)
-	{
-		A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
+    public void UpdateCurrentButtonA2(int index)
+    {
+        A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         CurrentButtonA2 = index;
-		A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
+        A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
     }
-    
+
     public void DeselectAmino()
     {
         //amino buttons
@@ -305,26 +306,27 @@ public class AminoSliderController : MonoBehaviour {
         AddConnection.interactable = false;
     }
 
-	public void HighLight3DMesh(int index, int molecule)
-	{
-		if (molecule == 0) {
+    public void HighLight3DMesh(int index, int molecule)
+    {
+        if (molecule == 0)
+        {
             A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
             CurrentButtonA1 = index;
             ChangeAminoAcidSelection(A1Buttons[CurrentButtonA1].gameObject);
-            A1Buttons [CurrentButtonA1].transform.localScale = selected_scale;
+            A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
             ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
-			//A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
-		}
+            //A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
+        }
         else
         {
-            A2Buttons [CurrentButtonA2].transform.localScale = normal_scale;
+            A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
             CurrentButtonA2 = index;
             ChangeAminoAcidSelection(A2Buttons[CurrentButtonA2].gameObject);
-            A2Buttons [CurrentButtonA2].transform.localScale = selected_scale;
+            A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
             ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
-			//A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
-		}
-	}
+            //A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
+        }
+    }
 
     public void HighLight3DMeshAll(int index_protein1, int index_protein2)
     {
@@ -333,201 +335,206 @@ public class AminoSliderController : MonoBehaviour {
         A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
         ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
         //A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
-        
+
         A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         //CurrentButtonA2 = index_protein2;
         A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
         ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
         //A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
     }
-	
-	public void GenerateAminoButtons1(string currentAmino, string tag, int index)
-	{		
-		//ButtonText.Initialize ();
-		//Debug.Log (currentAmino);
-		AminoButtonReference = Instantiate<GameObject>(AminoButton);
+
+    public void GenerateAminoButtons1(string currentAmino, string tag, int index)
+    {
+        //ButtonText.Initialize ();
+        //Debug.Log (currentAmino);
+        AminoButtonReference = Instantiate(AminoButton);
         //update the gameobejct name to grab later
         AminoButtonReference.name = index.ToString();
 
-        A1Buttons.Add (AminoButtonReference.GetComponent<AminoButtonController>());
-		AminoButtonReference.transform.SetParent (SliderMol[0].transform,false);
-		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
-		//store the color in the button
-		//AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		//AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
+        A1Buttons.Add(AminoButtonReference.GetComponent<AminoButtonController>());
+        AminoButtonReference.transform.SetParent(SliderMol[0].transform, false);
+        AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
+        //store the color in the button
+        //AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+        //AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
-		//InsertButtonToListOfAminoAcidsFuntionA1 (AminoButtonReference, currentAmino);
+        //InsertButtonToListOfAminoAcidsFuntionA1 (AminoButtonReference, currentAmino);
 
-		//Debug.Log (AminoColor [currentAmino]);
-		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
+        //Debug.Log (AminoColor [currentAmino]);
+        ButtonText = AminoButtonReference.GetComponentsInChildren<Text>();
         ButtonText[0].text = currentAmino; // currentAmino.Replace (" ", "");
-		ButtonText [1].text = tag;
+        ButtonText[1].text = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
+        AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
 
         //AminoButtonReference.GetComponentsInChildrenGetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
-        AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
-	}
+        AminoButtonReference.GetComponent<AminoButtonController>().AminoButtonID = index;
+    }
 
-	public void GenerateAminoButtons2(string currentAmino, string tag, int index)
-	{		
-		//ButtonText.Initialize ();
-		AminoButtonReference = Instantiate<GameObject>(AminoButton);
+    public void GenerateAminoButtons2(string currentAmino, string tag, int index)
+    {
+        //ButtonText.Initialize ();
+        AminoButtonReference = Instantiate(AminoButton);
         //update the gameobejct name to grab later
         AminoButtonReference.name = index.ToString();
-        A2Buttons.Add (AminoButtonReference.GetComponent<AminoButtonController>());
-		AminoButtonReference.transform.SetParent (SliderMol[1].transform,false);
-		AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor [currentAmino];
-		//store the color in the button
-		//AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
-		//AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
+        A2Buttons.Add(AminoButtonReference.GetComponent<AminoButtonController>());
+        AminoButtonReference.transform.SetParent(SliderMol[1].transform, false);
+        AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
+        //store the color in the button
+        //AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
+        //AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
 
-		//InsertButtonToListOfAminoAcidsFuntionA2 (AminoButtonReference, currentAmino);
+        //InsertButtonToListOfAminoAcidsFuntionA2 (AminoButtonReference, currentAmino);
 
-		ButtonText = AminoButtonReference.GetComponentsInChildren<Text> ();
-		ButtonText [0].text = currentAmino.Replace (" ", "");
-		ButtonText [1].text = tag;
+        ButtonText = AminoButtonReference.GetComponentsInChildren<Text>();
+        ButtonText[0].text = currentAmino.Replace(" ", "");
+        ButtonText[1].text = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
+        AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
 
         //AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
-        AminoButtonReference.GetComponent<AminoButtonController> ().AminoButtonID = index;
-	}
+        AminoButtonReference.GetComponent<AminoButtonController>().AminoButtonID = index;
+    }
 
-	void InsertButtonToListOfAminoAcidsFuntionA1(GameObject CurrentAmino, string NameAmino)
-	{
-		//insert the button to the correct list
-		if (FunctionTypes [NameAmino] == "Hydro")
-			A1Hydro.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Positive")
-			A1Positive.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Negative")
-			A1Negative.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Polar")
-			A1Polar.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Other")
-			A1Other.Add (CurrentAmino);
-	}
+    void InsertButtonToListOfAminoAcidsFuntionA1(GameObject CurrentAmino, string NameAmino)
+    {
+        //insert the button to the correct list
+        if (FunctionTypes[NameAmino] == "Hydro")
+            A1Hydro.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Positive")
+            A1Positive.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Negative")
+            A1Negative.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Polar")
+            A1Polar.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Other")
+            A1Other.Add(CurrentAmino);
+    }
 
-	void InsertButtonToListOfAminoAcidsFuntionA2(GameObject CurrentAmino, string NameAmino)
-	{
-		//insert the button to the correct list
-		if (FunctionTypes [NameAmino] == "Hydro")
-			A2Hydro.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Positive")
-			A2Positive.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Negative")
-			A2Negative.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Polar")
-			A2Polar.Add (CurrentAmino);
-		else if (FunctionTypes [NameAmino] == "Other")
-			A2Other.Add (CurrentAmino);
-	}
+    void InsertButtonToListOfAminoAcidsFuntionA2(GameObject CurrentAmino, string NameAmino)
+    {
+        //insert the button to the correct list
+        if (FunctionTypes[NameAmino] == "Hydro")
+            A2Hydro.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Positive")
+            A2Positive.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Negative")
+            A2Negative.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Polar")
+            A2Polar.Add(CurrentAmino);
+        else if (FunctionTypes[NameAmino] == "Other")
+            A2Other.Add(CurrentAmino);
+    }
 
-	public void EmptyAminoSliders()
-	{
-		foreach (Transform childTransform in SliderMol[0].transform) Destroy(childTransform.gameObject);
-		foreach (Transform childTransform in SliderMol[1].transform) Destroy(childTransform.gameObject);
-		//delete connetions		
-		foreach (Transform childTransform in AminoLinkPanelParent.transform) Destroy(childTransform.gameObject);
+    public void EmptyAminoSliders()
+    {
+        foreach (Transform childTransform in SliderMol[0].transform) Destroy(childTransform.gameObject);
+        foreach (Transform childTransform in SliderMol[1].transform) Destroy(childTransform.gameObject);
+        //delete connetions		
+        foreach (Transform childTransform in AminoLinkPanelParent.transform) Destroy(childTransform.gameObject);
         A1Buttons.Clear();
         A2Buttons.Clear();
     }
 
-	public void ChangeAminoAcidSelection(GameObject ButtonSelected)
-	{
-		if (ButtonSelected.transform.parent.name == "ContentPanelA1")
-		{
-			ButtonPickedA1 = ButtonSelected;
+    public void ChangeAminoAcidSelection(GameObject ButtonSelected)
+    {
+        if (ButtonSelected.transform.parent.name == "ContentPanelA1")
+        {
+            ButtonPickedA1 = ButtonSelected;
             //udate the slider value
             //ScrollbarAmino1.value = (float)ButtonSelected.GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A1 - 1);
         }
-		else
-		{
-			ButtonPickedA2 = ButtonSelected;
+        else
+        {
+            ButtonPickedA2 = ButtonSelected;
             //udate the slider value
             //ScrollbarAmino2.value = (float)ButtonSelected.GetComponent<AminoButtonController>().temp_AminoButtonID / ((float)number_childs_A2 - 1);
         }
 
-		if (ButtonPickedA1 != null && ButtonPickedA2 != null) {
+        if (ButtonPickedA1 != null && ButtonPickedA2 != null)
+        {
             //AddConnection.GetComponent<Animator> ().enabled = true;
             AddConnection.interactable = true;
         }
 
 
-/*
-        //if function type activated
-        if (uIController.auto_filter)
-        { 
-            switch(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino])
-            {//hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
-                case 0:
-                    uIController.ToggleHydroA1();
-                    break;
-                case 1:
-                    uIController.
+        /*
+                //if function type activated
+                if (uIController.auto_filter)
+                { 
+                    switch(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino])
+                    {//hydro - 0 / posi - 1 / polar - 2 / nega - 3 / special - 4
+                        case 0:
+                            uIController.ToggleHydroA1();
+                            break;
+                        case 1:
+                            uIController.
 
 
-                default:
-                    break;
-            }
-        }
-        Debug.Log(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino]);*/
+                        default:
+                            break;
+                    }
+                }
+                Debug.Log(buttonStructure.FunctionType[ButtonSelected.GetComponent<AminoButtonController>().name_amino]);*/
     }
 
-	public void AddConnectionButton()
-	{
-		//ButtonPickedA1.GetComponent<Button>().interactable = false;
-		//ButtonPickedA2.GetComponent<Button>().interactable = false;
-		if (!CheckIfConnectionExist (ButtonPickedA1, ButtonPickedA2))
+    public void AddConnectionButton()
+    {
+        //ButtonPickedA1.GetComponent<Button>().interactable = false;
+        //ButtonPickedA2.GetComponent<Button>().interactable = false;
+        if (!CheckIfConnectionExist(ButtonPickedA1, ButtonPickedA2))
         {
             sfx.PlayTrack(SFX.sound_index.connection_click);
             //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
             //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
-            ButtonPickedA1.transform.localScale = new Vector3 (1, 1, 1);
-			ButtonPickedA2.transform.localScale = new Vector3 (1, 1, 1);
-			AminoAcidsLinkPanel (BioBloxReference.GetComponent<ConnectionManager> ().CreateAminoAcidLink (BioBloxReference.molecules [0].GetComponent<PDB_mesh> (), ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID, BioBloxReference.molecules [1].GetComponent<PDB_mesh> (), ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
-			//ButtonPickedA1 = ButtonPickedA2 = null;
-			FindObjectOfType<ConnectionManager> ().SliderStrings.interactable = true;
-			//DeactivateAddConnectionButton ();
-		}
-		else
-		{
-			ConnectionExistMessage.SetBool("Play",true);
+            ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
+            ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
+            AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
+            //ButtonPickedA1 = ButtonPickedA2 = null;
+            FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
+            //DeactivateAddConnectionButton ();
+        }
+        else
+        {
+            ConnectionExistMessage.SetBool("Play", true);
             if (!sfx.isPlaying(SFX.sound_index.connection_exist))
                 sfx.PlayTrack(SFX.sound_index.connection_exist);
         }
-	}
+    }
 
-	//void DeactivateAddConnectionButton()
-	//{
-	//	AddConnection.GetComponent<Animator>().enabled = false;
-	//	AddConnection.GetComponent<Button> ().enabled = false;
-	//	Color c = AddConnection.GetComponent<Image>().color;
-	//	c.a = 0.3f;
-	//	AddConnection.GetComponent<Image> ().color = c;
-	//}
+    //void DeactivateAddConnectionButton()
+    //{
+    //	AddConnection.GetComponent<Animator>().enabled = false;
+    //	AddConnection.GetComponent<Button> ().enabled = false;
+    //	Color c = AddConnection.GetComponent<Image>().color;
+    //	c.a = 0.3f;
+    //	AddConnection.GetComponent<Image> ().color = c;
+    //}
 
-	public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
-	{
-		GameObject AminoLinkPanelReference;
-		//activate the linked image
-		LinkedGameObjectReference = Instantiate(LinkedGameObject);		
-		LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform,false);		
-		LinkedGameObjectReference = Instantiate(LinkedGameObject);		
-		LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform,false);
+    public void AminoAcidsLinkPanel(AtomConnection connection, GameObject ButtonPickedA1, GameObject ButtonPickedA2)
+    {
+        GameObject AminoLinkPanelReference;
+        //activate the linked image
+        LinkedGameObjectReference = Instantiate(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA1.transform.GetChild(2).transform, false);
+        LinkedGameObjectReference = Instantiate(LinkedGameObject);
+        LinkedGameObjectReference.transform.SetParent(ButtonPickedA2.transform.GetChild(2).transform, false);
 
-		AminoLinkPanelReference = Instantiate(AminoLinkPanel);
-		AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform,false);
-		AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().connection = connection;
-        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController> ().AminoButtonID;
-        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder> ().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController> ().AminoButtonID;
+        AminoLinkPanelReference = Instantiate(AminoLinkPanel);
+        AminoLinkPanelReference.transform.SetParent(AminoLinkPanelParent.transform, false);
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().connection = connection;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_name = ButtonPickedA1.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA1.GetComponent<AminoButtonController>().tag_amino;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_name = ButtonPickedA2.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA2.GetComponent<AminoButtonController>().tag_amino;
 
         //UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount);
 
-        FixButton (ButtonPickedA1,AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform,0);
-		FixButton (ButtonPickedA2,AminoLinkPanelReference, 1, AminoLinkPanelReference.transform.GetChild(0).transform,1);
+        FixButton(ButtonPickedA1, AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform, 0);
+        FixButton(ButtonPickedA2, AminoLinkPanelReference, 1, AminoLinkPanelReference.transform.GetChild(0).transform, 1);
 
 
         //get the atom connected
@@ -545,6 +552,8 @@ public class AminoSliderController : MonoBehaviour {
         int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
         //seting the atom index
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_atom_index = A_atoms[A_atom_index];
+        //seting atom name
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
 
         //INSTIATE THE ELEMENT
         GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -555,7 +564,7 @@ public class AminoSliderController : MonoBehaviour {
         if (P1AtomsHolder.childCount > A_atom_index)
             LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A_atom_index).transform, false);
         //animation
-       // P1AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
+        // P1AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
 
         //get the atom connected
         A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID];
@@ -572,6 +581,8 @@ public class AminoSliderController : MonoBehaviour {
         A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
         //seting the atom index
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_atom_index = A_atoms[A_atom_index];
+        //seting atom name
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
 
         //INSTIATE THE ELEMENT
         temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -579,113 +590,114 @@ public class AminoSliderController : MonoBehaviour {
         temp_reference.transform.SetParent(AminoLinkPanelReference.transform.GetChild(0).transform.GetChild(3).transform, false);
         //mark the atom	
         LinkedGameObjectReference = Instantiate(LinkedAtom);
-        if(P2AtomsHolder.childCount > A_atom_index)
+        if (P2AtomsHolder.childCount > A_atom_index)
             LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A_atom_index).transform, false);
         //animation
-       // P2AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
+        // P2AtomsHolder.GetChild(A_atom_index).GetComponent<Animator>().SetBool("High", true);
     }
 
     bool CheckIfConnectionExist(GameObject A1, GameObject A2)
-	{
-		int A1ID = A1.GetComponent<AminoButtonController> ().AminoButtonID;
-		int A2ID = A2.GetComponent<AminoButtonController> ().AminoButtonID;
-		bool existe = false;
+    {
+        int A1ID = A1.GetComponent<AminoButtonController>().AminoButtonID;
+        int A2ID = A2.GetComponent<AminoButtonController>().AminoButtonID;
+        bool existe = false;
 
-		foreach (Transform childLinks in AminoLinkPanelParent.transform)
-		{
-			if(childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
-			{
-				existe = true;
-			}
-		}
-		return existe;
-	}
+        foreach (Transform childLinks in AminoLinkPanelParent.transform)
+        {
+            if (childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
+            {
+                existe = true;
+            }
+        }
+        return existe;
+    }
 
-	void UpdateBackgroundSize(int hijos)
-	{
-		Vector2 temp = AminoLinkBackground.offsetMax;
-		temp.x = -231.0f + (47.0f * hijos);
-		AminoLinkBackground.offsetMax = temp;
-		if (hijos == 0) {
-			AminoLinkBackground.offsetMax = new Vector2 (-244.0f, temp.y);
-		}
-	}
+    void UpdateBackgroundSize(int hijos)
+    {
+        Vector2 temp = AminoLinkBackground.offsetMax;
+        temp.x = -231.0f + (47.0f * hijos);
+        AminoLinkBackground.offsetMax = temp;
+        if (hijos == 0)
+        {
+            AminoLinkBackground.offsetMax = new Vector2(-244.0f, temp.y);
+        }
+    }
 
-	void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i, Transform PanelParent,int child)
-	{
-		GameObject AminoButtonReference = Instantiate(AminoButton);
-		AminoButtonReference.SetActive (true);
-		AminoButtonReference.transform.position = Vector3.zero;
-		AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
-		AminoButtonReference.GetComponent<Button> ().interactable = true;
-		AminoButtonReference.GetComponent<Button> ().enabled = false;
+    void FixButton(GameObject AminoButton, GameObject AminoLinkPanelReference, int i, Transform PanelParent, int child)
+    {
+        GameObject AminoButtonReference = Instantiate(AminoButton);
+        AminoButtonReference.SetActive(true);
+        AminoButtonReference.transform.position = Vector3.zero;
+        AminoButtonReference.GetComponent<LayoutElement>().enabled = false;
+        AminoButtonReference.GetComponent<Button>().interactable = true;
+        AminoButtonReference.GetComponent<Button>().enabled = false;
         AminoButtonReference.GetComponent<Image>().raycastTarget = false;
         //deactivate the linked image
-        Destroy (AminoButtonReference.transform.GetChild (2).gameObject);
+        Destroy(AminoButtonReference.transform.GetChild(2).gameObject);
 
-		AminoButtonReference.transform.SetParent(PanelParent.GetChild(child), false);
-		RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
-		AminoButtonRect.anchorMin = new Vector2(0.5f,0.5f);
-		AminoButtonRect.anchorMax = new Vector2(0.5f,0.5f);
-		AminoButtonRect.pivot = new Vector2(0.5f,0.5f);
-		AminoButtonRect.sizeDelta = new Vector2(25, 25);
-		//AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
-	}
+        AminoButtonReference.transform.SetParent(PanelParent.GetChild(child), false);
+        RectTransform AminoButtonRect = AminoButtonReference.GetComponent<RectTransform>();
+        AminoButtonRect.anchorMin = new Vector2(0.5f, 0.5f);
+        AminoButtonRect.anchorMax = new Vector2(0.5f, 0.5f);
+        AminoButtonRect.pivot = new Vector2(0.5f, 0.5f);
+        AminoButtonRect.sizeDelta = new Vector2(25, 25);
+        //AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
+    }
 
-	public void RestoreDeletedAminoButtons(int B1, int B2)
-	{
-		//UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount-1);
-		SliderMol[0].transform.GetChild (B1).GetComponent<AminoButtonController> ().Linked = false;
-		SliderMol[1].transform.GetChild (B2).GetComponent<AminoButtonController> ().Linked = false;
-		Destroy(SliderMol[0].transform.GetChild (B1).transform.GetChild (2).transform.GetChild (0).gameObject);
-		Destroy(SliderMol[1].transform.GetChild (B2).transform.GetChild (2).transform.GetChild (0).gameObject);
-	}
+    public void RestoreDeletedAminoButtons(int B1, int B2)
+    {
+        //UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount-1);
+        SliderMol[0].transform.GetChild(B1).GetComponent<AminoButtonController>().Linked = false;
+        SliderMol[1].transform.GetChild(B2).GetComponent<AminoButtonController>().Linked = false;
+        Destroy(SliderMol[0].transform.GetChild(B1).transform.GetChild(2).transform.GetChild(0).gameObject);
+        Destroy(SliderMol[1].transform.GetChild(B2).transform.GetChild(2).transform.GetChild(0).gameObject);
+    }
 
-	//SLIDER BUTTONS
-	
-	public void A1LDown()
-	{
-		ButtonA1LDown = true;
-	}
+    //SLIDER BUTTONS
 
-	public void A1LUp()
-	{
-		ButtonA1LDown = false;
-	}
+    public void A1LDown()
+    {
+        ButtonA1LDown = true;
+    }
 
-	public void A1RDown()
-	{
-		ButtonA1RDown = true;
-	}
-	
-	public void A1RUp()
-	{
-		ButtonA1RDown = false;
-	}
+    public void A1LUp()
+    {
+        ButtonA1LDown = false;
+    }
 
-	public void A2LDown()
-	{
-		ButtonA2LDown = true;
-	}
-	
-	public void A2LUp()
-	{
-		ButtonA2LDown = false;
-	}
+    public void A1RDown()
+    {
+        ButtonA1RDown = true;
+    }
 
-	public void A2RDown()
-	{
-		ButtonA2RDown = true;
-	}
-	
-	public void A2RUp()
-	{
-		ButtonA2RDown = false;
-	}
+    public void A1RUp()
+    {
+        ButtonA1RDown = false;
+    }
+
+    public void A2LDown()
+    {
+        ButtonA2LDown = true;
+    }
+
+    public void A2LUp()
+    {
+        ButtonA2LDown = false;
+    }
+
+    public void A2RDown()
+    {
+        ButtonA2RDown = true;
+    }
+
+    public void A2RUp()
+    {
+        ButtonA2RDown = false;
+    }
 
     public void RegisterScore()
     {
-        
+
         //new higuest lennars score
         if (BioBloxReference.lennard_score > score_len_max)
         {
@@ -735,7 +747,7 @@ public class AminoSliderController : MonoBehaviour {
             max_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
             max_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
         }
-        
+
     }
 
     public void LoadScore()
@@ -744,7 +756,7 @@ public class AminoSliderController : MonoBehaviour {
         switch (DropDownLoadScore.value)
         {
             case 0:
-                if(score_aminolinks_holder_max.Count != 0)
+                if (score_aminolinks_holder_max.Count != 0)
                 {
                     for (int i = 0; i < score_aminolinks_holder_max.Count; i++)
                     {
@@ -777,7 +789,7 @@ public class AminoSliderController : MonoBehaviour {
                     BioBloxReference.molecules[1].transform.localEulerAngles = elec_protein0;
                     //show loadede message
                     ElecLoadMessage.SetBool("Play", true);
-                }  
+                }
                 break;
             case 2:
                 if (score_aminolinks_holder_len.Count != 0)
@@ -843,24 +855,30 @@ public class AminoSliderController : MonoBehaviour {
         AminoHolderReference.GetComponent<AminoConnectionHolder>().connection = connection_temp;
         AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID;
         AminoHolderReference.GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID;
-        //SET THE ATOMS AS THE FIRST ONE
-        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT1_index = 0;
-        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT2_index = 0;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().A1_name = ButtonPickedA1_temp.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA1_temp.GetComponent<AminoButtonController>().tag_amino;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().A2_name = ButtonPickedA2_temp.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA2_temp.GetComponent<AminoButtonController>().tag_amino;
+        
 
         //UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount);
 
-        FixButton(ButtonPickedA1_temp, AminoHolderReference, 0, AminoHolderReference.transform,0);
-        FixButton(ButtonPickedA2_temp, AminoHolderReference, 1, AminoHolderReference.transform,1);
+        FixButton(ButtonPickedA1_temp, AminoHolderReference, 0, AminoHolderReference.transform, 0);
+        FixButton(ButtonPickedA2_temp, AminoHolderReference, 1, AminoHolderReference.transform, 1);
 
         //get the atom connected
         int[] A_atoms = P1_mol.aminoAcidsAtomIds[ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID];
         //set the number of childs
         AminoHolderReference.GetComponent<AminoConnectionHolder>().A1_number_of_atoms = A_atoms.Length;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT1_index = A_atoms.Length - 1;
+
         //picking the last atom of the chain of the amino acid 1
-        string A_atom = P1_mol.atomNames[A_atoms[0]];
+        string A_atom = P1_mol.atomNames[A_atoms[A_atoms.Length - 1]];
         //check element A1
-        int name = P1_mol.names[A_atoms[0]];
+        int name = P1_mol.names[A_atoms[A_atoms.Length - 1]];
         int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting atom name
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
+        //seting the atom index
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().A1_atom_index = A_atoms[A_atoms.Length - 1];
 
         //INSTIATE THE ELEMENT
         GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -868,7 +886,7 @@ public class AminoSliderController : MonoBehaviour {
         temp_reference.transform.SetParent(AminoHolderReference.transform.GetChild(2).transform, false);
         //mark the atom	
         LinkedGameObjectReference = Instantiate(LinkedAtom);
-        LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(0).transform, false);
+        LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
         //animation
         //P1AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
 
@@ -876,11 +894,16 @@ public class AminoSliderController : MonoBehaviour {
         A_atoms = P2_mol.aminoAcidsAtomIds[ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID];
         //set the number of childs
         AminoHolderReference.GetComponent<AminoConnectionHolder>().A2_number_of_atoms = A_atoms.Length;
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT2_index = A_atoms.Length - 1;
         //picking the last atom of the chain of the amino acid 1
-        A_atom = P2_mol.atomNames[A_atoms[0]];
+        A_atom = P2_mol.atomNames[A_atoms[A_atoms.Length - 1]];
         //check element A1
-        name = P2_mol.names[A_atoms[0]];
+        name = P2_mol.names[A_atoms[A_atoms.Length - 1]];
         A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting atom name
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
+        //seting the atom index
+        AminoHolderReference.GetComponent<AminoConnectionHolder>().A2_atom_index = A_atoms[A_atoms.Length - 1];
 
         //INSTIATE THE ELEMENT
         temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -888,30 +911,31 @@ public class AminoSliderController : MonoBehaviour {
         temp_reference.transform.SetParent(AminoHolderReference.transform.GetChild(3).transform, false);
         //mark the atom	
         LinkedGameObjectReference = Instantiate(LinkedAtom);
-        LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(0).transform, false);
+        LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A_atoms.Length - 1).transform, false);
         //animation
-       // P2AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
+        // P2AtomsHolder.GetChild(0).GetComponent<Animator>().SetBool("High", true);
     }
 
     public void ModifyConnectionHolder_atomic(AtomConnection connection_temp, int A1_atom_index, int A1_atom_index_previous, int A2_atom_index, int A2_atom_index_previous, int protein_id_temp, GameObject current_panel, bool atom_exist)
     {
         GameObject temp_reference;
-        if (protein_id_temp == 0 )
+        if (protein_id_temp == 0)
         {
-            if(atom_exist)
+            if (atom_exist)
             {
                 //UNmark the atoM
                 //P1AtomsHolder.GetChild(A1_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
                 Destroy(P1AtomsHolder.GetChild(A1_atom_index_previous).transform.GetChild(2).gameObject);
             }
-            
+
             //P1_mesh.SelectAminoAcid(ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID);
             current_panel.GetComponent<AminoConnectionHolder>().AT1_index = A1_atom_index;
+            current_panel.GetComponent<AminoConnectionHolder>().AT1_name = P1AtomsHolder.GetChild(A1_atom_index).GetComponent<AtomConnectionController>().atom_name;
             temp_reference = Instantiate(atom_conn[P1AtomsHolder.GetChild(A1_atom_index).GetComponent<AtomConnectionController>().element_type]);
             temp_reference.GetComponentInChildren<Text>().text = P1AtomsHolder.GetChild(A1_atom_index).GetComponent<AtomConnectionController>().atom_name;
             temp_reference.transform.SetParent(current_panel.transform.GetChild(2).transform, false);
             //mark the atom	
-            HighlightAtomWhenConnectionClicked(A1_atom_index,0);
+            HighlightAtomWhenConnectionClicked(A1_atom_index, 0);
             //HighlightAtomWhenConnectionClicked(A2_atom_index, 1);
             //LinkedGameObjectReference = Instantiate(LinkedAtom);
             //LinkedGameObjectReference.transform.SetParent(P1AtomsHolder.GetChild(A1_atom_index).transform, false);
@@ -923,17 +947,18 @@ public class AminoSliderController : MonoBehaviour {
             if (atom_exist)
             {
                 //UNmark the atoM
-               // P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
+                // P2AtomsHolder.GetChild(A2_atom_index_previous).GetComponent<Animator>().SetBool("High", false);
                 Destroy(P2AtomsHolder.GetChild(A2_atom_index_previous).transform.GetChild(2).gameObject);
             }
-            
+
             //P2_mesh.SelectAminoAcid(ButtonPickedA2_temp.GetComponent<AminoButtonController>().AminoButtonID);
             current_panel.GetComponent<AminoConnectionHolder>().AT2_index = A2_atom_index;
+            current_panel.GetComponent<AminoConnectionHolder>().AT2_name = P2AtomsHolder.GetChild(A2_atom_index).GetComponent<AtomConnectionController>().atom_name;
             temp_reference = Instantiate(atom_conn[P2AtomsHolder.GetChild(A2_atom_index).GetComponent<AtomConnectionController>().element_type]);
             temp_reference.GetComponentInChildren<Text>().text = P2AtomsHolder.GetChild(A2_atom_index).GetComponent<AtomConnectionController>().atom_name;
             temp_reference.transform.SetParent(current_panel.transform.GetChild(3).transform, false);
             //mark the atom	
-            HighlightAtomWhenConnectionClicked(A2_atom_index,1);
+            HighlightAtomWhenConnectionClicked(A2_atom_index, 1);
             //HighlightAtomWhenConnectionClicked(A1_atom_index, 0);
             //LinkedGameObjectReference = Instantiate(LinkedAtom);
             //LinkedGameObjectReference.transform.SetParent(P2AtomsHolder.GetChild(A2_atom_index).transform, false);
@@ -991,52 +1016,62 @@ public class AminoSliderController : MonoBehaviour {
         ScrollbarAmino2.value = 0;
     }
 
-    public bool IsSelected(int slider, string id) {
+    public bool IsSelected(int slider, string id)
+    {
         GameObject button = slider == 1 ? ButtonPickedA2 : ButtonPickedA1;
         List<string> names = slider == 1 ? aminoAcidsNames[1] : aminoAcidsNames[0];
         List<string> tags = slider == 1 ? aminoAcidsTags[1] : aminoAcidsTags[0];
         if (button == null) return false;
-        int bid = button.GetComponent<AminoButtonController> ().AminoButtonID;
+        int bid = button.GetComponent<AminoButtonController>().AminoButtonID;
         string val = names[bid] + " " + tags[bid];
         //Debug.Log("val=[" + val + "] id=[" + id + "]");
         return val == id;
     }
 
-    public bool IsConnectionMade(string id1, string id2) {
+    public bool IsConnectionMade(string id1, string id2)
+    {
         //Debug.Log("icm " + id1 + " " + id2);
-		foreach (Transform childLinks in AminoLinkPanelParent.transform)
-		{
+        foreach (Transform childLinks in AminoLinkPanelParent.transform)
+        {
             int b1 = childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1;
             int b2 = childLinks.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2;
             string val1 = aminoAcidsNames[0][b1] + " " + aminoAcidsTags[0][b1];
             string val2 = aminoAcidsNames[1][b2] + " " + aminoAcidsTags[1][b2];
             //Debug.Log("val1=[" + val1 + "] val2=[" + val2 + "]" + (val1 == id1 && val2 == id2));
-			if (val1 == id1 && val2 == id2) {
+            if (val1 == id1 && val2 == id2)
+            {
                 return true;
-			}
-		}
+            }
+        }
         return false;
     }
 
-    public void FilterButtons(string[] aas) {
-        foreach (AminoButtonController button in A1Buttons) {
+    public void FilterButtons(string[] aas)
+    {
+        foreach (AminoButtonController button in A1Buttons)
+        {
             int bid = button.AminoButtonID;
             string tag = aminoAcidsNames[0][bid] + " " + aminoAcidsTags[0][bid];
             bool active = false;
-            foreach (string aa in aas) {
-                if (tag == aa) {
+            foreach (string aa in aas)
+            {
+                if (tag == aa)
+                {
                     active = true;
                     break;
                 }
             }
             button.gameObject.SetActive(active);
         }
-        foreach (AminoButtonController button in A2Buttons) {
+        foreach (AminoButtonController button in A2Buttons)
+        {
             int bid = button.AminoButtonID;
             string tag = aminoAcidsNames[1][bid] + " " + aminoAcidsTags[1][bid];
             bool active = false;
-            foreach (string aa in aas) {
-                if (tag == aa) {
+            foreach (string aa in aas)
+            {
+                if (tag == aa)
+                {
                     active = true;
                     break;
                 }
@@ -1071,6 +1106,10 @@ public class AminoSliderController : MonoBehaviour {
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().connection = connection;
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button1 = ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID;
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().ID_button2 = ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_name = ButtonPickedA1.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA1.GetComponent<AminoButtonController>().tag_amino;
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_name = ButtonPickedA2.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA2.GetComponent<AminoButtonController>().tag_amino;
+
+
         //SET THE ATOMS AS THE FIRST ONE
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT1_index = 0;
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT2_index = 0;
@@ -1085,10 +1124,14 @@ public class AminoSliderController : MonoBehaviour {
         //set the number of childs
         AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_number_of_atoms = A_atoms.Length;
         //picking the last atom of the chain of the amino acid 1
-        string A_atom = P1_mol.atomNames[A_atoms[A_atoms.Length-1]];
+        string A_atom = P1_mol.atomNames[A_atoms[A_atoms.Length - 1]];
         //check element A1
         int name = P1_mol.names[A_atoms[A_atoms.Length - 1]];
         int A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting atom name
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
+        //seting the atom index
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A1_atom_index = A_atoms[A_atoms.Length - 1];
 
         //INSTIATE THE ELEMENT
         GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -1104,6 +1147,10 @@ public class AminoSliderController : MonoBehaviour {
         //check element A1
         name = P2_mol.names[A_atoms[A_atoms.Length - 1]];
         A_atom_element = name == PDB_molecule.atom_C ? 0 : name == PDB_molecule.atom_N ? 1 : name == PDB_molecule.atom_O ? 2 : name == PDB_molecule.atom_S ? 3 : 4;
+        //seting atom name
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
+        //seting the atom index
+        AminoLinkPanelReference.transform.GetChild(0).GetComponent<AminoConnectionHolder>().A2_atom_index = A_atoms[A_atoms.Length - 1];
 
         //INSTIATE THE ELEMENT
         temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -1129,9 +1176,9 @@ public class AminoSliderController : MonoBehaviour {
 
     public void AtomSelected(int protein_id, int atom_child_index, int atom_index)
     {
-        if(protein_id == 0)
+        if (protein_id == 0)
         {
-            if(atom_selected_p1 != -1)
+            if (atom_selected_p1 != -1)
                 P1AtomsHolder.GetChild(atom_selected_p1).transform.localScale = normal_scale;
             else
                 P1AtomsHolder.GetChild(0).transform.localScale = normal_scale;

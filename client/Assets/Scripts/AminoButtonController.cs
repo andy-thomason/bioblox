@@ -8,7 +8,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 	public int AminoButtonID;
 	public bool Linked = false;
     public string name_amino;
-	public Color32 NormalColor;
+    public string tag_amino;
+    public Color32 NormalColor;
 	public Color32 FunctionColor;
     public int temp_AminoButtonID;
     BioBlox bb;

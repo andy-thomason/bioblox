@@ -24,6 +24,10 @@ public class AminoConnectionHolder : MonoBehaviour {
     public int AT2_index;
     public int A2_number_of_atoms;
     public int A2_atom_index;
+    public string A1_name;
+    public string A2_name;
+    public string AT1_name;
+    public string AT2_name;
     Vector3 normal_scale = new Vector3(1, 1, 1);
     Vector3 selected_scale = new Vector3(1.2f, 1.2f, 1.2f);
 
