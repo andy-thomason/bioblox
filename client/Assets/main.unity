@@ -30680,6 +30680,10 @@ MonoBehaviour:
   repulsiveForce: 20000
   seperationForce: 10000
   stringForce: 20000
+  LJseperationForce: -3000
+  LJMax: 10
+  LJMin: -10
+  LJinflation: 1
   rmsScoreSlider: {fileID: 0}
   heuristicScoreSlider: {fileID: 0}
   heuristicScore: {fileID: 0}
@@ -30701,6 +30705,7 @@ MonoBehaviour:
   num_touching_1: 0
   num_invalid: 0
   num_connections: 0
+  lennard_jones: 0
   MainCamera: {fileID: 1348893749}
   IntroCamera: {fileID: 0}
   TutorialHand: {fileID: 359174796}
@@ -32265,7 +32270,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1624556581}
   m_HandleRect: {fileID: 1624556580}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -71542,7 +71547,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.000030517578, y: 0}
+  m_AnchoredPosition: {x: -0.000076293945, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408

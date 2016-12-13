@@ -125,6 +125,10 @@ public class BioBlox : MonoBehaviour
     //  force applied by string
     public float stringForce = 20000.0f;
     //private float ScoreScaleValue;
+    public float LJseperationForce = -300.0f;
+    public float LJMax = 10.0f;
+    public float LJMin = -10.0f;
+    public float LJinflation = 1.0f;
 
     public Slider rmsScoreSlider;
     public Slider heuristicScoreSlider;
@@ -165,6 +169,7 @@ public class BioBlox : MonoBehaviour
     public int num_touching_1 = 0;
     public int num_invalid = 0;
     public int num_connections = 0;
+    public float lennard_jones = 0;
 
     public Camera MainCamera;
     LineRenderer line_renderer;
@@ -693,11 +698,14 @@ public class BioBlox : MonoBehaviour
     //aca se mueve
     void ApplyReturnToOriginForce ()
     {
-        for (int i = 0; i < molecules.Length; ++i) {
-            Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
-            if (molToOrigin.sqrMagnitude > 1.0f) {
-                Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
-                rb.AddForce (molToOrigin.normalized * repulsiveForce);
+        ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+        if (conMan.SliderStrings.value > 0.5) {
+            for (int i = 0; i < molecules.Length; ++i) {
+                Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
+                if (molToOrigin.sqrMagnitude > 1.0f) {
+                    Rigidbody rb = molecules [i].GetComponent<Rigidbody> ();
+                    rb.AddForce (molToOrigin.normalized * repulsiveForce);
+                }
             }
         }
     }
@@ -1016,7 +1024,7 @@ public class BioBlox : MonoBehaviour
                 Transform t1 = obj1.transform;
                 PDB_molecule mol0 = mesh0.mol;
                 PDB_molecule mol1 = mesh1.mol;
-                GridCollider b = new GridCollider(mol0, t0, mol1, t1, 0);
+                GridCollider b = new GridCollider(mol0, t0, mol1, t1, LJinflation);
                 work_done = b.work_done;
 
                 BitArray ba0 = new BitArray(mol0.atom_centres.Length);
@@ -1025,36 +1033,57 @@ public class BioBlox : MonoBehaviour
                 BitArray bab1 = new BitArray(mol1.atom_centres.Length);
                 atoms_touching = new BitArray[] { ba0, ba1 };
                 atoms_bad = new BitArray[] { bab0, bab1 };
-
+                Matrix4x4 t0mx = t0.localToWorldMatrix;
+                Matrix4x4 t1mx = t1.localToWorldMatrix;
+                lennard_jones = 0.0f;
+                //List<string> debug_csv = new List<string>();
 
                 // Apply forces to the rigid bodies.
                 foreach (GridCollider.Result r in b.results)
                 {
-                    Vector3 c0 = t0.TransformPoint(mol0.atom_centres[r.i0]);
-                    Vector3 c1 = t1.TransformPoint(mol1.atom_centres[r.i1]);
+                    Vector3 ac0 = mol0.atom_centres[r.i0];
+                    Vector3 ac1 = mol1.atom_centres[r.i1];
+                    Vector3 c0 = t0mx * new Vector4(ac0.x, ac0.y, ac0.z, 1);
+                    Vector3 c1 = t1mx * new Vector4(ac1.x, ac1.y, ac1.z, 1);
                     float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
                     float distance = (c1 - c0).magnitude;
 
+                    // see https://en.wikipedia.org/wiki/Lennard-Jones_potential
+                    float ljr = distance / (min_d * 1.122f);
+                    float lennard_jones_potential = Mathf.Pow(ljr, -12) - 2 * Mathf.Pow(ljr, -6);
+                    float lennard_jones_force = 12 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
+
+                    /*float ljr = distance / min_d;
+                    float lennard_jones_potential = Mathf.Pow(ljr, -12) - Mathf.Pow(ljr, -6);
+                    float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);*/
+
+                    lennard_jones_force = Mathf.Min(lennard_jones_force, LJMax);
+                    lennard_jones_force = Mathf.Max(lennard_jones_force, LJMin);
+                    //debug_csv.Add(string.Format("{0},{1},{2},{3},{4}", r.i0, r.i1, ljr, lennard_jones_potential, lennard_jones_force));
+                    lennard_jones += lennard_jones_potential;
+
                     num_connections++;
 
-                    if (distance < min_d)
-                    {
-                        Vector3 normal = (c0 - c1).normalized * (min_d - distance);
-                        normal *= seperationForce;
-                        r0.AddForceAtPosition(normal, c0);
-                        r1.AddForceAtPosition(-normal, c1);
+                    Vector3 normal = (c0 - c1).normalized;
+                    //normal *= seperationForce * (min_d - distance);
 
+                    normal *= lennard_jones_force * LJseperationForce;
+                    r0.AddForceAtPosition(normal, c0);
+                    r1.AddForceAtPosition(-normal, c1);
+
+                    if (distance < min_d * 1.2f)
+                    {
                         if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
                         if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                        if (distance < min_d * 0.5)
-                        {
-                            num_invalid++;
-                            bab0.Set(r.i0, true);
-                            bab1.Set(r.i1, true);
-                        }
+                    } else if (distance < min_d * 0.8f)
+                    {
+                        num_invalid++;
+                        bab0.Set(r.i0, true);
+                        bab1.Set(r.i1, true);
                     }
-
                 }
+
+                //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
 
                 if (num_touching_0 + num_touching_1 != 0)
                 {

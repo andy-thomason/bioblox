@@ -76,7 +76,7 @@ public class GridCollider
 
 		//Debug.DrawLine (min, max);
 
-		if (show_grid) {
+		if (false && show_grid) {
 			for (int z = z0; z <= z1; z += z1-z0) {
 				for (int x = x0; x <= x1; ++x) {
 					Debug.DrawLine (
@@ -176,7 +176,7 @@ public class GridCollider
 							Vector3 pos0 = t0.TransformPoint(ac0[i]);
 							if ((pos0 - pos1).magnitude < r0 + (r1 + inflation)) {
 								//debug.Write("pos0=" + pos0 + " pos1=" + pos1);
-								Debug.DrawLine (pos0, pos1);
+								//Debug.DrawLine (pos0, pos1);
 								results.Add(new Result(i, j));
 							}
 						}
