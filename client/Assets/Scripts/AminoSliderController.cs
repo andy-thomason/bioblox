@@ -640,7 +640,7 @@ public class AminoSliderController : MonoBehaviour
         AminoButtonRect.anchorMin = new Vector2(0.5f, 0.5f);
         AminoButtonRect.anchorMax = new Vector2(0.5f, 0.5f);
         AminoButtonRect.pivot = new Vector2(0.5f, 0.5f);
-        AminoButtonRect.sizeDelta = new Vector2(25, 25);
+        AminoButtonRect.sizeDelta = new Vector2(35, 35);
         //AminoButtonRect.localPosition += new Vector3(0,button_displace[i],0);
     }
 
