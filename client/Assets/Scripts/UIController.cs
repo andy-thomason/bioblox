@@ -699,9 +699,9 @@ public class UIController : MonoBehaviour {
         CutAway.value = CutAway.minValue;
         if (BioBloxReference.current_level == 0)
             BioBloxReference.ToggleMode.isOn = true;
-        isOverUI = false;
 
         sfx.StopTrack(SFX.sound_index.warning);
+        isOverUI = false;
     }
 
     public void Reset_UI()
@@ -715,6 +715,7 @@ public class UIController : MonoBehaviour {
         RestartCameraFromIntro();
         DropDownP1.value = 0;
         DropDownP2.value = 0;
+        isOverUI = false;
     }
 
     //tool panel
@@ -1142,17 +1143,20 @@ public class UIController : MonoBehaviour {
 
     public void OpenSavePanel()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         SavePanel.SetActive(true);
     }
 
     public void CloseSavePanel()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         SavePanel.SetActive(false);
         isOverUI = false;
     }
 
     public void SubmitSaveToServer()
     {
+        sfx.PlayTrack(SFX.sound_index.end_level);
         BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 0;
 
         P1_connections = "";
