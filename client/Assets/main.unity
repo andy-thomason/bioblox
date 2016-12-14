@@ -24661,7 +24661,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: SKELETON
       m_Image: {fileID: 0}
-    - m_Text: CARBON
+    - m_Text: BACKBONE
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -37553,7 +37553,7 @@ MonoBehaviour:
       m_Image: {fileID: 0}
     - m_Text: SKELETON
       m_Image: {fileID: 0}
-    - m_Text: CARBON
+    - m_Text: BACKBONE
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
