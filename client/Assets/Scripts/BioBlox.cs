@@ -1010,7 +1010,8 @@ public class BioBlox : MonoBehaviour
             }
 
 
-            if (molecules != null && molecules.Length >= 2)
+            ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+            if (molecules != null && molecules.Length >= 2 && conMan.SliderStrings.value <= 0.5)
             {
 
                 // Get a list of atoms that collide.
@@ -1049,13 +1050,21 @@ public class BioBlox : MonoBehaviour
                     float distance = (c1 - c0).magnitude;
 
                     // see https://en.wikipedia.org/wiki/Lennard-Jones_potential
+                    /*
+                    // 12-6 potential
                     float ljr = distance / (min_d * 1.122f);
                     float lennard_jones_potential = Mathf.Pow(ljr, -12) - 2 * Mathf.Pow(ljr, -6);
                     float lennard_jones_force = 12 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
+                    */
 
                     /*float ljr = distance / min_d;
                     float lennard_jones_potential = Mathf.Pow(ljr, -12) - Mathf.Pow(ljr, -6);
                     float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);*/
+
+                    // 8-6 potential
+                    float ljr = distance / (min_d * 1.1547f);
+                    float lennard_jones_potential = 3 * Mathf.Pow(ljr, -8) - 4 * Mathf.Pow(ljr, -6);
+                    float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
 
                     lennard_jones_force = Mathf.Min(lennard_jones_force, LJMax);
                     lennard_jones_force = Mathf.Max(lennard_jones_force, LJMin);
