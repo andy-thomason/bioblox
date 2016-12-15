@@ -7727,9 +7727,10 @@ Prefab:
     - target: {fileID: 114000012172402778, guid: 47ff0df933859a24f81cea100a6b23c2,
         type: 2}
       propertyPath: m_Text
-      value: Interleukin (IL)-33 is an important member of the IL-1 family that has
-        pleiotropic activities in innate and adaptive immune responses in host defense
-        and disease.
+      value: Interleukin IL33 is part of your immune system and has a role in asthma
+        and allergies. Here the IL33 (chain A) docks with a ST2 receptor, the big
+        C shape (chain B) to cause the release of other cytokines. IL-33 is also effective
+        in reversing Alzheimer-like symptoms in APP/PS1 mice. https://en.wikipedia.org/wiki/Interleukin_33
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: level_number
@@ -30905,7 +30906,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dampingFactor: 0.8
   minDistance: 0
-  maxDistance: 60
+  maxDistance: 100
   spring_constant: 10000
   SliderStrings: {fileID: 450668217}
   connectionMinDistances: []
@@ -65394,7 +65395,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1936962431}
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
