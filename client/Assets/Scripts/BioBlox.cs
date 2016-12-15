@@ -1080,15 +1080,15 @@ public class BioBlox : MonoBehaviour
                     r0.AddForceAtPosition(normal, c0);
                     r1.AddForceAtPosition(-normal, c1);
 
-                    if (distance < min_d * 1.2f)
-                    {
-                        if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-                        if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                    } else if (distance < min_d * 0.8f)
+                    if (distance < min_d * 0.8f)
                     {
                         num_invalid++;
                         bab0.Set(r.i0, true);
                         bab1.Set(r.i1, true);
+                    } else if (distance < min_d * 1.2f)
+                    {
+                        if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+                        if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
                     }
                 }
 
