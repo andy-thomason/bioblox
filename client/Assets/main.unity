@@ -8417,7 +8417,35 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 198170, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
       propertyPath: m_Name
-      value: Sphere_atom (785)
+      value: level_button
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000012844084622, guid: 47ff0df933859a24f81cea100a6b23c2,
+        type: 2}
+      propertyPath: m_Text
+      value: 4KC3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000011148084532, guid: 47ff0df933859a24f81cea100a6b23c2,
+        type: 2}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: cfd1414715bd07340853367c675162e9,
+        type: 3}
+    - target: {fileID: 114000012172402778, guid: 47ff0df933859a24f81cea100a6b23c2,
+        type: 2}
+      propertyPath: m_Text
+      value: Interleukin IL33 is part of your immune system and has a role in asthma
+        and allergies. Here the IL33 (chain A) docks with a ST2 receptor, the big
+        C shape (chain B) to cause the release of other cytokines. IL-33 is also effective
+        in reversing Alzheimer-like symptoms in APP/PS1 mice. https://en.wikipedia.org/wiki/Interleukin_33
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: level_number
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114000013512857156, guid: 47ff0df933859a24f81cea100a6b23c2,
+        type: 2}
+      propertyPath: m_MinWidth
+      value: 682
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
@@ -32825,7 +32853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dampingFactor: 0.8
   minDistance: 0
-  maxDistance: 60
+  maxDistance: 100
   spring_constant: 10000
   SliderStrings: {fileID: 450668217}
   connectionMinDistances: []
