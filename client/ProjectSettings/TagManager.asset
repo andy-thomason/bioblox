@@ -16,6 +16,7 @@ TagManager:
   - overlay_renderer
   - floor
   - GameManager
+  - level_holder
   layers:
   - Default
   - TransparentFX

@@ -695,60 +695,60 @@ public class AminoSliderController : MonoBehaviour
         ButtonA2RDown = false;
     }
 
-    public void RegisterScore()
-    {
+    //public void RegisterScore()
+    //{
 
-        //new higuest lennars score
-        if (BioBloxReference.lennard_score > score_len_max)
-        {
-            //clear the list
-            score_aminolinks_holder_len.Clear();
-            //show message high score
-            LPJMessage.SetBool("Play", true);
-            foreach (Transform childLinks in AminoLinkPanelParent.transform)
-            {
-                score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
-            }
-            //set the new high score to compare
-            score_len_max = BioBloxReference.lennard_score;
-            //store the rotation of the molecules
-            len_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
-            len_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
-        }//new higuest electrotatic score
-        if (BioBloxReference.electric_score > score_elec_max)
-        {
-            //clear the list
-            score_aminolinks_holder_elec.Clear();
-            //show message high score
-            ElecMessage.SetBool("Play", true);
-            foreach (Transform childLinks in AminoLinkPanelParent.transform)
-            {
-                score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
-            }
-            //set the new high score to compare
-            score_elec_max = BioBloxReference.electric_score;
-            //store the rotation of the molecules
-            elec_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
-            elec_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
-        }//new higuest max score
-        if (BioBloxReference.electric_score + BioBloxReference.lennard_score > score_total_max)
-        {
-            //clear the list
-            score_aminolinks_holder_max.Clear();
-            //show message high score
-            MaxMessage.SetBool("Play", true);
-            foreach (Transform childLinks in AminoLinkPanelParent.transform)
-            {
-                score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
-            }
-            //set the new high score to compare
-            score_total_max = BioBloxReference.electric_score + BioBloxReference.lennard_score;
-            //store the rotation of the molecules
-            max_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
-            max_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
-        }
+    //    //new higuest lennars score
+    //    if (BioBloxReference.lennard_score > score_len_max)
+    //    {
+    //        //clear the list
+    //        score_aminolinks_holder_len.Clear();
+    //        //show message high score
+    //        LPJMessage.SetBool("Play", true);
+    //        foreach (Transform childLinks in AminoLinkPanelParent.transform)
+    //        {
+    //            score_aminolinks_holder_len.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
+    //        }
+    //        //set the new high score to compare
+    //        score_len_max = BioBloxReference.lennard_score;
+    //        //store the rotation of the molecules
+    //        len_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
+    //        len_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
+    //    }//new higuest electrotatic score
+    //    if (BioBloxReference.electric_score > score_elec_max)
+    //    {
+    //        //clear the list
+    //        score_aminolinks_holder_elec.Clear();
+    //        //show message high score
+    //        ElecMessage.SetBool("Play", true);
+    //        foreach (Transform childLinks in AminoLinkPanelParent.transform)
+    //        {
+    //            score_aminolinks_holder_elec.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
+    //        }
+    //        //set the new high score to compare
+    //        score_elec_max = BioBloxReference.electric_score;
+    //        //store the rotation of the molecules
+    //        elec_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
+    //        elec_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
+    //    }//new higuest max score
+    //    if (BioBloxReference.electric_score + BioBloxReference.lennard_score > score_total_max)
+    //    {
+    //        //clear the list
+    //        score_aminolinks_holder_max.Clear();
+    //        //show message high score
+    //        MaxMessage.SetBool("Play", true);
+    //        foreach (Transform childLinks in AminoLinkPanelParent.transform)
+    //        {
+    //            score_aminolinks_holder_max.Add(new Vector2(childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button1, childLinks.GetComponentInChildren<AminoConnectionHolder>().ID_button2));
+    //        }
+    //        //set the new high score to compare
+    //        score_total_max = BioBloxReference.electric_score + BioBloxReference.lennard_score;
+    //        //store the rotation of the molecules
+    //        max_protein0 = BioBloxReference.molecules[0].transform.localEulerAngles;
+    //        max_protein1 = BioBloxReference.molecules[1].transform.localEulerAngles;
+    //    }
 
-    }
+    //}
 
     public void LoadScore()
     {
