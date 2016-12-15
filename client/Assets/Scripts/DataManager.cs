@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class DataManager : MonoBehaviour {
 
@@ -8,6 +9,8 @@ public class DataManager : MonoBehaviour {
     GameManager gm;
     WWWForm www_form;
     public string id_user;
+    public int number_of_level;
+    Transform level_holder;
 
     // Use this for initialization
     void Start ()
@@ -30,14 +33,34 @@ public class DataManager : MonoBehaviour {
         www_form = new WWWForm();
         www_form.AddField("id_user", id_user);
         www_form.AddField("username", username);
+        www_form.AddField("number_of_levels", number_of_level);
+
         StartCoroutine(insertUser());
     }
 
     IEnumerator insertUser()
     {
+
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
         gm.SetID();
+        
+        //get the number of levels
+        level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
+
+        //SPLIT
+        string[] splitScores = (SQLQuery.text).Split('+');
+        //ASSIGN THE SCORES
+        for (int i = 0; i < number_of_level; i++)
+        {
+            Debug.Log(splitScores[i]);
+            string[] splitScoresLevel = splitScores[i].Split('-');
+            //assign score ui
+            for (int j = 0; j <= 2; j++)
+            {
+                level_holder.GetChild(i).transform.GetChild(j + 1).GetComponent<Text>().text = splitScoresLevel[j];
+            }
+        }
     }
 
     public void SendSaveData(string n_atoms, string lpj, string ei, string P1_connections, string P2_connections, float slider_value)

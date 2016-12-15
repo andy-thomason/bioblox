@@ -2644,6 +2644,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   current_level: -1
   loading_panel: {fileID: 1000010795831814}
+  id_user: 0
 --- !u!114 &114000010634499630
 MonoBehaviour:
   m_ObjectHideFlags: 1

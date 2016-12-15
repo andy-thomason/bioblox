@@ -657,28 +657,28 @@ public class UIController : MonoBehaviour {
     {
         
         EndLevelPanel.SetActive(true);
-        number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
+        //number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
 
-        //format
-        int minutes = Mathf.FloorToInt(BioBloxReference.game_time / 60F);
-        int seconds = Mathf.FloorToInt(BioBloxReference.game_time - minutes * 60);
-        string time_game;
-        //string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
-        if (minutes == 0)
-            time_game = seconds + " seconds";
-        else
-            time_game = minutes + " minutes " + seconds + " seconds";
+        ////format
+        //int minutes = Mathf.FloorToInt(BioBloxReference.game_time / 60F);
+        //int seconds = Mathf.FloorToInt(BioBloxReference.game_time - minutes * 60);
+        //string time_game;
+        ////string niceTime = string.Format("{0:0}:{1:00}", minutes, seconds);
+        //if (minutes == 0)
+        //    time_game = seconds + " seconds";
+        //else
+        //    time_game = minutes + " minutes " + seconds + " seconds";
 
 
-        time_end_level.text = time_game;
+        //time_end_level.text = time_game;
 
-        //isnert to xml
-        if (number_atoms_end_level.text != "0" && BioBloxReference.is_score_valid)
-        {
-            //play audio
-            sfx.PlayTrack(SFX.sound_index.end_level);
-            time_to_save = BioBloxReference.game_time;
-        }
+        ////isnert to xml
+        //if (number_atoms_end_level.text != "0" && BioBloxReference.is_score_valid)
+        //{
+        //    //play audio
+        //    sfx.PlayTrack(SFX.sound_index.end_level);
+        //    time_to_save = BioBloxReference.game_time;
+        //}
 
     }
 
