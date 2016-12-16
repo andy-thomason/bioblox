@@ -115,8 +115,7 @@ public class UIController : MonoBehaviour {
     //cutaway wall
     public Transform cutaway_wall;
     float camera_distance = 200.0f;
-
-    public GameObject EndLevelPanel;
+    
     public Text number_atoms_end_level;
     public Text time_end_level;
 
@@ -164,8 +163,12 @@ public class UIController : MonoBehaviour {
     LineRenderer lr;
     DataManager dm;
     ConnectionManager cm;
+    GameManager gm;
 
     int transparent_render;
+
+    public int amino_id = 0;
+    public int amino_clicked = -1;
 
     void Awake()
 	{
@@ -180,7 +183,7 @@ public class UIController : MonoBehaviour {
         or = FindObjectOfType<OverlayRenderer>();
         dm = FindObjectOfType<DataManager>();
         cm = FindObjectOfType<ConnectionManager>();
-
+        gm = FindObjectOfType<GameManager>();
     }
 
     public void init()
@@ -226,10 +229,19 @@ public class UIController : MonoBehaviour {
 
         if(SavePanel.activeSelf)
         {
-            BioBloxReference.scoring.calcScore();
-            n_atoms.text = BioBloxReference.NumberOfAtoms.text;
-            lpj.text = (BioBloxReference.scoring.vdwScore).ToString("F3");
-            ei.text = (BioBloxReference.scoring.elecScore).ToString("F3");
+            if(!expert_mode)
+            {
+                BioBloxReference.scoring.calcScore();
+                n_atoms.text = BioBloxReference.NumberOfAtoms.text;
+                lpj.text = (BioBloxReference.scoring.vdwScore * -1).ToString("F1");
+                ei.text = (BioBloxReference.scoring.elecScore * -1).ToString("F1");
+            }
+            else
+            {
+                n_atoms.text = BioBloxReference.NumberOfAtoms.text;
+                lpj.text = BioBloxReference.LennardScore.text;
+                ei.text = BioBloxReference.ElectricScore.text;
+            }
         }
         
 
@@ -655,8 +667,8 @@ public class UIController : MonoBehaviour {
 
     public void EndLevel()
     {
-        
-        EndLevelPanel.SetActive(true);
+        gm.selection_panel.SetActive(true);
+        gm.MenuButtons.SetActive(true);
         //number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
 
         ////format
@@ -685,13 +697,11 @@ public class UIController : MonoBehaviour {
     public void BackButtonEndPanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        EndLevelPanel.SetActive(false);
         isOverUI = false;
     }
     //for the button in the end level panel
     public void RestartLevel()
     {
-        EndLevelPanel.SetActive(false);
         RestartCamera();
         aminoSliderController.DeleteAllAminoConnections();
         BioBloxReference.game_time = 0;

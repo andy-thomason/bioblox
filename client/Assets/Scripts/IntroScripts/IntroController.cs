@@ -81,7 +81,7 @@ public class IntroController : MonoBehaviour {
         bb.game_status = BioBlox.GameStatus.MainScreen;
         bb.Reset();
         ui.Reset_UI();
-        ui.EndLevelPanel.SetActive(false);
+        //ui.EndLevelPanel.SetActive(false);
         intro_light.enabled = true;
         GameCanvas.alpha = 0;
         GameCanvas.blocksRaycasts = false;
