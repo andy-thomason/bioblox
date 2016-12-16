@@ -17,9 +17,9 @@ public class DataManager : MonoBehaviour {
     {
         bb = FindObjectOfType<BioBlox>();
         gm = FindObjectOfType<GameManager>();
-        //temp
-        StartCoroutine(insertUser());
-        //temp
+        ////temp
+        //StartCoroutine(insertUser());
+        ////temp
     }
 	
 	// Update is called once per frame
@@ -43,15 +43,15 @@ public class DataManager : MonoBehaviour {
 
     IEnumerator insertUser()
     {
-        //temp
-        www_form = new WWWForm();
-        www_form.AddField("id_user", 2);
-        www_form.AddField("username", "pedro");
-        www_form.AddField("number_of_levels", number_of_level);
-        //temp
+        ////temp
+        //www_form = new WWWForm();
+        //www_form.AddField("id_user", 2);
+        //www_form.AddField("username", "pedro");
+        //www_form.AddField("number_of_levels", number_of_level);
+        ////temp
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
-        //gm.SetID();
+        gm.SetID();
         
         //get the number of levels
         level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;

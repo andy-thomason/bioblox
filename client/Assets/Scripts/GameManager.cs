@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour {
     public void ChangeLevel(int level)
     {
         loading_panel.SetActive(true);
-        FindObjectOfType<EndLevelScript>().selection_panel.SetActive(false);
+        selection_panel.SetActive(false);
         current_level = level;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }

@@ -4,12 +4,10 @@ using System.Collections;
 public class EndLevelScript : MonoBehaviour {
 
     public GameObject selection_panel;
-    UIController ui;
 
     // Use this for initialization
     void Start()
     {
-        ui = FindObjectOfType<UIController>();
     }
 
     // Update is called once per frame
@@ -20,6 +18,7 @@ public class EndLevelScript : MonoBehaviour {
 
     public void ClosePanel()
     {
+        FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
         selection_panel.SetActive(false);
     }
 
@@ -30,6 +29,7 @@ public class EndLevelScript : MonoBehaviour {
 
     public void Retry()
     {
-        ui.RestartLevel();
+        FindObjectOfType<UIController>().RestartLevel();
+        selection_panel.SetActive(false);
     }
 }

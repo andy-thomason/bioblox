@@ -667,6 +667,7 @@ public class UIController : MonoBehaviour {
 
     public void EndLevel()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         gm.selection_panel.SetActive(true);
         gm.MenuButtons.SetActive(true);
         //number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
@@ -702,6 +703,7 @@ public class UIController : MonoBehaviour {
     //for the button in the end level panel
     public void RestartLevel()
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         RestartCamera();
         aminoSliderController.DeleteAllAminoConnections();
         BioBloxReference.game_time = 0;
