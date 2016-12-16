@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.IO;
 using System.Collections;
@@ -2161,18 +2161,19 @@ public class PDB_score {
                     // dvd: stands for dividend
                     // dvs: stands for divisor
                     // TODO: optimization
-                    float attrDvd = scoringMatrix[key][1] * Mathf.Pow (scoringMatrix[key][0], 6.0f);
-                    float repDvd = scoringMatrix[key][1] * Mathf.Pow (scoringMatrix[key][0], 8.0f);
+                    float [] line = scoringMatrix[key];
+                    float attrDvd = line[1] * Mathf.Pow (line[0], 6.0f);
+                    float repDvd = line[1] * Mathf.Pow (line[0], 8.0f);
                     float attrDvs = Mathf.Pow (distance2, 3.0f);
                     float repDvs = Mathf.Pow (distance2, 4.0f);
                     float vdw = (repDvd/repDvs) - (attrDvd/attrDvs);
                     //if repulsive
-                    if (scoringMatrix[key][2] < 0) {
+                    if (line[2] < 0) {
                         //switch between minimum or saddle point
-                        if (distance2 > scoringMatrix[key][4]) {
-                            vdw *= scoringMatrix[key][2];
+                        if (distance2 > line[4]) {
+                            vdw *= line[2];
                         } else {
-                            vdw += (scoringMatrix[key][2]-1)*scoringMatrix[key][3];
+                            vdw += (line[2]-1)*line[3];
                         }
                     }
                     elecScore += elec;

@@ -1061,7 +1061,7 @@ public class BioBlox : MonoBehaviour
                     float lennard_jones_potential = Mathf.Pow(ljr, -12) - Mathf.Pow(ljr, -6);
                     float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);*/
 
-                    // 8-6 potential
+                    // 8-6 potential (force is the differential)
                     float ljr = distance / (min_d * 1.1547f);
                     float lennard_jones_potential = 3 * Mathf.Pow(ljr, -8) - 4 * Mathf.Pow(ljr, -6);
                     float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
