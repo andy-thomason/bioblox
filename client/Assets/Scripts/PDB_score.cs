@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Collections;
@@ -2131,8 +2131,8 @@ public class PDB_score {
         ligAtomCoords = reducedRepresentation (ligand, out ligAtomLabels);
         this.recT = recT;
         this.ligT = ligT;
-        //Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
-        //Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
+        Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
+        Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
     }
 
     public void calcScore() {
@@ -2178,12 +2178,99 @@ public class PDB_score {
                     }
                     elecScore += elec;
                     vdwScore += vdw;
-
                 }
             }
         }
 
         score = elecScore + vdwScore;
+    }
+
+    public void calcScore2() {
+        elecScore = 0f;
+        vdwScore = 0f;
+        Matrix4x4 transfMat = recT.worldToLocalMatrix * ligT.localToWorldMatrix;
+
+        // Sort the atoms by x coordinate to improve performance.
+        int[] rec_indices = new int[recAtomCoords.Length];
+        float[] rec_keys = new float[recAtomCoords.Length];
+        for (int i = 0; i != recAtomCoords.Length; ++i) {
+          rec_indices[i] = i;
+          rec_keys[i] = recAtomCoords[i].x;
+        }
+
+        int[] lig_indices = new int[ligAtomCoords.Length];
+        float[] lig_keys = new float[ligAtomCoords.Length];
+        for (int i = 0; i != ligAtomCoords.Length; ++i) {
+          lig_indices[i] = i;
+          lig_keys[i] = transfMat.MultiplyPoint3x4 (ligAtomCoords[i]).x;
+        }
+
+        Array.Sort(rec_keys, rec_indices);
+        Array.Sort(lig_keys, lig_indices);
+
+        //if (calcScore2times++ >= 1) return;
+
+        //int num_d = 0, wd = 0;
+
+        int lig_start = 0;
+        float dx = Mathf.Sqrt(cutoff);
+        //Debug.Log("cs2 dx=" + dx);
+
+        for (int rec_idx = 0; rec_idx != rec_indices.Length; ++rec_idx) {
+          int i = rec_indices[rec_idx];
+          float value = recAtomCoords[i].x;
+          //Debug.Log("z " + rec_idx + "/" + i + " v=" + value + ": " + (value - dx) + " .. " + (value + dx));
+          while (lig_start < lig_keys.Length && lig_keys[lig_start] < value - dx) {
+            ++lig_start;
+          }
+          for (int lig_idx = lig_start; lig_idx < lig_keys.Length && lig_keys[lig_idx] <= value + dx; ++lig_idx) {
+            int j = lig_indices[lig_idx];
+            // Check the distance between all ligand-receptor atom pairs.
+            Vector3 lCoords = transfMat.MultiplyPoint3x4 (ligAtomCoords[j]);
+            //Debug.Log("" + rec_idx + ": " + lig_idx + " " + value + " " + lCoords);
+
+            float distance2 = (lCoords - recAtomCoords[i]).sqrMagnitude;
+            //Scoring function
+            //wd++;
+            if (distance2 <= cutoff) {
+                //num_d++;
+                if (distance2 < 0.001) {
+                    distance2 = 0.001f;
+                }
+                string key = recAtomLabels[i] + "_" + ligAtomLabels[j];
+
+                int charge1 = 0;
+                charges.TryGetValue(ligAtomLabels[j], out charge1);
+                int charge2 = 0;
+                charges.TryGetValue(recAtomLabels[i], out charge2);
+                float elec = (332.053986f * charge1 * charge2) / (15.0f * distance2);
+
+                // dvd: stands for dividend
+                // dvs: stands for divisor
+                // TODO: optimization
+                float [] line = scoringMatrix[key];
+                float attrDvd = line[1] * Mathf.Pow (line[0], 6.0f);
+                float repDvd = line[1] * Mathf.Pow (line[0], 8.0f);
+                float attrDvs = Mathf.Pow (distance2, 3.0f);
+                float repDvs = Mathf.Pow (distance2, 4.0f);
+                float vdw = (repDvd/repDvs) - (attrDvd/attrDvs);
+                //if repulsive
+                if (line[2] < 0) {
+                    //switch between minimum or saddle point
+                    if (distance2 > line[4]) {
+                        vdw *= line[2];
+                    } else {
+                        vdw += (line[2]-1)*line[3];
+                    }
+                }
+                elecScore += elec;
+                vdwScore += vdw;
+              }
+            }
+        }
+
+        score = elecScore + vdwScore;
+        //Debug.Log("c2 " + num_d + " wd " + wd);
     }
 
     public void Reset()
