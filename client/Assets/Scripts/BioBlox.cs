@@ -1044,8 +1044,8 @@ public class BioBlox : MonoBehaviour
                 {
                     Vector3 ac0 = mol0.atom_centres[r.i0];
                     Vector3 ac1 = mol1.atom_centres[r.i1];
-                    Vector3 c0 = t0mx * new Vector4(ac0.x, ac0.y, ac0.z, 1);
-                    Vector3 c1 = t1mx * new Vector4(ac1.x, ac1.y, ac1.z, 1);
+                    Vector3 c0 = t0mx.MultiplyPoint3x4(ac0);
+                    Vector3 c1 = t1mx.MultiplyPoint3x4(ac1);
                     float min_d = mol0.atom_radii[r.i0] + mol1.atom_radii[r.i1];
                     float distance = (c1 - c0).magnitude;
 
