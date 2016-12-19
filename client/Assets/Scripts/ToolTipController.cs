@@ -45,10 +45,10 @@ public class ToolTipController : MonoBehaviour {
             switch (CurrentButtom.GetComponent<ToolTipButtonData>().Tooltip_Offset)
             {
                 case ToolTipButtonData.TOOLTIP_DIRECTION.RIGHT:
-                    ToolTipReference.transform.Translate(Input.mousePosition + new Vector3((ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width ) / 1.5f, 0, 0));
+                    ToolTipReference.transform.Translate(Input.mousePosition + new Vector3((ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width ), 0, 0));
                     break;
                 case ToolTipButtonData.TOOLTIP_DIRECTION.LEFT:
-                    ToolTipReference.transform.Translate(Input.mousePosition - new Vector3((ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width) / 1.5f, 0, 0));
+                    ToolTipReference.transform.Translate(Input.mousePosition - new Vector3((ToolTipReference.transform.FindChild("ToolTipText").GetComponent<RectTransform>().rect.width), 0, 0));
                     break;
                 case ToolTipButtonData.TOOLTIP_DIRECTION.UP:
                     ToolTipReference.transform.Translate(Input.mousePosition + new Vector3(0, 30.0f, 0));

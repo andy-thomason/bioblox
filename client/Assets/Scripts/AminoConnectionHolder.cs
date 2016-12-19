@@ -30,6 +30,7 @@ public class AminoConnectionHolder : MonoBehaviour {
     public string AT2_name;
     Vector3 normal_scale = new Vector3(1, 1, 1);
     Vector3 selected_scale = new Vector3(1.2f, 1.2f, 1.2f);
+    public int connection_id;
 
     public void UpdateLink()
 	{		
@@ -105,6 +106,9 @@ public class AminoConnectionHolder : MonoBehaviour {
             transform.GetChild(3).gameObject.SetActive(true);
             transform.GetChild(4).gameObject.SetActive(true);
         }
+
+        connection_id = ui.amino_id;
+        ui.amino_id++;
     }
 
 	void Update()
@@ -187,7 +191,13 @@ public class AminoConnectionHolder : MonoBehaviour {
     bool atom_exist;
     public void AT1L()
     {
-        if(AT1_index > 0)
+        if(ui.amino_clicked != connection_id)
+        {
+            HighlightClick();
+            ui.amino_clicked = connection_id;
+        }
+
+        if (AT1_index > 0)
         {
             sfx.PlayTrack(SFX.sound_index.amino_click);
             //if false, no atoms are displayed
@@ -234,6 +244,12 @@ public class AminoConnectionHolder : MonoBehaviour {
     }
     public void AT1R()
     {
+        if (ui.amino_clicked != connection_id)
+        {
+            HighlightClick();
+            ui.amino_clicked = connection_id;
+        }
+
         if (AT1_index < A1_number_of_atoms-1)
         {
             sfx.PlayTrack(SFX.sound_index.amino_click);
@@ -280,6 +296,12 @@ public class AminoConnectionHolder : MonoBehaviour {
     }
     public void AT2L()
     {
+        if (ui.amino_clicked != connection_id)
+        {
+            HighlightClick();
+            ui.amino_clicked = connection_id;
+        }
+
         if (AT2_index > 0)
         {
 
@@ -327,6 +349,12 @@ public class AminoConnectionHolder : MonoBehaviour {
     }
     public void AT2R()
     {
+        if (ui.amino_clicked != connection_id)
+        {
+            HighlightClick();
+            ui.amino_clicked = connection_id;
+        }
+
         if (AT2_index < A2_number_of_atoms-1)
         {
 

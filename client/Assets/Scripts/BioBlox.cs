@@ -228,6 +228,8 @@ public class BioBlox : MonoBehaviour
 
     public GameObject GameManager;
     public GameObject MenuButtons;
+    DataManager dm;
+    public Transform level_holder;
 
     void Awake()
     {
@@ -235,7 +237,7 @@ public class BioBlox : MonoBehaviour
         if(GameObject.FindGameObjectWithTag("GameManager") == null)
         {
             Instantiate(GameManager);
-            MenuButtons.SetActive(false);
+            //MenuButtons.SetActive(false);
         }
     }
 
@@ -269,8 +271,6 @@ public class BioBlox : MonoBehaviour
         
         if (current_level != -1)
             StartCoroutine(DownloadMolecules());
-        else
-            uiController.EndLevel();
     }
 
     public void StartGame()
@@ -597,7 +597,7 @@ public class BioBlox : MonoBehaviour
         //ui.LevelClickled.GetComponent<LevelInfo>().SendData();
 
         uiController.Reset_UI();
-        uiController.EndLevelPanel.SetActive(false);
+        //uiController.EndLevelPanel.SetActive(false);
         
         //sfx.StopTrack(SFX.sound_index.warning);
     }
@@ -1080,7 +1080,7 @@ public class BioBlox : MonoBehaviour
                     r0.AddForceAtPosition(normal, c0);
                     r1.AddForceAtPosition(-normal, c1);
 
-                    if (distance < min_d * 0.8f)
+                    if (distance < min_d * 0.5f)
                     {
                         num_invalid++;
                         bab0.Set(r.i0, true);
@@ -1093,25 +1093,49 @@ public class BioBlox : MonoBehaviour
                 }
 
                 //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
-
-                if (num_touching_0 + num_touching_1 != 0)
+                //Debug.Log("num_invalid: " + num_invalid);
+                if (num_invalid == 0)
                 {
+                    ElectricScore.color = LennardScore.color = NumberOfAtoms.color = Color.black;
                     if (uiController.expert_mode)
                     {
                         scoring.calcScore();
                         ////set values for refence
-                        lennard_score = (int)scoring.vdwScore;
-                        electric_score = (int)scoring.elecScore;
-                        if (scoring.elecScore < 50000) ElectricScore.text = (scoring.elecScore).ToString("F1");
-                        if (scoring.vdwScore < 50000) LennardScore.text = (scoring.vdwScore).ToString("F1");
+                        //lennard_score = (int)scoring.vdwScore;
+                        // electric_score = (int)scoring.elecScore;
+                        if (scoring.elecScore < 200)
+                        {
+                            LennardScore.color = Color.black;
+                            ElectricScore.text = (scoring.elecScore * -1).ToString("F1");
+                        }
+                        else
+                        {
+                            ElectricScore.color = Color.red;
+                            ElectricScore.text = "-200";
+                            //invalid
+                            num_invalid = 1;
+                        }
+                        if (scoring.vdwScore < 200)
+                        {
+                            LennardScore.color = Color.black;
+                            LennardScore.text = (scoring.vdwScore * -1).ToString("F1");
+                        }
+                        else
+                        {
+                            LennardScore.color = Color.red;
+                            LennardScore.text = "-200";
+                            //invalid
+                            num_invalid = 1;
+                        }
                     }
-                    if (NumberOfAtoms) NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
+
+                    NumberOfAtoms.text = (num_touching_0 + num_touching_1).ToString();
                     //if (SimpleScore) SimpleScore.text = "Score: " + (num_touching_0 + num_touching_1).ToString() + " atoms touching.";
                 }
                 else
                 {
-                    ElectricScore.text = LennardScore.text = "0.0";
-                    NumberOfAtoms.text = "0";
+                    ElectricScore.color = LennardScore.color = NumberOfAtoms.color = Color.red;
+                    //NumberOfAtoms.text = "0";
                     //SimpleScore.text = "Score: 0 atoms touching.";
                 }
 
@@ -1124,6 +1148,11 @@ public class BioBlox : MonoBehaviour
                 //Debug.Log ("num_touching_0: "+num_touching_0+" / num_touching_1: "+num_touching_1);
                 //Debug.Log ("num_invalid: "+num_invalid);
 
+            }
+            else
+            {
+                LennardScore.text = ElectricScore.text = NumberOfAtoms.text = "0.0";
+                ElectricScore.color = LennardScore.color = NumberOfAtoms.color = Color.black;
             }
             
             InvalidDockScore.SetActive(num_invalid != 0);
