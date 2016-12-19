@@ -1099,7 +1099,7 @@ public class BioBlox : MonoBehaviour
                     ElectricScore.color = LennardScore.color = NumberOfAtoms.color = Color.black;
                     if (uiController.expert_mode)
                     {
-                        scoring.calcScore();
+                        scoring.calcScore2();
                         ////set values for refence
                         //lennard_score = (int)scoring.vdwScore;
                         // electric_score = (int)scoring.elecScore;
