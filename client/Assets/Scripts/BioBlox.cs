@@ -684,7 +684,7 @@ public class BioBlox : MonoBehaviour
         float val = 0.4f * mass * r * r;
 
         ri.drag = 2f;
-        ri.angularDrag = 5f;
+        ri.angularDrag = 10.0f;
         ri.useGravity = false;
         ri.mass = mass;
         ri.inertiaTensor = new Vector3 (val, val, val);
