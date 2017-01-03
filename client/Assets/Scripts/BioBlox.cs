@@ -9,6 +9,7 @@ using System.IO;
 
 public class BioBlox : MonoBehaviour
 {
+    public bool isDemo = false;
     // dictaing which gametype, puzzle or museum
     //bool simpleGame = true;
 
@@ -59,31 +60,6 @@ public class BioBlox : MonoBehaviour
     
     // a holder variable for the current event system
     EventSystem eventSystem;
-    //files
-    //List<string> filename_levels = new List<string>();
-
-    //levels name
-//<<<<<<< HEAD
-//    List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
-//    List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
-//    List<Tuple<string, string>> level_mesh_carbon = new List<Tuple<string, string>>();
-//=======
-//    //List<Tuple<string, string>> level_mesh_default = new List<Tuple<string, string>>();
-//    //List<Tuple<string, string>> level_mesh_bs = new List<Tuple<string, string>>();
-//>>>>>>> chains
-    //public Dictionary<string, string> level_mesh_default = new Dictionary<string, string>{
-    //    {"0",  "1"}, {"4KC3_A_se_1",  "4KC3_B_se_1"}
-    //};
-
-    //public Dictionary<string, string> level_mesh_bs = new Dictionary<string, string>{
-    //    {"2PTC_E_bs_1",  "2PTC_I_bs_1"}, {"4KC3_A_bs_1",  "4KC3_B_bs_1"}
-    //};
-
-
-
-    // the win and loose spash images
-    //public GameObject winSplash;
-    //public GameObject looseSplash;
     public GameObject goSplash;
 
     // a variable controlling the size of the area faded out during the win state
@@ -266,6 +242,17 @@ public class BioBlox : MonoBehaviour
 
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
+
+        if (isDemo)
+        {
+            GameObject.Find("SaveButton").SetActive(false);
+        }
+        else
+        {
+            GameObject.Find("CanvasDemo").SetActive(false);
+        }
+
+
         //set the trypsin fiesr level temp
         current_level = FindObjectOfType<GameManager>().current_level;
         

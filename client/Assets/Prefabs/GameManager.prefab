@@ -1022,7 +1022,6 @@ GameObject:
   - 222: {fileID: 222000012612616234}
   - 114: {fileID: 114000010478698072}
   - 114: {fileID: 114000013533641280}
-  - 114: {fileID: 114000011427740718}
   - 114: {fileID: 114000011571085974}
   m_Layer: 5
   m_Name: load
@@ -1112,7 +1111,6 @@ GameObject:
   - 222: {fileID: 222000012902640868}
   - 114: {fileID: 114000013751030846}
   - 114: {fileID: 114000012594061732}
-  - 114: {fileID: 114000010052474618}
   - 114: {fileID: 114000010480227348}
   m_Layer: 5
   m_Name: load
@@ -1641,7 +1639,6 @@ GameObject:
   - 222: {fileID: 222000011870058080}
   - 114: {fileID: 114000012149865304}
   - 114: {fileID: 114000010609756822}
-  - 114: {fileID: 114000010056196622}
   - 114: {fileID: 114000010411371396}
   m_Layer: 5
   m_Name: load
@@ -4218,30 +4215,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114000010052474618
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012250186052}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd22b39c937e1c4592b43617294e582, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  level_number: 0
---- !u!114 &114000010056196622
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000013462546204}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd22b39c937e1c4592b43617294e582, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  level_number: 0
 --- !u!114 &114000010057101810
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5366,18 +5339,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114000011427740718
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012105551450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd22b39c937e1c4592b43617294e582, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  level_number: 0
 --- !u!114 &114000011448222248
 MonoBehaviour:
   m_ObjectHideFlags: 1
