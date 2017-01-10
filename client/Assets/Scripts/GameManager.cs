@@ -16,14 +16,16 @@ public class GameManager : MonoBehaviour {
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
-        Application.ExternalCall("SendUserData");
 
-        //if demo disbale levels
-        if (FindObjectOfType<BioBlox>().isDemo)
+        //if NOT DEMO, GET THE USER ID
+        if (!FindObjectOfType<BioBlox>().isDemo)
+        {
+            Application.ExternalCall("SendUserData");
+        }
+        else // DISABLE THE REST OF THE LEVELS / IS DONE HERE BECAUSE IS ONLY ONCE
         {
             Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
             int button_child = level_holder.GetChild(0).transform.childCount - 1;
-            Debug.Log(button_child);
             foreach (Transform levels in level_holder)
             {
                 levels.GetChild(button_child).gameObject.SetActive(false);

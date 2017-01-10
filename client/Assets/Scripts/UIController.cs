@@ -1151,6 +1151,7 @@ public class UIController : MonoBehaviour {
     public GameObject Tick;
     string P1_connections;
     string P2_connections;
+    string connections;
     AminoConnectionHolder ach;
 
     public void OpenSavePanel()
@@ -1173,15 +1174,17 @@ public class UIController : MonoBehaviour {
 
         P1_connections = "";
         P2_connections = "";
+        connections = "";
 
         foreach (Transform AminoLinkChild in AminoLinkPanel.transform)
         {
             ach = AminoLinkChild.GetChild(0).GetComponent<AminoConnectionHolder>();
             P1_connections += ach.A1_name + "-" + ach.AT1_name + " / ";
             P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
+            connections += ach.ID_button1 + "-" + ach.ID_button2 + "/";
         }
 
-        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, P1_connections, P2_connections, cm.SliderStrings.value);
+        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
         Tick.SetActive(true);
         StartCoroutine(WaitForSec());
     }

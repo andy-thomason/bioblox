@@ -213,14 +213,8 @@ public class BioBlox : MonoBehaviour
         if(GameObject.FindGameObjectWithTag("GameManager") == null)
         {
             Instantiate(GameManager);
-            //MenuButtons.SetActive(false);
         }
     }
-
-    //public void cacaca()
-    //{
-    //    SceneManager.LoadScene(0, LoadSceneMode.Single);
-    //}
 
     // Use this for initialization
     void Start ()
@@ -239,6 +233,7 @@ public class BioBlox : MonoBehaviour
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         //first eprson
         aminoSlider = FindObjectOfType<AminoSliderController>();
+        dm = FindObjectOfType<DataManager>();
 
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
@@ -266,11 +261,6 @@ public class BioBlox : MonoBehaviour
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
         uiController.ToggleHintFromIntro();
-
-        if (current_level == 0)
-            ToggleMode.isOn = true;
-        else
-            ToggleMode.isOn = false;
         
         game_time = 0;
         playing = true;
@@ -287,11 +277,42 @@ public class BioBlox : MonoBehaviour
         uiController.init();
 
         FindObjectOfType<GameManager>().loading_panel.SetActive(false);
-        //loading_panel_start.SetActive(false);
 
-        StartCoroutine(game_loop());
+        //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
+        dm.GetLevelScore();
 
     }
+
+    public void SetLevelScoresBeforeStartGame(string level_scores)
+    {
+        //before start the game loop load the score and check if set the tutorial or not
+        if (current_level == 0 && level_scores == "0")
+            ToggleMode.isOn = true;
+        else
+            ToggleMode.isOn = false;
+
+        string[] splitLevelData = (level_scores).Split('*');
+
+        if (level_scores != "0") { 
+            //SET THE CONNECTIONS
+            //SPLIT
+            string[] splitScores = (splitLevelData[0]).Split('/');
+
+            for (int i = 0; i < splitScores.Length - 1; i++)
+            {
+                //SPLIT each amino
+                string[] splitScores_amino = (splitScores[i]).Split('-');
+                aminoSlider.AminoAcidsLinkPanel_load_score(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink(molecules_PDB_mesh[0], int.Parse(splitScores_amino[0]), molecules_PDB_mesh[1], int.Parse(splitScores_amino[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino[1]).gameObject);
+            }
+
+            //SET THE POSOTION
+            molecules[0].transform.localEulerAngles = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
+            molecules[1].transform.localEulerAngles = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
+        }
+
+        StartCoroutine(game_loop());
+    }
+
     public string GetCurrentLevelName ()
     {
         return levels[current_level].pdbFile;

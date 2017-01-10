@@ -71,13 +71,13 @@ public class DataManager : MonoBehaviour {
         }
     }
 
-    public void SendSaveData(string n_atoms, string lpj, string ei, string P1_connections, string P2_connections, float slider_value)
+    public void SendSaveData(string n_atoms, string lpj, string ei, string P1_connections, string P2_connections, float slider_value, string connections)
     {
         //create position/rotation
-        string p1_position = bb.molecules[0].transform.localPosition.x + "," + bb.molecules[0].transform.localPosition.y + "," + bb.molecules[0].transform.localPosition.z;
-        string p2_position = bb.molecules[1].transform.localPosition.x + "," + bb.molecules[1].transform.localPosition.y + "," + bb.molecules[1].transform.localPosition.z;
-        string p1_rotation = bb.molecules[0].transform.eulerAngles.x + "," + bb.molecules[0].transform.eulerAngles.y + "," + bb.molecules[0].transform.eulerAngles.z;
-        string p2_rotation = bb.molecules[1].transform.eulerAngles.x + "," + bb.molecules[1].transform.eulerAngles.y + "," + bb.molecules[1].transform.eulerAngles.z;
+        string p1_position = bb.molecules[0].transform.localPosition.x.ToString("F2") + "," + bb.molecules[0].transform.localPosition.y.ToString("F2") + "," + bb.molecules[0].transform.localPosition.z.ToString("F2");
+        string p2_position = bb.molecules[1].transform.localPosition.x.ToString("F2") + "," + bb.molecules[1].transform.localPosition.y.ToString("F2") + "," + bb.molecules[1].transform.localPosition.z.ToString("F2");
+        string p1_rotation = bb.molecules[0].transform.eulerAngles.x.ToString("F2") + "," + bb.molecules[0].transform.eulerAngles.y.ToString("F2") + "," + bb.molecules[0].transform.eulerAngles.z.ToString("F2");
+        string p2_rotation = bb.molecules[1].transform.eulerAngles.x.ToString("F2") + "," + bb.molecules[1].transform.eulerAngles.y.ToString("F2") + "," + bb.molecules[1].transform.eulerAngles.z.ToString("F2");
 
         www_form = new WWWForm();
         www_form.AddField("id_user", gm.id_user);
@@ -92,6 +92,7 @@ public class DataManager : MonoBehaviour {
         www_form.AddField("p1_connections", P1_connections);
         www_form.AddField("p2_connections", P2_connections);
         www_form.AddField("slider_value", slider_value.ToString());
+        www_form.AddField("connections", connections);
         StartCoroutine(insertSave());
     }
 
@@ -99,5 +100,20 @@ public class DataManager : MonoBehaviour {
     {
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/insert_score.php", www_form);
         yield return SQLQuery;
+    }
+
+    public void GetLevelScore()
+    {
+        www_form = new WWWForm();
+        www_form.AddField("id_user", gm.id_user);
+        www_form.AddField("level", gm.current_level);
+        StartCoroutine(GetLevelScoreCoru());
+    }
+
+    IEnumerator GetLevelScoreCoru()
+    {
+        WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/load_level.php", www_form);
+        yield return SQLQuery;
+        bb.SetLevelScoresBeforeStartGame(SQLQuery.text);
     }
 }
