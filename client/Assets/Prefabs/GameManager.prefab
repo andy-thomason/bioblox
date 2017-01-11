@@ -6936,7 +6936,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: CREATING PROTEINS, PLEASE WAIT...
+  m_Text: LOADING PROTEINS, PLEASE WAIT...
 --- !u!114 &114000013018673680
 MonoBehaviour:
   m_ObjectHideFlags: 1

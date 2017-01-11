@@ -206,6 +206,7 @@ public class BioBlox : MonoBehaviour
     public GameObject MenuButtons;
     DataManager dm;
     public Transform level_holder;
+    string level_scores_from_server;
 
     void Awake()
     {
@@ -276,8 +277,6 @@ public class BioBlox : MonoBehaviour
         //UI INIT
         uiController.init();
 
-        FindObjectOfType<GameManager>().loading_panel.SetActive(false);
-
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
         dm.GetLevelScore();
 
@@ -285,30 +284,12 @@ public class BioBlox : MonoBehaviour
 
     public void SetLevelScoresBeforeStartGame(string level_scores)
     {
+        level_scores_from_server = level_scores;
         //before start the game loop load the score and check if set the tutorial or not
-        if (current_level == 0 && level_scores == "0")
+        if (current_level == 0 && level_scores_from_server == "0")
             ToggleMode.isOn = true;
         else
             ToggleMode.isOn = false;
-
-        string[] splitLevelData = (level_scores).Split('*');
-
-        if (level_scores != "0") { 
-            //SET THE CONNECTIONS
-            //SPLIT
-            string[] splitScores = (splitLevelData[0]).Split('/');
-
-            for (int i = 0; i < splitScores.Length - 1; i++)
-            {
-                //SPLIT each amino
-                string[] splitScores_amino = (splitScores[i]).Split('-');
-                aminoSlider.AminoAcidsLinkPanel_load_score(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink(molecules_PDB_mesh[0], int.Parse(splitScores_amino[0]), molecules_PDB_mesh[1], int.Parse(splitScores_amino[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino[1]).gameObject);
-            }
-
-            //SET THE POSOTION
-            molecules[0].transform.localEulerAngles = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
-            molecules[1].transform.localEulerAngles = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
-        }
 
         StartCoroutine(game_loop());
     }
@@ -837,15 +818,6 @@ public class BioBlox : MonoBehaviour
                     current_level = 0;
                 }
 
-                if (lockButton)
-                {
-                    //lockButton.gameObject.SetActive(false);
-                    //lockButton.interactable = false;
-                }
-
-                //make_molecules(true, MeshTopology.Triangles);
-
-                // This is very grubby, must generalise.
                 GameObject mol1 = molecules[0];
                 GameObject mol2 = molecules[1];
 
@@ -891,6 +863,44 @@ public class BioBlox : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
                 eventSystem.enabled = true;
 
+                //set the score from the sever
+                if (level_scores_from_server != "0")
+                {
+                    //freeze them
+                    mol1.GetComponent<Rigidbody>().isKinematic = true;
+                    mol2.GetComponent<Rigidbody>().isKinematic = true;
+
+                    string[] splitLevelData = (level_scores_from_server).Split('*');
+                    //SET THE CONNECTIONS
+                    //SPLIT
+                    string[] splitScores = (splitLevelData[0]).Split('/');
+
+                    for (int i = 0; i < splitScores.Length - 1; i++)
+                    {
+                        //SPLIT each amino
+                        string[] splitScores_amino = (splitScores[i]).Split('-');
+                        aminoSlider.AminoAcidsLinkPanel_load_score(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink(molecules_PDB_mesh[0], int.Parse(splitScores_amino[0]), molecules_PDB_mesh[1], int.Parse(splitScores_amino[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino[1]).gameObject);
+                    }
+
+                    //SET THE ROTATION
+                    molecules[0].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[2]));
+                    molecules[1].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[2]));
+                    //SET THE POSOTION
+                    molecules[0].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
+                    molecules[1].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
+                    
+                    gameObject.GetComponent<ConnectionManager>().SliderStrings.interactable = true;
+                    gameObject.GetComponent<ConnectionManager>().SliderStrings.value = float.Parse(splitLevelData[3]);
+                    sfx.StopTrack(SFX.sound_index.string_reel_out);
+
+                    //unfreeze them
+                    yield return new WaitForSeconds(1.0f);
+                    mol1.GetComponent<Rigidbody>().isKinematic = false;
+                    mol2.GetComponent<Rigidbody>().isKinematic = false;
+                }
+
+                FindObjectOfType<GameManager>().loading_panel.SetActive(false);
+
 
                 // Enter waiting state
                 game_state = GameState.Waiting;
@@ -926,71 +936,8 @@ public class BioBlox : MonoBehaviour
                             GameScoreValue.text = "0";
                         }*/
                     }
-
-                    if (lockButton)
-                    {
-                        //lockButton.gameObject.SetActive (rms_distance_score < winScore);
-                        //lockButton.interactable = (rms_distance_score < winScore);
-                    }
                 }
-
                 Debug.Log("exited docking loop " + game_state);
-
-                if (game_state == GameState.Locked)
-                {
-                    Debug.Log("locking");
-
-                    eventSystem.enabled = false;
-
-                    //StartCoroutine("DockingOneAxis");
-                    if (sites[0])
-                    {
-                        PopOut(sites[0]);
-                    }
-
-                    if (sites[1])
-                    {
-                        PopOut(sites[1]);
-                    }
-
-                    //lockButton.gameObject.SetActive(false);
-                    //lockButton.interactable = false;
-
-                    Debug.Log("Docked");
-
-                    this.GetComponent<AudioManager>().Play("Win");
-
-                    GameObject parent = new GameObject();
-                    Rigidbody r = parent.AddComponent<Rigidbody>();
-                    molecules[0].transform.SetParent(parent.transform, true);
-                    molecules[1].transform.SetParent(parent.transform, true);
-
-                    r.angularDrag = 1.0f;
-                    r.constraints = RigidbodyConstraints.FreezePosition;
-                    r.useGravity = false;
-                    parent.name = "MoveableParent";
-
-                    //this is to stop the molecules rumbling around as they inherit the pearents velocity
-                    Component.Destroy(molecules[0].GetComponent<Rigidbody>());
-                    Component.Destroy(molecules[1].GetComponent<Rigidbody>());
-
-                    //StartCoroutine ("WinSplash", new Vector3 (0, 0, 0));
-                    GameObject.Destroy(sites[0]);
-                    GameObject.Destroy(sites[1]);
-
-                    Debug.Log("current_level=" + current_level);
-                    current_level++;
-                    if (current_level == levels.Length)
-                    {
-                        Debug.Log("End of levels");
-                        current_level = 0;
-                    }
-                    conMan.Reset();
-                    Reset();
-                    molecules = null;
-                    //GetComponent<AminoButtonController> ().EmptyAminoSliders ();
-                    //EndLevelMenu.SetActive(true);
-                }
             }
         }
     }
