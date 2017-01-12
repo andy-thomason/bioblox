@@ -469,7 +469,7 @@ GameObject:
   - 222: {fileID: 222000013070093258}
   - 114: {fileID: 114000014173044860}
   m_Layer: 5
-  m_Name: Text (2)
+  m_Name: DidYouKnow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4831,6 +4831,35 @@ MonoBehaviour:
   level_scores: []
   number_of_level: 0
   selection_panel: {fileID: 1000011186676230}
+  DidYouKnow: {fileID: 114000014173044860}
+  loading_facts:
+  - "Protein docking is a molecular modelling technique. The goal of protein\u2013ligand
+    docking is to predict the position and orientation of a ligand (a small molecule)
+    when it is bound to a protein receptor or enzyme."
+  - Proteins contain carbon, oxygen, hydrogen, nitrogen and sometimes sulphur.
+  - Protein is a long chain-like molecule that is made up of small units known as
+    amino acids, joined together by peptide bonds.
+  - "The word \u201Cprotein\u201D is from the Greek word proteios, which means \u201Cprimary\u201D
+    or \u201Cholding the first place.\u201D The term was first used in 1883."
+  - The lifespan of most proteins totals two days or less. However, the recent discovery
+    of extremely long-lived proteins may provide scientists with insight into cell
+    aging and neurodegeneration
+  - The human body has about 100,000 different types of protein. The body needs protein
+    to grow, heal, and carry about nearly every chemical reaction in the body.
+  - The basic monomers of proteins are amino acids.
+  - The amino acids are joined together by peptide bonds formed by condensation reactions.
+  - The peptide bonds in proteins can be broken down by hydrolysis. This can be done
+    with dilute acid or a protease enzyme.
+  - Once protein is digested it is broken down into its amino acids. These amino acids
+    can then be reused to make the proteins your body needs to maintain muscles, bones,
+    blood, and body organs.
+  - There are over 20 slightly differing amino acids. Our bodies can produce around
+    13 of these, but there are 9 amino acids that our body cannot make itself. These
+    are called essential amino acids and we obtain these by eating certain protein-rich
+    foods.
+  - Protein is essential for life, it is crucial to all cells in the body playing
+    a key role as enzymes in a cell. After water, protein is the most plentiful substance
+    in the body.
 --- !u!114 &114000010634499630
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -8103,7 +8132,7 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "Protein docking is a molecular modelling technique. The goal of protein\u2013ligand
     docking is to predict the position and orientation of a ligand (a small molecule)
@@ -9251,11 +9280,11 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000013580050774}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 70}
-  m_SizeDelta: {x: 1599.3, y: 1}
+  m_AnchoredPosition: {x: 0, y: -31}
+  m_SizeDelta: {x: 1599.3, y: 350.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000010700736378
 RectTransform:
@@ -9498,7 +9527,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000013580050774}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -479, y: 140}
@@ -9679,7 +9708,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000013580050774}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 33, y: -39}
@@ -10611,9 +10640,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 224000010672266644}
   - {fileID: 224000011807857758}
   - {fileID: 224000011489595918}
-  - {fileID: 224000010672266644}
   - {fileID: 224000014124138776}
   - {fileID: 224000011672812504}
   - {fileID: 224000013140772992}

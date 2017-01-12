@@ -1185,6 +1185,7 @@ public class UIController : MonoBehaviour {
         }
 
         dm.SendSaveData(n_atoms.text, lpj.text, ei.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
+        UpdateLocalScore(n_atoms.text);
         Tick.SetActive(true);
         StartCoroutine(WaitForSec());
     }
@@ -1197,6 +1198,12 @@ public class UIController : MonoBehaviour {
         BioBloxReference.validating_holder.SetActive(true);
         BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 1;
         isOverUI = false;
+    }
+
+    void UpdateLocalScore(string n_atoms)
+    {
+        if (int.Parse(GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text) < int.Parse(n_atoms))
+            GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = n_atoms;
     }
 
     //void GetAminoAtoms()

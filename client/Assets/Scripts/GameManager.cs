@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
@@ -12,10 +13,14 @@ public class GameManager : MonoBehaviour {
     public string[] level_scores;
     public int number_of_level;
     public GameObject selection_panel;
+    public Text DidYouKnow;
+    public string[] loading_facts;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
+
+        DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 
         //if NOT DEMO, GET THE USER ID
         if (!FindObjectOfType<BioBlox>().isDemo)
@@ -40,6 +45,12 @@ public class GameManager : MonoBehaviour {
         selection_panel.SetActive(false);
         current_level = level;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+
+    public void EndLoading()
+    {
+        loading_panel.SetActive(false);
+        DidYouKnow.text = loading_facts[Random.Range(0, 11)];
     }
 
     public void SetID()

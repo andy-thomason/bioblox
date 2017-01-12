@@ -899,7 +899,7 @@ public class BioBlox : MonoBehaviour
                     mol2.GetComponent<Rigidbody>().isKinematic = false;
                 }
 
-                FindObjectOfType<GameManager>().loading_panel.SetActive(false);
+                FindObjectOfType<GameManager>().EndLoading();
 
 
                 // Enter waiting state
