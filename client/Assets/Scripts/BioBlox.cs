@@ -824,12 +824,12 @@ public class BioBlox : MonoBehaviour
                 originPosition[0] = mol1.transform.position;
                 originPosition[1] = mol2.transform.position;
 
-                //create the win condition from the file specified paired atoms
-                for (int i = 0; i < molecules_PDB_mesh[0].mol.pairedLabels.Length; ++i)
-                {
-                    winCondition.Add(new Tuple<int, int>(molecules_PDB_mesh[0].mol.pairedLabels[i].First,
-                                      molecules_PDB_mesh[0].mol.pairedLabels[i].Second));
-                }
+                ////create the win condition from the file specified paired atoms
+                //for (int i = 0; i < molecules_PDB_mesh[0].mol.pairedLabels.Length; ++i)
+                //{
+                //    winCondition.Add(new Tuple<int, int>(molecules_PDB_mesh[0].mol.pairedLabels[i].First,
+                //                      molecules_PDB_mesh[0].mol.pairedLabels[i].Second));
+                //}
                 //debug 3D texture
                 //GameObject.Find ("Test").GetComponent<Tex3DMap> ().Build (p1.mol);
                 molecules_PDB_mesh[0].other = molecules_PDB_mesh[1].gameObject;

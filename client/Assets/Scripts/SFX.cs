@@ -7,6 +7,7 @@ public class SFX : MonoBehaviour {
     public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand, ship, ship_scanning };
     public AudioClip ReelIn;
     public AudioClip ReelOut;
+    AudioClip main_music;
     public AudioSource[] audioSource;
     public AudioSource[] audioSource_collision;
     // Use this for initialization
@@ -15,6 +16,14 @@ public class SFX : MonoBehaviour {
     {
         audioSource = GetComponents<AudioSource>();
         audioSource_collision = transform.GetChild(0).GetComponents<AudioSource>();
+    }
+
+    void Update()
+    {
+        if (audioSource[0].volume < 0.2f)
+        {
+            audioSource[0].volume += 0.005f;
+        }
     }
 
     #region MUTE BUTTON

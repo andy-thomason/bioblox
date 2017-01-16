@@ -15,10 +15,13 @@ public class GameManager : MonoBehaviour {
     public GameObject selection_panel;
     public Text DidYouKnow;
     public string[] loading_facts;
+    public GameObject tutorial_panel;
+    SFX sfx;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
+        sfx = FindObjectOfType<SFX>();
 
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 
@@ -56,5 +59,11 @@ public class GameManager : MonoBehaviour {
     public void SetID()
     {
         id_user = int.Parse(FindObjectOfType<DataManager>().id_user);
+    }
+
+    public void CloseTutorialPanel()
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
+        tutorial_panel.SetActive(false);
     }
 }

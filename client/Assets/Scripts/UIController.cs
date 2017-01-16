@@ -1221,4 +1221,10 @@ public class UIController : MonoBehaviour {
     //}
 
     #endregion
+
+    public void OpenTutorialInitialPanel()
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
+        gm.tutorial_panel.SetActive(true);
+    }
 }
