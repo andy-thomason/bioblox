@@ -3,7 +3,7 @@ using System.Collections;
 
 public class EndLevelScript : MonoBehaviour {
 
-    public GameObject selection_panel;
+    public CanvasGroup selection_panel;
 
     // Use this for initialization
     void Start()
@@ -19,17 +19,20 @@ public class EndLevelScript : MonoBehaviour {
     public void ClosePanel()
     {
         FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
-        selection_panel.SetActive(false);
+        selection_panel.alpha = 0;
+        selection_panel.blocksRaycasts = false;
     }
 
     public void OpenPanel()
     {
-        selection_panel.SetActive(true);
+        selection_panel.alpha = 1;
+        selection_panel.blocksRaycasts = true;
     }
 
     public void Retry()
     {
         FindObjectOfType<UIController>().RestartLevel();
-        selection_panel.SetActive(false);
+        selection_panel.alpha = 0;
+        selection_panel.blocksRaycasts = false;
     }
 }

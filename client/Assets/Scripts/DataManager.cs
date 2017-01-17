@@ -71,7 +71,7 @@ public class DataManager : MonoBehaviour {
         }
     }
 
-    public void SendSaveData(string n_atoms, string lpj, string ei, string P1_connections, string P2_connections, float slider_value, string connections)
+    public void SendSaveData(string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections)
     {
         //create position/rotation
         string p1_position = bb.molecules[0].transform.localPosition.x.ToString("F2") + "," + bb.molecules[0].transform.localPosition.y.ToString("F2") + "," + bb.molecules[0].transform.localPosition.z.ToString("F2");
@@ -85,6 +85,7 @@ public class DataManager : MonoBehaviour {
         www_form.AddField("n_atoms", n_atoms);
         www_form.AddField("lpj", lpj);
         www_form.AddField("ei", ei);
+        www_form.AddField("game_score", game_score);
         www_form.AddField("p1_position", p1_position);
         www_form.AddField("p2_position", p2_position);
         www_form.AddField("p1_rotation", p1_rotation);

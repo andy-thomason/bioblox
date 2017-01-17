@@ -226,25 +226,6 @@ public class UIController : MonoBehaviour {
             if (Input.GetKey(KeyCode.Escape))
                 EndLevel();
         }
-
-        if(SavePanel.activeSelf)
-        {
-            if(!expert_mode)
-            {
-                BioBloxReference.scoring.calcScore();
-                n_atoms.text = BioBloxReference.NumberOfAtoms.text;
-                lpj.text = (BioBloxReference.scoring.vdwScore * -1).ToString("F1");
-                ei.text = (BioBloxReference.scoring.elecScore * -1).ToString("F1");
-            }
-            else
-            {
-                n_atoms.text = BioBloxReference.NumberOfAtoms.text;
-                lpj.text = BioBloxReference.LennardScore.text;
-                ei.text = BioBloxReference.ElectricScore.text;
-            }
-        }
-        
-
     }
 
     public void DeselectOnClick()
@@ -668,7 +649,8 @@ public class UIController : MonoBehaviour {
     public void EndLevel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        gm.selection_panel.SetActive(true);
+        gm.selection_panel.alpha = 1;
+        gm.selection_panel.blocksRaycasts = true;
         gm.MenuButtons.SetActive(true);
         //number_atoms_end_level.text = BioBloxReference.NumberOfAtoms.text;
 
@@ -1147,6 +1129,7 @@ public class UIController : MonoBehaviour {
     public Text n_atoms;
     public Text lpj;
     public Text ei;
+    public Text game_score;
     public GameObject SavePanel;
     public GameObject Tick;
     string P1_connections;
@@ -1183,9 +1166,9 @@ public class UIController : MonoBehaviour {
             P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
             connections += ach.ID_button1 + "-" + ach.ID_button2 + "/";
         }
-
-        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
-        UpdateLocalScore(n_atoms.text);
+        
+        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
+        UpdateLocalScore(n_atoms.text, lpj.text, ei.text, game_score.text);
         Tick.SetActive(true);
         StartCoroutine(WaitForSec());
     }
@@ -1200,10 +1183,17 @@ public class UIController : MonoBehaviour {
         isOverUI = false;
     }
 
-    void UpdateLocalScore(string n_atoms)
+    void UpdateLocalScore(string n_atoms, string lpj, string ei, string game_score)
     {
-        if (int.Parse(GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text) < int.Parse(n_atoms))
-            GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = n_atoms;
+        Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
+
+        if (int.Parse(level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text) < int.Parse(game_score))
+        {
+            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = game_score;
+            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(2).GetComponent<Text>().text = n_atoms;
+            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(3).GetComponent<Text>().text = lpj;
+            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(4).GetComponent<Text>().text = ei;
+        }
     }
 
     //void GetAminoAtoms()

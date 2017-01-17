@@ -39,7 +39,10 @@ public class ConnectionManager : MonoBehaviour
 
 	public void StringManager()
 	{
-		for (int i = 0; i<connectionMinDistances.Length; i++)
+        //delay the submit button for 5 secs everytime the slider is moved
+        bb.is_score_valid = false;
+
+        for (int i = 0; i<connectionMinDistances.Length; i++)
 		{
 			connectionMinDistances[i] = 60 * SliderStrings.value;
         }

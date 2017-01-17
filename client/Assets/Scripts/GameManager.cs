@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
     DataManager dm;
     public string[] level_scores;
     public int number_of_level;
-    public GameObject selection_panel;
+    public CanvasGroup selection_panel;
     public Text DidYouKnow;
     public string[] loading_facts;
     public GameObject tutorial_panel;
@@ -45,7 +45,8 @@ public class GameManager : MonoBehaviour {
     public void ChangeLevel(int level)
     {
         loading_panel.SetActive(true);
-        selection_panel.SetActive(false);
+        selection_panel.alpha = 0;
+        selection_panel.blocksRaycasts = false;
         current_level = level;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
