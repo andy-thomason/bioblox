@@ -601,7 +601,5 @@ public class PlyLoader {
             }
         }
         return meshes.ToArray();
-            
-    return new Mesh[0];
     }
 }

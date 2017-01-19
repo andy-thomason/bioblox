@@ -26,8 +26,8 @@ if len(sys.argv) == 2 and sys.argv[1] == 'list':
       m = chains_re.match(line)
       if m:
         chains = m.group(1)
-        if len(chains) == 2:
-          print("  ('%s', '%s', '%s', 1)," %( f, chains[:-1], chains[-1]))
+        #if len(chains) == 2:
+        print("  ('%s', '%s', '%s', 1)," %( f, chains[:-1], chains[-1]))
         
   sys.exit()
 
