@@ -90,7 +90,7 @@ public class PDB_score {
 
     // each pair is AtomLabels[lhs] * 256 + AtomLabels[rhs]
     public enum Pairs {
-      Gca_Gca = 1,
+      Gca_Gca = 257,
       Gca_A = 258,
       Gca_R1 = 259,
       Gca_R2 = 260,
@@ -3276,34 +3276,43 @@ public class PDB_score {
                 if (distance2 < 0.001) {
                     distance2 = 0.001f;
                 }
-                Pairs key = (Pairs)((int)recAtomLabels[i] * 256 + (int)ligAtomLabels[j]);
 
-                int charge1 = 0;
-                charges.TryGetValue(ligAtomLabels[j], out charge1);
-                int charge2 = 0;
-                charges.TryGetValue(recAtomLabels[i], out charge2);
-                float elec = (332.053986f * charge1 * charge2) / (15.0f * distance2);
+                AtomLabels recAtom = recAtomLabels[i];
+                AtomLabels ligAtom = ligAtomLabels[j];
+
+                float charge = 0;
+                if (ligAtom == AtomLabels.R2 || ligAtom == AtomLabels.K2) charge = 1;
+                else if (ligAtom == AtomLabels.E2 || ligAtom == AtomLabels.D) charge = -1;
+
+                if (recAtom == AtomLabels.E2 || recAtom == AtomLabels.D) charge = -charge;
+                float elec = ((332.053986f/15.0f) * charge) / distance2;
 
                 // dvd: stands for dividend
                 // dvs: stands for divisor
-                // TODO: optimization
-                float [] line = scoringMatrix[key];
-                float attrDvd = line[1] * Mathf.Pow (line[0], 6.0f);
-                float repDvd = line[1] * Mathf.Pow (line[0], 8.0f);
-                float attrDvs = Mathf.Pow (distance2, 3.0f);
-                float repDvs = Mathf.Pow (distance2, 4.0f);
-                float vdw = (repDvd/repDvs) - (attrDvd/attrDvs);
-                //if repulsive
-                if (line[2] < 0) {
-                    //switch between minimum or saddle point
-                    if (distance2 > line[4]) {
-                        vdw *= line[2];
-                    } else {
-                        vdw += (line[2]-1)*line[3];
-                    }
+                Pairs key = (Pairs)((int)recAtom * 256 + (int)ligAtom);
+                if (scoringMatrix.ContainsKey(key)) {
+                  float [] line = scoringMatrix[key];
+                  float l02 = line[0] * line[0];
+                  float attrDvd = line[1] * (l02 * l02) * l02;
+                  float repDvd = line[1] * (l02 * l02) * (l02 * l02);
+                  float attrDvs = (distance2 * distance2) * distance2;
+                  float repDvs = (distance2 * distance2) * (distance2 * distance2);
+                  float vdw = (repDvd/repDvs) - (attrDvd/attrDvs);
+
+                  //if repulsive
+                  if (line[2] < 0) {
+                      //switch between minimum or saddle point
+                      if (distance2 > line[4]) {
+                          vdw *= line[2];
+                      } else {
+                          vdw += (line[2]-1)*line[3];
+                      }
+                  }
+                  elecScore += elec;
+                  vdwScore += vdw;
+                } else {
+                  Debug.Log(key);
                 }
-                elecScore += elec;
-                vdwScore += vdw;
               }
             }
         }
