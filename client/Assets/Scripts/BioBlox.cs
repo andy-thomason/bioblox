@@ -53,7 +53,7 @@ public class BioBlox : MonoBehaviour
        new Level("1FSS", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
        new Level("1EMV", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
        new Level("1GRN", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
-       new Level("1OHZ", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40)
+       new Level("1ACB", "E", "I", "1", "1", new Vector3(-20, 0, 0), 40)
     };
 
     enum protein_view {normal, transparent, bs};
@@ -261,6 +261,9 @@ public class BioBlox : MonoBehaviour
             StartCoroutine(DownloadMolecules());
     }
 
+    Rigidbody r0;
+    Rigidbody r1;
+
     public void StartGame()
     {
         //Reset();
@@ -279,11 +282,16 @@ public class BioBlox : MonoBehaviour
         molecules_PDB_mesh[1].DeselectAminoAcid();
         aminoSlider.DeselectAmino();
 
+        r0 = molecules[0].GetComponent<Rigidbody>();
+        r1 = molecules[1].GetComponent<Rigidbody>();
+
         //UI INIT
         uiController.init();
 
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
         dm.GetLevelScore();
+
+        InvokeRepeating("CalcScore", 1.0f, 0.5f);
 
     }
 
@@ -950,20 +958,20 @@ public class BioBlox : MonoBehaviour
             }
 
 
-            ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
+            //ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
             if (molecules != null && molecules.Length >= 2)
             {
                 // Get a list of atoms that collide.
-                GameObject obj0 = molecules[0];
-                GameObject obj1 = molecules[1];
-                PDB_mesh mesh0 = obj0.GetComponent<PDB_mesh>();
-                PDB_mesh mesh1 = obj1.GetComponent<PDB_mesh>();
-                Rigidbody r0 = obj0.GetComponent<Rigidbody>();
-                Rigidbody r1 = obj1.GetComponent<Rigidbody>();
-                Transform t0 = obj0.transform;
-                Transform t1 = obj1.transform;
-                PDB_molecule mol0 = mesh0.mol;
-                PDB_molecule mol1 = mesh1.mol;
+                //GameObject obj0 = molecules[0];
+                //GameObject obj1 = molecules[1];
+                //PDB_mesh mesh0 = molecules[0].GetComponent<PDB_mesh>();
+                //PDB_mesh mesh1 = molecules[1].GetComponent<PDB_mesh>();
+                //Rigidbody r0 = obj0.GetComponent<Rigidbody>();
+                //Rigidbody r1 = obj1.GetComponent<Rigidbody>();
+                Transform t0 = molecules[0].transform;
+                Transform t1 = molecules[1].transform;
+                PDB_molecule mol0 = molecules_PDB_mesh[0].mol;
+                PDB_molecule mol1 = molecules_PDB_mesh[1].mol;
                 GridCollider b = new GridCollider(mol0, t0, mol1, t1, LJinflation);
                 work_done = b.work_done;
 
@@ -975,7 +983,7 @@ public class BioBlox : MonoBehaviour
                 atoms_bad = new BitArray[] { bab0, bab1 };
                 Matrix4x4 t0mx = t0.localToWorldMatrix;
                 Matrix4x4 t1mx = t1.localToWorldMatrix;
-                lennard_jones = 0.0f;
+                //lennard_jones = 0.0f;
                 //List<string> debug_csv = new List<string>();
 
                 // Apply forces to the rigid bodies.
@@ -1033,53 +1041,40 @@ public class BioBlox : MonoBehaviour
 
                 //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
                 //Debug.Log("num_invalid: " + num_invalid);
-                if (num_invalid == 0)
-                {
-                    scoring.calcScore2();
+                //if (num_invalid == 0)
+                //{
+                //    scoring.calcScore2();
                     
-                    ie_score = Mathf.Round(scoring.elecScore * -1);
-                    lpj_score = Mathf.Round(scoring.vdwScore * -1);
-                    t_atoms_score = num_touching_0 + num_touching_1;
-                    game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
+                //    ie_score = Mathf.Round(scoring.elecScore * -1);
+                //    lpj_score = Mathf.Round(scoring.vdwScore * -1);
+                //    t_atoms_score = num_touching_0 + num_touching_1;
+                //    //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
+                //    game_score_value = Mathf.Max(0, -1 * (scoring.vdwScore + scoring.elecScore) + 1000);
 
-                    if (uiController.expert_mode)
-                    {
-                        ElectricScore.text = "" + ie_score;
-                        LennardScore.text = "" + lpj_score;
-                        touching_atoms.text = "" + t_atoms_score;
-                    }
+                //    if (uiController.expert_mode)
+                //    {
+                //        ElectricScore.text = "" + ie_score;
+                //        LennardScore.text = "" + lpj_score;
+                //        touching_atoms.text = "" + t_atoms_score;
+                //    }
 
-                    //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
-                    game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+                //    //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
+                //    game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
 
-                    //when saved panel is on
-                    if (uiController.SavePanel.activeSelf)
-                    {
-                        uiController.n_atoms.text =  "" + t_atoms_score;
-                        uiController.lpj.text = "" + lpj_score;
-                        uiController.ei.text = "" + ie_score;
-                        uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
-                    }
-                }
+                //    //when saved panel is on
+                //    if (uiController.SavePanel.activeSelf)
+                //    {
+                //        uiController.n_atoms.text =  "" + t_atoms_score;
+                //        uiController.lpj.text = "" + lpj_score;
+                //        uiController.ei.text = "" + ie_score;
+                //        uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+                //    }
+                //}
 
             }
 
             InvalidDockScore.SetActive(num_invalid != 0);
             is_score_valid = num_invalid == 0;
-            //if (num_invalid != 0 && !sfx.isPlaying(SFX.sound_index.warning))
-            //    sfx.PlayTrackDelay(SFX.sound_index.warning, 1.5f);
-            //else if (num_invalid == 0 && sfx.isPlaying(SFX.sound_index.warning))
-            //    sfx.StopTrack(SFX.sound_index.warning);
-            /*
-            //lock button
-            if (num_invalid == 0 && (lennard_score != 0 || electric_score != 0))
-            {
-                lockButton.interactable = true;
-            }
-            else
-            {
-                lockButton.interactable = false;
-            }*/
             
             if (eventSystem != null && eventSystem.IsActive())
             {
@@ -1094,6 +1089,36 @@ public class BioBlox : MonoBehaviour
             }
 
             number_total_atoms = num_touching_0 + num_touching_1;
+        }
+    }
+
+    void CalcScore()
+    {
+        scoring.calcScore2();
+
+        ie_score = Mathf.Round(scoring.elecScore * -1);
+        lpj_score = Mathf.Round(scoring.vdwScore * -1);
+        t_atoms_score = num_touching_0 + num_touching_1;
+        //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
+        game_score_value = Mathf.Max(0.0f, (lpj_score + ie_score) + 1000.0f);
+
+        if (uiController.expert_mode)
+        {
+            ElectricScore.text = "" + ie_score;
+            LennardScore.text = "" + lpj_score;
+            touching_atoms.text = "" + t_atoms_score;
+        }
+
+        //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
+        game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+
+        //when saved panel is on
+        if (uiController.SavePanel.activeSelf)
+        {
+            uiController.n_atoms.text = "" + t_atoms_score;
+            uiController.lpj.text = "" + lpj_score;
+            uiController.ei.text = "" + ie_score;
+            uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
         }
     }
 

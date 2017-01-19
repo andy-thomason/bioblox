@@ -64,7 +64,7 @@ public class DataManager : MonoBehaviour {
             Debug.Log(splitScores[i]);
             string[] splitScoresLevel = splitScores[i].Split(',');
             //assign score ui
-            for (int j = 0; j <= 2; j++)
+            for (int j = 0; j <= 3; j++)
             {
                 level_holder.GetChild(i).transform.GetChild(j + 1).GetComponent<Text>().text = splitScoresLevel[j];
             }
