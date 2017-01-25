@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-print("Usage: build_all.py list|build")
+print("Usage: build_all.py list|build|caonly")
 
 
 pdbdir = '.' #os.path.dirname(sys.argv[0])
@@ -142,6 +142,9 @@ if len(sys.argv) == 2 and sys.argv[1] == 'build':
     for line in os.popen(ex):
       print(line)
 
+
+if len(sys.argv) == 2 and (sys.argv[1] == 'build' or sys.argv[1] == 'caonly'):
+  for f, ch1, ch2, lod in chains:
     ex = "%s %s ca --chains %s --ply --lod 1" % (exe_file, pdbdir + '/' + f, ch1)
     print(ex)
     for line in os.popen(ex):
