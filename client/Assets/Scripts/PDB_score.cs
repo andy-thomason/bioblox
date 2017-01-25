@@ -3291,6 +3291,7 @@ public class PDB_score {
                 // dvs: stands for divisor
                 Pairs key = (Pairs)((int)recAtom * 256 + (int)ligAtom);
                 if (scoringMatrix.ContainsKey(key)) {
+                  // { Pairs.Gca_Gca, new float[] { 1.66f, 0.58f, -1.0f, 0.0f, 0.0f } }, 
                   float [] line = scoringMatrix[key];
                   float l02 = line[0] * line[0];
                   float attrDvd = line[1] * (l02 * l02) * l02;
