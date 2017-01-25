@@ -50,10 +50,16 @@ public class BioBlox : MonoBehaviour
     Level[] levels = {
        new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35),
        new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
-       new Level("1FSS", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
-       new Level("1EMV", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
-       new Level("1GRN", "A", "B", "2", "1", new Vector3(-20, 0, 0), 40),
-       new Level("1ACB", "E", "I", "1", "1", new Vector3(-20, 0, 0), 40)
+       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
+       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
+       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
+       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40),
+       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40)
     };
 
     enum protein_view {normal, transparent, bs};
@@ -212,6 +218,11 @@ public class BioBlox : MonoBehaviour
     float lpj_score;
     int t_atoms_score;
     float game_score_value;
+
+    public Sprite sprite_score_normal;
+    public Sprite sprite_score_error;
+    public Sprite sprite_score_good;
+    public Image current_score_sprite;
 
     void Awake()
     {
@@ -681,7 +692,7 @@ public class BioBlox : MonoBehaviour
     void ApplyReturnToOriginForce ()
     {
         ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
-        if (conMan.SliderStrings.value > 0.5) {
+        //if (conMan.SliderStrings.value > 0.5) {
             for (int i = 0; i < molecules.Length; ++i) {
                 Vector3 molToOrigin = originPosition [i] - molecules [i].transform.position;
                 if (molToOrigin.sqrMagnitude > 1.0f) {
@@ -689,7 +700,7 @@ public class BioBlox : MonoBehaviour
                     rb.AddForce (molToOrigin.normalized * repulsiveForce);
                 }
             }
-        }
+        //}
     }
 
     public void DebugDock()
@@ -1009,21 +1020,24 @@ public class BioBlox : MonoBehaviour
                     float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);*/
 
                     // 8-6 potential (force is the differential)
-                    float ljr = distance / (min_d * 1.1547f);
-                    float lennard_jones_potential = 3 * Mathf.Pow(ljr, -8) - 4 * Mathf.Pow(ljr, -6);
-                    float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
+                    //REAL PHYSICS HERE **
+                    //float ljr = distance / (min_d * 1.1547f);
+                    //float lennard_jones_potential = 3 * Mathf.Pow(ljr, -8) - 4 * Mathf.Pow(ljr, -6);
+                    //float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
 
-                    lennard_jones_force = Mathf.Min(lennard_jones_force, LJMax);
-                    lennard_jones_force = Mathf.Max(lennard_jones_force, LJMin);
-                    //debug_csv.Add(string.Format("{0},{1},{2},{3},{4}", r.i0, r.i1, ljr, lennard_jones_potential, lennard_jones_force));
-                    lennard_jones += lennard_jones_potential;
+                    //lennard_jones_force = Mathf.Min(lennard_jones_force, LJMax);
+                    //lennard_jones_force = Mathf.Max(lennard_jones_force, LJMin);
+                    ////debug_csv.Add(string.Format("{0},{1},{2},{3},{4}", r.i0, r.i1, ljr, lennard_jones_potential, lennard_jones_force));
+                    //lennard_jones += lennard_jones_potential;
+                    //REAL PHYSICS HERE **
 
                     num_connections++;
 
                     Vector3 normal = (c0 - c1).normalized;
                     //normal *= seperationForce * (min_d - distance);
 
-                    normal *= lennard_jones_force * LJseperationForce;
+                    //normal *= lennard_jones_force * LJseperationForce;
+                    normal *= 2000.0f;
                     r0.AddForceAtPosition(normal, c0);
                     r1.AddForceAtPosition(-normal, c1);
 
@@ -1072,8 +1086,7 @@ public class BioBlox : MonoBehaviour
                 //}
 
             }
-
-            InvalidDockScore.SetActive(num_invalid != 0);
+            
             is_score_valid = num_invalid == 0;
             
             if (eventSystem != null && eventSystem.IsActive())
@@ -1096,11 +1109,15 @@ public class BioBlox : MonoBehaviour
     {
         scoring.calcScore2();
 
-        ie_score = Mathf.Round(scoring.elecScore * -1);
-        lpj_score = Mathf.Round(scoring.vdwScore * -1);
+        ie_score = Mathf.Round(scoring.elecScore);
+        lpj_score = Mathf.Round(-1 * scoring.vdwScore);
         t_atoms_score = num_touching_0 + num_touching_1;
         //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
-        game_score_value = Mathf.Max(0.0f, (lpj_score + ie_score) + 1000.0f);
+
+        if (t_atoms_score == 0)
+            game_score_value = 0;
+        else
+            game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
 
         if (uiController.expert_mode)
         {
@@ -1110,7 +1127,7 @@ public class BioBlox : MonoBehaviour
         }
 
         //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
-        game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+        game_score.text = "" + game_score_value;
 
         //when saved panel is on
         if (uiController.SavePanel.activeSelf)
@@ -1120,6 +1137,20 @@ public class BioBlox : MonoBehaviour
             uiController.ei.text = "" + ie_score;
             uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
         }
+
+        InvalidDockScore.SetActive(num_invalid != 0 || game_score_value < 0);
+
+        //if (number_total_atoms != 0)
+        //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
+        //else
+        //    current_score_sprite.sprite = sprite_score_normal;
+
+        if (t_atoms_score == 0)
+            current_score_sprite.sprite = sprite_score_normal;
+        else if (!is_score_valid || game_score_value < 0)
+            current_score_sprite.sprite = sprite_score_error;
+        else
+            current_score_sprite.sprite = sprite_score_good;
     }
 
     public void RestartGame()
@@ -1669,6 +1700,15 @@ public class BioBlox : MonoBehaviour
     public void download()
     {
         StartCoroutine(DownloadMolecules());
+    }
+
+    public void RestartProteinPositions()
+    {
+        Vector3 xoff = new Vector3(level.separation, 0, 0);
+        molecules[0].transform.localPosition = (level.offset - xoff);
+        molecules[1].transform.localPosition = (level.offset + xoff);
+        molecules[0].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
+        molecules[1].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
     }
 }
 

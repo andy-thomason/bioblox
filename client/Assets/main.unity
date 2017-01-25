@@ -5807,7 +5807,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf0f104d967457943a878392e03a6dbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  id_user: 
+  id_user: 0
   number_of_level: 5
 --- !u!1001 &195977628
 Prefab:
@@ -29552,7 +29552,6 @@ GameObject:
   - 114: {fileID: 913013352}
   - 114: {fileID: 913013353}
   - 114: {fileID: 913013349}
-  - 114: {fileID: 913013355}
   m_Layer: 0
   m_Name: BioBlox
   m_TagString: Untagged
@@ -29584,7 +29583,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a5210f38c12224c97066f4b1a9c125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDemo: 0
+  isDemo: 1
   winShouldFadeMol: 0
   current_level: 0
   goSplash: {fileID: 0}
@@ -29646,6 +29645,11 @@ MonoBehaviour:
     type: 2}
   MenuButtons: {fileID: 0}
   level_holder: {fileID: 0}
+  sprite_score_normal: {fileID: 21300000, guid: d99699d0fb8e2b24daf70991ac956d3d,
+    type: 3}
+  sprite_score_error: {fileID: 21300000, guid: c9583b190d6f81a4ebe4fb1c448c89d1, type: 3}
+  sprite_score_good: {fileID: 21300000, guid: 04c1665506150c146a8511121c81ff6d, type: 3}
+  current_score_sprite: {fileID: 1187516139}
   SubmitButton: {fileID: 687592686}
   validating_holder: {fileID: 1194946624}
   work_done: 0
@@ -29942,17 +29946,6 @@ MonoBehaviour:
   ele_score_display: {fileID: 1348526230}
   lp_score_display: {fileID: 621789572}
   state_display: {fileID: 427102792}
---- !u!114 &913013355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 913013345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 355dda79b078fc349aa279ce4c1a0711, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &919090289
 GameObject:
   m_ObjectHideFlags: 0
@@ -31248,7 +31241,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1624556581}
   m_HandleRect: {fileID: 1624556580}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -32636,9 +32629,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'ELECTROSTATIC
+  m_Text: 'CHARGE
 
-    INTERACTION'
+    SCORE'
 --- !u!222 &1013305083
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -37932,7 +37925,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 2b453c1d8d25e1f42ad0dc49b679d9cf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d99699d0fb8e2b24daf70991ac956d3d, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -47273,7 +47266,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1885682006}
   m_HandleRect: {fileID: 1885682005}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -64003,7 +63996,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1936962431}
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -67550,9 +67543,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'LENNARD-JONES
+  m_Text: 'CONTACT
 
-    POTENTIAL'
+    SCORE'
 --- !u!222 &2043607406
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -70029,7 +70022,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: -0.000030517578, y: 0}
+  m_AnchoredPosition: {x: 0.00015258789, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408

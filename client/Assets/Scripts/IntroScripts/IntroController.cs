@@ -23,7 +23,6 @@ public class IntroController : MonoBehaviour {
     BioBlox bb;
     public Animator SFXAnimator;
     SFX sfx;
-    XML xml;
 
     void Awake()
     {
@@ -32,7 +31,6 @@ public class IntroController : MonoBehaviour {
         // AboutButton.worldCamera = IntroCamera.GetComponent<Camera>();
         ui = FindObjectOfType<UIController>();
         bb = FindObjectOfType<BioBlox>();
-        xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
         //sfx.PlayTrack(SFX.sound_index.main_audio);
         SFXAnimator.SetBool("Start", true);
@@ -75,9 +73,6 @@ public class IntroController : MonoBehaviour {
     
     public void GameToMain()
     {
-        if(ui.number_atoms_end_level.text != "0" && bb.is_score_valid)
-            xml.SaveXML(bb.current_level, ui.number_atoms_end_level.text, ui.time_to_save);
-
         bb.game_status = BioBlox.GameStatus.MainScreen;
         bb.Reset();
         ui.Reset_UI();

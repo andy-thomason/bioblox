@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour {
         }
         else // DISABLE THE REST OF THE LEVELS / IS DONE HERE BECAUSE IS ONLY ONCE
         {
+            id_user = -1;
             Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
             int button_child = level_holder.GetChild(0).transform.childCount - 1;
             foreach (Transform levels in level_holder)

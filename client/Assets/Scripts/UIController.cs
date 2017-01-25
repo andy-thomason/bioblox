@@ -121,7 +121,6 @@ public class UIController : MonoBehaviour {
 
     //save button
     public GameObject SaveButton;
-    XML xml;
     public Animator HintPanel;
     public GameObject HintPanelOpen;
     public GameObject HintPanelClose;
@@ -178,7 +177,6 @@ public class UIController : MonoBehaviour {
         MainCameraComponent = MainCamera.transform.GetChild(0).GetComponent<Camera>();
         lr = FindObjectOfType<LineRenderer>();
         //button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
-        xml = FindObjectOfType<XML>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
         dm = FindObjectOfType<DataManager>();
@@ -688,6 +686,8 @@ public class UIController : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.button_click);
         RestartCamera();
         aminoSliderController.DeleteAllAminoConnections();
+        //reset position
+        BioBloxReference.RestartProteinPositions();
         BioBloxReference.game_time = 0;
         Reset_UI();
         CutAway.value = CutAway.minValue;
