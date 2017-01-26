@@ -627,7 +627,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 2);
         //CheckDefaultMesh(protein_index);
     }
@@ -637,7 +637,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 3);
         //CheckDefaultMesh(protein_index);
     }
@@ -1150,10 +1150,12 @@ public class UIController : MonoBehaviour {
         isOverUI = false;
     }
 
-    public void SubmitSaveToServer()
+    public void SubmitSaveToServer(int slot)
     {
+        BioBloxReference.is_validating = false;
         sfx.PlayTrack(SFX.sound_index.end_level);
-        BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 0;
+        BioBloxReference.SlotButtons.alpha = 0.0f;
+        BioBloxReference.SlotButtons.blocksRaycasts = false;
 
         P1_connections = "";
         P2_connections = "";
@@ -1167,8 +1169,8 @@ public class UIController : MonoBehaviour {
             connections += ach.ID_button1 + "-" + ach.ID_button2 + "/";
         }
         
-        dm.SendSaveData(n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
-        UpdateLocalScore(n_atoms.text, lpj.text, ei.text, game_score.text);
+        dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections);
+        UpdateLocalScore(slot, n_atoms.text, lpj.text, ei.text, game_score.text);
         Tick.SetActive(true);
         StartCoroutine(WaitForSec());
     }
@@ -1179,21 +1181,25 @@ public class UIController : MonoBehaviour {
         SavePanel.SetActive(false);
         Tick.SetActive(false);
         BioBloxReference.validating_holder.SetActive(true);
-        BioBloxReference.SubmitButton.GetComponent<CanvasGroup>().alpha = 1;
         isOverUI = false;
+        BioBloxReference.is_validating = true;
     }
 
-    void UpdateLocalScore(string n_atoms, string lpj, string ei, string game_score)
+    void UpdateLocalScore(int slot, string n_atoms, string lpj, string ei, string game_score)
     {
+        string[] new_scores = { game_score, n_atoms, lpj, ei};
+
         Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
 
-        if (int.Parse(level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text) < int.Parse(game_score))
-        {
-            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = game_score;
-            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(2).GetComponent<Text>().text = n_atoms;
-            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(3).GetComponent<Text>().text = lpj;
-            level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(4).GetComponent<Text>().text = ei;
-        }
+        level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<SlotController>().SetValues(new_scores);
+
+        //if (int.Parse(level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<Text>().text) < int.Parse(game_score))
+        //{
+        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = game_score;
+        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(2).GetComponent<Text>().text = n_atoms;
+        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(3).GetComponent<Text>().text = lpj;
+        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(4).GetComponent<Text>().text = ei;
+        //}
     }
 
     //void GetAminoAtoms()

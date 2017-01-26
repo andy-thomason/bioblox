@@ -419,8 +419,9 @@ public class BioBlox : MonoBehaviour
     }
 
     float time_valid_score = 0;
-    public Button SubmitButton;
+    public CanvasGroup SlotButtons;
     public GameObject validating_holder;
+    public bool is_validating = true;
 
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update ()
@@ -441,22 +442,27 @@ public class BioBlox : MonoBehaviour
                 UpdateHint();
         }
 
-        //check if score is valid
-        if(is_score_valid)
+        if (is_validating)
         {
-            time_valid_score += Time.deltaTime;
-        }
-        else
-        {
-            time_valid_score = 0;
-            SubmitButton.gameObject.SetActive(false);
-            validating_holder.SetActive(true);
-        }
+            //check if score is valid
+            if (is_score_valid)
+            {
+                time_valid_score += Time.deltaTime;
+            }
+            else
+            {
+                time_valid_score = 0;
+                SlotButtons.alpha = 0.0f;
+                SlotButtons.blocksRaycasts = false;
+                validating_holder.SetActive(true);
+            }
 
-        if (time_valid_score > 5.0f)
-        {
-            validating_holder.SetActive(false);
-            SubmitButton.gameObject.SetActive(true);
+            if (time_valid_score > 5.0f)
+            {
+                validating_holder.SetActive(false);
+                SlotButtons.alpha = 1.0f;
+                SlotButtons.blocksRaycasts = true;
+            }
         }
     }
 

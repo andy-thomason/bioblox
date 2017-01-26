@@ -21,9 +21,9 @@ public class DataManager : MonoBehaviour {
         //StartCoroutine(insertUser());
         ////temp
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
 	
 	}
 
@@ -48,6 +48,7 @@ public class DataManager : MonoBehaviour {
         //www_form.AddField("id_user", 2);
         //www_form.AddField("username", "pedro");
         //www_form.AddField("number_of_levels", number_of_level);
+        //gm.id_user = 2;
         ////temp
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
@@ -55,23 +56,30 @@ public class DataManager : MonoBehaviour {
         
         //get the number of levels
         level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
+        //slots holder
+        int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
 
         //SPLIT
         string[] splitScores = (SQLQuery.text).Split('+');
-        //ASSIGN THE SCORES
+        //ASSIGN THE SCORES TO THE BUTTONS
         for (int i = 0; i < number_of_level; i++)
         {
-            Debug.Log(splitScores[i]);
-            string[] splitScoresLevel = splitScores[i].Split(',');
-            //assign score ui
-            for (int j = 0; j <= 3; j++)
+            string[] splitScores_slot = splitScores[i].Split('*');
+            //Debug.Log(splitScores[i]);
+            for (int j = 0; j <= 2; j++)
             {
-                level_holder.GetChild(i).transform.GetChild(j + 1).GetComponent<Text>().text = splitScoresLevel[j];
+                string[] splitScoresLevel = splitScores_slot[j].Split(',');
+                level_holder.GetChild(i).transform.GetChild(slot_holder_index).transform.GetChild(j).GetComponent<SlotController>().SetValues(splitScoresLevel);
             }
+            ////assign score ui
+            //for (int j = 0; j <= 3; j++)
+            //{
+            //    level_holder.GetChild(i).transform.GetChild(j + 1).GetComponent<Text>().text = splitScoresLevel[j];
+            //}
         }
     }
 
-    public void SendSaveData(string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections)
+    public void SendSaveData(int slot, string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections)
     {
         //create position/rotation
         string p1_position = bb.molecules[0].transform.localPosition.x.ToString("F2") + "," + bb.molecules[0].transform.localPosition.y.ToString("F2") + "," + bb.molecules[0].transform.localPosition.z.ToString("F2");
@@ -82,6 +90,7 @@ public class DataManager : MonoBehaviour {
         www_form = new WWWForm();
         www_form.AddField("id_user", gm.id_user);
         www_form.AddField("level", gm.current_level);
+        www_form.AddField("slot", slot);
         www_form.AddField("n_atoms", n_atoms);
         www_form.AddField("lpj", lpj);
         www_form.AddField("ei", ei);
@@ -106,8 +115,10 @@ public class DataManager : MonoBehaviour {
     public void GetLevelScore()
     {
         www_form = new WWWForm();
+        
         www_form.AddField("id_user", gm.id_user);
         www_form.AddField("level", gm.current_level);
+        www_form.AddField("slot", gm.current_slot);
         StartCoroutine(GetLevelScoreCoru());
     }
 

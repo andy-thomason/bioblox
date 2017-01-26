@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour {
 
     public int current_level = -1;
+    public int current_slot;
     public GameObject loading_panel;
     public GameObject MenuButtons;
     public int id_user;
@@ -34,7 +35,7 @@ public class GameManager : MonoBehaviour {
         {
             id_user = -1;
             Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
-            int button_child = level_holder.GetChild(0).transform.childCount - 1;
+            int button_child = level_holder.GetChild(0).transform.childCount - 2;
             foreach (Transform levels in level_holder)
             {
                 levels.GetChild(button_child).gameObject.SetActive(false);
@@ -43,12 +44,13 @@ public class GameManager : MonoBehaviour {
         }
     }
     
-    public void ChangeLevel(int level)
+    public void ChangeLevel(int level, int slot)
     {
         loading_panel.SetActive(true);
         selection_panel.alpha = 0;
         selection_panel.blocksRaycasts = false;
         current_level = level;
+        current_slot = slot;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
