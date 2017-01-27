@@ -10955,7 +10955,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &362904220
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11006,7 +11006,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'score: 68'
+  m_Text: 'score: 0'
 --- !u!222 &362904222
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13234,7 +13234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &432635839
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13285,7 +13285,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'score: 68'
+  m_Text: 'score: 0'
 --- !u!222 &432635841
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -28390,7 +28390,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &875160128
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28441,7 +28441,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: 'score: 68'
+  m_Text: 'score: 0'
 --- !u!222 &875160130
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -30222,6 +30222,10 @@ MonoBehaviour:
   P2AtomInfo: {fileID: 1186499503}
   amino_id: 0
   amino_clicked: -1
+  slot_score:
+  - {fileID: 362904221}
+  - {fileID: 432635840}
+  - {fileID: 875160129}
   previous_level: -1
   cutawayON: 0
   time_to_save: 0
@@ -64720,7 +64724,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1936962431}
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -70746,7 +70750,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.00010681152, y: 0}
+  m_AnchoredPosition: {x: 0.0001373291, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408

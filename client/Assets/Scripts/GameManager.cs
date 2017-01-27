@@ -35,12 +35,19 @@ public class GameManager : MonoBehaviour {
         {
             id_user = -1;
             Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
-            int button_child = level_holder.GetChild(0).transform.childCount - 2;
-            foreach (Transform levels in level_holder)
+            int button_child = level_holder.GetChild(0).transform.childCount - 1;
+
+            for(int i = 1; i < level_holder.childCount; i++)
             {
-                levels.GetChild(button_child).gameObject.SetActive(false);
+                level_holder.GetChild(i).transform.GetChild(button_child).gameObject.SetActive(false);
+                level_holder.GetChild(i).transform.GetChild(button_child - 1).GetComponent<LevelSelectionButton>().enabled = false;
+                level_holder.GetChild(i).transform.GetChild(button_child - 1).gameObject.AddComponent<RedirectToLogin>();
+                level_holder.GetChild(i).transform.GetChild(button_child - 1).transform.GetChild(0).GetComponent<Text>().text = "Log in to play";
             }
-            level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(true);
+            //disable load slots from the first level
+            level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(false);
+            //level_holder.GetChild(0).transform.GetChild(button_child - 1).GetComponent<Button>().interactable = true;
+            //level_holder.GetChild(0).transform.GetChild(button_child - 1).transform.GetChild(0).GetComponent<Text>().text = "Load";
         }
     }
     
