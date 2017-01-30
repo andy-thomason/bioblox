@@ -155,12 +155,11 @@ public class AminoSliderController : MonoBehaviour
         aminoAcidsTags[0] = P1_mol.aminoAcidsTags;
         aminoAcidsTags[1] = P2_mol.aminoAcidsTags;
 
-
         for (int i = 0; i < aminoAcidsNames[0].Count; ++i)
         {
             if (aminoAcidsNames[0][i] != null)
             {
-                GenerateAminoButtons1(aminoAcidsNames[0][i], aminoAcidsTags[0][i], i);
+                GenerateAminoButtons1(aminoAcidsNames[0][i], aminoAcidsTags[0][i], i, P1_mol.aminoAcidsAtomIds[i]);
             }
         }
 
@@ -168,7 +167,7 @@ public class AminoSliderController : MonoBehaviour
         {
             if (aminoAcidsNames[1][i] != null)
             {
-                GenerateAminoButtons2(aminoAcidsNames[1][i], aminoAcidsTags[1][i], i);
+                GenerateAminoButtons2(aminoAcidsNames[1][i], aminoAcidsTags[1][i], i, P2_mol.aminoAcidsAtomIds[i]);
             }
         }
         GetNumberOfAmino_0();
@@ -343,7 +342,7 @@ public class AminoSliderController : MonoBehaviour
         //A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
     }
 
-    public void GenerateAminoButtons1(string currentAmino, string tag, int index)
+    public void GenerateAminoButtons1(string currentAmino, string tag, int index, int[] atom_id)
     {
         //ButtonText.Initialize ();
         //Debug.Log (currentAmino);
@@ -366,13 +365,14 @@ public class AminoSliderController : MonoBehaviour
         ButtonText[1].text = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
         AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
+        AminoButtonReference.GetComponent<AminoButtonController>().amino_id = atom_id;
 
         //AminoButtonReference.GetComponentsInChildrenGetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
         AminoButtonReference.GetComponent<AminoButtonController>().AminoButtonID = index;
     }
 
-    public void GenerateAminoButtons2(string currentAmino, string tag, int index)
+    public void GenerateAminoButtons2(string currentAmino, string tag, int index, int[] atom_id)
     {
         //ButtonText.Initialize ();
         AminoButtonReference = Instantiate(AminoButton);
@@ -392,6 +392,7 @@ public class AminoSliderController : MonoBehaviour
         ButtonText[1].text = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
         AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
+        AminoButtonReference.GetComponent<AminoButtonController>().amino_id = atom_id;
 
         //AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id

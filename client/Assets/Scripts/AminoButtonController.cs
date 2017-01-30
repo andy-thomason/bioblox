@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
 	public int AminoButtonID;
+    public int[] amino_id;
 	public bool Linked = false;
     public string name_amino;
     public string tag_amino;
