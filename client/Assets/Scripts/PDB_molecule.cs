@@ -714,6 +714,163 @@ end_header
 
     }
 
+    readonly string[] connection_table = new string[] {
+      "ASP",
+        " CB ", " CG ",
+        " CG ", " OD1",
+        " CG ", " OD2",
+      "ALA",
+      "CYS",
+        " CB ", " SG ",
+      "GLU",
+        " CB ", " CG ",
+        " CG ", " CD ",
+        " CD ", " OE1",
+        " CD ", " OE2",
+      "PHE",
+        " CB ", " CG ",
+        " CG ", " CD1",
+        " CG ", " CD2",
+        " CD1", " CE1",
+        " CD2", " CE2",
+        " CE1", " CZ ",
+        " CE2", " CZ ",
+      "GLY",
+      "HIS",
+        " CB ", " CG ",
+        " CG ", " ND1",
+        " CG ", " CD2",
+        " ND1", " CE1",
+        " CD2", " NE2",
+        " CE1", " NE2",
+      "ILE",
+        " CB ", " CG1",
+        " CB ", " CG2",
+        " CG1", " CD1",
+      "LYS",
+        " CB ", " CG ",
+        " CG ", " CD ",
+        " CD ", " CE ",
+        " CE ", " NZ ",
+      "LEU",
+        " CB ", " CG ",
+        " CG ", " CD1",
+        " CG ", " CD2",
+      "MET",
+        " CB ", " CG ",
+        " CG ", " SD ",
+        " SD ", " CE ",
+      "ASN",
+        " CB ", " CG ",
+        " CG ", " OD1",
+        " CG ", " ND2",
+      "PRO",
+        " CB ", " CG ",
+        " CG ", " CD ",
+      "GLN",
+        " CB ", " CG ",
+        " CG ", " CD ",
+        " CD ", " OE1",
+        " CD ", " NE2",
+      "ARG",
+        " CB ", " CG ",
+        " CG ", " CD ",
+        " CD ", " NE ",
+        " NE ", " CZ ",
+        " CZ ", " NH1",
+        " CZ ", " NH2",
+      "SER",
+        " CB ", " OG ",
+      "THR",
+        " CB ", " OG1",
+        " CB ", " CG2",
+      "VAL",
+        " CB ", " CG1",
+        " CB ", " CG2",
+      "TRP",
+        " CB ", " CG ",
+        " CG ", " CD1",
+        " CG ", " CD2",
+        " CD1", " NE1",
+        " CD2", " CE3",
+        " NE1", " CE2",
+        " CE2", " CZ2",
+        " CE3", " CZ3",
+        " CZ2", " CH2",
+        " CZ3", " CH2",
+      "TYR",
+        " CB ", " CG ",
+        " CG ", " CD1",
+        " CG ", " CD2",
+        " CD1", " CE1",
+        " CD2", " CE2",
+        " CE1", " CZ ",
+        " CE2", " CZ ",
+        " CZ ", " OH ",
+    };
+
+    int findAtom(string [] atoms, int bidx, int eidx, string name) {
+      for (int i = bidx; i != eidx; ++i) {
+        if (atoms[i] == name) return i;
+      }
+      return -1;
+    }
+
+    int addImplicitConnections(ref List<int> output, string [] atoms, int bidx, int eidx, int prevC, bool is_ca) {
+      int N_idx = findAtom(atoms, bidx, eidx, " N  ");
+      int C_idx = findAtom(atoms, bidx, eidx, " C  ");
+      int O_idx = findAtom(atoms, bidx, eidx, " O  ");
+      int CA_idx = findAtom(atoms, bidx, eidx, " CA ");
+      int CB_idx = findAtom(atoms, bidx, eidx, " CB ");
+
+      if (N_idx == -1 || C_idx == -1 || O_idx == -1 || CA_idx == -1) {
+        return -1;
+      }
+
+      if (is_ca) {
+        if (prevC != -1) {
+          output.Add(prevC); output.Add(CA_idx);
+        }
+        prevC = CA_idx;
+      } else {
+        if (prevC != -1) {
+          output.Add(prevC); output.Add(N_idx);
+        }
+
+        output.Add(N_idx); output.Add(CA_idx);
+
+        output.Add(CA_idx); output.Add(C_idx);
+
+        output.Add(C_idx); output.Add(O_idx);
+
+        prevC = C_idx;
+      }
+
+      //return C_idx;
+
+      // All except GLY
+      if (CB_idx != -1) {
+        output.Add(CA_idx); output.Add(CB_idx);
+      }
+
+      for (int i = 0; i != connection_table.Length; ++i) {
+        if (connection_table[i][0] >= 'A' && atoms[bidx] == connection_table[i]) {
+          ++i;
+          while (connection_table[i][0] == ' ') {
+            int from = findAtom(atoms, bidx, eidx, connection_table[i]);
+            int to = findAtom(atoms, bidx, eidx, connection_table[i+1]);
+            i += 2;
+            if (from != -1 && to != -1) {
+              output.Add(from); output.Add(to);
+            }
+          }
+          break;
+        }
+      }
+
+      return prevC;
+    }
+
     static public int collide_ray(
         GameObject obj, PDB_molecule mol, Transform t,
         Ray ray)

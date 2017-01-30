@@ -1663,6 +1663,15 @@ public class BioBlox : MonoBehaviour
         reset_molecule(molecules[0], 0, level.offset - xoff);
         reset_molecule(molecules[1], 1, level.offset + xoff);
 
+        /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
+          GameObject go = new GameObject();
+          go.transform.SetParent(mol1.transform);
+          MeshFilter mf = go.AddComponent<MeshFilter>();
+          //mf.mesh = 
+          MeshRenderer mr = go.AddComponent<MeshRenderer>();
+          go.transform.position = c;
+        }*/
+
         uiController.SetHintImage(level.pdbFile); //HINT
 
         StartGame();
