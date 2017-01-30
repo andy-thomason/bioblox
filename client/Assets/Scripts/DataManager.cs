@@ -70,12 +70,17 @@ public class DataManager : MonoBehaviour {
             {
                 string[] splitScoresLevel = splitScores_slot[j].Split(',');
                 level_holder.GetChild(i).transform.GetChild(slot_holder_index).transform.GetChild(j).GetComponent<SlotController>().SetValues(splitScoresLevel);
+
+                if(j==0)
+                {
+                    //assign score ui
+                    for (int l = 0; l <= 3; l++)
+                    {
+                        level_holder.GetChild(i).transform.GetChild(l + 1).GetComponent<Text>().text = splitScoresLevel[l];
+                    }
+                }
             }
-            ////assign score ui
-            //for (int j = 0; j <= 3; j++)
-            //{
-            //    level_holder.GetChild(i).transform.GetChild(j + 1).GetComponent<Text>().text = splitScoresLevel[j];
-            //}
+
         }
     }
 
