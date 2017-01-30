@@ -5,7 +5,7 @@ import os
 import re
 import sys
 
-print("Usage: build_all.py list|build|caonly")
+print("Usage: build_all.py list|build|caonlyi|bsonly")
 
 
 pdbdir = '.' #os.path.dirname(sys.argv[0])
@@ -130,6 +130,7 @@ if len(sys.argv) == 2 and sys.argv[1] == 'build':
     for line in os.popen(ex):
       print(line)
 
+if len(sys.argv) == 2 and (sys.argv[1] == 'build' or sys.argv[1] == 'bsonly'):
   # ball and stick models
   for f, ch1, ch2, lod in chains:
     ex = "%s %s bs --chains %s --ply --lod 1" % (exe_file, pdbdir + '/' + f, ch1)
