@@ -63,15 +63,11 @@ public class MouseOrbitImproved_main : MonoBehaviour
         {
             if (Input.GetMouseButton(1))
             {
-                Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
+                //Cursor.SetCursor(cursor_move, Vector2.zero, CursorMode.Auto);
                 x += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
                 y -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
 
                 y = ClampAngle(y, yMinLimit, yMaxLimit);
-            }
-            else
-            {
-                Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             }
 
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * scroll_speed, distanceMin, distanceMax);

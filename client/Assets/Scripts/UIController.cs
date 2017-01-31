@@ -1027,7 +1027,7 @@ public class UIController : MonoBehaviour {
             MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
             sfx.PlayTrack(SFX.sound_index.button_click);
             FadeCanvasToExplore.SetBool("Start", false);
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             StartCoroutine(WaitForFade());
             explore_view = !explore_view;
             //set the color

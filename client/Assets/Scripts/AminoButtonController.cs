@@ -32,14 +32,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            is_disabled = !is_disabled;
-            transform.GetChild(3).gameObject.SetActive(is_disabled);
-
-            for (int i = 0; i < amino_id.Length; i++)
-                bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
-
-        }
+            DisableAmino();
 
         sfx.PlayTrack(SFX.sound_index.amino_click);
     }
@@ -82,5 +75,16 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void SetGameObject()
     {
         aminoSli.ChangeAminoAcidSelection(gameObject);
+    }
+
+    public void DisableAmino()
+    {
+        is_disabled = !is_disabled;
+        transform.GetChild(3).gameObject.SetActive(is_disabled);
+
+        for (int i = 0; i < amino_id.Length; i++)
+            bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
+
+        HighLightOnClick();
     }
 }

@@ -68,12 +68,12 @@ public class ShipController : MonoBehaviour {
         {
             if(!sfx.isPlaying(SFX.sound_index.ship_scanning))
                 sfx.PlayTrack(SFX.sound_index.ship_scanning);
-            Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
+            //Cursor.SetCursor(cursor_aim, Vector2.zero, CursorMode.Auto);
             scanning.SetActive(true);
         }
         else
         {
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
             atom_name.SetActive(false);
             scanning.SetActive(false);
             sfx.StopTrack(SFX.sound_index.ship_scanning);
