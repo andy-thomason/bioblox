@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
+    public int protein_id;
 	public int AminoButtonID;
     public int[] amino_id;
 	public bool Linked = false;
@@ -28,6 +29,17 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            PDB_molecule mol = bb.molecules_PDB_mesh[protein_id].mol;
+            BitArray ba = new BitArray(mol.atom_centres.Length);
+
+            for (int i = 0; i < amino_id.Length; i++)
+            {
+                ba.Set(amino_id[i], false);
+            }
+        }
+
         sfx.PlayTrack(SFX.sound_index.amino_click);
     }
 

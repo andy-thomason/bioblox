@@ -366,6 +366,7 @@ public class AminoSliderController : MonoBehaviour
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
         AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().amino_id = atom_id;
+        AminoButtonReference.GetComponent<AminoButtonController>().protein_id = 0;
 
         //AminoButtonReference.GetComponentsInChildrenGetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
@@ -393,6 +394,7 @@ public class AminoSliderController : MonoBehaviour
         AminoButtonReference.GetComponent<AminoButtonController>().name_amino = currentAmino;
         AminoButtonReference.GetComponent<AminoButtonController>().tag_amino = tag;
         AminoButtonReference.GetComponent<AminoButtonController>().amino_id = atom_id;
+        AminoButtonReference.GetComponent<AminoButtonController>().protein_id = 1;
 
         //AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
