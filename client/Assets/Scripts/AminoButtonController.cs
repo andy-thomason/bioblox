@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public int protein_id;
+    bool is_disabled;
 	public int AminoButtonID;
     public int[] amino_id;
 	public bool Linked = false;
@@ -25,19 +26,19 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         sfx = FindObjectOfType<SFX>();
         aminoSli = FindObjectOfType<AminoSliderController>();
         ui = FindObjectOfType<UIController>();
+        is_disabled = false;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            PDB_molecule mol = bb.molecules_PDB_mesh[protein_id].mol;
-            BitArray ba = new BitArray(mol.atom_centres.Length);
+            is_disabled = !is_disabled;
+            transform.GetChild(3).gameObject.SetActive(is_disabled);
 
             for (int i = 0; i < amino_id.Length; i++)
-            {
-                ba.Set(amino_id[i], false);
-            }
+                bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
+
         }
 
         sfx.PlayTrack(SFX.sound_index.amino_click);
