@@ -12,7 +12,7 @@ public class BioBlox : MonoBehaviour
     public bool isDemo = false;
     // dictaing which gametype, puzzle or museum
     //bool simpleGame = true;
-
+    
     //public int level;
 
     // controls whether the win state should attempt to fade out the molecules
@@ -84,6 +84,7 @@ public class BioBlox : MonoBehaviour
     public PDB_mesh[] molecules_PDB_mesh;
     public BitArray[] atoms_touching;
     public BitArray[] atoms_bad;
+    public BitArray[] atoms_disabled;
 
     //  NOT CURRENTLY IN USE
     //  sites are smaller regions of the molecules that can be selected and manipulated independtly from the molecules
@@ -1006,6 +1007,9 @@ public class BioBlox : MonoBehaviour
                 // Apply forces to the rigid bodies.
                 foreach (GridCollider.Result r in b.results)
                 {
+                    // turn off collision for some atoms.
+                    if (atoms_disabled[0][r.i0] || atoms_disabled[1][r.i1]) continue;
+
                     Vector3 ac0 = mol0.atom_centres[r.i0];
                     Vector3 ac1 = mol1.atom_centres[r.i1];
                     Vector3 c0 = t0mx.MultiplyPoint3x4(ac0);
@@ -1574,6 +1578,11 @@ public class BioBlox : MonoBehaviour
         molecules[1] = mol2.gameObject;
         molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
         molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+        // Set a bit in this bit array to disable an atom from collision
+        BitArray bad0 = new BitArray(molecules_PDB_mesh[0].mol.atom_centres.Length);
+        BitArray bad1 = new BitArray(molecules_PDB_mesh[1].mol.atom_centres.Length);
+        atoms_disabled = new BitArray[] { bad0, bad1 };
 
         // Ioannis scoring
         scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
