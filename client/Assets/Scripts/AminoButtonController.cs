@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public int protein_id;
-    bool is_disabled;
+    public bool is_disabled;
 	public int AminoButtonID;
     public int[] amino_id;
 	public bool Linked = false;
@@ -86,5 +86,14 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
 
         HighLightOnClick();
+    }
+
+    public void DisableAminoReset()
+    {
+        is_disabled = !is_disabled;
+        transform.GetChild(3).gameObject.SetActive(is_disabled);
+
+        for (int i = 0; i < amino_id.Length; i++)
+            bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
     }
 }

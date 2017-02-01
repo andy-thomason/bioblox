@@ -43,6 +43,7 @@ public class OverlayRenderer : MonoBehaviour {
     public Material Atom_2;
     public Material Atom_selected;
     public Material Atom_selected_fp;
+    public Material disabled_material;
 
     //Material material_to_use;
     UIController ui;
@@ -113,6 +114,7 @@ public class OverlayRenderer : MonoBehaviour {
                 {
                     bool is_selected = j < sel.Length && sel[j];
                     bool is_touching = bb.atoms_touching != null && bb.atoms_touching[i][j];
+                    bool is_disabled = bb.atoms_disabled != null && bb.atoms_disabled[i][j];
                     bool is_bad = bb.atoms_bad != null && bb.atoms_bad[i][j];
                     bool is_atom_selected = false;
                     //is_bad = msh.selected_atoms[j] == asc.atom_selected_p1;
@@ -171,9 +173,6 @@ public class OverlayRenderer : MonoBehaviour {
                                 )
                             );
                         }
-                        ////get ATOMS DESCRIPTION
-                        //if(i == 0) p1_atomos.Add(new Atom(atom,j,i));
-                        //else p2_atomos.Add(new Atom(atom, j, i)); ;
                     }
                     else if (is_selected && ui.is_hovering)
                     {
@@ -188,48 +187,40 @@ public class OverlayRenderer : MonoBehaviour {
                             }
                         }
                     }
+                    else if (is_disabled)
+                    {
+                        if (sphere_index < icons_spheres_store.Count)
+                        {
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = disabled_material;
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            sphere_index++;
+                        }
+                    }
                     //3D OVERLAY
                     if (is_touching && atom_3d_overlay)
                     {
-                        //Debug.Log(!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying);
-                        //if (!sfx.audioSource[SFX.sound_index.protein_colliding.GetHashCode()].isPlaying)
-                        //{
-                        //    sfx.PlayTrack(SFX.sound_index.protein_colliding);
-                        //}
-
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            //if(is_bad)
-                            //{
-                            //    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                            //    add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            //    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = overlaping;
-                            //}
-                            //else
-                            //{
-                                if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
-                                {
-                                    //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
-                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
-                                }
-                                if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
-                                {
-                                    //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
-                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
-                                }
+                            if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
+                            {
+                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
+                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            }
+                            if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
+                            {
+                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
+                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            }
 
-                                if (is_bad)
-                                    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
-                                else
-                                    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material[atom] : P2atom_material[atom];
-
-                            //}
-                            
-                            sphere_index++;
+                            if (is_bad)
+                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
+                            else
+                                sphere_index++;
                         }
                     }
                 }

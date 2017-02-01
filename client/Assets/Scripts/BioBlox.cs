@@ -618,7 +618,7 @@ public class BioBlox : MonoBehaviour
 
         uiController.Reset_UI();
         //uiController.EndLevelPanel.SetActive(false);
-        
+
         //sfx.StopTrack(SFX.sound_index.warning);
     }
 
@@ -1733,6 +1733,21 @@ public class BioBlox : MonoBehaviour
         molecules[1].transform.localPosition = (level.offset + xoff);
         molecules[0].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
         molecules[1].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
+    }
+
+    public void ResetDisabledAminoAcids()
+    {
+        foreach(AminoButtonController abc in aminoSlider.A1Buttons)
+        {
+            if (abc.is_disabled)
+                abc.DisableAminoReset();
+        }
+
+        foreach (AminoButtonController abc in aminoSlider.A2Buttons)
+        {
+            if (abc.is_disabled)
+                abc.DisableAminoReset();
+        }
     }
 }
 

@@ -64974,6 +64974,7 @@ MonoBehaviour:
   Atom_2: {fileID: 2100000, guid: 3cf1afd09c4628045a53640e3440bcb4, type: 2}
   Atom_selected: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
   Atom_selected_fp: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
+  disabled_material: {fileID: 2100000, guid: 3d1636e88fdeb1e4096fcf10ad9be35a, type: 2}
   lookat_camera: {fileID: 1348893749}
   Sphere_atom: {fileID: 198170, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   Sphere_atom_holder: {fileID: 1803283717}
