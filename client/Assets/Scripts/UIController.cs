@@ -188,11 +188,11 @@ public class UIController : MonoBehaviour {
 
     public void init()
     {
-        number_of_meshes = BioBloxReference.molecules[0].transform.childCount;
+        number_of_meshes = BioBloxReference.molecules[0].transform.GetChild(0).transform.childCount;
         //DONT FIND ATOMS
         p1_atom_status = 0;
         p2_atom_status = 0;
-        transparent_render = BioBloxReference.molecules[0].transform.childCount - 1;
+        transparent_render = BioBloxReference.molecules[0].transform.GetChild(0).transform.childCount - 1;
         DropDownP1.value = 0;
         DropDownP2.value = 0;
         //SET VALUES TO SAVE BUTTONS
@@ -541,7 +541,7 @@ public class UIController : MonoBehaviour {
 
     void UpdateMeshCutaway(int id_protein, int id_child_mesh)
     {
-        foreach (Transform molecule_renderer in BioBloxReference.molecules[id_protein].transform.GetChild(id_child_mesh).transform)
+        foreach (Transform molecule_renderer in BioBloxReference.molecules[id_protein].transform.GetChild(0).transform.GetChild(id_child_mesh).transform)
         {
             molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
         }
@@ -557,7 +557,7 @@ public class UIController : MonoBehaviour {
         {
             for (int i = 0; i < number_of_meshes - 1; i++)
             {
-                foreach (Transform molecule_renderer in BioBloxReference.molecules[j].transform.GetChild(i).transform)
+                foreach (Transform molecule_renderer in BioBloxReference.molecules[j].transform.GetChild(0).transform.GetChild(i).transform)
                 {
                     molecule_renderer.GetComponent<Renderer>().material.SetFloat("_Distance", CutAway.value);
                 }
@@ -613,39 +613,39 @@ public class UIController : MonoBehaviour {
 
     public void ToggleNormalMesh(int protein_index)
     {
-        BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 0);
         //CheckDefaultMesh(protein_index);
     }
 
     public void ToggleTransparentMesh(int protein_index)
     {
-        BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(true);
         //CheckDefaultMesh(protein_index);
     }
 
     public void ToggleBSMesh(int protein_index)
     {
-        BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 2);
         //CheckDefaultMesh(protein_index);
     }
 
     public void ToggleCMesh(int protein_index)
     {
-        BioBloxReference.molecules[protein_index].transform.GetChild(0).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(1).gameObject.SetActive(false);
-        BioBloxReference.molecules[protein_index].transform.GetChild(2).gameObject.SetActive(true);
-        BioBloxReference.molecules[protein_index].transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+        BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
         UpdateMeshCutaway(protein_index, 3);
         //CheckDefaultMesh(protein_index);
     }
@@ -752,30 +752,12 @@ public class UIController : MonoBehaviour {
 
     public void Shadows(bool status, int protein)
     {
-        foreach (Transform molecule_renderer in BioBloxReference.molecules[protein].transform.GetChild(0).transform)
+        foreach (Transform molecule_renderer in BioBloxReference.molecules[protein].transform.GetChild(0).transform.GetChild(0).transform)
         {
             molecule_renderer.GetComponent<MeshRenderer>().shadowCastingMode = status ? ShadowCastingMode.On : ShadowCastingMode.Off;
         }
     }
 
-    public void DeleteHarpoons()
-    {
-        if (BioBloxReference.molecules[0].transform.childCount > 3)
-        {
-            for (int i = number_of_meshes; i < BioBloxReference.molecules[0].transform.childCount; i++)
-            {
-                Destroy(BioBloxReference.molecules[0].transform.GetChild(i).gameObject);
-            }
-
-        }
-        if (BioBloxReference.molecules[1].transform.childCount > 3)
-        { 
-            for (int i = number_of_meshes; i < BioBloxReference.molecules[1].transform.childCount; i++)
-            {
-                Destroy(BioBloxReference.molecules[1].transform.GetChild(i).gameObject);
-            }
-        }
-    }
     //to restart when the same level is selcted
     public void SaveLastLevelPlayed(GameObject LevelButtonClickled)
     {
@@ -959,155 +941,7 @@ public class UIController : MonoBehaviour {
         }
     }
     #endregion
-    #region EXPLORER VIEW
-    public void SetAtomNameExplorerView(string temp)
-    {
-        atom_name.gameObject.SetActive(true);
-        atom_name.text = temp;
-    }
-
-    GameObject temp_ship;
-    public Slider slider_explore_view;
-    float previous_slider_explore_value = 0;
-    public Button OnExplorer;
-    public Button OffExplorer;
-
-    //public void ToggleExploreView()
-    //{
-    //    MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
-    //    if (!explore_view)
-    //    {
-    //        sfx.PlayTrack(SFX.sound_index.button_click);
-    //        FadeCanvasToExplore.SetBool("Start", true);
-    //        SaveButton.SetActive(false);
-    //        isOverUI = false;
-    //        //RepositionCameraWOMovement();
-    //        CutAway.value = CutAway.minValue;
-    //        Tutorial.isOn = false;
-    //        StartCoroutine(WaitForFade());
-    //    }
-    //    else
-    //    {
-    //        sfx.PlayTrack(SFX.sound_index.button_click);
-    //        FadeCanvasToExplore.SetBool("Start", false);
-    //        Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-    //        StartCoroutine(WaitForFade());
-    //    }
-
-    //    explore_view = !explore_view;
-    //}
-
-    public void StartExploreButton()
-    {
-        if (!explore_view)
-        {
-            MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
-            sfx.PlayTrack(SFX.sound_index.button_click);
-            FadeCanvasToExplore.SetBool("Start", true);
-            SaveButton.SetActive(false);
-            isOverUI = false;
-            //RepositionCameraWOMovement();
-            CutAway.value = CutAway.minValue;
-            Tutorial.isOn = false;
-            StartCoroutine(WaitForFade());
-            explore_view = !explore_view;
-            //set the color
-            button_color = OnExplorer.colors;
-            button_color.normalColor = Color.white;
-            button_color.highlightedColor = Color.white;
-            button_color.pressedColor = Color.white;
-            OnExplorer.colors = button_color;
-            //off
-            button_color = OffExplorer.colors;
-            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            OffExplorer.colors = button_color;
-        }
-    }
-
-    public void EndExploreButton()
-    {
-        if (explore_view)
-        {
-            MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = false;
-            sfx.PlayTrack(SFX.sound_index.button_click);
-            FadeCanvasToExplore.SetBool("Start", false);
-            //Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
-            StartCoroutine(WaitForFade());
-            explore_view = !explore_view;
-            //set the color
-            ColorBlock button_color = OnExplorer.colors;
-            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            OnExplorer.colors = button_color;
-            //off
-            button_color = OffExplorer.colors;
-            button_color.normalColor = Color.white;
-            button_color.highlightedColor = Color.white;
-            button_color.pressedColor = Color.white;
-            OffExplorer.colors = button_color;
-            BioBloxReference.molecules_PDB_mesh[0].cam = MainCameraComponent;
-            BioBloxReference.molecules_PDB_mesh[1].cam = MainCameraComponent;
-        }
-    }
-
-    public void StartExplore()
-    {
-        //RenderSettings.skybox = space_skybox;
-        //floor.SetActive(false);
-
-        //MainCamera.GetComponent<Animator>().SetBool("Start", true);
-        MainCamera.GetComponent<Camera>().enabled = false;
-        //MainCanvas.SetActive(false);
-        //ChangeCCTVShip();
-        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = false;
-
-        //spawn ship
-        sfx.StopTrack(SFX.sound_index.ship);
-        //uIController.ChangeCCTVLoading();
-        //only 1 active
-        temp_ship = Instantiate(space_ship);
-        sfx.PlayTrackDelay(SFX.sound_index.ship, 0.6f);
-        temp_ship.tag = "space_ship";
-        //temp.transform.SetParent(transform, false);
-        temp_ship.transform.position = new Vector3(0, 0, -60);
-        //set the camera
-        lr.lookat_camera = temp_ship.transform.GetChild(0).GetComponent<Camera>();
-    }
-
-    public void EndExplore()
-    {
-        sfx.StopTrack(SFX.sound_index.ship);
-        MainCamera.GetComponent<Camera>().enabled = true;
-        if (explorerController.beacon_holder.Count > 0)
-            ToggleBeacon.isOn = true;
-        MainCamera.GetComponent<MouseOrbitImproved_main>().enabled = true;
-        //set the camera
-        lr.lookat_camera = MainCameraComponent;
-        SaveButton.SetActive(true);
-        Destroy(temp_ship);
-    }
-
-    IEnumerator WaitForFade()
-    {
-        yield return new WaitForSeconds(1);
-        if(explore_view)
-            StartExplore();
-        else
-            EndExplore();
-        MainCanvas.GetComponent<CanvasGroup>().blocksRaycasts = true;
-    }
-
-    //public void ExploreViewClick()
-    //{
-    //    if (slider_explore_view.value == previous_slider_explore_value)
-    //        slider_explore_view.value = slider_explore_view.value == 0 ? slider_explore_view.maxValue : slider_explore_view.minValue;
-
-    //    previous_slider_explore_value = slider_explore_view.value;
-    //}
-    #endregion
+  
 
     #region ATOM OVERLAY
     public void Atom2DDisplay()

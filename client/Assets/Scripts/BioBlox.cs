@@ -186,6 +186,19 @@ public class BioBlox : MonoBehaviour
 
     bool loaded = false;
 
+
+    #region HINT MOVEMENT
+    Vector3 docking_position_0;
+    Quaternion docking_rotation_0;
+    Vector3 docking_position_1;
+    Quaternion docking_rotation_1;
+    float journeyLength_0;
+    float journeyLength_1;
+    float speed = 0.2F;
+    float startTime;
+    bool is_hint_moving = false;
+    #endregion
+
     public enum GameState
     {
         Setup,
@@ -464,6 +477,31 @@ public class BioBlox : MonoBehaviour
                 SlotButtons.alpha = 1.0f;
                 SlotButtons.blocksRaycasts = true;
             }
+        }
+
+        if(is_hint_moving)
+        {
+            //float distCovered = (Time.time - startTime) * speed;
+            //float fracJourney = distCovered / journeyLength_0;
+            //molecules[0].transform.GetChild(0).transform.position = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, docking_position_0, fracJourney);
+            //molecules[0].transform.GetChild(0).transform.rotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
+
+            //fracJourney = distCovered / journeyLength_1;
+            //molecules[1].transform.GetChild(0).transform.position = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, docking_position_1, fracJourney);
+            //molecules[1].transform.GetChild(0).transform.rotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
+
+            float distCovered = (Time.time - startTime) * speed;
+            float fracJourney = distCovered / journeyLength_0;
+            molecules[0].transform.localPosition = Vector3.Lerp(molecules[0].transform.localPosition, Vector3.zero, fracJourney);
+            molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, docking_position_0, fracJourney);
+            molecules[0].transform.localRotation = Quaternion.Lerp(molecules[0].transform.localRotation, Quaternion.identity, fracJourney);
+            molecules[0].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
+
+            fracJourney = distCovered / journeyLength_1;
+            molecules[1].transform.localPosition = Vector3.Lerp(molecules[1].transform.localPosition, Vector3.zero, fracJourney);
+            molecules[1].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, docking_position_1, fracJourney);
+            molecules[1].transform.localRotation = Quaternion.Lerp(molecules[1].transform.localRotation, Quaternion.identity, fracJourney);
+            molecules[1].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
         }
     }
 
@@ -960,7 +998,7 @@ public class BioBlox : MonoBehaviour
     // Physics simulation
     void FixedUpdate() {
 
-        if (game_status == GameStatus.GameScreen)
+        if (game_status == GameStatus.GameScreen && !is_hint_moving)
         {
 
             num_touching_0 = 0;
@@ -1527,6 +1565,8 @@ public class BioBlox : MonoBehaviour
     Stream stream;
     GameObject transparency_0;
     GameObject transparency_1;
+    Vector3 position_molecule_0;
+    Vector3 position_molecule_1;
 
 
     IEnumerator DownloadMolecules()
@@ -1574,6 +1614,16 @@ public class BioBlox : MonoBehaviour
         mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
         mol2.transform.SetParent(Molecules);
 
+        //create holder of amino views
+        GameObject molecule_0_views = new GameObject();
+        molecule_0_views.name = "molecule_0";
+        molecule_0_views.transform.SetParent(mol1.transform);
+
+        //create holder of amino views
+        GameObject molecule_1_views = new GameObject();
+        molecule_1_views.name = "molecule_1";
+        molecule_1_views.transform.SetParent(mol2.transform);
+
         molecules[0] = mol1.gameObject;
         molecules[1] = mol2.gameObject;
         molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
@@ -1598,9 +1648,16 @@ public class BioBlox : MonoBehaviour
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
         transparency_0 = Instantiate(parent_molecule_reference);
-        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
         parent_molecule_reference.SetActive(true);
+        //save the docking position/rotation of the protein 0
+        docking_position_0 = parent_molecule_reference.transform.localPosition;
+        docking_rotation_0 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_0);
+
+        position_molecule_0 = parent_molecule_reference.transform.localPosition;
+
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //DEFAULT
         parent_molecule_reference = Instantiate(parent_molecule);
@@ -1609,9 +1666,16 @@ public class BioBlox : MonoBehaviour
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
         transparency_1 = Instantiate(parent_molecule_reference);
-        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
         parent_molecule_reference.SetActive(true);
+        //save the docking position/rotation of the protein 0
+        docking_position_1 = parent_molecule_reference.transform.localPosition;
+        docking_rotation_1 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_1);
+
+        position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //BALLS AND STICK 1
         parent_molecule_reference = Instantiate(parent_molecule);
@@ -1619,9 +1683,10 @@ public class BioBlox : MonoBehaviour
         txt_bytes = mol1_bs_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.bs);
-        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
         parent_molecule_reference.SetActive(false);
-        parent_molecule_reference.transform.Translate(offset_position_0);
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //BALLS AND STICK 2
         parent_molecule_reference = Instantiate(parent_molecule);
@@ -1629,9 +1694,10 @@ public class BioBlox : MonoBehaviour
         txt_bytes = mol2_bs_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
-        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
         parent_molecule_reference.SetActive(false);
-        parent_molecule_reference.transform.Translate(offset_position_1);
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //C&A 1
         parent_molecule_reference = Instantiate(parent_molecule);
@@ -1639,9 +1705,10 @@ public class BioBlox : MonoBehaviour
         txt_bytes = mol1_ca_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
-        parent_molecule_reference.transform.SetParent(mol1.transform);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
         parent_molecule_reference.SetActive(false);
-        parent_molecule_reference.transform.Translate(offset_position_0);
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //C&A 2
         parent_molecule_reference = Instantiate(parent_molecule);
@@ -1649,28 +1716,35 @@ public class BioBlox : MonoBehaviour
         txt_bytes = mol2_ca_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
-        parent_molecule_reference.transform.SetParent(mol2.transform);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
         parent_molecule_reference.SetActive(false);
-        parent_molecule_reference.transform.Translate(offset_position_1);
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         //TRANSPARENT 1
-        transparency_0.transform.SetParent(mol1.transform);
+        transparency_0.transform.SetParent(molecule_0_views.transform);
         // mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(transparency_0, 0);
         transparency_0.SetActive(false);
-        transparency_0.transform.Translate(offset_position_0);
+        //transparency_0.transform.Translate(offset_position_0);
+        transparency_0.transform.localPosition = Vector3.zero;
 
         //TRANSPARENT 2
-        transparency_1.transform.SetParent(mol2.transform);
+        transparency_1.transform.SetParent(molecule_1_views.transform);
         // mol1_mesh.name = "transparent_p1";
         FixTransparentMolecule(transparency_1, 1);
         transparency_1.SetActive(false);
-        transparency_1.transform.Translate(offset_position_1);
+        //transparency_1.transform.Translate(offset_position_1);
+        transparency_1.transform.localPosition = Vector3.zero;
 
         Vector3 xoff = new Vector3(level.separation, 0, 0);
 
         reset_molecule(molecules[0], 0, level.offset - xoff);
         reset_molecule(molecules[1], 1, level.offset + xoff);
+
+        //setting the position of each molecule
+        molecule_0_views.transform.localPosition = position_molecule_0;
+        molecule_1_views.transform.localPosition = position_molecule_1;
 
         /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
           GameObject go = new GameObject();
@@ -1749,5 +1823,41 @@ public class BioBlox : MonoBehaviour
                 abc.DisableAminoReset();
         }
     }
+
+    #region HINT MOVEMENT
+
+    Vector3 default_position_molecule_0;
+    Quaternion default_rotation_molecule_0;
+    Vector3 default_position_molecule_1;
+    Quaternion default_rotation_molecule_1;
+
+    public void StartHintMovement()
+    {
+        if (!is_hint_moving)
+        {
+            startTime = Time.time;
+            journeyLength_0 = Vector3.Distance(molecules[0].transform.localPosition, Vector3.zero);
+            journeyLength_1 = Vector3.Distance(molecules[1].transform.localPosition, Vector3.zero);
+            //save position
+            default_position_molecule_0 = molecules[0].transform.localPosition;
+            default_rotation_molecule_0 = molecules[0].transform.localRotation;
+            default_position_molecule_1 = molecules[1].transform.localPosition;
+            default_rotation_molecule_1 = molecules[1].transform.localRotation;
+            is_hint_moving = !is_hint_moving;
+        }
+        else
+        {
+            molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
+            molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
+
+            molecules[0].transform.localPosition = default_position_molecule_0;
+            molecules[0].transform.localRotation = default_rotation_molecule_0;
+            molecules[1].transform.localPosition = default_position_molecule_1;
+            molecules[1].transform.localRotation = default_rotation_molecule_1;
+
+            is_hint_moving = !is_hint_moving;
+        }
+    }
+    #endregion
 }
 

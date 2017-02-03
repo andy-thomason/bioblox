@@ -214,8 +214,10 @@ public class PDB_mesh : MonoBehaviour {
     MeshRenderer[] meshes;
     //Vector3 light_pos;
     ExploreController exploreController;
-    //test
     GameObject camera_first_person;
+    Transform mo_m;
+    Vector3 camera_position;
+    Quaternion camera_rotation;
 
     void Awake()
     {
@@ -225,6 +227,7 @@ public class PDB_mesh : MonoBehaviour {
         uIController = FindObjectOfType<UIController>();
         camera_first_person = GameObject.Find("CameraFirstPerson");
         exploreController = FindObjectOfType<ExploreController>();
+        mo_m = GameObject.FindGameObjectWithTag("camera_holder").transform;
     }
 
     //Camera main_camera;
@@ -233,6 +236,14 @@ public class PDB_mesh : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+        //get if the camera is rotating - for desabling the amino
+        if (Input.GetMouseButtonDown(1))
+        {
+            camera_rotation = mo_m.localRotation;
+            camera_position = mo_m.localPosition;
+        }
+
+        //create the ray
         ray = cam.ScreenPointToRay (Input.mousePosition);
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
@@ -288,11 +299,14 @@ public class PDB_mesh : MonoBehaviour {
         }
         else if (Input.GetMouseButtonUp(1))
         {
-            Ray r = cam.ScreenPointToRay(Input.mousePosition);
-            atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
-            if (atom != -1)
+            if (camera_rotation == mo_m.localRotation && camera_position == mo_m.localPosition)
             {
-                GetAminoId(atom);
+                Ray r = cam.ScreenPointToRay(Input.mousePosition);
+                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                if (atom != -1)
+                {
+                    GetAminoId(atom);
+                }
             }
             //Ray r = cam.ScreenPointToRay(Input.mousePosition);
             //atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
@@ -308,8 +322,8 @@ public class PDB_mesh : MonoBehaviour {
             has_rotated = false;
             rotating = false;
         }
-        
-        lastMousePos = mousePos;
+
+            lastMousePos = mousePos;
     }
 
     public float select_fudge = 0.67f;
