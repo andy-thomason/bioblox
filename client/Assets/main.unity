@@ -30016,7 +30016,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64a5210f38c12224c97066f4b1a9c125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDemo: 0
+  isDemo: 1
   winShouldFadeMol: 0
   current_level: 0
   goSplash: {fileID: 0}
@@ -64974,6 +64974,7 @@ MonoBehaviour:
   Atom_2: {fileID: 2100000, guid: 3cf1afd09c4628045a53640e3440bcb4, type: 2}
   Atom_selected: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
   Atom_selected_fp: {fileID: 2100000, guid: a8bac4056f872a84fa7a4514d7a9e538, type: 2}
+  disabled_material: {fileID: 2100000, guid: 3d1636e88fdeb1e4096fcf10ad9be35a, type: 2}
   lookat_camera: {fileID: 1348893749}
   Sphere_atom: {fileID: 198170, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   Sphere_atom_holder: {fileID: 1803283717}
@@ -70750,7 +70751,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0.0001373291, y: 0}
+  m_AnchoredPosition: {x: 0.00012207031, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &2113111408

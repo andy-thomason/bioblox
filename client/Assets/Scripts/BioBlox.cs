@@ -620,7 +620,7 @@ public class BioBlox : MonoBehaviour
 
         uiController.Reset_UI();
         //uiController.EndLevelPanel.SetActive(false);
-        
+
         //sfx.StopTrack(SFX.sound_index.warning);
     }
 
@@ -1739,21 +1739,22 @@ public class BioBlox : MonoBehaviour
         molecules[1].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
     }
 
-    void find_hint_pairs(PDB_molecule mol0, PDB_molecule mol1) {
+    // hint_pairs is a list of atom indices that are close to each other in the docked configuration
+    void find_hint_pairs(PDB_molecule mol0, PDB_molecule mol1, float max_distance=4) {
       for (int a0 = 0; a0 != mol0.aminoAcidsAtomIds.Count; ++a0) {
         int [] ids0 = mol0.aminoAcidsAtomIds[a0];
         for (int b0 = 0; b0 != ids0.Length; ++b0) {
           int i0 = ids0[b0];
+          // compensate for centering transform
           Vector3 pos0 = mol0.atom_centres[i0] + mol0.pos;
-          //if (i0 < 10) Debug.Log("" + i0 + ": " + pos0);
           for (int a1 = 1; a1 != mol1.aminoAcidsAtomIds.Count; ++a1) {
             int [] ids1 = mol1.aminoAcidsAtomIds[a1];
             for (int b1 = 1; b1 != ids1.Length; ++b1) {
               int i1 = ids1[b1];
+              // compensate for centering transform
               Vector3 pos1 = mol1.atom_centres[i1] + mol1.pos;
-              //if (i1 < 10) Debug.Log("" + i1 + ": " + pos1);
 
-              if ((pos0 - pos1).sqrMagnitude < 16) {
+              if ((pos0 - pos1).sqrMagnitude < max_distance * max_distance) {
                 hint_pairs.Add(i0);
                 hint_pairs.Add(i1);
                 //Debug.Log("[" + pos0 + "] [" + pos1 + "] " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
@@ -1762,7 +1763,21 @@ public class BioBlox : MonoBehaviour
           }
         }
       }
+    }
 
+    public void ResetDisabledAminoAcids()
+    {
+        foreach(AminoButtonController abc in aminoSlider.A1Buttons)
+        {
+            if (abc.is_disabled)
+                abc.DisableAminoReset();
+        }
+
+        foreach (AminoButtonController abc in aminoSlider.A2Buttons)
+        {
+            if (abc.is_disabled)
+                abc.DisableAminoReset();
+        }
     }
 }
 

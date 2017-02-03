@@ -693,6 +693,7 @@ public class UIController : MonoBehaviour {
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         RestartCamera();
+        BioBloxReference.ResetDisabledAminoAcids();
         aminoSliderController.DeleteAllAminoConnections();
         //reset position
         BioBloxReference.RestartProteinPositions();
@@ -717,6 +718,11 @@ public class UIController : MonoBehaviour {
         RestartCameraFromIntro();
         DropDownP1.value = 0;
         DropDownP2.value = 0;
+        BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
+        BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
+        aminoSliderController.DeselectAmino();
+        DeselectAtoms();
+
         isOverUI = false;
     }
 

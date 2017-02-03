@@ -20,28 +20,28 @@ public class CameraRotation : MonoBehaviour {
         if (Input.GetKey(KeyCode.UpArrow))
         {
             coordinate = transform.localPosition.y;
-            coordinate++;
+            coordinate += 0.5f;
             transform.localPosition = new Vector3(transform.localPosition.x, coordinate, transform.localPosition.z);
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
         {
             coordinate = transform.localPosition.y;
-            coordinate--;
+            coordinate -= 0.5f;
             transform.localPosition = new Vector3(transform.localPosition.x, coordinate, transform.localPosition.z);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             coordinate = transform.localPosition.x;
-            coordinate--;
+            coordinate -= 0.5f;
             transform.localPosition = new Vector3(coordinate, transform.localPosition.y, transform.localPosition.z);
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
             coordinate = transform.localPosition.x;
-            coordinate++;
+            coordinate += 0.5f;
             transform.localPosition = new Vector3(coordinate, transform.localPosition.y, transform.localPosition.z);
         }
 

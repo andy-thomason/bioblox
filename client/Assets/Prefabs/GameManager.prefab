@@ -220,7 +220,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1000010119993836
 GameObject:
   m_ObjectHideFlags: 1
@@ -885,7 +885,7 @@ GameObject:
   - 222: {fileID: 222000012169249598}
   - 114: {fileID: 114000013674018328}
   m_Layer: 0
-  m_Name: slider_text
+  m_Name: disable_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3008,6 +3008,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1000012238739884
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 224000011419077466}
+  - 222: {fileID: 222000010600004564}
+  - 114: {fileID: 114000013515174028}
+  m_Layer: 0
+  m_Name: slider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1000012240828210
 GameObject:
   m_ObjectHideFlags: 1
@@ -3190,7 +3207,7 @@ GameObject:
   - 222: {fileID: 222000012943914140}
   - 114: {fileID: 114000010887972470}
   m_Layer: 0
-  m_Name: slider_text (1)
+  m_Name: title
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5226,7 +5243,7 @@ GameObject:
   - 222: {fileID: 222000013979599888}
   - 114: {fileID: 114000010740691080}
   m_Layer: 0
-  m_Name: slider
+  m_Name: disable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5314,6 +5331,23 @@ GameObject:
   - 114: {fileID: 114000014087005666}
   m_Layer: 5
   m_Name: n_atom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!1 &1000013725289002
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 224: {fileID: 224000011075398544}
+  - 222: {fileID: 222000012812323590}
+  - 114: {fileID: 114000012676448432}
+  m_Layer: 0
+  m_Name: slider_text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10965,7 +10999,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: 92bd9aca89235a94aaf85872f406ce97, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0546c7da4a34c954e86b5d0a7c65a4b3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -16491,6 +16525,39 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: LEFT CLICK OVER THE PROTEIN TO SELECT A RESIDUE AND ROTATE THE PROTEINS
+--- !u!114 &114000012676448432
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013725289002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 708705254, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 01f00bd58056ba1459d5f9c182eefa14, type: 3}
+    m_FontSize: 23
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 10
+    m_MaxSize: 40
+    m_Alignment: 1
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 1
+    m_LineSpacing: 1
+  m_Text: DRAG THIS SLIDER TO PULL THE PROTEINS TOGETHER
 --- !u!114 &114000012681594066
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -19001,6 +19068,33 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 'Score: '
+--- !u!114 &114000013515174028
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012238739884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Sprite: {fileID: 21300000, guid: 92bd9aca89235a94aaf85872f406ce97, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
 --- !u!114 &114000013521266970
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -19451,7 +19545,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: DRAG THIS SLIDER TO PULL THE PROTEINS TOGETHER
+  m_Text: RIGHT CLICK OVER THE RESIDUE TO DISABLE IT FROM PHYSICS AND SCORING
 --- !u!114 &114000013675135968
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -22020,6 +22114,12 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010425704130}
+--- !u!222 &222000010600004564
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012238739884}
 --- !u!222 &222000010630996960
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -22980,6 +23080,12 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000011412315348}
+--- !u!222 &222000012812323590
+CanvasRenderer:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013725289002}
 --- !u!222 &222000012818237848
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -24787,16 +24893,16 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010654537222}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000011213263510}
-  m_RootOrder: 6
+  m_RootOrder: 17
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -39, y: -56}
+  m_AnchoredPosition: {x: -39, y: -63}
   m_SizeDelta: {x: 356.01, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000010873800994
@@ -24927,6 +25033,24 @@ RectTransform:
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!224 &224000011075398544
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013725289002}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 224000011213263510}
+  m_RootOrder: 6
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -39, y: 94}
+  m_SizeDelta: {x: 356.01, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000011076491992
 RectTransform:
@@ -25152,13 +25276,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 224000011973427370}
+  - {fileID: 224000011419077466}
   - {fileID: 224000010418439834}
   - {fileID: 224000011807271916}
   - {fileID: 224000013579956968}
   - {fileID: 224000013685328434}
   - {fileID: 224000011635431742}
-  - {fileID: 224000010870372626}
+  - {fileID: 224000011075398544}
   - {fileID: 224000011336070854}
   - {fileID: 224000012256012036}
   - {fileID: 224000012921910700}
@@ -25168,6 +25292,8 @@ RectTransform:
   - {fileID: 224000013229889436}
   - {fileID: 224000013745344896}
   - {fileID: 224000011191858794}
+  - {fileID: 224000011973427370}
+  - {fileID: 224000010870372626}
   m_Father: {fileID: 224000013336640336}
   m_RootOrder: 3
   m_AnchorMin: {x: 0, y: 0}
@@ -25392,6 +25518,24 @@ RectTransform:
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -134.1, y: 72}
   m_SizeDelta: {x: 138.3, y: 46.5}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!224 &224000011419077466
+RectTransform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012238739884}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.58034164, y: 0.5803417, z: 0.5803417}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 224000011213263510}
+  m_RootOrder: 0
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -43, y: 218}
+  m_SizeDelta: {x: 74, y: 351}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000011425480670
 RectTransform:
@@ -26364,17 +26508,17 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000013653943118}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.84286666, y: 0.84286684, z: 0.84286684}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 224000011213263510}
-  m_RootOrder: 0
+  m_RootOrder: 16
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -43, y: 135}
-  m_SizeDelta: {x: 74, y: 351}
+  m_AnchoredPosition: {x: -43, y: -20}
+  m_SizeDelta: {x: 134, y: 62}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000011975640996
 RectTransform:
