@@ -186,6 +186,8 @@ public class BioBlox : MonoBehaviour
 
     bool loaded = false;
 
+    List<int> hint_pairs;
+
     public enum GameState
     {
         Setup,
@@ -1584,6 +1586,8 @@ public class BioBlox : MonoBehaviour
         BitArray bad1 = new BitArray(molecules_PDB_mesh[1].mol.atom_centres.Length);
         atoms_disabled = new BitArray[] { bad0, bad1 };
 
+        find_hint_pairs(molecules_PDB_mesh[0].mol, molecules_PDB_mesh[1].mol);
+
         // Ioannis scoring
         scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
 
@@ -1733,6 +1737,32 @@ public class BioBlox : MonoBehaviour
         molecules[1].transform.localPosition = (level.offset + xoff);
         molecules[0].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
         molecules[1].transform.localRotation = Quaternion.Euler(new Vector3(0, 0, -90.0f));
+    }
+
+    void find_hint_pairs(PDB_molecule mol0, PDB_molecule mol1) {
+      for (int a0 = 0; a0 != mol0.aminoAcidsAtomIds.Count; ++a0) {
+        int [] ids0 = mol0.aminoAcidsAtomIds[a0];
+        for (int b0 = 0; b0 != ids0.Length; ++b0) {
+          int i0 = ids0[b0];
+          Vector3 pos0 = mol0.atom_centres[i0] + mol0.pos;
+          //if (i0 < 10) Debug.Log("" + i0 + ": " + pos0);
+          for (int a1 = 1; a1 != mol1.aminoAcidsAtomIds.Count; ++a1) {
+            int [] ids1 = mol1.aminoAcidsAtomIds[a1];
+            for (int b1 = 1; b1 != ids1.Length; ++b1) {
+              int i1 = ids1[b1];
+              Vector3 pos1 = mol1.atom_centres[i1] + mol1.pos;
+              //if (i1 < 10) Debug.Log("" + i1 + ": " + pos1);
+
+              if ((pos0 - pos1).sqrMagnitude < 16) {
+                hint_pairs.Add(i0);
+                hint_pairs.Add(i1);
+                //Debug.Log("[" + pos0 + "] [" + pos1 + "] " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
+              }
+            }
+          }
+        }
+      }
+
     }
 }
 
