@@ -1741,6 +1741,7 @@ public class BioBlox : MonoBehaviour
 
     // hint_pairs is a list of atom indices that are close to each other in the docked configuration
     void find_hint_pairs(PDB_molecule mol0, PDB_molecule mol1, float max_distance=4) {
+      hint_pairs = new List<int>();
       for (int a0 = 0; a0 != mol0.aminoAcidsAtomIds.Count; ++a0) {
         int [] ids0 = mol0.aminoAcidsAtomIds[a0];
         for (int b0 = 0; b0 != ids0.Length; ++b0) {
