@@ -35,31 +35,33 @@ public class BioBlox : MonoBehaviour
     public string lod_bs;
     public Vector3 offset;
       public float separation;
+        public float docking_degrees;
 
-      public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_bs, Vector3 offset, float separation) {
+      public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_bs, Vector3 offset, float separation, float docking_degrees) {
         this.pdbFile = pdbFile;
         this.chainsA = chainsA;
         this.chainsB =chainsB;
             this.lod = lod;
             this.lod_bs = lod_bs;
             this.offset = offset;
-        this.separation = separation;
-      }
+            this.separation = separation;
+            this.docking_degrees = docking_degrees;
+        }
     };
 
     Level[] levels = {
-       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35),
-       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
-       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
-       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
-       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40),
-       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40),
-       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40)
+       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90),
+       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45),
+       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40, 0)
     };
 
     enum protein_view {normal, transparent, bs};
@@ -187,9 +189,9 @@ public class BioBlox : MonoBehaviour
     bool loaded = false;
 
     #region HINT MOVEMENT
-    Vector3 docking_position_0;
+    //Vector3 docking_position_0;
     Quaternion docking_rotation_0;
-    Vector3 docking_position_1;
+    //Vector3 docking_position_1;
     Quaternion docking_rotation_1;
     float journeyLength_0;
     float journeyLength_1;
@@ -238,6 +240,8 @@ public class BioBlox : MonoBehaviour
     public Sprite sprite_score_good;
     public Image current_score_sprite;
 
+    GameObject line_renderer_object;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -260,7 +264,8 @@ public class BioBlox : MonoBehaviour
 
         eventSystem = EventSystem.current;
         //update
-        line_renderer = GameObject.FindObjectOfType<LineRenderer>() as LineRenderer;
+        line_renderer = FindObjectOfType<LineRenderer>() as LineRenderer;
+        line_renderer_object = FindObjectOfType<LineRenderer>().gameObject;
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         //first eprson
         aminoSlider = FindObjectOfType<AminoSliderController>();
@@ -481,27 +486,31 @@ public class BioBlox : MonoBehaviour
 
         if(is_hint_moving)
         {
-            //float distCovered = (Time.time - startTime) * speed;
-            //float fracJourney = distCovered / journeyLength_0;
-            //molecules[0].transform.GetChild(0).transform.position = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, docking_position_0, fracJourney);
-            //molecules[0].transform.GetChild(0).transform.rotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
-
-            //fracJourney = distCovered / journeyLength_1;
-            //molecules[1].transform.GetChild(0).transform.position = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, docking_position_1, fracJourney);
-            //molecules[1].transform.GetChild(0).transform.rotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
 
             float distCovered = (Time.time - startTime) * speed;
             float fracJourney = distCovered / journeyLength_0;
-            molecules[0].transform.localPosition = Vector3.Lerp(molecules[0].transform.localPosition, Vector3.zero, fracJourney);
-            molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, docking_position_0, fracJourney);
+
+            //Debug.Log(molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos);
+
+            molecules[0].transform.localPosition = Vector3.Lerp(molecules[0].transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
+
+            //molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
+
             molecules[0].transform.localRotation = Quaternion.Lerp(molecules[0].transform.localRotation, Quaternion.identity, fracJourney);
             molecules[0].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
 
             fracJourney = distCovered / journeyLength_1;
+
+
             molecules[1].transform.localPosition = Vector3.Lerp(molecules[1].transform.localPosition, Vector3.zero, fracJourney);
-            molecules[1].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, docking_position_1, fracJourney);
+
+            //molecules[1].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, Vector3.zero, fracJourney);
+
             molecules[1].transform.localRotation = Quaternion.Lerp(molecules[1].transform.localRotation, Quaternion.identity, fracJourney);
             molecules[1].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
+
+            //rotate parent(molecules vertical instead of horizontal) if needed. LEvel struct parameter
+            molecules[0].transform.parent.transform.localRotation = Quaternion.Lerp(molecules[0].transform.parent.transform.localRotation, Quaternion.Euler(0,0,levels[current_level].docking_degrees), fracJourney);
         }
     }
 
@@ -1653,7 +1662,7 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
         parent_molecule_reference.SetActive(true);
         //save the docking position/rotation of the protein 0
-        docking_position_0 = parent_molecule_reference.transform.localPosition;
+        //docking_position_0 = parent_molecule_reference.transform.localPosition;
         docking_rotation_0 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_0);
 
@@ -1671,7 +1680,7 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
         parent_molecule_reference.SetActive(true);
         //save the docking position/rotation of the protein 0
-        docking_position_1 = parent_molecule_reference.transform.localPosition;
+        //docking_position_1 = parent_molecule_reference.transform.localPosition;
         docking_rotation_1 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_1);
 
@@ -1872,6 +1881,8 @@ public class BioBlox : MonoBehaviour
             default_rotation_molecule_0 = molecules[0].transform.localRotation;
             default_position_molecule_1 = molecules[1].transform.localPosition;
             default_rotation_molecule_1 = molecules[1].transform.localRotation;
+            //hide the chain
+            line_renderer_object.SetActive(is_hint_moving);
             is_hint_moving = !is_hint_moving;
         }
         else
@@ -1883,6 +1894,10 @@ public class BioBlox : MonoBehaviour
             molecules[0].transform.localRotation = default_rotation_molecule_0;
             molecules[1].transform.localPosition = default_position_molecule_1;
             molecules[1].transform.localRotation = default_rotation_molecule_1;
+            //restart camera
+            molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
+            //show the chain
+            line_renderer_object.SetActive(is_hint_moving);
 
             is_hint_moving = !is_hint_moving;
         }

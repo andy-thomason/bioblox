@@ -217,6 +217,8 @@ public class OverlayRenderer : MonoBehaviour {
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                             }
 
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material[atom] : P2atom_material[atom];
+
                             if (is_bad)
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
                             else

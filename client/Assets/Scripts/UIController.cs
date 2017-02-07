@@ -497,6 +497,18 @@ public class UIController : MonoBehaviour {
         isProtein2Fixed = !isProtein2Fixed;
     }
 
+    public void FixProtein1_save()
+    {
+        BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = !isProtein1Fixed;
+        isProtein1Fixed = !isProtein1Fixed;
+    }
+
+    public void FixProtein2_save()
+    {
+        BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
+        isProtein2Fixed = !isProtein2Fixed;
+    }
+
 
 
     public void ChangeRenderProtein1()
@@ -988,6 +1000,8 @@ public class UIController : MonoBehaviour {
     public void OpenSavePanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+        FixProtein1_save();
+        FixProtein2_save();
         SavePanel.SetActive(true);
     }
 
@@ -996,6 +1010,8 @@ public class UIController : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.button_click);
         SavePanel.SetActive(false);
         isOverUI = false;
+        FixProtein1_save();
+        FixProtein2_save();
     }
 
     public void SubmitSaveToServer(int slot)
@@ -1034,6 +1050,8 @@ public class UIController : MonoBehaviour {
         BioBloxReference.validating_holder.SetActive(true);
         isOverUI = false;
         BioBloxReference.is_validating = true;
+        FixProtein1_save();
+        FixProtein2_save();
     }
 
     void UpdateLocalScore(int slot, string n_atoms, string lpj, string ei, string game_score)

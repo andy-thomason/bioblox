@@ -19,6 +19,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     SFX sfx;
     AminoSliderController aminoSli;
     UIController ui;
+    int selected_index = 4;
 
     void Start()
     {
@@ -68,6 +69,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             aminoSli.UpdateCurrentButtonA1(AminoButtonID);
             //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         }
+        //highlight color
+        transform.GetChild(selected_index).gameObject.SetActive(true);
         aminoSli.ChangeAminoAcidSelection (gameObject);
     }
 
@@ -80,7 +83,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void DisableAmino()
     {
         is_disabled = !is_disabled;
-        transform.GetChild(3).gameObject.SetActive(is_disabled);
+        transform.GetChild(4).gameObject.SetActive(is_disabled);
 
         for (int i = 0; i < amino_id.Length; i++)
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
@@ -91,7 +94,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void DisableAminoReset()
     {
         is_disabled = !is_disabled;
-        transform.GetChild(3).gameObject.SetActive(is_disabled);
+        transform.GetChild(4).gameObject.SetActive(is_disabled);
 
         for (int i = 0; i < amino_id.Length; i++)
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;

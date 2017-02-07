@@ -64,6 +64,7 @@ public class GameManager : MonoBehaviour {
     public void EndLoading()
     {
         loading_panel.SetActive(false);
+        FindObjectOfType<UIController>().isOverUI = false;
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
     }
 
