@@ -873,9 +873,9 @@ end_header
 
     static public int collide_ray(
         GameObject obj, PDB_molecule mol, Transform t,
-        Ray ray)
+        Ray ray, float shrinker=1)
     {
-        BvhRayCollider b = new BvhRayCollider (mol, t, ray);
+        BvhRayCollider b = new BvhRayCollider (mol, t, ray, shrinker);
         int closestIndex = -1;
         float closestDistance = float.MaxValue;
         for (int i=0; i<b.results.Count; i++) {
@@ -896,7 +896,7 @@ end_header
         GameObject obj, PDB_molecule mol, Transform t,
         Ray ray, GameObject other_obj)
     {
-        BvhRayCollider b = new BvhRayCollider(mol, t, ray);
+        BvhRayCollider b = new BvhRayCollider(mol, t, ray, 1);
         int closestIndex = -1;
         float closestDistance = float.MaxValue;
         for (int i = 0; i < b.results.Count; i++)
