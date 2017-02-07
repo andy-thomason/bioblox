@@ -184,7 +184,7 @@ public class BioBlox : MonoBehaviour
     public Transform Molecules;
     public Toggle ToggleMode;
 
-    bool loaded = false;
+    //bool loaded = false;
 
     #region HINT MOVEMENT
     Vector3 docking_position_0;
@@ -1499,7 +1499,7 @@ public class BioBlox : MonoBehaviour
     public Material normal_1;
     public Material bs_0;
     public Material bs_1;
-    bool switch_material = true;
+    //bool switch_material = true;
     //bool switch_material = true;
 
     //fix the transparent molecule
@@ -1828,9 +1828,12 @@ public class BioBlox : MonoBehaviour
               Vector3 pos1 = mol1.atom_centres[i1] + mol1.pos;
 
               if ((pos0 - pos1).sqrMagnitude < max_distance * max_distance) {
+                Vector3 dir = (pos0 - pos1).normalized;
+                float d0 = Vector3.Dot(mol0.atom_centres[i0].normalized, dir);
+                float d1 = Vector3.Dot(mol1.atom_centres[i1].normalized, dir);
                 hint_pairs.Add(i0);
                 hint_pairs.Add(i1);
-                //Debug.Log("[" + pos0 + "] [" + pos1 + "] " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
+                if (d0 > 0.3f && d1 > 0.3f) Debug.Log("[" + pos0 + "] [" + pos1 + "] d0=" + d0 + " d1=" + d1 + " " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
               }
             }
           }

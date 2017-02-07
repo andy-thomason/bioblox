@@ -23,7 +23,7 @@ public class PDB_mesh : MonoBehaviour {
     // add atom indices to here to display them selected
     public int[] selected_atoms = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     SFX sfx;
-    int last_atom_scanned = -1;
+    //int last_atom_scanned = -1;
 
     public int number_of_current_atoms;
 
@@ -245,8 +245,12 @@ public class PDB_mesh : MonoBehaviour {
 
         //create the ray
         ray = cam.ScreenPointToRay (Input.mousePosition);
+
+        // reduce this to 0.3 or so if in Skeleton mode.
+        // shrink ray PEDRO!
+        float shrinker = 1.0f;
         //create a ray to the cursor and cast it, if it hits at all
-        int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray);
+        int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray, shrinker);
         Vector3 mousePos = Input.mousePosition;
 
         if (Input.GetMouseButtonDown(0) && !uIController.isOverUI)
@@ -287,7 +291,7 @@ public class PDB_mesh : MonoBehaviour {
             if (rotating && !has_rotated)
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
-                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
                 if (atom != -1)
                 {
                     SelectAtom(atom);
@@ -302,7 +306,7 @@ public class PDB_mesh : MonoBehaviour {
             if (camera_rotation == mo_m.localRotation && camera_position == mo_m.localPosition)
             {
                 Ray r = cam.ScreenPointToRay(Input.mousePosition);
-                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
                 if (atom != -1)
                 {
                     GetAminoId(atom);

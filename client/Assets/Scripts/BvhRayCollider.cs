@@ -13,6 +13,7 @@ public class BvhRayCollider
 	Transform t;
 	Ray ray;
 	int work_done=0;
+  float shrinker;
 
 	public struct Result
 	{
@@ -54,7 +55,7 @@ public class BvhRayCollider
 					collide_recursive(bvh*2+1);
 					collide_recursive(bvh*2+2);
 			}
-			else
+			else if (d < bvh_radius * bvh_radius * shrinker * shrinker)
 			{
 				results.Add(new Result(terminal));
 			}
@@ -96,11 +97,12 @@ public class BvhRayCollider
 		}
 	}
 	
-	public BvhRayCollider(PDB_molecule mol,Transform t, Ray ray)
+	public BvhRayCollider(PDB_molecule mol,Transform t, Ray ray, float shrinker)
 	{
 		this.mol=mol;
 		this.t=t;
 		this.ray=ray;
+    this.shrinker = shrinker;
 		results =new List<Result>();
 		collide_recursive(0);
 	}
