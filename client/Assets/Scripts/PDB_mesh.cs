@@ -219,6 +219,9 @@ public class PDB_mesh : MonoBehaviour {
     Vector3 camera_position;
     Quaternion camera_rotation;
 
+    public enum protein_render_options { normal, transparent, bs, carbon };
+    public int protein_render = 0;
+
     void Awake()
     {
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
@@ -248,7 +251,7 @@ public class PDB_mesh : MonoBehaviour {
 
         // reduce this to 0.3 or so if in Skeleton mode.
         // shrink ray PEDRO!
-        float shrinker = 1.0f;
+        float shrinker = protein_render == protein_render_options.normal.GetHashCode() ? 1.0f : protein_render == protein_render_options.transparent.GetHashCode() ? 1.0f : 0.3f;
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray, shrinker);
         Vector3 mousePos = Input.mousePosition;

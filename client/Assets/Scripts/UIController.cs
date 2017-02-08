@@ -629,6 +629,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules_PDB_mesh[protein_index].protein_render = PDB_mesh.protein_render_options.normal.GetHashCode();
         UpdateMeshCutaway(protein_index, 0);
         //CheckDefaultMesh(protein_index);
     }
@@ -639,6 +640,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(true);
+        BioBloxReference.molecules_PDB_mesh[protein_index].protein_render = PDB_mesh.protein_render_options.transparent.GetHashCode();
         //CheckDefaultMesh(protein_index);
     }
 
@@ -648,6 +650,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules_PDB_mesh[protein_index].protein_render = PDB_mesh.protein_render_options.bs.GetHashCode();
         UpdateMeshCutaway(protein_index, 2);
         //CheckDefaultMesh(protein_index);
     }
@@ -658,6 +661,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(transparent_render).gameObject.SetActive(false);
+        BioBloxReference.molecules_PDB_mesh[protein_index].protein_render = PDB_mesh.protein_render_options.carbon.GetHashCode();
         UpdateMeshCutaway(protein_index, 3);
         //CheckDefaultMesh(protein_index);
     }
