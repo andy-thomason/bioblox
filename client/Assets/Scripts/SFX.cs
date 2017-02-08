@@ -20,7 +20,7 @@ public class SFX : MonoBehaviour {
 
     void Update()
     {
-        if (audioSource[0].volume < 0.2f)
+        if (audioSource[0].volume < 0.1f)
         {
             audioSource[0].volume += 0.005f;
         }
