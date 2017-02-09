@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
@@ -21,6 +22,10 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     UIController ui;
     int selected_index = 4;
 
+    public List<int> dock_amino_id;
+    public List<int> dock_atom_id;
+    public List<string> dock_amino_name_tag_atom;
+
     void Start()
     {
         bb = FindObjectOfType<BioBlox>();
@@ -33,7 +38,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
-            DisableAmino();
+            DisplayAminoInfo();
+            //DisableAmino();
 
         sfx.PlayTrack(SFX.sound_index.amino_click);
     }
@@ -98,5 +104,16 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
         for (int i = 0; i < amino_id.Length; i++)
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
+    }
+
+    public void DisplayAminoInfo()
+    {
+        if(dock_amino_id.Count != 0)
+        {
+            for(int i = 0; i < dock_amino_id.Count; i++)
+            {
+                Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
+            }
+        }
     }
 }
