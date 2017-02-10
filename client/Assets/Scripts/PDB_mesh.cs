@@ -459,7 +459,7 @@ public class PDB_mesh : MonoBehaviour {
             {
                 if (ids[j] == atom)
                 {
-                    aminoSliderController.SliderMol[protein_id].transform.GetChild(i).GetComponent<AminoButtonController>().DisableAmino();
+                    aminoSliderController.SliderMol[protein_id].transform.GetChild(i).GetComponent<AminoButtonController>().DisplayAminoInfo();
                     aminoSliderController.HighLight3DMesh(i, protein_id);
                 }
             }
