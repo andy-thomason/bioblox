@@ -1119,6 +1119,5 @@ public class UIController : MonoBehaviour {
             Destroy(AminoButton_Atom_reference_1);
             AminoButton_reference_1.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
         }
-
     }
 }
