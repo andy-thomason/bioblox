@@ -30198,6 +30198,9 @@ MonoBehaviour:
   AminoButton_Atom_reference_1: {fileID: 0}
   AminoButton_reference_1: {fileID: 0}
   CloseAtomPanel: {fileID: 21300000, guid: 117e2e82720f5834ab08cf6af7d16749, type: 3}
+  GridToggleButton: {fileID: 1358176985}
+  GridToggleColor_normal: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+  GridToggleColor_pressed: {r: 0.57254905, g: 0.8, b: 0, a: 1}
   previous_level: -1
   cutawayON: 0
   time_to_save: 0
@@ -31717,7 +31720,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1624556580}
   m_Direction: 3
   m_Value: 1
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -43196,7 +43199,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 54.000244, y: 104.1}
+  m_AnchoredPosition: {x: 54.000305, y: 104.1}
   m_SizeDelta: {x: 110, y: 313.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1320799540
@@ -44534,6 +44537,127 @@ Prefab:
 Transform:
   m_PrefabParentObject: {fileID: 453972, guid: b2e44d4f87561c44d8f60c5063d27244, type: 2}
   m_PrefabInternal: {fileID: 1354640584}
+--- !u!1001 &1358176983
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1464341408}
+    m_Modifications:
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 114807483317151030, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 913013348}
+    - target: {fileID: 114807483317151030, guid: 78539450a1dfe0548a84901010d51878,
+        type: 2}
+      propertyPath: m_Delegates.Array.data[0].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ToggleGrid
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 78539450a1dfe0548a84901010d51878, type: 2}
+  m_IsPrefabParent: 0
+--- !u!224 &1358176984 stripped
+RectTransform:
+  m_PrefabParentObject: {fileID: 224284156051234338, guid: 78539450a1dfe0548a84901010d51878,
+    type: 2}
+  m_PrefabInternal: {fileID: 1358176983}
+--- !u!114 &1358176985 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114840163014944312, guid: 78539450a1dfe0548a84901010d51878,
+    type: 2}
+  m_PrefabInternal: {fileID: 1358176983}
+  m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
 --- !u!1001 &1360598143
 Prefab:
   m_ObjectHideFlags: 0
@@ -47591,8 +47715,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1885682006}
   m_HandleRect: {fileID: 1885682005}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.99999994
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -48629,6 +48753,7 @@ RectTransform:
   - {fileID: 665749557}
   - {fileID: 1196021963}
   - {fileID: 1780153030}
+  - {fileID: 1358176984}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -64352,7 +64477,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 3
   m_Value: 0
-  m_Size: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
