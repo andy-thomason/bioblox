@@ -21,6 +21,10 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     AminoSliderController aminoSli;
     UIController ui;
     int selected_index = 0;
+    public GameObject AminoButton_Atom;
+    public Sprite OpenAtomPanel;
+    public Sprite CloseAtomPanel;
+    bool is_AminoButton_Atom_open = false;
 
     public List<int> dock_amino_id;
     public List<int> dock_atom_id;
@@ -115,5 +119,27 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
                 Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
             }
         }
+    }
+
+    public void SpawnAminoButton_Atom()
+    {
+        if(!is_AminoButton_Atom_open)
+        {
+            ui.EraseAminoButton_Atom_reference();
+            transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
+            GameObject temp_panel = Instantiate(AminoButton_Atom);
+            temp_panel.transform.SetParent(transform.parent, false);
+            temp_panel.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+            ui.AminoButton_Atom_reference = temp_panel;
+            ui.AminoButton_reference = gameObject;
+        }
+        else
+        {
+            transform.GetChild(2).GetComponent<Image>().sprite = OpenAtomPanel;
+            Destroy(transform.parent.GetChild(transform.GetSiblingIndex() + 1).gameObject);
+        }
+
+        is_AminoButton_Atom_open = !is_AminoButton_Atom_open;
+        HighLightOnClick();
     }
 }

@@ -171,6 +171,10 @@ public class UIController : MonoBehaviour {
 
     public Text[] slot_score;
 
+    public GameObject AminoButton_Atom_reference;
+    public GameObject AminoButton_reference;
+    public Sprite CloseAtomPanel;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -1095,5 +1099,15 @@ public class UIController : MonoBehaviour {
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         gm.tutorial_panel.SetActive(true);
+    }
+
+    public void EraseAminoButton_Atom_reference()
+    {
+        if (AminoButton_Atom_reference != null)
+        {
+            Destroy(AminoButton_Atom_reference);
+            AminoButton_reference.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
+        }
+
     }
 }

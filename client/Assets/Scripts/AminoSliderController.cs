@@ -371,10 +371,9 @@ public class AminoSliderController : MonoBehaviour
         AminoButtonReference = Instantiate(AminoButton);
         //update the gameobejct name to grab later
         AminoButtonReference.name = index.ToString();
-
         A1Buttons.Add(AminoButtonReference.GetComponent<AminoButtonController>());
         AminoButtonReference.transform.SetParent(SliderMol[0].transform, false);
-        AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
+        AminoButtonReference.transform.GetChild(1).GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
         //store the color in the button
         //AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
         //AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
@@ -403,7 +402,7 @@ public class AminoSliderController : MonoBehaviour
         AminoButtonReference.name = index.ToString();
         A2Buttons.Add(AminoButtonReference.GetComponent<AminoButtonController>());
         AminoButtonReference.transform.SetParent(SliderMol[1].transform, false);
-        AminoButtonReference.GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
+        AminoButtonReference.transform.GetChild(1).GetComponent<Image>().color = buttonStructure.NormalColor[currentAmino];
         //store the color in the button
         //AminoButtonReference.GetComponent<AminoButtonController>().NormalColor = buttonStructure.NormalColor [currentAmino];		
         //AminoButtonReference.GetComponent<AminoButtonController>().FunctionColor = buttonStructure.FunctionColor [currentAmino];
