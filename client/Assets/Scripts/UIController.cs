@@ -636,6 +636,7 @@ public class UIController : MonoBehaviour {
 
     public void ToggleNormalMesh(int protein_index)
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -647,6 +648,7 @@ public class UIController : MonoBehaviour {
 
     public void ToggleTransparentMesh(int protein_index)
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -657,6 +659,7 @@ public class UIController : MonoBehaviour {
 
     public void ToggleBSMesh(int protein_index)
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -668,6 +671,7 @@ public class UIController : MonoBehaviour {
 
     public void ToggleCMesh(int protein_index)
     {
+        sfx.PlayTrack(SFX.sound_index.button_click);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
@@ -1129,6 +1133,7 @@ public class UIController : MonoBehaviour {
     public void ToggleGrid()
     {
         floor.SetActive(!is_grid_active);
-        GridToggleButton.color = is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
+        GridToggleButton.color = !is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
+        is_grid_active = !is_grid_active;
     }
 }
