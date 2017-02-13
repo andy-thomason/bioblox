@@ -176,6 +176,11 @@ public class UIController : MonoBehaviour {
     public GameObject AminoButton_Atom_reference_1;
     public GameObject AminoButton_reference_1;
     public Sprite CloseAtomPanel;
+    
+    bool is_grid_active = true;
+    public Image GridToggleButton;
+    public Color GridToggleColor_normal;
+    public Color GridToggleColor_pressed;
 
     void Awake()
 	{
@@ -1119,5 +1124,11 @@ public class UIController : MonoBehaviour {
             Destroy(AminoButton_Atom_reference_1);
             AminoButton_reference_1.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
         }
+    }
+
+    public void ToggleGrid()
+    {
+        floor.SetActive(!is_grid_active);
+        GridToggleButton.color = is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
     }
 }
