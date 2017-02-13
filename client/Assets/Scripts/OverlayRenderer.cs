@@ -150,7 +150,7 @@ public class OverlayRenderer : MonoBehaviour {
                             if (sphere_index < icons_spheres_store.Count)
                             {
                                 //spheres on transparent render protein 0
-                                if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
+                                if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
                                 {
                                     //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                                     icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
