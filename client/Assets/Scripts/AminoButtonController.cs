@@ -51,7 +51,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public void HighLight()
     {
-        if (transform.parent.name == "ContentPanelA2")
+        if (protein_id == 1)
 		{
             bb.molecules_PDB_mesh[1].SelectAminoAcid(AminoButtonID);
             //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
@@ -67,7 +67,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 	public void HighLightOnClick()
     {
         sfx.PlayTrack(SFX.sound_index.amino_click);
-        if (transform.parent.name == "ContentPanelA2")
+        if (protein_id == 1)
 		{
 			bb.molecules_PDB_mesh[1].SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA2(AminoButtonID);
@@ -125,13 +125,22 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     {
         if(!is_AminoButton_Atom_open)
         {
-            ui.EraseAminoButton_Atom_reference();
             transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
             GameObject temp_panel = Instantiate(AminoButton_Atom);
             temp_panel.transform.SetParent(transform.parent, false);
             temp_panel.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
-            ui.AminoButton_Atom_reference = temp_panel;
-            ui.AminoButton_reference = gameObject;
+            if(protein_id == 0)
+            {
+                ui.EraseAminoButton_Atom_reference_0();
+                ui.AminoButton_Atom_reference_0 = temp_panel;
+                ui.AminoButton_reference_0 = gameObject;
+            }
+            else
+            {
+                ui.EraseAminoButton_Atom_reference_1();
+                ui.AminoButton_Atom_reference_1 = temp_panel;
+                ui.AminoButton_reference_1 = gameObject;
+            }
         }
         else
         {

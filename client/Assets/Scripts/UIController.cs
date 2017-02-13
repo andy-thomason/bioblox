@@ -171,8 +171,10 @@ public class UIController : MonoBehaviour {
 
     public Text[] slot_score;
 
-    public GameObject AminoButton_Atom_reference;
-    public GameObject AminoButton_reference;
+    public GameObject AminoButton_Atom_reference_0;
+    public GameObject AminoButton_reference_0;
+    public GameObject AminoButton_Atom_reference_1;
+    public GameObject AminoButton_reference_1;
     public Sprite CloseAtomPanel;
 
     void Awake()
@@ -1101,12 +1103,21 @@ public class UIController : MonoBehaviour {
         gm.tutorial_panel.SetActive(true);
     }
 
-    public void EraseAminoButton_Atom_reference()
+    public void EraseAminoButton_Atom_reference_0()
     {
-        if (AminoButton_Atom_reference != null)
+        if (AminoButton_Atom_reference_0 != null)
         {
-            Destroy(AminoButton_Atom_reference);
-            AminoButton_reference.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
+            Destroy(AminoButton_Atom_reference_0);
+            AminoButton_reference_0.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
+        }
+    }
+
+    public void EraseAminoButton_Atom_reference_1()
+    {
+        if (AminoButton_Atom_reference_1 != null)
+        {
+            Destroy(AminoButton_Atom_reference_1);
+            AminoButton_reference_1.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
         }
 
     }
