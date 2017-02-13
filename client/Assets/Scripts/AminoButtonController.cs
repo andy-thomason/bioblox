@@ -20,7 +20,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     SFX sfx;
     AminoSliderController aminoSli;
     UIController ui;
-    int selected_index = 4;
+    int selected_index = 0;
 
     public List<int> dock_amino_id;
     public List<int> dock_atom_id;
