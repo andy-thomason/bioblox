@@ -35,22 +35,22 @@ public class AminoConnectionHolder : MonoBehaviour {
     public void UpdateLink()
 	{		
 		FindObjectOfType<ConnectionManager> ().DeleteAminoAcidLink (connection);
-		FindObjectOfType<AminoSliderController> ().RestoreDeletedAminoButtons (ID_button1, ID_button2);
+		//FindObjectOfType<AminoSliderController> ().RestoreDeletedAminoButtons (ID_button1, ID_button2);
 		FindObjectOfType<ConnectionManager> ().DisableSlider ();
         //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
-        Destroy (gameObject);
+        //Destroy (gameObject);
 	}
 
     public void DeleteLink()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         cn.DeleteAminoAcidLink(connection);
-        asc.RestoreDeletedAminoButtons(ID_button1, ID_button2);
+        //asc.RestoreDeletedAminoButtons(ID_button1, ID_button2);
         cn.DisableSlider();
-        ui.P1CleanAtomButtons();
-        ui.P2CleanAtomButtons();
-        Destroy(transform.parent.gameObject);
+        //ui.P1CleanAtomButtons();
+        //ui.P2CleanAtomButtons();
+        Destroy(gameObject);
     }
 
     public void HighlightClick()
@@ -113,8 +113,8 @@ public class AminoConnectionHolder : MonoBehaviour {
 
 	void Update()
 	{
-        if (distancia == null) return;
-		distancia.text = (connection.distance).ToString ("F1");
+  //      if (distancia == null) return;
+		//distancia.text = (connection.distance).ToString ("F1");
 	}
 
     //SLIDER amino BUTTONS
@@ -147,18 +147,21 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if ((ID_button1 - 1) >= 0)
             {
-                asc.ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
+                FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
+                //asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
+                asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
-                UpdateLink();
+                FindObjectOfType<ConnectionManager>().DisableSlider();
             }
         }
         else
         {
             if ((ID_button2 - 1) >= 0)
             {
-                asc.ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
+                FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
+                asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
-                UpdateLink();
+                FindObjectOfType<ConnectionManager>().DisableSlider();
             }
         }
        
@@ -171,18 +174,20 @@ public class AminoConnectionHolder : MonoBehaviour {
         {
             if (AminoPanel1.transform.childCount > (ID_button1 + 1))
             {
-                asc.ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
+                FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
+                asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
-                UpdateLink();
+                FindObjectOfType<ConnectionManager>().DisableSlider();
             }
         }
         else
         {
             if (AminoPanel2.transform.childCount > (ID_button2 + 1))
             {
-                asc.ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
+                FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
+                asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
-                UpdateLink();
+                FindObjectOfType<ConnectionManager>().DisableSlider();
             }
         }
     }
