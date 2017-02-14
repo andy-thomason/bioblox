@@ -969,7 +969,7 @@ public class BioBlox : MonoBehaviour
                     {
                         //SPLIT each amino
                         string[] splitScores_amino = (splitScores[i]).Split('-');
-                        aminoSlider.AminoAcidsLinkPanel_load_score(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink(molecules_PDB_mesh[0], int.Parse(splitScores_amino[0]), molecules_PDB_mesh[1], int.Parse(splitScores_amino[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino[1]).gameObject);
+                        aminoSlider._AminoAcidsLinkPanel(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink(molecules_PDB_mesh[0], int.Parse(splitScores_amino[0]), molecules_PDB_mesh[1], int.Parse(splitScores_amino[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino[1]).gameObject);
                     }
 
                     //SET THE ROTATION
