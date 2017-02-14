@@ -38,8 +38,6 @@ public class SFX : MonoBehaviour {
         MuteAll(is_audio_playing);
 
         is_audio_playing = !is_audio_playing;
-
-        audio_mute_image.sprite = is_audio_playing ? audio_on : audio_off;
     }
     #endregion
 

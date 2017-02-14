@@ -301,7 +301,7 @@ public class BioBlox : MonoBehaviour
         //Reset();
         game_status = GameStatus.GameScreen;
         uiController.isOverUI = false;
-        uiController.ToggleHintFromIntro();
+        //uiController.ToggleHintFromIntro();
 
         game_time = 0;
         playing = true;
@@ -802,7 +802,7 @@ public class BioBlox : MonoBehaviour
     {
         Level level = levels[current_level];
 
-        uiController.SetHintImage(level.pdbFile); //HINT
+        //uiController.SetHintImage(level.pdbFile); //HINT
 
         // These filenames refer to the prefabs in Assets/Resources/Mesh
         string mol1_se_filename = "Mesh/" + level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
@@ -1210,12 +1210,12 @@ public class BioBlox : MonoBehaviour
         else
             game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
 
-        if (uiController.expert_mode)
-        {
+        //if (uiController.expert_mode)
+        //{
             ElectricScore.text = "" + ie_score;
             LennardScore.text = "" + lpj_score;
             touching_atoms.text = "" + t_atoms_score;
-        }
+        //}
 
         //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
         game_score.text = "" + game_score_value;
@@ -1826,7 +1826,7 @@ public class BioBlox : MonoBehaviour
           go.transform.position = c;
         }*/
 
-        uiController.SetHintImage(level.pdbFile); //HINT
+        //uiController.SetHintImage(level.pdbFile); //HINT
 
         StartGame();
 

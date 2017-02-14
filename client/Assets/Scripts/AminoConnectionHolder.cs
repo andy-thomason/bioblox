@@ -100,12 +100,12 @@ public class AminoConnectionHolder : MonoBehaviour {
         cn = FindObjectOfType<ConnectionManager>();
         or = FindObjectOfType<OverlayRenderer>();
 
-        if (ui.expert_mode)
-        {
-            transform.GetChild(2).gameObject.SetActive(true);
-            transform.GetChild(3).gameObject.SetActive(true);
-            transform.GetChild(4).gameObject.SetActive(true);
-        }
+        //if (ui.expert_mode)
+        //{
+        //    transform.GetChild(2).gameObject.SetActive(true);
+        //    transform.GetChild(3).gameObject.SetActive(true);
+        //    transform.GetChild(4).gameObject.SetActive(true);
+        //}
 
         connection_id = ui.amino_id;
         ui.amino_id++;

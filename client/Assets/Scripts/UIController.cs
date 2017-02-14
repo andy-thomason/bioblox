@@ -812,7 +812,7 @@ public class UIController : MonoBehaviour {
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
-        ExpertModeOffStart();
+        //ExpertModeOffStart();
         RestartCameraFromIntro();
         DropDownP1.value = 0;
         DropDownP2.value = 0;
@@ -841,11 +841,6 @@ public class UIController : MonoBehaviour {
         HintPanel.SetBool("Start", hint_panel_status);
         HintPanelOpen.SetActive(!hint_panel_status);
         HintPanelClose.SetActive(hint_panel_status);
-    }
-
-    public void SetHintImage(string level_name)
-    {
-        HintImage.sprite = Sprite.Create(Resources.Load<Texture2D>("hint/"+ level_name), HintImage.sprite.rect, HintImage.sprite.pivot);
     }
 
     public void Shadows(bool status, int protein)
@@ -929,12 +924,9 @@ public class UIController : MonoBehaviour {
         foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
     }
 
-    #region TOGGLE GAME MODE
-
-    public Button OnExpert;
-    public Button OffExpert;
-    public bool expert_mode = false;
-    ColorBlock button_color;
+   // #region TOGGLE GAME MODE
+    
+    public bool expert_mode = true;
 
     //public void GameModeClick()
     //{
@@ -944,101 +936,101 @@ public class UIController : MonoBehaviour {
     //    previous_slider_value = slider_game_mode.value;
     //}
 
-    public void ExpertModeOn()
-    {
-        if(!expert_mode)
-        {
-            sfx.PlayTrack(SFX.sound_index.button_click);
-            P1AtomInfo.gameObject.SetActive(!expert_mode);
-            P2AtomInfo.gameObject.SetActive(!expert_mode);
-            score_panel_alpha.alpha = expert_mode ? 0 : 1;
-            expert_mode = !expert_mode;
-            #region set the color OF THE BUTTON ON/OFF
-            //set the color OF THE BUTTON ON/OFF
-            button_color = OnExpert.colors;
-            button_color.normalColor = Color.white;
-            button_color.highlightedColor = Color.white;
-            button_color.pressedColor = Color.white;
-            OnExpert.colors = button_color;
-            //off
-            button_color = OffExpert.colors;
-            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            OffExpert.colors = button_color;
-            #endregion
-            foreach(Transform child in AminoLinkPanel.transform)
-            {
-                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
-                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
-                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
-            }
-        }
-    }
+    //public void ExpertModeOn()
+    //{
+    //    if(!expert_mode)
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.button_click);
+    //        P1AtomInfo.gameObject.SetActive(!expert_mode);
+    //        P2AtomInfo.gameObject.SetActive(!expert_mode);
+    //        score_panel_alpha.alpha = expert_mode ? 0 : 1;
+    //        expert_mode = !expert_mode;
+    //        #region set the color OF THE BUTTON ON/OFF
+    //        //set the color OF THE BUTTON ON/OFF
+    //        button_color = OnExpert.colors;
+    //        button_color.normalColor = Color.white;
+    //        button_color.highlightedColor = Color.white;
+    //        button_color.pressedColor = Color.white;
+    //        OnExpert.colors = button_color;
+    //        //off
+    //        button_color = OffExpert.colors;
+    //        button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        OffExpert.colors = button_color;
+    //        #endregion
+    //        foreach(Transform child in AminoLinkPanel.transform)
+    //        {
+    //            child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+    //            child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+    //            child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+    //        }
+    //    }
+    //}
 
-    public void ExpertModeOff()
-    {
-        if (expert_mode)
-        {
-            sfx.PlayTrack(SFX.sound_index.button_click);
-            P1AtomInfo.gameObject.SetActive(!expert_mode);
-            P2AtomInfo.gameObject.SetActive(!expert_mode);
-            score_panel_alpha.alpha = expert_mode ? 0 : 1;
-            expert_mode = !expert_mode;
-            #region set the color OF THE BUTTON ON/OFF
-            //set the color
-            button_color = OnExpert.colors;
-            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            OnExpert.colors = button_color;
-            //off
-            button_color = OffExpert.colors;
-            button_color.normalColor = Color.white;
-            button_color.highlightedColor = Color.white;
-            button_color.pressedColor = Color.white;
-            OffExpert.colors = button_color;
-            #endregion
-            foreach (Transform child in AminoLinkPanel.transform)
-            {
-                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
-                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
-                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
-            }
-        }
-    }
+    //public void ExpertModeOff()
+    //{
+    //    if (expert_mode)
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.button_click);
+    //        P1AtomInfo.gameObject.SetActive(!expert_mode);
+    //        P2AtomInfo.gameObject.SetActive(!expert_mode);
+    //        score_panel_alpha.alpha = expert_mode ? 0 : 1;
+    //        expert_mode = !expert_mode;
+    //        #region set the color OF THE BUTTON ON/OFF
+    //        //set the color
+    //        button_color = OnExpert.colors;
+    //        button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        OnExpert.colors = button_color;
+    //        //off
+    //        button_color = OffExpert.colors;
+    //        button_color.normalColor = Color.white;
+    //        button_color.highlightedColor = Color.white;
+    //        button_color.pressedColor = Color.white;
+    //        OffExpert.colors = button_color;
+    //        #endregion
+    //        foreach (Transform child in AminoLinkPanel.transform)
+    //        {
+    //            child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+    //            child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+    //            child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
 
-    public void ExpertModeOffStart()
-    {
-        if (expert_mode)
-        {
-            p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
-            p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
-            score_panel_alpha.alpha = expert_mode ? 0 : 1;
-            expert_mode = !expert_mode;
-            #region set the color OF THE BUTTON ON/OFF
-            //set the color
-            button_color = OnExpert.colors;
-            button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
-            OnExpert.colors = button_color;
-            //off
-            button_color = OffExpert.colors;
-            button_color.normalColor = Color.white;
-            button_color.highlightedColor = Color.white;
-            button_color.pressedColor = Color.white;
-            OffExpert.colors = button_color;
-            #endregion
-            foreach (Transform child in AminoLinkPanel.transform)
-            {
-                child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
-                child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
-                child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
-            }
-        }
-    }
-    #endregion
+    //public void ExpertModeOffStart()
+    //{
+    //    if (expert_mode)
+    //    {
+    //        p1_atom_holder.parent.gameObject.SetActive(!expert_mode);
+    //        p2_atom_holder.parent.gameObject.SetActive(!expert_mode);
+    //        score_panel_alpha.alpha = expert_mode ? 0 : 1;
+    //        expert_mode = !expert_mode;
+    //        #region set the color OF THE BUTTON ON/OFF
+    //        //set the color
+    //        button_color = OnExpert.colors;
+    //        button_color.normalColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.highlightedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        button_color.pressedColor = new Color(0.78F, 0.78F, 0.78F, 0.5F);
+    //        OnExpert.colors = button_color;
+    //        //off
+    //        button_color = OffExpert.colors;
+    //        button_color.normalColor = Color.white;
+    //        button_color.highlightedColor = Color.white;
+    //        button_color.pressedColor = Color.white;
+    //        OffExpert.colors = button_color;
+    //        #endregion
+    //        foreach (Transform child in AminoLinkPanel.transform)
+    //        {
+    //            child.transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+    //            child.transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+    //            child.transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
+    //#endregion
   
 
     #region ATOM OVERLAY
