@@ -1237,11 +1237,11 @@ public class BioBlox : MonoBehaviour
         //    current_score_sprite.sprite = sprite_score_normal;
 
         if (t_atoms_score == 0)
-            current_score_sprite.sprite = sprite_score_normal;
+            current_score_sprite.color = Color.white;
         else if (!is_score_valid || game_score_value < 0)
-            current_score_sprite.sprite = sprite_score_error;
+            current_score_sprite.color = Color.red;
         else
-            current_score_sprite.sprite = sprite_score_good;
+            current_score_sprite.color = Color.green;
     }
 
     public void RestartGame()

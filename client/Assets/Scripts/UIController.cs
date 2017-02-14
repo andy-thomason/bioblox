@@ -1202,7 +1202,7 @@ public class UIController : MonoBehaviour {
     public void ToggleGrid()
     {
         floor.SetActive(!is_grid_active);
-        GridToggleButton.color = !is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
+        GridToggleButton.color = is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
         is_grid_active = !is_grid_active;
     }
 }
