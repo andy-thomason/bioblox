@@ -182,6 +182,9 @@ public class UIController : MonoBehaviour {
     public Color GridToggleColor_normal;
     public Color GridToggleColor_pressed;
 
+    public Image[] protein0_render_buttons;
+    public Image[] protein1_render_buttons;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -637,6 +640,22 @@ public class UIController : MonoBehaviour {
     public void ToggleNormalMesh(int protein_index)
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+
+        if(protein_index == 0)
+        {
+            protein0_render_buttons[0].color = GridToggleColor_pressed;
+            protein0_render_buttons[1].color = GridToggleColor_normal;
+            protein0_render_buttons[2].color = GridToggleColor_normal;
+            protein0_render_buttons[3].color = GridToggleColor_normal;
+        }
+        else
+        {
+            protein1_render_buttons[0].color = GridToggleColor_pressed;
+            protein1_render_buttons[1].color = GridToggleColor_normal;
+            protein1_render_buttons[2].color = GridToggleColor_normal;
+            protein1_render_buttons[3].color = GridToggleColor_normal;
+        }
+
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -649,6 +668,22 @@ public class UIController : MonoBehaviour {
     public void ToggleTransparentMesh(int protein_index)
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+
+        if (protein_index == 0)
+        {
+            protein0_render_buttons[0].color = GridToggleColor_normal;
+            protein0_render_buttons[1].color = GridToggleColor_pressed;
+            protein0_render_buttons[2].color = GridToggleColor_normal;
+            protein0_render_buttons[3].color = GridToggleColor_normal;
+        }
+        else
+        {
+            protein1_render_buttons[0].color = GridToggleColor_normal;
+            protein1_render_buttons[1].color = GridToggleColor_pressed;
+            protein1_render_buttons[2].color = GridToggleColor_normal;
+            protein1_render_buttons[3].color = GridToggleColor_normal;
+        }
+
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -660,6 +695,22 @@ public class UIController : MonoBehaviour {
     public void ToggleBSMesh(int protein_index)
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+
+        if (protein_index == 0)
+        {
+            protein0_render_buttons[0].color = GridToggleColor_normal;
+            protein0_render_buttons[1].color = GridToggleColor_normal;
+            protein0_render_buttons[2].color = GridToggleColor_pressed;
+            protein0_render_buttons[3].color = GridToggleColor_normal;
+        }
+        else
+        {
+            protein1_render_buttons[0].color = GridToggleColor_normal;
+            protein1_render_buttons[1].color = GridToggleColor_normal;
+            protein1_render_buttons[2].color = GridToggleColor_pressed;
+            protein1_render_buttons[3].color = GridToggleColor_normal;
+        }
+
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
@@ -672,6 +723,22 @@ public class UIController : MonoBehaviour {
     public void ToggleCMesh(int protein_index)
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+
+        if (protein_index == 0)
+        {
+            protein0_render_buttons[0].color = GridToggleColor_normal;
+            protein0_render_buttons[1].color = GridToggleColor_normal;
+            protein0_render_buttons[2].color = GridToggleColor_normal;
+            protein0_render_buttons[3].color = GridToggleColor_pressed;
+        }
+        else
+        {
+            protein1_render_buttons[0].color = GridToggleColor_normal;
+            protein1_render_buttons[1].color = GridToggleColor_normal;
+            protein1_render_buttons[2].color = GridToggleColor_normal;
+            protein1_render_buttons[3].color = GridToggleColor_pressed;
+        }
+
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
         BioBloxReference.molecules[protein_index].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);

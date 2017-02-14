@@ -157,7 +157,7 @@ public class OverlayRenderer : MonoBehaviour {
                                     add_Icon_sphere(icons_spheres_store[sphere_index]);
                                 }
                                 //spheres on transparent render protein 1
-                                if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
+                                if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
                                 {
                                     //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
                                     icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
@@ -178,7 +178,7 @@ public class OverlayRenderer : MonoBehaviour {
                     {
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() || ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode())
+                            if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
                             {
                                 icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
@@ -202,14 +202,14 @@ public class OverlayRenderer : MonoBehaviour {
                     {
                         if (sphere_index < icons_spheres_store.Count)
                         {
-                            if (ui.DropDownP1.value != UIController.protein_render.normal.GetHashCode() && i == 0)
+                            if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
                             {
                                 //material_to_use = i == 1 ? Atom_1 : Atom_2;
                                 //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
                                 icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
                                 add_Icon_sphere(icons_spheres_store[sphere_index]);
                             }
-                            if (ui.DropDownP2.value != UIController.protein_render.normal.GetHashCode() && i == 1)
+                            if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
                             {
                                 //material_to_use = i == 1 ? Atom_1 : Atom_2;
                                 //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
