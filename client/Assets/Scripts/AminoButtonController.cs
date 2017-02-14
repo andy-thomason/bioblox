@@ -129,6 +129,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             GameObject temp_panel = Instantiate(AminoButton_Atom);
             temp_panel.transform.SetParent(transform.parent, false);
             temp_panel.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
             if(protein_id == 0)
             {
                 ui.EraseAminoButton_Atom_reference_0();
@@ -144,8 +145,21 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         }
         else
         {
-            transform.GetChild(2).GetComponent<Image>().sprite = OpenAtomPanel;
-            Destroy(transform.parent.GetChild(transform.GetSiblingIndex() + 1).gameObject);
+            //transform.GetChild(2).GetComponent<Image>().sprite = OpenAtomPanel;
+            //Destroy(transform.parent.GetChild(transform.GetSiblingIndex() + 1).gameObject);
+
+            if (protein_id == 0)
+            {
+                ui.EraseAminoButton_Atom_reference_0();
+                ui.AminoButton_Atom_reference_0 = null;
+                ui.AminoButton_reference_0 = null;
+            }
+            else
+            {
+                ui.EraseAminoButton_Atom_reference_1();
+                ui.AminoButton_Atom_reference_1 = null;
+                ui.AminoButton_reference_1 = null;
+            }
         }
 
         is_AminoButton_Atom_open = !is_AminoButton_Atom_open;
