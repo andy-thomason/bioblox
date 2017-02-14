@@ -2793,6 +2793,7 @@ GameObject:
   - component: {fileID: 114000011640804382}
   - component: {fileID: 114000012269442680}
   - component: {fileID: 114000010852105316}
+  - component: {fileID: 114104988627795842}
   m_Layer: 5
   m_Name: SFX_on_off
   m_TagString: Untagged
@@ -13889,7 +13890,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114000010004601384}
   m_HandleRect: {fileID: 224000013740748564}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -21990,6 +21991,18 @@ MonoBehaviour:
     m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: 0
+--- !u!114 &114104988627795842
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012109682770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273599c5728f8fc4dab9648a91e5e523, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  is_clicked: 1
 --- !u!222 &222000010003505062
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -26992,11 +27005,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 224000013336640336}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 760, y: -60.7}
+  m_AnchoredPosition: {x: 760, y: -60.700195}
   m_SizeDelta: {x: 49, y: 49}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224000012216779850
@@ -28610,8 +28623,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 224000014006358240}
   - {fileID: 224000012203076586}
+  - {fileID: 224000014006358240}
   - {fileID: 224000013580050774}
   - {fileID: 224000011213263510}
   - {fileID: 224000010080314522}
@@ -29862,7 +29875,7 @@ RectTransform:
   - {fileID: 224000010644797866}
   - {fileID: 4000012094997568}
   m_Father: {fileID: 224000013336640336}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
