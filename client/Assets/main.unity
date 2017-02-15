@@ -28538,6 +28538,7 @@ MonoBehaviour:
   P1AtomsHolder: {fileID: 2120382754}
   P2AtomsHolder: {fileID: 30590353}
   normal_atom_color: {r: 0.36862746, g: 0.36862746, b: 0.36862746, a: 1}
+  current_atom_child_id: 
 --- !u!114 &913013352
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -129,8 +129,9 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             GameObject temp_panel = Instantiate(AminoButton_Atom);
             temp_panel.transform.SetParent(transform.parent, false);
             temp_panel.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+            aminoSli.current_atom_child_id0 = aminoSli.current_atom_child_id1 = 0;
 
-            if(protein_id == 0)
+            if (protein_id == 0)
             {
                 ui.EraseAminoButton_Atom_reference_0();
                 ui.AminoButton_Atom_reference_0 = temp_panel;
@@ -142,6 +143,23 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
                 ui.AminoButton_Atom_reference_1 = temp_panel;
                 ui.AminoButton_reference_1 = gameObject;
             }
+            
+            //get the values
+            PDB_molecule P_mol = bb.molecules_PDB_mesh[protein_id].mol;
+            int[] A_atoms = P_mol.aminoAcidsAtomIds[AminoButtonID];
+
+            //go throuygh atoms and enable
+            for (int i = 0; i < A_atoms.Length; i++)
+            {
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponentInChildren<Text>().text = P_mol.atomNames[A_atoms[i]];
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().protein_id = protein_id;
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().atom_id = A_atoms[i];
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().amino_child_index = AminoButtonID;
+            }
+            temp_panel.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().color = FindObjectOfType<UIController>().GridToggleColor_pressed;
+
         }
         else
         {
@@ -165,4 +183,14 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         is_AminoButton_Atom_open = !is_AminoButton_Atom_open;
         HighLightOnClick();
     }
+
+    //public void HighlightCurrentAtom(int current_child_index)
+    //{
+    //    if(current_atom_child_id != -1)
+    //    {
+    //        transform.parent.GetChild(current_atom_child_id).GetComponent<Image>().color = ui.GridToggleColor_normal;
+    //        transform.parent.GetChild(current_child_index).GetComponent<Image>().color = ui.normal_button_color;
+    //        current_atom_child_id = current_child_index;
+    //    }
+    //}
 }

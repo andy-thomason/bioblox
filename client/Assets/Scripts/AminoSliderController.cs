@@ -140,6 +140,9 @@ public class AminoSliderController : MonoBehaviour
 
     public Color normal_atom_color;
 
+    public int current_atom_child_id0;
+    public int current_atom_child_id1;
+
     void Awake()
     {
         buttonStructure = FindObjectOfType<ButtonStructure>();
@@ -316,11 +319,11 @@ public class AminoSliderController : MonoBehaviour
         //amino buttons
         //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
-        ButtonPickedA1 = null;
-        ButtonPickedA2 = null;
+        ButtonPickedA1 = ButtonPickedA2 = null;
         AddConnection.interactable = false;
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+        current_atom_child_id0 = current_atom_child_id1 = 0;
     }
 
     public void HighLight3DMesh(int index, int molecule)
@@ -1508,5 +1511,38 @@ public class AminoSliderController : MonoBehaviour
         P2AtomsHolder.GetChild(atom_index).transform.localScale = selected_scale;
     }
     #endregion
+
+    public void UpdateCurrentAtomSelected(int protein_id, int amino_child_index, int atom_child_index)
+    {
+        if(protein_id == 0)
+        {
+            atom_selected_p1 = atom_child_index;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.normal_button_color;
+            current_atom_child_id0 = atom_child_index;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+        }
+        else
+        {
+            atom_selected_p2 = atom_child_index;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.normal_button_color;
+            current_atom_child_id1 = atom_child_index;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+        }
+
+        //if (current_atom_child_id0 != -1)
+        //{
+        //    Debug.Log(SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).name);
+        //    SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.normal_button_color;
+        //    current_atom_child_id0 = atom_child_index;
+        //    SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+        //}
+        //else if(current_atom_child_id1 != -1)
+        //{
+        //    SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.normal_button_color;
+        //    current_atom_child_id1 = atom_child_index;
+        //    SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+        //}
+
+    }
 
 }

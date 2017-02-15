@@ -3170,8 +3170,8 @@ public class PDB_score {
         ligAtomCoords = reducedRepresentation (ligand, out ligAtomLabels);
         this.recT = recT;
         this.ligT = ligT;
-        Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
-        Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
+        //Debug.Log ("Rec: from " + receptor.names.Length + " to " + recAtomCoords.Length);
+        //Debug.Log ("Lig: from " + ligand.names.Length + " to " + ligAtomCoords.Length);
     }
 
     /*public void calcScore() {
