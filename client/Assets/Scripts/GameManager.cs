@@ -76,6 +76,8 @@ public class GameManager : MonoBehaviour {
     public void CloseTutorialPanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+        selection_panel.alpha = 1;
+        selection_panel.interactable = true;
         tutorial_panel.SetActive(false);
     }
 }

@@ -244,7 +244,7 @@ public class UIController : MonoBehaviour {
 
             //esc to spawn the menu
             if (Input.GetKey(KeyCode.Escape))
-                EndLevel();
+                OpenLevelSelectionPanel();
         }
     }
 
@@ -257,23 +257,23 @@ public class UIController : MonoBehaviour {
         }
     }
 
-	//tool panel
-	public void ToogleToolMenu()
-	{
-        tool_panel_status = !tool_panel_status;
-        sfx.PlayTrack(SFX.sound_index.button_click);
-		ToolPanel.SetBool ("Open", tool_panel_status);
-        CloseToolImage.SetActive(tool_panel_status);
-        OpenToolImage.SetActive(!tool_panel_status);
-    }
+	////tool panel
+	//public void ToogleToolMenu()
+	//{
+ //       tool_panel_status = !tool_panel_status;
+ //       sfx.PlayTrack(SFX.sound_index.button_click);
+	//	ToolPanel.SetBool ("Open", tool_panel_status);
+ //       CloseToolImage.SetActive(tool_panel_status);
+ //       OpenToolImage.SetActive(!tool_panel_status);
+ //   }
 
-    public void ToogleToolMenuStart()
-    {
-        tool_panel_status = !tool_panel_status;
-        ToolPanel.SetBool("Open", tool_panel_status);
-        CloseToolImage.SetActive(tool_panel_status);
-        OpenToolImage.SetActive(!tool_panel_status);
-    }
+ //   public void ToogleToolMenuStart()
+ //   {
+ //       tool_panel_status = !tool_panel_status;
+ //       ToolPanel.SetBool("Open", tool_panel_status);
+ //       CloseToolImage.SetActive(tool_panel_status);
+ //       OpenToolImage.SetActive(!tool_panel_status);
+ //   }
 
     public void RestartCamera()
     {
@@ -750,7 +750,7 @@ public class UIController : MonoBehaviour {
 
     public float time_to_save;
 
-    public void EndLevel()
+    public void OpenLevelSelectionPanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
         gm.selection_panel.alpha = 1;
@@ -808,7 +808,7 @@ public class UIController : MonoBehaviour {
     public void Reset_UI()
     {
         tool_panel_status = true;
-        ToogleToolMenuStart();
+        //ToogleToolMenuStart();
         FixProtein1Toggle.isOn = false;
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
