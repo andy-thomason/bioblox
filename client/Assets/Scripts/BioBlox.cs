@@ -1042,7 +1042,6 @@ public class BioBlox : MonoBehaviour
 
         if (game_status == GameStatus.GameScreen && !is_hint_moving)
         {
-
             num_touching_0 = 0;
             num_touching_1 = 0;
             num_invalid = 0;
@@ -1198,50 +1197,54 @@ public class BioBlox : MonoBehaviour
 
     void CalcScore()
     {
-        scoring.calcScore2();
+        if (!is_hint_moving)
+        {
+            scoring.calcScore2();
 
-        ie_score = Mathf.Round(scoring.elecScore);
-        lpj_score = Mathf.Round(-1 * scoring.vdwScore);
-        t_atoms_score = num_touching_0 + num_touching_1;
-        //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
+            ie_score = Mathf.Round(scoring.elecScore);
+            lpj_score = Mathf.Round(-1 * scoring.vdwScore);
+            t_atoms_score = num_touching_0 + num_touching_1;
+            //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
 
-        if (t_atoms_score == 0)
-            game_score_value = 0;
-        else
-            game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
+            if (t_atoms_score == 0)
+                game_score_value = 0;
+            else
+                game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
 
-        //if (uiController.expert_mode)
-        //{
+            //if (uiController.expert_mode)
+            //{
             ElectricScore.text = "" + ie_score;
             LennardScore.text = "" + lpj_score;
             touching_atoms.text = "" + t_atoms_score;
-        //}
+            //}
 
-        //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
-        game_score.text = "" + game_score_value;
+            //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
+            game_score.text = "" + game_score_value;
 
-        //when saved panel is on
-        if (uiController.SavePanel.activeSelf)
-        {
-            uiController.n_atoms.text = "" + t_atoms_score;
-            uiController.lpj.text = "" + lpj_score;
-            uiController.ei.text = "" + ie_score;
-            uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+            //when saved panel is on
+            if (uiController.SavePanel.activeSelf)
+            {
+                uiController.n_atoms.text = "" + t_atoms_score;
+                uiController.lpj.text = "" + lpj_score;
+                uiController.ei.text = "" + ie_score;
+                uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+            }
+
+            InvalidDockScore.SetActive(num_invalid != 0 || game_score_value < 0);
+
+            //if (number_total_atoms != 0)
+            //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
+            //else
+            //    current_score_sprite.sprite = sprite_score_normal;
+
+            if (t_atoms_score == 0)
+                current_score_sprite.color = Color.white;
+            else if (!is_score_valid || game_score_value < 0)
+                current_score_sprite.color = Color.red;
+            else
+                current_score_sprite.color = Color.green;
+
         }
-
-        InvalidDockScore.SetActive(num_invalid != 0 || game_score_value < 0);
-
-        //if (number_total_atoms != 0)
-        //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
-        //else
-        //    current_score_sprite.sprite = sprite_score_normal;
-
-        if (t_atoms_score == 0)
-            current_score_sprite.color = Color.white;
-        else if (!is_score_valid || game_score_value < 0)
-            current_score_sprite.color = Color.red;
-        else
-            current_score_sprite.color = Color.green;
     }
 
     public void RestartGame()
@@ -1968,6 +1971,7 @@ public class BioBlox : MonoBehaviour
         }
         else
         {
+            is_hint_moving = !is_hint_moving;
             molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
             molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
 
