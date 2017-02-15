@@ -124,7 +124,7 @@ public class OverlayRenderer : MonoBehaviour {
                     int uvy = 3 - atom / 4;
                     int uvx = atom & 3;
                     //higjlight the atom seleted in expoert mode
-                    if(ui.expert_mode && is_selected)
+                    if(is_selected)
                     {
                         if (j == P1_selected_atom_id || j == P2_selected_atom_id)
                             is_atom_selected = true;

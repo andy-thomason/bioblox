@@ -181,6 +181,7 @@ public class UIController : MonoBehaviour {
     public Image GridToggleButton;
     public Color GridToggleColor_normal;
     public Color GridToggleColor_pressed;
+    public Color normal_button_color;
 
     public Image[] protein0_render_buttons;
     public Image[] protein1_render_buttons;
