@@ -8428,8 +8428,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -300}
-  m_SizeDelta: {x: 180, y: 600}
+  m_AnchoredPosition: {x: 0, y: -341.5}
+  m_SizeDelta: {x: 180, y: 683}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &300515414
 MonoBehaviour:
@@ -28416,6 +28416,7 @@ MonoBehaviour:
   GridToggleButton: {fileID: 812056395}
   GridToggleColor_normal: {r: 1, g: 1, b: 1, a: 1}
   GridToggleColor_pressed: {r: 0.68235296, g: 1, b: 0.015686275, a: 1}
+  normal_button_color: {r: 0.42352942, g: 0.42352942, b: 0.42352942, a: 1}
   protein0_render_buttons:
   - {fileID: 2115295832}
   - {fileID: 2051228906}

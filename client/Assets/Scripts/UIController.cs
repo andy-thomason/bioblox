@@ -181,6 +181,7 @@ public class UIController : MonoBehaviour {
     public Image GridToggleButton;
     public Color GridToggleColor_normal;
     public Color GridToggleColor_pressed;
+    public Color normal_button_color;
 
     public Image[] protein0_render_buttons;
     public Image[] protein1_render_buttons;
@@ -1175,9 +1176,7 @@ public class UIController : MonoBehaviour {
     {
         if (AminoButton_Atom_reference_0 != null)
         {
-            Debug.Log(AminoButton_Atom_reference_0.name);
             Destroy(AminoButton_Atom_reference_0);
-            Debug.Log("desntroy");
             AminoButton_reference_0.transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
         }
     }

@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
     public string[] loading_facts;
     public GameObject tutorial_panel;
     SFX sfx;
+    bool open_selection_once_at_start = false;
 
     void Awake()
     {
@@ -76,8 +77,13 @@ public class GameManager : MonoBehaviour {
     public void CloseTutorialPanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        selection_panel.alpha = 1;
-        selection_panel.interactable = true;
         tutorial_panel.SetActive(false);
+        if (!open_selection_once_at_start)
+        {
+            selection_panel.alpha = 1;
+            selection_panel.interactable = true;
+            open_selection_once_at_start = true;
+        }
+        FindObjectOfType<UIController>().isOverUI = false;
     }
 }

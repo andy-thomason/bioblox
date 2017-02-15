@@ -1951,8 +1951,10 @@ public class BioBlox : MonoBehaviour
 
     public void StartHintMovement()
     {
+
         if (!is_hint_moving)
         {
+            is_hint_moving = !is_hint_moving;
             startTime = Time.time;
             journeyLength_0 = Vector3.Distance(molecules[0].transform.localPosition, Vector3.zero);
             journeyLength_1 = Vector3.Distance(molecules[1].transform.localPosition, Vector3.zero);
@@ -1962,10 +1964,7 @@ public class BioBlox : MonoBehaviour
             default_position_molecule_1 = molecules[1].transform.localPosition;
             default_rotation_molecule_1 = molecules[1].transform.localRotation;
             //hide the chain
-            line_renderer_object.SetActive(is_hint_moving);
-
-            Debug.Log(Vector3.Angle(molecules_PDB_mesh[0].mol.pos, molecules_PDB_mesh[1].mol.pos));
-            is_hint_moving = !is_hint_moving;
+            line_renderer_object.SetActive(!is_hint_moving);
         }
         else
         {
@@ -1979,9 +1978,7 @@ public class BioBlox : MonoBehaviour
             //restart camera
             molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
             //show the chain
-            line_renderer_object.SetActive(is_hint_moving);
-
-            is_hint_moving = !is_hint_moving;
+            line_renderer_object.SetActive(!is_hint_moving);
         }
     }
     #endregion
