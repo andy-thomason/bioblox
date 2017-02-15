@@ -67,6 +67,22 @@ public class AminoConnectionHolder : MonoBehaviour {
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
     }
 
+    public void _HighlightClick()
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
+        //bb.molecules_PDB_mesh[1].SelectAminoAcid_when_connection_clicked(ID_button2, A2_atom_index);
+        asc.UpdateCurrentButtonA1(ID_button1);
+        //bb.molecules_PDB_mesh[0].SelectAminoAcid_when_connection_clicked(ID_button1, A1_atom_index);
+        asc.UpdateCurrentButtonA2(ID_button2);
+        //asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+        // asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+        //asc.HighLight3DMeshAll(ID_button1, ID_button2);
+        //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+        //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+        asc.A1Buttons[ID_button1].HighLightOnClick();
+        asc.A1Buttons[ID_button2].HighLightOnClick();
+    }
+
     void HightlighClickForNextAtom()
     {
         bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
@@ -145,9 +161,10 @@ public class AminoConnectionHolder : MonoBehaviour {
         //A1
         if (A1 == -1)
         {
+            ui.EraseAminoButton_Atom_reference_0();
+            ui.EraseAminoButton_Atom_reference_1();
             if ((ID_button1 - 1) >= 0)
             {
-                ui.EraseAminoButton_Atom_reference_0();
                 FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
                 //asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, transform.parent);
                 asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
@@ -157,9 +174,10 @@ public class AminoConnectionHolder : MonoBehaviour {
         }
         else
         {
+            ui.EraseAminoButton_Atom_reference_0();
+            ui.EraseAminoButton_Atom_reference_1();
             if ((ID_button2 - 1) >= 0)
             {
-                ui.EraseAminoButton_Atom_reference_1();
                 FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
                 asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
@@ -174,9 +192,10 @@ public class AminoConnectionHolder : MonoBehaviour {
         //A1
         if(A1 == 1)
         {
+            ui.EraseAminoButton_Atom_reference_0();
+            ui.EraseAminoButton_Atom_reference_1();
             if (AminoPanel1.transform.childCount > (ID_button1 + 1))
             {
-                ui.EraseAminoButton_Atom_reference_0();
                 FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
                 asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;
@@ -185,9 +204,10 @@ public class AminoConnectionHolder : MonoBehaviour {
         }
         else
         {
+            ui.EraseAminoButton_Atom_reference_0();
+            ui.EraseAminoButton_Atom_reference_1();
             if (AminoPanel2.transform.childCount > (ID_button2 + 1))
             {
-                ui.EraseAminoButton_Atom_reference_1();
                 FindObjectOfType<ConnectionManager>().DeleteAminoAcidLink(connection);
                 asc._ModifyConnectionHolder(cn.CreateAminoAcidLink(bb.molecules_PDB_mesh[0], ID_button1 + A1, bb.molecules_PDB_mesh[1], ID_button2 + A2), AminoPanel1.transform.GetChild(ID_button1 + A1).gameObject, AminoPanel2.transform.GetChild(ID_button2 + A2).gameObject, gameObject);
                 cn.SliderStrings.interactable = true;

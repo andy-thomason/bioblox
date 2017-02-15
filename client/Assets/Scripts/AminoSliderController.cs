@@ -314,6 +314,25 @@ public class AminoSliderController : MonoBehaviour
         //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
     }
 
+    public void UpdateCurrentButtonWhenConnectionClickedA1(int index)
+    {
+        //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
+        A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+        CurrentButtonA1 = index;
+        A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
+        //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
+
+    }
+
+    public void UpdateCurrentButtonWhenConnectionClickedA2(int index)
+    {
+        //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
+        A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
+        CurrentButtonA2 = index;
+        A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
+        //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
+    }
+
     public void DeselectAmino()
     {
         //amino buttons
