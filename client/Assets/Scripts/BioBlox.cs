@@ -1951,9 +1951,8 @@ public class BioBlox : MonoBehaviour
 
     public void StartHintMovement()
     {
-        is_hint_moving = !is_hint_moving;
 
-        if (is_hint_moving)
+        if (!is_hint_moving)
         {
             is_hint_moving = !is_hint_moving;
             startTime = Time.time;
@@ -1966,8 +1965,6 @@ public class BioBlox : MonoBehaviour
             default_rotation_molecule_1 = molecules[1].transform.localRotation;
             //hide the chain
             line_renderer_object.SetActive(!is_hint_moving);
-
-            Debug.Log(Vector3.Angle(molecules_PDB_mesh[0].mol.pos, molecules_PDB_mesh[1].mol.pos));
         }
         else
         {

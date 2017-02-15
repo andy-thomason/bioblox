@@ -517,8 +517,8 @@ public class AminoSliderController : MonoBehaviour
             //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
             //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
             //normal size for link manger
-            ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
-            ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
+            //ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
+            //ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
             _AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), ButtonPickedA1.GetComponent<AminoButtonController>().AminoButtonID, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), ButtonPickedA2.GetComponent<AminoButtonController>().AminoButtonID), ButtonPickedA1, ButtonPickedA2);
             //ButtonPickedA1 = ButtonPickedA2 = null;
             FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
