@@ -246,6 +246,8 @@ public class BioBlox : MonoBehaviour
 
     public GameObject[] amino_panel_highlight;
 
+    public Text[] protein_name_text;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -319,8 +321,9 @@ public class BioBlox : MonoBehaviour
         r0 = molecules[0].GetComponent<Rigidbody>();
         r1 = molecules[1].GetComponent<Rigidbody>();
 
-        Debug.Log(molecules_PDB_mesh[0].mol.name);
-        Debug.Log(molecules_PDB_mesh[1].mol.name);
+        //set names on the amino panels
+        protein_name_text[0].text = molecules_PDB_mesh[0].mol.name;
+        protein_name_text[1].text = molecules_PDB_mesh[1].mol.name;
 
         //UI INIT
         uiController.init();
