@@ -1106,7 +1106,7 @@ public class UIController : MonoBehaviour {
 
         foreach (Transform AminoLinkChild in AminoLinkPanel.transform)
         {
-            ach = AminoLinkChild.GetChild(0).GetComponent<AminoConnectionHolder>();
+            ach = AminoLinkChild.GetComponent<AminoConnectionHolder>();
             P1_connections += ach.A1_name + "-" + ach.AT1_name + " / ";
             P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
             connections += ach.ID_button1 + "-" + ach.ID_button2 + "/";
