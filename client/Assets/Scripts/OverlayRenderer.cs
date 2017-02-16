@@ -68,8 +68,6 @@ public class OverlayRenderer : MonoBehaviour {
     public int P1_selected_atom_id = -1;
     public int P2_selected_atom_id = -1;
 
-    public byte transparencia_culiao = 255;
-
     // Use this for initialization
     void Start ()
     {
@@ -108,7 +106,7 @@ public class OverlayRenderer : MonoBehaviour {
 
                 float c10 = Mathf.Cos(Time.time * 5.0f) * 0.5f + 0.5f;
                 float c20 = Mathf.Cos(Time.time * 20.0f) * 0.5f + 0.5f;
-                Color32 selected = new Color32(255, 255, 255, transparencia_culiao);
+                Color32 selected = new Color32(255, 255, 255, 200);
                 Color32 touching = new Color32(128, 128, 128, (byte)(63.0f*c10+192));
                 Color32 bad = new Color32(255, 0, 0, (byte)(255.0f*c20));
                 Color32 atom_color = new Color32(0, 0, 0, 255);
@@ -148,7 +146,23 @@ public class OverlayRenderer : MonoBehaviour {
                     if (is_selected)
                     {
                         if (j == P1_selected_atom_id || j == P2_selected_atom_id)
-                            is_atom_selected = true;
+                        {
+                            add_Icon(
+                               new Icon(
+                                   t.TransformPoint(mol.atom_centres[j]),
+                                   mol.atom_radii[j], new Vector2(uvx * 0.25f, (9 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 9 * 0.25f), selected
+                               )
+                           );
+                        }
+                        else
+                        {
+                            add_Icon(
+                               new Icon(
+                                   t.TransformPoint(mol.atom_centres[j]),
+                                   mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), selected
+                               )
+                           );
+                        }
 
                         //if (sphere_index < icons_spheres_store.Count)
                         //{
@@ -169,12 +183,9 @@ public class OverlayRenderer : MonoBehaviour {
                         //    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
                         //    sphere_index++;
                         //}
-                        add_Icon(
-                                new Icon(
-                                    t.TransformPoint(mol.atom_centres[j]),
-                                    mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), is_atom_selected ? atom_color : selected
-                                )
-                            );
+                       
+
+
                         
                     }
                     //else if (is_selected && ui.is_hovering)
