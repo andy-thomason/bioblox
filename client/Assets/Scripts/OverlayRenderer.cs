@@ -137,7 +137,7 @@ public class OverlayRenderer : MonoBehaviour {
                             new Icon(
                                 t.TransformPoint(mol.atom_centres[j]),
                                 mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f),
-                                is_bad ? bad : is_touching ? touching : selected
+                                is_bad ? bad : selected
                             )
                         );
                     }
