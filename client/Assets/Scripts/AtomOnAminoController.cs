@@ -13,6 +13,10 @@ public class AtomOnAminoController : MonoBehaviour, IPointerClickHandler
     {
         FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.amino_click);
         FindObjectOfType<AminoSliderController>().UpdateCurrentAtomSelected(protein_id, amino_child_index, transform.GetSiblingIndex());
+        if(protein_id == 0)
+            FindObjectOfType<OverlayRenderer>().P1_selected_atom_id = atom_id;
+        else
+            FindObjectOfType<OverlayRenderer>().P2_selected_atom_id = atom_id;
 
         //transform.parent.transform.GetChild(transform.GetSiblingIndex() - 1).GetComponent<AminoButtonController>().HighlightCurrentAtom(transform.GetSiblingIndex());
     }

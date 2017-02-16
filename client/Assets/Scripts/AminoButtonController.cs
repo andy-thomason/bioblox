@@ -72,7 +72,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 			bb.molecules_PDB_mesh[1].SelectAminoAcid(AminoButtonID);
             aminoSli.UpdateCurrentButtonA2(AminoButtonID);
             //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
-		}
+        }
 		else
 		{
             bb.molecules_PDB_mesh[0].SelectAminoAcid(AminoButtonID);
