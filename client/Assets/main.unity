@@ -1826,7 +1826,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Slot 3
+  m_Text: Save 3
 --- !u!222 &65472881
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16742,7 +16742,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Slot 2
+  m_Text: Save 2
 --- !u!222 &576634597
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -23735,6 +23735,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 780602389}
+  - component: {fileID: 780602390}
   m_Layer: 5
   m_Name: Fill Area
   m_TagString: Untagged
@@ -23762,6 +23763,17 @@ RectTransform:
   m_AnchoredPosition: {x: 7, y: -5.3}
   m_SizeDelta: {x: 0, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &780602390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 780602388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &784627825
 Prefab:
   m_ObjectHideFlags: 0
@@ -27873,6 +27885,7 @@ GameObject:
   - component: {fileID: 909031737}
   - component: {fileID: 909031739}
   - component: {fileID: 909031738}
+  - component: {fileID: 909031740}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -27934,6 +27947,17 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 909031736}
+--- !u!114 &909031740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 909031736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &909693795
 Prefab:
   m_ObjectHideFlags: 0
@@ -28161,7 +28185,6 @@ MonoBehaviour:
   lennard_score: 0
   cutawaySlider: {fileID: 209063048}
   thicknessSlider: {fileID: 0}
-  InvalidDockScore: {fileID: 1122807211}
   dockOverrideOffset: 0
   EndLevelMenu: {fileID: 0}
   lockButton: {fileID: 0}
@@ -28185,6 +28208,8 @@ MonoBehaviour:
   game_time: 0
   Molecules: {fileID: 268347350}
   ToggleMode: {fileID: 1629988531}
+  connection_slider_image: {fileID: 1960233345}
+  slider_valid_color: {r: 0.015686275, g: 0.6509804, b: 1, a: 1}
   game_state: 0
   game_status: 0
   hint_stage: 0
@@ -28198,8 +28223,8 @@ MonoBehaviour:
   sprite_score_good: {fileID: 21300000, guid: 04c1665506150c146a8511121c81ff6d, type: 3}
   current_score_sprite: {fileID: 1187516139}
   amino_panel_highlight:
-  - {fileID: 418631475}
   - {fileID: 1319808244}
+  - {fileID: 418631475}
   protein_name_text:
   - {fileID: 2095176415}
   - {fileID: 1315919404}
@@ -29714,7 +29739,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1624556580}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -33732,7 +33757,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: Slot 1
+  m_Text: Save 1
 --- !u!222 &1113548191
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -51912,6 +51937,7 @@ GameObject:
   - component: {fileID: 1733968317}
   - component: {fileID: 1733968319}
   - component: {fileID: 1733968318}
+  - component: {fileID: 1733968320}
   m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
@@ -51973,6 +51999,17 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1733968316}
+--- !u!114 &1733968320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1733968316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1735319233
 GameObject:
   m_ObjectHideFlags: 0
@@ -51997,7 +52034,7 @@ CanvasGroup:
   m_GameObject: {fileID: 1735319233}
   m_Enabled: 1
   m_Alpha: 0
-  m_Interactable: 0
+  m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
 --- !u!4 &1735319235
@@ -60752,7 +60789,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1936962430}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999999
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -60967,7 +61004,6 @@ MonoBehaviour:
   atom_3d_overlay: 0
   P1_selected_atom_id: -1
   P2_selected_atom_id: -1
-  transparencia_culiao: 255
 --- !u!4 &1958373725
 Transform:
   m_ObjectHideFlags: 0
@@ -65605,6 +65641,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 2088686496}
+  - component: {fileID: 2088686497}
   m_Layer: 5
   m_Name: Handle Slide Area
   m_TagString: Untagged
@@ -65632,6 +65669,17 @@ RectTransform:
   m_AnchoredPosition: {x: 7, y: -0.3}
   m_SizeDelta: {x: 0, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2088686497
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2088686495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2088706375
 GameObject:
   m_ObjectHideFlags: 0
@@ -66149,6 +66197,7 @@ GameObject:
   - component: {fileID: 2099115443}
   - component: {fileID: 2099115445}
   - component: {fileID: 2099115444}
+  - component: {fileID: 2099115446}
   m_Layer: 5
   m_Name: Image (1)
   m_TagString: Untagged
@@ -66207,6 +66256,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2099115442}
+--- !u!114 &2099115446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2099115442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2106576717
 Prefab:
   m_ObjectHideFlags: 0

@@ -71,9 +71,9 @@ public class AminoConnectionHolder : MonoBehaviour {
     public void _HighlightClick()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        //bb.molecules_PDB_mesh[1].SelectAminoAcid_when_connection_clicked(ID_button2, A2_atom_index);
+        bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
         asc.UpdateCurrentButtonA1(ID_button1);
-        //bb.molecules_PDB_mesh[0].SelectAminoAcid_when_connection_clicked(ID_button1, A1_atom_index);
+        bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
         asc.UpdateCurrentButtonA2(ID_button2);
         //asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
         // asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);

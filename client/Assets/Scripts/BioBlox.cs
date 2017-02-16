@@ -133,7 +133,6 @@ public class BioBlox : MonoBehaviour
     //public Slider overrideSlider;
     public Slider cutawaySlider;
     public Slider thicknessSlider;
-    public GameObject InvalidDockScore;
     //public List<Slider> dockSliders = new List<Slider> ();
     public float dockOverrideOffset = 0.0f;
     //Animator of the tools menu
@@ -202,6 +201,9 @@ public class BioBlox : MonoBehaviour
     bool is_hint_moving = false;
     #endregion
     //List<int> hint_pairs;
+
+    public Image connection_slider_image;
+    public Color slider_valid_color;
 
     public enum GameState
     {
@@ -1238,7 +1240,7 @@ public class BioBlox : MonoBehaviour
                 uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
             }
 
-            InvalidDockScore.SetActive(num_invalid != 0 || game_score_value < 0);
+            connection_slider_image.color = !(num_invalid != 0 || game_score_value < 0) ? slider_valid_color : Color.red;
 
             //if (number_total_atoms != 0)
             //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;

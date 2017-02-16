@@ -213,8 +213,10 @@ public class AminoSliderController : MonoBehaviour
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     //A1Buttons[LastButtonA1].transform.localScale = normal_scale;
                     A1Buttons[LastButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+                    SetColorTextToNormalFromButtonA1(LastButtonA1);
                     //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
                     A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
+                    SetColorTextToSelectedFromButtonA1(CurrentButtonA1);
                     ScrollbarAmino1.value = ScrollbarAmino1.value - step_for_A1;
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
@@ -237,8 +239,10 @@ public class AminoSliderController : MonoBehaviour
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     //A1Buttons[LastButtonA1].transform.localScale = normal_scale;
                     A1Buttons[LastButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+                    SetColorTextToNormalFromButtonA1(LastButtonA1);
                     //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
                     A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
+                    SetColorTextToSelectedFromButtonA1(CurrentButtonA1);
                     ScrollbarAmino1.value = ScrollbarAmino1.value + step_for_A1;
                     A1Buttons[CurrentButtonA1].HighLight();
                 }
@@ -260,8 +264,10 @@ public class AminoSliderController : MonoBehaviour
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     //A2Buttons[LastButtonA2].transform.localScale = normal_scale;
                     A2Buttons[LastButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
+                    SetColorTextToNormalFromButtonA2(LastButtonA2);
                     //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
                     A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
+                    SetColorTextToSelectedFromButtonA2(CurrentButtonA2);
                     ScrollbarAmino2.value = ScrollbarAmino2.value - step_for_A2;
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
@@ -283,8 +289,10 @@ public class AminoSliderController : MonoBehaviour
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     //A2Buttons[LastButtonA2].transform.localScale = normal_scale;
                     A2Buttons[LastButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
+                    SetColorTextToNormalFromButtonA2(LastButtonA2);
                     //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
                     A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
+                    SetColorTextToSelectedFromButtonA2(CurrentButtonA2);
                     ScrollbarAmino2.value = ScrollbarAmino2.value + step_for_A2;
                     A2Buttons[CurrentButtonA2].HighLight();
                 }
@@ -297,9 +305,34 @@ public class AminoSliderController : MonoBehaviour
         }
     }
 
+    void SetColorTextToNormalFromButtonA1(int CurrentButtonA1)
+    {
+        A1Buttons[CurrentButtonA1].transform.GetChild(2).GetComponent<Image>().color = Color.white;
+        A1Buttons[CurrentButtonA1].transform.GetChild(3).GetComponent<Text>().color = Color.white;
+    }
+
+    void SetColorTextToNormalFromButtonA2(int CurrentButtonA2)
+    {
+        A2Buttons[CurrentButtonA2].transform.GetChild(2).GetComponent<Image>().color = Color.white;
+        A2Buttons[CurrentButtonA2].transform.GetChild(3).GetComponent<Text>().color = Color.white;
+    }
+
+    void SetColorTextToSelectedFromButtonA1(int CurrentButtonA1)
+    {
+        A1Buttons[CurrentButtonA1].transform.GetChild(2).GetComponent<Image>().color = Color.black;
+        A1Buttons[CurrentButtonA1].transform.GetChild(3).GetComponent<Text>().color = Color.black;
+    }
+
+    void SetColorTextToSelectedFromButtonA2(int CurrentButtonA2)
+    {
+        A2Buttons[CurrentButtonA2].transform.GetChild(2).GetComponent<Image>().color = Color.black;
+        A2Buttons[CurrentButtonA2].transform.GetChild(3).GetComponent<Text>().color = Color.black;
+    }
+
     public void UpdateCurrentButtonA1(int index)
     {
         //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
+        SetColorTextToNormalFromButtonA1(CurrentButtonA1);
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
         CurrentButtonA1 = index;
         //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
@@ -309,6 +342,7 @@ public class AminoSliderController : MonoBehaviour
     public void UpdateCurrentButtonA2(int index)
     {
         //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
+        SetColorTextToNormalFromButtonA2(CurrentButtonA2);
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
         CurrentButtonA2 = index;
         //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
@@ -340,6 +374,8 @@ public class AminoSliderController : MonoBehaviour
         //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
         ButtonPickedA1 = ButtonPickedA2 = null;
         AddConnection.interactable = false;
+        SetColorTextToNormalFromButtonA1(CurrentButtonA1);
+        SetColorTextToNormalFromButtonA2(CurrentButtonA2);
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
         current_atom_child_id0 = current_atom_child_id1 = 0;
@@ -351,10 +387,12 @@ public class AminoSliderController : MonoBehaviour
         {
             //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
             A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+            SetColorTextToNormalFromButtonA1(CurrentButtonA1);
             CurrentButtonA1 = index;
             ChangeAminoAcidSelection(A1Buttons[CurrentButtonA1].gameObject);
             //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
             A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
+            SetColorTextToSelectedFromButtonA1(CurrentButtonA1);
             ScrollbarAmino1.value = 1 - ((float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1));
             //A1Buttons [CurrentButtonA1].GetComponent<AminoButtonController> ().SetGameObject();
         }
@@ -362,10 +400,12 @@ public class AminoSliderController : MonoBehaviour
         {
             //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
             A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
+            SetColorTextToNormalFromButtonA2(CurrentButtonA2);
             CurrentButtonA2 = index;
             ChangeAminoAcidSelection(A2Buttons[CurrentButtonA2].gameObject);
             //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
             A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
+            SetColorTextToSelectedFromButtonA2(CurrentButtonA2);
             ScrollbarAmino2.value = 1 - ((float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1));
             //A2Buttons [CurrentButtonA2].GetComponent<AminoButtonController> ().SetGameObject();
         }
@@ -378,6 +418,7 @@ public class AminoSliderController : MonoBehaviour
         //CurrentButtonA1 = index_protein1;
         //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
+        SetColorTextToSelectedFromButtonA1(CurrentButtonA1);
         ScrollbarAmino1.value = 1 - ((float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1));
         //A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
 
@@ -386,6 +427,7 @@ public class AminoSliderController : MonoBehaviour
         //CurrentButtonA2 = index_protein2;
         //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
+        SetColorTextToSelectedFromButtonA2(CurrentButtonA2);
         ScrollbarAmino2.value = 1 - ((float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1));
         //A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
     }
@@ -665,7 +707,8 @@ public class AminoSliderController : MonoBehaviour
 
         AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(1).GetComponent<Text>().text = ButtonPickedA1.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA1.GetComponent<AminoButtonController>().tag_amino;
         AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(1).GetComponent<Text>().text = ButtonPickedA2.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA2.GetComponent<AminoButtonController>().tag_amino;
-
+        AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(2).GetComponent<Image>().color = buttonStructure.NormalColor[ButtonPickedA1.GetComponent<AminoButtonController>().name_amino];
+        AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(2).GetComponent<Image>().color = buttonStructure.NormalColor[ButtonPickedA2.GetComponent<AminoButtonController>().name_amino];
         //UpdateBackgroundSize (AminoLinkPanelParent.transform.childCount);
 
         //FixButton(ButtonPickedA1, AminoLinkPanelReference, 0, AminoLinkPanelReference.transform.GetChild(0).transform, 0);
@@ -690,7 +733,7 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
 
-        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(4).transform;
+        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform;
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
@@ -698,6 +741,7 @@ public class AminoSliderController : MonoBehaviour
             atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
             atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
         
@@ -732,7 +776,7 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
 
-        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(4).transform;
+        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform;
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
@@ -740,6 +784,7 @@ public class AminoSliderController : MonoBehaviour
             atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
             atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
@@ -1094,7 +1139,9 @@ public class AminoSliderController : MonoBehaviour
 
         AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(1).GetComponent<Text>().text = ButtonPickedA1_temp.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA1_temp.GetComponent<AminoButtonController>().tag_amino;
         AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(1).GetComponent<Text>().text = ButtonPickedA2_temp.GetComponent<AminoButtonController>().name_amino + " " + ButtonPickedA2_temp.GetComponent<AminoButtonController>().tag_amino;
-        
+        AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(2).GetComponent<Image>().color = buttonStructure.NormalColor[ButtonPickedA1_temp.GetComponent<AminoButtonController>().name_amino];
+        AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(2).GetComponent<Image>().color = buttonStructure.NormalColor[ButtonPickedA2_temp.GetComponent<AminoButtonController>().name_amino];
+
         //get the atom connected
         int[] A_atoms = P1_mol.aminoAcidsAtomIds[ButtonPickedA1_temp.GetComponent<AminoButtonController>().AminoButtonID];
         //set the number of childs
@@ -1113,13 +1160,14 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
 
-        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(4).transform;
+        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform;
 
         //go throuygh disable them all
         for (int i = 0; i < 12; i++)
         {
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = false;
             atom_buttons_holder.GetChild(i).GetComponent<Image>().color = normal_atom_color;
         }
 
@@ -1129,6 +1177,7 @@ public class AminoSliderController : MonoBehaviour
             atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
             atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
@@ -1164,13 +1213,14 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
 
-        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(4).transform;
+        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform;
 
         //go throuygh disable them all
         for (int i = 0; i < 12; i++)
         {
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = false;
             atom_buttons_holder.GetChild(i).GetComponent<Image>().color = normal_atom_color;
         }
 
@@ -1180,6 +1230,7 @@ public class AminoSliderController : MonoBehaviour
             atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
             atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
