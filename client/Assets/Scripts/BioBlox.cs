@@ -319,6 +319,9 @@ public class BioBlox : MonoBehaviour
         r0 = molecules[0].GetComponent<Rigidbody>();
         r1 = molecules[1].GetComponent<Rigidbody>();
 
+        Debug.Log(molecules_PDB_mesh[0].mol.name);
+        Debug.Log(molecules_PDB_mesh[1].mol.name);
+
         //UI INIT
         uiController.init();
 
