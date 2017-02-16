@@ -124,11 +124,11 @@ public class OverlayRenderer : MonoBehaviour {
                     int uvy = 3 - atom / 4;
                     int uvx = atom & 3;
                     //higjlight the atom seleted in expoert mode
-                    if(is_selected)
-                    {
-                        if (j == P1_selected_atom_id || j == P2_selected_atom_id)
-                            is_atom_selected = true;
-                    }
+                    //if(is_selected)
+                    //{
+                    //    if (j == P1_selected_atom_id || j == P2_selected_atom_id)
+                    //        is_atom_selected = true;
+                    //}
 
                     //2D OVERLAY
                     if ((is_touching || is_bad) && atom_2d_overlay)
@@ -145,86 +145,87 @@ public class OverlayRenderer : MonoBehaviour {
                     //HERE TO SYNC THE PDB WITH THE MESH - is_selected && 
                     if (is_selected)
                     {
-                        if (!(ui.first_person && ui.first_person_protein != i))
-                        {
-                            if (sphere_index < icons_spheres_store.Count)
-                            {
-                                //spheres on transparent render protein 0
-                                if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
-                                {
-                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
-                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
-                                }
-                                //spheres on transparent render protein 1
-                                if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
-                                {
-                                    //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
-                                    icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                    add_Icon_sphere(icons_spheres_store[sphere_index]);
-                                }
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
-                                sphere_index++;
-                            }
-                            add_Icon(
+                        if (j == P1_selected_atom_id || j == P2_selected_atom_id)
+                            is_atom_selected = true;
+
+                        //if (sphere_index < icons_spheres_store.Count)
+                        //{
+                        //    //spheres on transparent render protein 0
+                        //    if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
+                        //    {
+                        //        //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                        //        icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                        //        add_Icon_sphere(icons_spheres_store[sphere_index]);
+                        //    }
+                        //    //spheres on transparent render protein 1
+                        //    if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
+                        //    {
+                        //        //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_selected;
+                        //        icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                        //        add_Icon_sphere(icons_spheres_store[sphere_index]);
+                        //    }
+                        //    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
+                        //    sphere_index++;
+                        //}
+                        add_Icon(
                                 new Icon(
                                     t.TransformPoint(mol.atom_centres[j]),
                                     mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), is_atom_selected ? atom_color : selected
                                 )
                             );
-                        }
+                        
                     }
-                    else if (is_selected && ui.is_hovering)
-                    {
-                        if (sphere_index < icons_spheres_store.Count)
-                        {
-                            if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
-                            {
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                                sphere_index++;
-                            }
-                        }
-                    }
-                    else if (is_disabled)
-                    {
-                        if (sphere_index < icons_spheres_store.Count)
-                        {
-                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = disabled_material;
-                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                            add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            sphere_index++;
-                        }
-                    }
-                    //3D OVERLAY
-                    if (is_touching && atom_3d_overlay)
-                    {
-                        if (sphere_index < icons_spheres_store.Count)
-                        {
-                            if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
-                            if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
-                            {
-                                //material_to_use = i == 1 ? Atom_1 : Atom_2;
-                                //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
-                                icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                add_Icon_sphere(icons_spheres_store[sphere_index]);
-                            }
+                    //else if (is_selected && ui.is_hovering)
+                    //{
+                    //    if (sphere_index < icons_spheres_store.Count)
+                    //    {
+                    //        if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
+                    //        {
+                    //            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
+                    //            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                    //            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                    //            sphere_index++;
+                    //        }
+                    //    }
+                    //}
+                    //else if (is_disabled)
+                    //{
+                    //    if (sphere_index < icons_spheres_store.Count)
+                    //    {
+                    //        icons_spheres_store[sphere_index].GetComponent<Renderer>().material = disabled_material;
+                    //        icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                    //        add_Icon_sphere(icons_spheres_store[sphere_index]);
+                    //        sphere_index++;
+                    //    }
+                    //}
+                    ////3D OVERLAY
+                    //if (is_touching && atom_3d_overlay)
+                    //{
+                    //    if (sphere_index < icons_spheres_store.Count)
+                    //    {
+                    //        if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() && i == 0)
+                    //        {
+                    //            //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                    //            //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_1;
+                    //            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                    //            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                    //        }
+                    //        if (bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode() && i == 1)
+                    //        {
+                    //            //material_to_use = i == 1 ? Atom_1 : Atom_2;
+                    //            //icons_spheres_store[sphere_index].GetComponent<Renderer>().material = Atom_2;
+                    //            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                    //            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                    //        }
 
-                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material[atom] : P2atom_material[atom];
+                    //        icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material[atom] : P2atom_material[atom];
 
-                            if (is_bad)
-                                icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
-                            else
-                                sphere_index++;
-                        }
-                    }
+                    //        if (is_bad)
+                    //            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = i == 0 ? P1atom_material_o[atom] : P2atom_material_o[atom];
+                    //        else
+                    //            sphere_index++;
+                    //    }
+                    //}
                 }
             }
 
