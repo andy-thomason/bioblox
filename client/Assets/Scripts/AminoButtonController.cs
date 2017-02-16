@@ -81,6 +81,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         }
         //highlight color
         transform.GetChild(selected_index).gameObject.SetActive(true);
+        transform.GetChild(2).GetComponent<Image>().color = Color.black;
+        transform.GetChild(3).GetComponent<Text>().color = Color.black;
         aminoSli.ChangeAminoAcidSelection (gameObject);
     }
 
