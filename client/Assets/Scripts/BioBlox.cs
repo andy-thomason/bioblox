@@ -244,6 +244,8 @@ public class BioBlox : MonoBehaviour
 
     GameObject line_renderer_object;
 
+    public GameObject[] amino_panel_highlight;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level

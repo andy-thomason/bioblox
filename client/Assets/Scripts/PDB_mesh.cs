@@ -254,6 +254,10 @@ public class PDB_mesh : MonoBehaviour {
         float shrinker = protein_render == protein_render_options.normal.GetHashCode() ? 1.0f : protein_render == protein_render_options.transparent.GetHashCode() ? 1.0f : 0.3f;
         //create a ray to the cursor and cast it, if it hits at all
         int atomID = PDB_molecule.collide_ray (gameObject, mol, transform, ray, shrinker);
+
+        //activate higghlight
+        bb.amino_panel_highlight[protein_id].active = atomID != -1 ? true : false;
+
         Vector3 mousePos = Input.mousePosition;
 
         if (Input.GetMouseButtonDown(0) && !uIController.isOverUI)
@@ -329,6 +333,7 @@ public class PDB_mesh : MonoBehaviour {
             has_rotated = false;
             rotating = false;
         }
+
 
             lastMousePos = mousePos;
     }
