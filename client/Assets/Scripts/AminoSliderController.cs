@@ -374,19 +374,19 @@ public class AminoSliderController : MonoBehaviour
     public void HighLight3DMeshAll(int index_protein1, int index_protein2)
     {
         //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
-        A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
+        //A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
         //CurrentButtonA1 = index_protein1;
         //A1Buttons[CurrentButtonA1].transform.localScale = selected_scale;
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(true);
-        ScrollbarAmino1.value = (float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1);
+        ScrollbarAmino1.value = 1 - ((float)CurrentButtonA1 / ((float)SliderMol[0].transform.childCount - 1));
         //A1Buttons[CurrentButtonA1].GetComponent<AminoButtonController>().HighLight();
 
         //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
-        A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
+        //A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
         //CurrentButtonA2 = index_protein2;
         //A2Buttons[CurrentButtonA2].transform.localScale = selected_scale;
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(true);
-        ScrollbarAmino2.value = (float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1);
+        ScrollbarAmino2.value = 1 - ((float)CurrentButtonA2 / ((float)SliderMol[1].transform.childCount - 1));
         //A2Buttons[CurrentButtonA2].GetComponent<AminoButtonController>().HighLight();   
     }
 

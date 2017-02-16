@@ -239,7 +239,7 @@ public class UIController : MonoBehaviour {
                     BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
                     BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
                     aminoSliderController.DeselectAmino();
-                    DeselectAtoms();
+                    //DeselectAtoms();
                 }
             }
 
@@ -820,7 +820,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
         BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
         aminoSliderController.DeselectAmino();
-        DeselectAtoms();
+        //DeselectAtoms();
 
         isOverUI = false;
     }
@@ -918,12 +918,12 @@ public class UIController : MonoBehaviour {
         aminoSliderController.P2AtomsHolder = temp_reference.transform;
     }
 
-    void DeselectAtoms()
-    {
+    //void DeselectAtoms()
+    //{
 
-        foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
-        foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
-    }
+    //    foreach (Transform child in p2_atom_holder) Destroy(child.gameObject);
+    //    foreach (Transform child in p1_atom_holder) Destroy(child.gameObject);
+    //}
 
    // #region TOGGLE GAME MODE
     

@@ -48,24 +48,25 @@ public class AminoConnectionHolder : MonoBehaviour {
         cn.DeleteAminoAcidLink(connection);
         //asc.RestoreDeletedAminoButtons(ID_button1, ID_button2);
         cn.DisableSlider();
+        asc.DeselectAmino();
         //ui.P1CleanAtomButtons();
         //ui.P2CleanAtomButtons();
         Destroy(gameObject);
     }
 
-    public void HighlightClick()
-    {
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        bb.molecules_PDB_mesh[1].SelectAminoAcid_when_connection_clicked(ID_button2,A2_atom_index);
-        asc.UpdateCurrentButtonA2(ID_button2);
-        bb.molecules_PDB_mesh[0].SelectAminoAcid_when_connection_clicked(ID_button1,A1_atom_index);
-        asc.UpdateCurrentButtonA1(ID_button1);
-        asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
-        asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-        asc.HighLight3DMeshAll(ID_button1, ID_button2);
-        //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
-        //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
-    }
+    //public void HighlightClick()
+    //{
+    //    sfx.PlayTrack(SFX.sound_index.button_click);
+    //    //bb.molecules_PDB_mesh[1].SelectAminoAcid_when_connection_clicked(ID_button2,A2_atom_index);
+    //    asc.UpdateCurrentButtonA2(ID_button2);
+    //    //bb.molecules_PDB_mesh[0].SelectAminoAcid_when_connection_clicked(ID_button1,A1_atom_index);
+    //    asc.UpdateCurrentButtonA1(ID_button1);
+    //    asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+    //    asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+    //    asc.HighLight3DMeshAll(ID_button1, ID_button2);
+    //    //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+    //    //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
+    //}
 
     public void _HighlightClick()
     {
@@ -76,33 +77,33 @@ public class AminoConnectionHolder : MonoBehaviour {
         asc.UpdateCurrentButtonA2(ID_button2);
         //asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
         // asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-        //asc.HighLight3DMeshAll(ID_button1, ID_button2);
+        asc.HighLight3DMeshAll(ID_button1, ID_button2);
         //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
-        asc.A1Buttons[ID_button1].HighLightOnClick();
-        asc.A1Buttons[ID_button2].HighLightOnClick();
+        //asc.A1Buttons[ID_button1].HighLightOnClick();
+        //asc.A1Buttons[ID_button2].HighLightOnClick();
     }
 
-    void HightlighClickForNextAtom()
-    {
-        bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
-        asc.UpdateCurrentButtonA2(ID_button2);
-        bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
-        asc.UpdateCurrentButtonA1(ID_button1);
-        asc.HighLight3DMeshAll(ID_button1, ID_button2);
-    }
+    //void HightlighClickForNextAtom()
+    //{
+    //    bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
+    //    asc.UpdateCurrentButtonA2(ID_button2);
+    //    bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
+    //    asc.UpdateCurrentButtonA1(ID_button1);
+    //    asc.HighLight3DMeshAll(ID_button1, ID_button2);
+    //}
 
-    public void HighlightWhenMovingThroughAtomsA1()
-    {
-        bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
-        asc.UpdateCurrentButtonA1(ID_button1);
-    }
+    //public void HighlightWhenMovingThroughAtomsA1()
+    //{
+    //    bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
+    //    asc.UpdateCurrentButtonA1(ID_button1);
+    //}
 
-    public void HighlightWhenMovingThroughAtomsA2()
-    {
-        bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
-        asc.UpdateCurrentButtonA2(ID_button2);
-    }
+    //public void HighlightWhenMovingThroughAtomsA2()
+    //{
+    //    bb.molecules_PDB_mesh[1].SelectAminoAcid(ID_button2);
+    //    asc.UpdateCurrentButtonA2(ID_button2);
+    //}
 
     void Awake()
 	{
@@ -216,218 +217,218 @@ public class AminoConnectionHolder : MonoBehaviour {
         }
     }
 
-    //SLIDER atom BUTTONS
-    bool atom_exist;
-    public void AT1L()
-    {
-        if(ui.amino_clicked != connection_id)
-        {
-            HighlightClick();
-            ui.amino_clicked = connection_id;
-        }
+    ////SLIDER atom BUTTONS
+    //bool atom_exist;
+    //public void AT1L()
+    //{
+    //    if(ui.amino_clicked != connection_id)
+    //    {
+    //        HighlightClick();
+    //        ui.amino_clicked = connection_id;
+    //    }
 
-        if (AT1_index > 0)
-        {
-            sfx.PlayTrack(SFX.sound_index.amino_click);
-            //if false, no atoms are displayed
-            atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
+    //    if (AT1_index > 0)
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.amino_click);
+    //        //if false, no atoms are displayed
+    //        atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
 
-            if (ui.p1_atom_holder.childCount != 0)
-            {
-                ui.p1_atom_holder.GetChild(AT1_index).localScale = normal_scale;
-                ui.p1_atom_holder.GetChild(AT1_index - 1).localScale = selected_scale;
-            }
+    //        if (ui.p1_atom_holder.childCount != 0)
+    //        {
+    //            ui.p1_atom_holder.GetChild(AT1_index).localScale = normal_scale;
+    //            ui.p1_atom_holder.GetChild(AT1_index - 1).localScale = selected_scale;
+    //        }
             
-            AT1_index--;
+    //        AT1_index--;
 
-            //update the eatom highligght
-            A1_atom_index--;
-            or.P1_selected_atom_id = A1_atom_index;
+    //        //update the eatom highligght
+    //        A1_atom_index--;
+    //        or.P1_selected_atom_id = A1_atom_index;
 
-            if (!atom_exist)
-            {
-                HightlighClickForNextAtom();
-                asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-            }
-            else
-            {
-                if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
-                {
-                    HighlightWhenMovingThroughAtomsA1();
-                    HighlightWhenMovingThroughAtomsA2();
-                    atom_exist = false;
-                    asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-                }
-            }
+    //        if (!atom_exist)
+    //        {
+    //            HightlighClickForNextAtom();
+    //            asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+    //        }
+    //        else
+    //        {
+    //            if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
+    //            {
+    //                HighlightWhenMovingThroughAtomsA1();
+    //                HighlightWhenMovingThroughAtomsA2();
+    //                atom_exist = false;
+    //                asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+    //            }
+    //        }
 
-            cn.DeleteAminoAcidLink(connection);
-            Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
+    //        cn.DeleteAminoAcidLink(connection);
+    //        Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
 
             
 
-            //if (!atom_exist)
-            //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0,gameObject);
-            //else
-                asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0, gameObject, atom_exist);
-        }
-    }
-    public void AT1R()
-    {
-        if (ui.amino_clicked != connection_id)
-        {
-            HighlightClick();
-            ui.amino_clicked = connection_id;
-        }
+    //        //if (!atom_exist)
+    //        //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0,gameObject);
+    //        //else
+    //            asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index + 1, AT2_index, AT2_index, 0, gameObject, atom_exist);
+    //    }
+    //}
+    //public void AT1R()
+    //{
+    //    if (ui.amino_clicked != connection_id)
+    //    {
+    //        HighlightClick();
+    //        ui.amino_clicked = connection_id;
+    //    }
 
-        if (AT1_index < A1_number_of_atoms-1)
-        {
-            sfx.PlayTrack(SFX.sound_index.amino_click);
-            //if false, no atoms are displayed
-            atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
+    //    if (AT1_index < A1_number_of_atoms-1)
+    //    {
+    //        sfx.PlayTrack(SFX.sound_index.amino_click);
+    //        //if false, no atoms are displayed
+    //        atom_exist = ui.p1_atom_holder.childCount != 0 ? true : false;
 
-            if(ui.p1_atom_holder.childCount != 0)
-            {
-                ui.p1_atom_holder.GetChild(AT1_index).localScale = normal_scale;
-                ui.p1_atom_holder.GetChild(AT1_index + 1).localScale = selected_scale;
-            }
+    //        if(ui.p1_atom_holder.childCount != 0)
+    //        {
+    //            ui.p1_atom_holder.GetChild(AT1_index).localScale = normal_scale;
+    //            ui.p1_atom_holder.GetChild(AT1_index + 1).localScale = selected_scale;
+    //        }
 
-            AT1_index++;
+    //        AT1_index++;
 
-            //update the eatom highligght
-            A1_atom_index++;
-            or.P1_selected_atom_id = A1_atom_index;
+    //        //update the eatom highligght
+    //        A1_atom_index++;
+    //        or.P1_selected_atom_id = A1_atom_index;
 
-            if (!atom_exist)
-            {
-                HightlighClickForNextAtom();
-                asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-            }
-            else
-            {
-                if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
-                {
-                    HighlightWhenMovingThroughAtomsA1();
-                    HighlightWhenMovingThroughAtomsA2();
-                    atom_exist = false;
-                    asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-                }
-            }
+    //        if (!atom_exist)
+    //        {
+    //            HightlighClickForNextAtom();
+    //            asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+    //        }
+    //        else
+    //        {
+    //            if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
+    //            {
+    //                HighlightWhenMovingThroughAtomsA1();
+    //                HighlightWhenMovingThroughAtomsA2();
+    //                atom_exist = false;
+    //                asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
+    //            }
+    //        }
 
-            cn.DeleteAminoAcidLink(connection);
-            Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
+    //        cn.DeleteAminoAcidLink(connection);
+    //        Destroy(transform.GetChild(2).transform.GetChild(0).gameObject);
 
            
-            //if (!atom_exist)
-            //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject);
-            //else
-                asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject, atom_exist);
-        }
-    }
-    public void AT2L()
-    {
-        if (ui.amino_clicked != connection_id)
-        {
-            HighlightClick();
-            ui.amino_clicked = connection_id;
-        }
+    //        //if (!atom_exist)
+    //        //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject);
+    //        //else
+    //            asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index - 1, AT2_index, AT2_index, 0, gameObject, atom_exist);
+    //    }
+    //}
+    //public void AT2L()
+    //{
+    //    if (ui.amino_clicked != connection_id)
+    //    {
+    //        HighlightClick();
+    //        ui.amino_clicked = connection_id;
+    //    }
 
-        if (AT2_index > 0)
-        {
+    //    if (AT2_index > 0)
+    //    {
 
-            sfx.PlayTrack(SFX.sound_index.amino_click);
-            //if false, no atoms are displayed
-            atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
+    //        sfx.PlayTrack(SFX.sound_index.amino_click);
+    //        //if false, no atoms are displayed
+    //        atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
 
-            if (ui.p2_atom_holder.childCount != 0)
-            {
-                ui.p2_atom_holder.GetChild(AT2_index).localScale = normal_scale;
-                ui.p2_atom_holder.GetChild(AT2_index - 1).localScale = selected_scale;
-            }
+    //        if (ui.p2_atom_holder.childCount != 0)
+    //        {
+    //            ui.p2_atom_holder.GetChild(AT2_index).localScale = normal_scale;
+    //            ui.p2_atom_holder.GetChild(AT2_index - 1).localScale = selected_scale;
+    //        }
 
-            AT2_index--;
+    //        AT2_index--;
 
-            //update the eatom highligght
-            A2_atom_index--;
-            or.P2_selected_atom_id = A2_atom_index;
+    //        //update the eatom highligght
+    //        A2_atom_index--;
+    //        or.P2_selected_atom_id = A2_atom_index;
 
-            if (!atom_exist)
-            {
-                HightlighClickForNextAtom();
-                asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
-            }
-            else
-            {
-                if(asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
-                {
-                    HighlightWhenMovingThroughAtomsA1();
-                    HighlightWhenMovingThroughAtomsA2();
-                    atom_exist = false;
-                    asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
-                }
+    //        if (!atom_exist)
+    //        {
+    //            HightlighClickForNextAtom();
+    //            asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+    //        }
+    //        else
+    //        {
+    //            if(asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
+    //            {
+    //                HighlightWhenMovingThroughAtomsA1();
+    //                HighlightWhenMovingThroughAtomsA2();
+    //                atom_exist = false;
+    //                asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+    //            }
                 
-            }
+    //        }
 
-            cn.DeleteAminoAcidLink(connection);
-            Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
+    //        cn.DeleteAminoAcidLink(connection);
+    //        Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
 
-            //if (!atom_exist)
-            //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject);
-            //else
-                asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject, atom_exist);
-        }
-    }
-    public void AT2R()
-    {
-        if (ui.amino_clicked != connection_id)
-        {
-            HighlightClick();
-            ui.amino_clicked = connection_id;
-        }
+    //        //if (!atom_exist)
+    //        //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject);
+    //        //else
+    //            asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index + 1, 1, gameObject, atom_exist);
+    //    }
+    //}
+    //public void AT2R()
+    //{
+    //    if (ui.amino_clicked != connection_id)
+    //    {
+    //        HighlightClick();
+    //        ui.amino_clicked = connection_id;
+    //    }
 
-        if (AT2_index < A2_number_of_atoms-1)
-        {
+    //    if (AT2_index < A2_number_of_atoms-1)
+    //    {
 
-            sfx.PlayTrack(SFX.sound_index.amino_click);
-            //if false, no atoms are displayed
-            atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
+    //        sfx.PlayTrack(SFX.sound_index.amino_click);
+    //        //if false, no atoms are displayed
+    //        atom_exist = ui.p2_atom_holder.childCount != 0 ? true : false;
 
-            if (ui.p2_atom_holder.childCount != 0)
-            {
-                ui.p2_atom_holder.GetChild(AT2_index).localScale = normal_scale;
-                ui.p2_atom_holder.GetChild(AT2_index + 1).localScale = selected_scale;
-            }
+    //        if (ui.p2_atom_holder.childCount != 0)
+    //        {
+    //            ui.p2_atom_holder.GetChild(AT2_index).localScale = normal_scale;
+    //            ui.p2_atom_holder.GetChild(AT2_index + 1).localScale = selected_scale;
+    //        }
             
-            AT2_index++;
+    //        AT2_index++;
 
-            //update the eatom highligght
-            A2_atom_index++;
-            or.P2_selected_atom_id = A2_atom_index;
+    //        //update the eatom highligght
+    //        A2_atom_index++;
+    //        or.P2_selected_atom_id = A2_atom_index;
 
-            if (!atom_exist)
-            {
-                HightlighClickForNextAtom();
-                asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
-            }
-            else
-            {
-                if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
-                {
-                    HighlightWhenMovingThroughAtomsA1();
-                    HighlightWhenMovingThroughAtomsA2();
-                    atom_exist = false;
-                    asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
-                }
-            }
+    //        if (!atom_exist)
+    //        {
+    //            HightlighClickForNextAtom();
+    //            asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+    //        }
+    //        else
+    //        {
+    //            if (asc.CurrentButtonA1 != ID_button1 || asc.CurrentButtonA2 != ID_button2)
+    //            {
+    //                HighlightWhenMovingThroughAtomsA1();
+    //                HighlightWhenMovingThroughAtomsA2();
+    //                atom_exist = false;
+    //                asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
+    //            }
+    //        }
 
-            cn.DeleteAminoAcidLink(connection);
-            Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
+    //        cn.DeleteAminoAcidLink(connection);
+    //        Destroy(transform.GetChild(3).transform.GetChild(0).gameObject);
 
-            //if (!atom_exist)
-            //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject);
-            //else
-                asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject, atom_exist);
-        }
-    }
+    //        //if (!atom_exist)
+    //        //    asc.ModifyConnectionHolder_atomic_when_no_selection(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject);
+    //        //else
+    //            asc.ModifyConnectionHolder_atomic(cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index), AT1_index, AT1_index, AT2_index, AT2_index - 1, 1, gameObject, atom_exist);
+    //    }
+    //}
 
     public void ModifyAtomConnection(int atom_index, int protein_id, int atom_child_index)
     {
