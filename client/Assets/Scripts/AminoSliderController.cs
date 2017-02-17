@@ -568,6 +568,31 @@ public class AminoSliderController : MonoBehaviour
         }
     }
 
+    public void AddConnectionButton_from_amino_info_panel(GameObject ButtonPickedA1, GameObject ButtonPickedA2, int amino_index_0, int amino_index_1)
+    {
+        //ButtonPickedA1.GetComponent<Button>().interactable = false;
+        //ButtonPickedA2.GetComponent<Button>().interactable = false;
+        if (!CheckIfConnectionExist(ButtonPickedA1, ButtonPickedA2))
+        {
+            sfx.PlayTrack(SFX.sound_index.connection_click);
+            //ButtonPickedA1.GetComponent<Animator>().SetBool("High", false);
+            //ButtonPickedA2.GetComponent<Animator>().SetBool("High", false);
+            //normal size for link manger
+            //ButtonPickedA1.transform.localScale = new Vector3(1, 1, 1);
+            //ButtonPickedA2.transform.localScale = new Vector3(1, 1, 1);
+            _AminoAcidsLinkPanel(BioBloxReference.GetComponent<ConnectionManager>().CreateAminoAcidLink(BioBloxReference.molecules[0].GetComponent<PDB_mesh>(), amino_index_0, BioBloxReference.molecules[1].GetComponent<PDB_mesh>(), amino_index_1), ButtonPickedA1, ButtonPickedA2);
+            //ButtonPickedA1 = ButtonPickedA2 = null;
+            FindObjectOfType<ConnectionManager>().SliderStrings.interactable = true;
+            //DeactivateAddConnectionButton ();
+        }
+        else
+        {
+            ConnectionExistMessage.SetBool("Play", true);
+            if (!sfx.isPlaying(SFX.sound_index.connection_exist))
+                sfx.PlayTrack(SFX.sound_index.connection_exist);
+        }
+    }
+
     //void DeactivateAddConnectionButton()
     //{
     //	AddConnection.GetComponent<Animator>().enabled = false;

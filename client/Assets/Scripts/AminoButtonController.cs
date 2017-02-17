@@ -142,6 +142,11 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
                 AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform, false);
 
                 AminoInfoPanel_element_temp.transform.GetChild(0).GetComponent<Text>().text = dock_amino_name_tag_atom[i];
+                if(protein_id == 0)
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], dock_atom_id[i], protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_atom_id[i]).gameObject);
+                else
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, dock_atom_id[i], protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_atom_id[i]).gameObject, gameObject);
+
             }
             
             AminoInfoPanel_temp.transform.position = Input.mousePosition;
