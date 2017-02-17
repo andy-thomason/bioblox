@@ -53,7 +53,7 @@ public class AminoSliderController : MonoBehaviour
     public GameObject LinkedGameObject;
     GameObject LinkedGameObjectReference;
     public GameObject LinkedAtom;
-    ButtonStructure buttonStructure;
+    public ButtonStructure buttonStructure;
     UIController uIController;
 
     //local score
@@ -111,11 +111,11 @@ public class AminoSliderController : MonoBehaviour
     public List<GameObject> A2Hydro = new List<GameObject>();
     public List<GameObject> A2Polar = new List<GameObject>();
     public List<GameObject> A2Other = new List<GameObject>();
-    public Dictionary<string, string> FunctionTypes = new Dictionary<string, string>{
-        {"ALA",  "Hydro"}, {"ARG",  "Positive"}, {"ASN",  "Polar"}, {"ASP",  "Negative"}, {"CYS",  "Other"}, {"GLU",  "Negative"},
-        {"GLY",  "Other"}, {"HIS",  "Positive"}, {"ILE",  "Hydro"}, {"LEU",  "Hydro"}, {"LYS",  "Positive"}, {"MET",  "Hydro"},
-        {"PHE",  "Hydro"},  {"PRO",  "Other"}, {"SER",  "Polar"}, {"THR",  "Polar"}, {"GLN", "Polar"}, {"TRP",  "Hydro"},
-        {"TYR",  "Hydro"}, {"VAL",  "Hydro"},
+    public Dictionary<string, string> AminoFullNames = new Dictionary<string, string>{
+        {"ALA",  "Alanine"}, {"ARG",  "Arginine"}, {"ASN",  "Asparagine"}, {"ASP",  "Aspartic acid"}, {"CYS",  "Cysteine"}, {"GLU",  "Glutamic acid"},
+        {"GLY",  "Glycine"}, {"HIS",  "Histidine"}, {"ILE",  "Isoleucine"}, {"LEU",  "Leucine"}, {"LYS",  "Lysine"}, {"MET",  "Methionine"},
+        {"PHE",  "Phenylalanine"},  {"PRO",  "Proline"}, {"SER",  "Serine"}, {"THR",  "Threonine"}, {"GLN", "Glutamine"}, {"TRP",  "Tryptophan"},
+        {"TYR",  "Tyrosine"}, {"VAL",  "Valine"},
     };
 
     SFX sfx;
@@ -142,6 +142,8 @@ public class AminoSliderController : MonoBehaviour
 
     public int current_atom_child_id0;
     public int current_atom_child_id1;
+
+    public GameObject AminoInfoPanelCurrentOpen;
 
     void Awake()
     {
@@ -487,36 +489,6 @@ public class AminoSliderController : MonoBehaviour
         //AminoButtonReference.GetComponentInChildren<Text>().text = currentAmino.Replace(" ","")+System.Environment.NewLine+tag;
         //set the button id
         AminoButtonReference.GetComponent<AminoButtonController>().AminoButtonID = index;
-    }
-
-    void InsertButtonToListOfAminoAcidsFuntionA1(GameObject CurrentAmino, string NameAmino)
-    {
-        //insert the button to the correct list
-        if (FunctionTypes[NameAmino] == "Hydro")
-            A1Hydro.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Positive")
-            A1Positive.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Negative")
-            A1Negative.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Polar")
-            A1Polar.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Other")
-            A1Other.Add(CurrentAmino);
-    }
-
-    void InsertButtonToListOfAminoAcidsFuntionA2(GameObject CurrentAmino, string NameAmino)
-    {
-        //insert the button to the correct list
-        if (FunctionTypes[NameAmino] == "Hydro")
-            A2Hydro.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Positive")
-            A2Positive.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Negative")
-            A2Negative.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Polar")
-            A2Polar.Add(CurrentAmino);
-        else if (FunctionTypes[NameAmino] == "Other")
-            A2Other.Add(CurrentAmino);
     }
 
     public void EmptyAminoSliders()
@@ -1613,6 +1585,12 @@ public class AminoSliderController : MonoBehaviour
         //    SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
         //}
 
+    }
+
+    public void DeleteCurrentAminoInfoPanel()
+    {
+        if (AminoInfoPanelCurrentOpen != null)
+            Destroy(AminoInfoPanelCurrentOpen);
     }
 
 }

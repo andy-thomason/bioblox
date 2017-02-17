@@ -30,6 +30,11 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public List<int> dock_atom_id;
     public List<string> dock_amino_name_tag_atom;
 
+    //infi poanels
+    public GameObject AminoInfoPanel_simple;
+    public GameObject AminoInfoPanel_multi;
+    public GameObject AminoInfoPanel_element;
+
     void Start()
     {
         bb = FindObjectOfType<BioBlox>();
@@ -114,12 +119,46 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public void DisplayAminoInfo()
     {
+        aminoSli.DeleteCurrentAminoInfoPanel();
+
+        //exist helpo dock - multi panel
         if(dock_amino_id.Count != 0)
         {
-            for(int i = 0; i < dock_amino_id.Count; i++)
+            //no help, just info of the button
+            GameObject AminoInfoPanel_temp = Instantiate(AminoInfoPanel_multi);
+            //asign the current for reference
+            aminoSli.AminoInfoPanelCurrentOpen = AminoInfoPanel_temp;
+            AminoInfoPanel_temp.transform.SetParent(ui.MainCanvas.transform, false);
+            
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = aminoSli.AminoFullNames[name_amino];
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>().text = name_amino + " " + tag_amino;
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(2).GetComponent<Image>().color = aminoSli.buttonStructure.NormalColor[name_amino];
+
+            for (int i = 0; i < dock_amino_id.Count; i++)
             {
                 Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
+                //no help, just info of the button
+                GameObject AminoInfoPanel_element_temp = Instantiate(AminoInfoPanel_element);
+                AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform, false);
+
+                AminoInfoPanel_element_temp.transform.GetChild(0).GetComponent<Text>().text = dock_amino_name_tag_atom[i];
             }
+            
+            AminoInfoPanel_temp.transform.position = Input.mousePosition;
+        }
+        else
+        {
+            //no help, just info of the button
+            GameObject AminoInfoPanel_temp = Instantiate(AminoInfoPanel_simple);
+            //asign the current for reference
+            aminoSli.AminoInfoPanelCurrentOpen = AminoInfoPanel_temp;
+            AminoInfoPanel_temp.transform.SetParent(ui.MainCanvas.transform, false);
+
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = aminoSli.AminoFullNames[name_amino];
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>().text = name_amino +" "+ tag_amino;
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(2).GetComponent<Image>().color = aminoSli.buttonStructure.NormalColor[name_amino];
+
+            AminoInfoPanel_temp.transform.position = Input.mousePosition;
         }
     }
 

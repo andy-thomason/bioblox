@@ -186,6 +186,8 @@ public class UIController : MonoBehaviour {
     public Image[] protein0_render_buttons;
     public Image[] protein1_render_buttons;
 
+    public bool is_over_amino_info_panel = false;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -247,6 +249,9 @@ public class UIController : MonoBehaviour {
             if (Input.GetKey(KeyCode.Escape))
                 OpenLevelSelectionPanel();
         }
+
+        if (!is_over_amino_info_panel && Input.GetMouseButton(0))
+            aminoSliderController.DeleteCurrentAminoInfoPanel();
     }
 
     public void DeselectOnClick()

@@ -134,6 +134,12 @@ MonoBehaviour:
   dock_amino_id: 
   dock_atom_id: 
   dock_amino_name_tag_atom: []
+  AminoInfoPanel_simple: {fileID: 1516634765684576, guid: 59f6761b12047984fbd94e6afedb6003,
+    type: 2}
+  AminoInfoPanel_multi: {fileID: 1567534262429404, guid: fa008223cfed9174cb58f5e8c5988e79,
+    type: 2}
+  AminoInfoPanel_element: {fileID: 1481783497438066, guid: 0d4514f965eb8be40969d53e6a271426,
+    type: 2}
 --- !u!114 &11438648
 MonoBehaviour:
   m_ObjectHideFlags: 1
