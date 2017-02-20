@@ -60,6 +60,7 @@ public class OverlayRenderer : MonoBehaviour {
     public Material[] P1atom_material_o;
     public Material[] P2atom_material_o;
     public Material overlaping;
+    MouseOrbitImproved_main camera_script;
     //List<Atom> p1_atomos = new List<Atom>();
     //List<Atom> p2_atomos = new List<Atom>();
     public bool atom_2d_overlay = false;
@@ -80,6 +81,7 @@ public class OverlayRenderer : MonoBehaviour {
 		mesh.MarkDynamic ();
         MeshRenderer mr = GetComponent<MeshRenderer>();
         asc = FindObjectOfType<AminoSliderController>();
+        camera_script = FindObjectOfType<MouseOrbitImproved_main>();
         mr.material.renderQueue = 4000;
         get_spheres();
     }
@@ -271,6 +273,7 @@ public class OverlayRenderer : MonoBehaviour {
 		Vector3 camera_pos = lookat_camera.transform.position;
         Vector3 up = Vector3.up; // lookat_camera.transform.up;
         Vector3 right = Vector3.right; // lookat_camera.transform.right;
+        //float plane_distance = lookat_camera.nearClipPlane + 1.0f; camera_script
         float plane_distance = lookat_camera.nearClipPlane + 1.0f;
         for (int i = 0; i != icons.Count; ++i) {
             Icon icon = icons[i];

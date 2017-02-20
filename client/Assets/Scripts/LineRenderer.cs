@@ -37,11 +37,6 @@ public class LineRenderer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        if (GameObject.FindGameObjectWithTag("FirstPerson") != null)
-            lookat_camera_renderer = GameObject.FindGameObjectWithTag("FirstPerson").GetComponent<Camera>();
-        else
-            lookat_camera_renderer = lookat_camera;
-
         if (lookat_camera_renderer == null) {
 			Debug.Log("warning: lookat_camera missing");
 			return;
