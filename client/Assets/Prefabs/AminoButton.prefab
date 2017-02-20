@@ -129,8 +129,8 @@ MonoBehaviour:
   temp_AminoButtonID: 0
   AminoButton_Atom: {fileID: 1381495160114672, guid: bd1326c0699019244b1ea30b320d6c7a,
     type: 2}
-  OpenAtomPanel: {fileID: 21300000, guid: 117e2e82720f5834ab08cf6af7d16749, type: 3}
-  CloseAtomPanel: {fileID: 21300000, guid: d3658cfc1d54ef64b9dae7ada9f0cfc3, type: 3}
+  OpenAtomPanel: {fileID: 21300000, guid: 84e2cec7073c59d4d9d404357f0c08ea, type: 3}
+  CloseAtomPanel: {fileID: 21300000, guid: 478a6f1e97b6fb14ca01a1ef0d479acb, type: 3}
   dock_amino_id: 
   dock_atom_id: 
   dock_amino_name_tag_atom: []
