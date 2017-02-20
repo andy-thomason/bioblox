@@ -70,6 +70,11 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void _HighlightClick()
     {
+        if (asc.ConnHighlightImage != null)
+            asc.ConnHighlightImage.SetActive(false);
+
+        transform.GetChild(4).gameObject.SetActive(true);
+
         sfx.PlayTrack(SFX.sound_index.button_click);
         bb.molecules_PDB_mesh[0].SelectAminoAcid(ID_button1);
         asc.UpdateCurrentButtonA1(ID_button1);
@@ -78,6 +83,7 @@ public class AminoConnectionHolder : MonoBehaviour {
         //asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
         // asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
         asc.HighLight3DMeshAll();
+        asc.ConnHighlightImage = transform.GetChild(4).gameObject;
         //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //asc.A1Buttons[ID_button1].HighLightOnClick();
@@ -437,22 +443,22 @@ public class AminoConnectionHolder : MonoBehaviour {
         if(protein_id == 0)
         {
             //remove highlight color previous amino
-            transform.GetChild(1).transform.GetChild(4).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.normal_button_color;
+            transform.GetChild(1).transform.GetChild(5).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.normal_button_color;
             AT1_index = atom_child_index;
             connection = cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, atom_child_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index);
             or.P1_selected_atom_id = atom_index;
             //add highlight color previous amino
-            transform.GetChild(1).transform.GetChild(4).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
+            transform.GetChild(1).transform.GetChild(5).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
         }
         else
         {
             //remove highlight color previous amino
-            transform.GetChild(2).transform.GetChild(4).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.normal_button_color;
+            transform.GetChild(2).transform.GetChild(5).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.normal_button_color;
             AT2_index = atom_child_index;
             connection = cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, atom_child_index);
             or.P2_selected_atom_id = atom_index;
             //add highlight color previous amino
-            transform.GetChild(2).transform.GetChild(4).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
+            transform.GetChild(2).transform.GetChild(5).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
         }
     }
 

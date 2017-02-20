@@ -25,7 +25,7 @@ public class LineRenderer : MonoBehaviour {
 	List<Line> lines = new List<Line>();
 
 	public Camera lookat_camera;
-    Camera lookat_camera_renderer;
+    //Camera lookat_camera;
 
     // Use this for initialization
     void Start () {
@@ -37,7 +37,7 @@ public class LineRenderer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        if (lookat_camera_renderer == null) {
+        if (lookat_camera == null) {
 			Debug.Log("warning: lookat_camera missing");
 			return;
 		}
@@ -46,7 +46,7 @@ public class LineRenderer : MonoBehaviour {
 		Vector2[] uvs = new Vector2[lines.Count * 4];
 		int[] indices = new int[lines.Count * 6];
 
-		Vector3 camera_pos = lookat_camera_renderer.transform.position;
+		Vector3 camera_pos = lookat_camera.transform.position;
 		for (int i = 0; i != lines.Count; ++i) {
 			Line line = lines[i];
 			Vector3 to_end = line.end - line.start;

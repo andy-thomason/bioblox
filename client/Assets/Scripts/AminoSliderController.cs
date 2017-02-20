@@ -148,6 +148,8 @@ public class AminoSliderController : MonoBehaviour
     public RectTransform Amino1;
     public RectTransform Amino2;
 
+    public GameObject ConnHighlightImage;
+
     void Awake()
     {
         buttonStructure = FindObjectOfType<ButtonStructure>();
@@ -387,6 +389,9 @@ public class AminoSliderController : MonoBehaviour
         A2Buttons[CurrentButtonA2].transform.GetChild(selected_index).gameObject.SetActive(false);
         A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
         current_atom_child_id0 = current_atom_child_id1 = 0;
+        if(ConnHighlightImage != null)
+            ConnHighlightImage.SetActive(false);
+        ConnHighlightImage = null;
     }
 
     public void HighLight3DMesh(int index, int molecule)
