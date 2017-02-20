@@ -77,7 +77,7 @@ public class AminoConnectionHolder : MonoBehaviour {
         asc.UpdateCurrentButtonA2(ID_button2);
         //asc.HighlightAtomWhenConnectionClicked(AT1_index, 0);
         // asc.HighlightAtomWhenConnectionClicked(AT2_index, 1);
-        asc.HighLight3DMeshAll(ID_button1, ID_button2);
+        asc.HighLight3DMeshAll();
         //ui.p1_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //ui.p2_atom_status = UIController.p_atom_status_enum.find_atoms.GetHashCode();
         //asc.A1Buttons[ID_button1].HighLightOnClick();

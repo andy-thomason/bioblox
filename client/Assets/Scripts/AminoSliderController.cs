@@ -145,6 +145,9 @@ public class AminoSliderController : MonoBehaviour
 
     public GameObject AminoInfoPanelCurrentOpen;
 
+    public RectTransform Amino1;
+    public RectTransform Amino2;
+
     void Awake()
     {
         buttonStructure = FindObjectOfType<ButtonStructure>();
@@ -186,8 +189,11 @@ public class AminoSliderController : MonoBehaviour
         //create a custom state
         GameObject.FindGameObjectWithTag("data_1").GetComponent<ButtonGameState>().SaveCustom();
 
-        step_for_A1 = 1.0f / number_childs_A1;
-        step_for_A2 = 1.0f / number_childs_A2;
+        step_for_A1 = 1.0f / (number_childs_A1 / 1.03168f);
+        step_for_A2 = 1.0f / (number_childs_A2 / 1.035f);
+
+        CurrentButtonA1 = LastButtonA1 = number_childs_A1 / 2;
+        CurrentButtonA2 = LastButtonA2 = number_childs_A2 / 2;
     }
 
     public void Reset()
@@ -413,7 +419,7 @@ public class AminoSliderController : MonoBehaviour
         }
     }
 
-    public void HighLight3DMeshAll(int index_protein1, int index_protein2)
+    public void HighLight3DMeshAll()
     {
         //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         //A1Buttons[CurrentButtonA1].transform.GetChild(selected_index).gameObject.SetActive(false);
@@ -807,7 +813,11 @@ public class AminoSliderController : MonoBehaviour
 
         foreach (Transform childLinks in AminoLinkPanelParent.transform)
         {
-            if (childLinks.GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetComponent<AminoConnectionHolder>().ID_button2 == A2ID)
+            //get the index of the atom
+            int index_atom_a1 = atom_selected_p1 == -1 ? (A1.GetComponent<AminoButtonController>().amino_id.Length - 1) : atom_selected_p1;
+            int index_atom_a2 = atom_selected_p2 == -1 ? (A2.GetComponent<AminoButtonController>().amino_id.Length - 1) : atom_selected_p2;
+
+            if (childLinks.GetComponent<AminoConnectionHolder>().ID_button1 == A1ID && childLinks.GetComponent<AminoConnectionHolder>().ID_button2 == A2ID && index_atom_a1 == childLinks.GetComponent<AminoConnectionHolder>().AT1_index && index_atom_a2 == childLinks.GetComponent<AminoConnectionHolder>().AT2_index)
             {
                 existe = true;
             }
@@ -1160,7 +1170,7 @@ public class AminoSliderController : MonoBehaviour
         Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform;
 
         //go throuygh disable them all
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 14; i++)
         {
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;
@@ -1213,7 +1223,7 @@ public class AminoSliderController : MonoBehaviour
         atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform;
 
         //go throuygh disable them all
-        for (int i = 0; i < 12; i++)
+        for (int i = 0; i < 14; i++)
         {
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;

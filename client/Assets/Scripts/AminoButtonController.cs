@@ -71,7 +71,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
 	public void HighLightOnClick()
     {
-        sfx.PlayTrack(SFX.sound_index.amino_click);
+        //sfx.PlayTrack(SFX.sound_index.amino_click);
         if (protein_id == 1)
 		{
 			bb.molecules_PDB_mesh[1].SelectAminoAcid(AminoButtonID);
@@ -143,9 +143,16 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
                 AminoInfoPanel_element_temp.transform.GetChild(0).GetComponent<Text>().text = dock_amino_name_tag_atom[i];
                 if(protein_id == 0)
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], dock_atom_id[i], protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_atom_id[i]).gameObject);
+                {
+                    Debug.Log(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.childCount);
+                    Debug.Log(System.Array.IndexOf(amino_id, dock_atom_id[i]));
+                    Debug.Log(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], System.Array.IndexOf(amino_id, dock_atom_id[i]), protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
+
+
+                }
                 else
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, dock_atom_id[i], protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_atom_id[i]).gameObject, gameObject);
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, System.Array.IndexOf(amino_id, dock_atom_id[i]), protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).gameObject, gameObject);
 
             }
             

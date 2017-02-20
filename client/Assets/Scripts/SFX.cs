@@ -28,16 +28,25 @@ public class SFX : MonoBehaviour {
 
     #region MUTE BUTTON
     bool is_audio_playing = true;
+    bool is_sfx_playing = true;
     public Sprite audio_off;
     public Sprite audio_on;
     public Image audio_mute_image;
 
-    public void MuteAllSounds()
+    public void MuteMusic()
     {
         PlayTrack(SFX.sound_index.button_click);
-        MuteAll(is_audio_playing);
+        Mute_Music(is_audio_playing);
 
         is_audio_playing = !is_audio_playing;
+    }
+
+    public void MuteSFX()
+    {
+        PlayTrack(SFX.sound_index.button_click);
+        Mute_SFX(is_sfx_playing);
+
+        is_sfx_playing = !is_sfx_playing;
     }
     #endregion
 
@@ -108,7 +117,7 @@ public class SFX : MonoBehaviour {
         audioSource[index.GetHashCode()].PlayDelayed(delay);
     }
 
-    public void MuteAll(bool status)
+    public void Mute_SFX(bool status)
     {
         foreach(AudioSource aus in audioSource)
         {
@@ -119,5 +128,11 @@ public class SFX : MonoBehaviour {
         {
             aus.mute = status;
         }
+        audioSource[0].mute = !is_audio_playing;
+    }
+
+    public void Mute_Music(bool status)
+    {
+        audioSource[0].mute = status;
     }
 }

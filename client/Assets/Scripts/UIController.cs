@@ -210,8 +210,6 @@ public class UIController : MonoBehaviour {
         p1_atom_status = 0;
         p2_atom_status = 0;
         transparent_render = BioBloxReference.molecules[0].transform.GetChild(0).transform.childCount - 1;
-        DropDownP1.value = 0;
-        DropDownP2.value = 0;
         //SET VALUES TO SAVE BUTTONS
         Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;//slots holder
         int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
@@ -605,11 +603,6 @@ public class UIController : MonoBehaviour {
             cutawayON = false;
             sfx.StopTrack(SFX.sound_index.cutaway_cutting);
             sfx.StopTrack(SFX.sound_index.cutaway_protein);
-            //shadow on
-            if (DropDownP1.value == protein_render.normal.GetHashCode())
-                Shadows(true, 0);
-            if (DropDownP2.value == protein_render.normal.GetHashCode())
-                Shadows(true, 1);
         }
         else if(!cutawayON)
         {
