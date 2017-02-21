@@ -1207,7 +1207,7 @@ public class BioBlox : MonoBehaviour
 
     void CalcScore()
     {
-        if (!is_hint_moving)
+        if (!is_hint_moving && scoring != null)
         {
             scoring.calcScore2();
 
