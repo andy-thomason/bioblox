@@ -53,6 +53,7 @@ GameObject:
   m_Component:
   - component: {fileID: 224828779463865698}
   - component: {fileID: 114900029036153206}
+  - component: {fileID: 114553731531440238}
   m_Layer: 5
   m_Name: BackgroundColor
   m_TagString: Untagged
@@ -124,6 +125,7 @@ GameObject:
   - component: {fileID: 224104943652013938}
   - component: {fileID: 222766454801852684}
   - component: {fileID: 114241217344752388}
+  - component: {fileID: 114678420221284276}
   m_Layer: 5
   m_Name: PanelColorHolder
   m_TagString: Untagged
@@ -298,6 +300,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BackgroundColor: 2
+--- !u!114 &114553731531440238
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1168631829251200}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114571060238307820
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -310,6 +323,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BackgroundColor: 0
+--- !u!114 &114678420221284276
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1578609459314300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12a7fbc2a9e69b3408bc4b8987aca2e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114767084644511602
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -229,7 +229,7 @@ public class UIController : MonoBehaviour {
         if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
             //deselection aminoacids
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && !first_person && BioBloxReference.molecules.Length != 0)
+            if ((Input.GetMouseButtonDown(0)) && !first_person && BioBloxReference.molecules.Length != 0)
             {
                 Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
                 int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules_PDB_mesh[0].mol, BioBloxReference.molecules[0].transform, ray);
@@ -243,6 +243,8 @@ public class UIController : MonoBehaviour {
                     //DeselectAtoms();
                 }
             }
+            if(Input.GetMouseButtonDown(1))
+                aminoSliderController.DeleteCurrentAminoInfoPanel();
 
             //esc to spawn the menu
             if (Input.GetKey(KeyCode.Escape))
