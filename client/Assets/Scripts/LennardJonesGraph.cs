@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 [ExecuteInEditMode]
 public class LennardJonesGraph : Graphic 
 {
   delegate void AddQuad(Color32 c, float x0, float y0, float x1, float y1);
 
+  public List<float> points;
+  public float point_size = 0.01f;
+
 	protected override void OnPopulateMesh(VertexHelper vh)
 	{
-    Debug.Log("OnPopulateMesh 2");
-
 		Vector2 corner1 = Vector2.zero;
 		Vector2 corner2 = Vector2.zero;
 
@@ -57,22 +59,12 @@ public class LennardJonesGraph : Graphic
       index += 4;
     };
 
-    Color32 c2 = new Color32(0x00, 0x00, 0x00, 0xff);
-    //addQuad(color, 0, 0, 1, 1);
-    for (int i = 0; i != 30; ++i) {
-      float vx = i * (1.0f/30);
-      float vy = Mathf.Sin(vx * 4) * 0.5f + 0.5f;
-      addQuad(c2, vx, vy, vx + 0.02f, vy + 0.02f);
+    if (points != null) {
+      for (int i = 0; i != points.Count/2; ++i) {
+        float vx = points[i*2+0];
+        float vy = points[i*2+1];
+        addQuad(color, vx - point_size, vy - point_size, vx + point_size, vy + point_size);
+      }
     }
 	}
-
-/*    Color32 point_colour = new Color32(0x00, 0x00, 0x00, 0x00);
-    for (int i = 0; i != 100; ++i) {
-      float x = corner1.x + (corner2.x - corner1.x) * i / 100;
-      float y = corner1.y + (corner2.x - corner2.y) * i / 100;
-      vert.position = new Vector2(corner2.x, corner1.y);
-      vert.color = point_colour;
-      vbo.Add(vert);
-    }
-	}*/
 }
