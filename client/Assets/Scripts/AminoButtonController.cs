@@ -100,18 +100,17 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void DisableAmino()
     {
         is_disabled = !is_disabled;
-        transform.GetChild(4).gameObject.SetActive(is_disabled);
-
+        //transform.GetChild(4).gameObject.SetActive(is_disabled);
         for (int i = 0; i < amino_id.Length; i++)
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
 
-        HighLightOnClick();
+        //HighLightOnClick();
     }
 
     public void DisableAminoReset()
     {
         is_disabled = !is_disabled;
-        transform.GetChild(4).gameObject.SetActive(is_disabled);
+        //transform.GetChild(4).gameObject.SetActive(is_disabled);
 
         for (int i = 0; i < amino_id.Length; i++)
             bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
@@ -133,26 +132,23 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = aminoSli.AminoFullNames[name_amino];
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>().text = name_amino + " " + tag_amino;
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(2).GetComponent<Image>().color = aminoSli.buttonStructure.NormalColor[name_amino];
+            //set the reference in the onjkect
+            AminoInfoPanel_temp.GetComponent<InfoPanelController>().AminoObject = gameObject;
+            //set the toggle
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(4).transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(!is_disabled);
 
             for (int i = 0; i < dock_amino_id.Count; i++)
             {
-                Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
+                //Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
                 //no help, just info of the button
                 GameObject AminoInfoPanel_element_temp = Instantiate(AminoInfoPanel_element);
-                AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform, false);
+                AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform.GetChild(0).transform, false);
 
                 AminoInfoPanel_element_temp.transform.GetChild(0).GetComponent<Text>().text = dock_amino_name_tag_atom[i];
                 if(protein_id == 0)
-                {
-                    Debug.Log(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.childCount);
-                    Debug.Log(System.Array.IndexOf(amino_id, dock_atom_id[i]));
-                    Debug.Log(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], System.Array.IndexOf(amino_id, dock_atom_id[i]), protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
-
-
-                }
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
                 else
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, System.Array.IndexOf(amino_id, dock_atom_id[i]), protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).gameObject, gameObject);
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).gameObject, gameObject);
 
             }
             
@@ -169,6 +165,11 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = aminoSli.AminoFullNames[name_amino];
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(1).GetComponent<Text>().text = name_amino +" "+ tag_amino;
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(2).GetComponent<Image>().color = aminoSli.buttonStructure.NormalColor[name_amino];
+            //set the reference in the onjkect
+            AminoInfoPanel_temp.GetComponent<InfoPanelController>().AminoObject = gameObject;
+            //set the toggle
+            Debug.Log(is_disabled);
+            AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(!is_disabled);
 
             AminoInfoPanel_temp.transform.position = Input.mousePosition;
         }
@@ -207,6 +208,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponentInChildren<Text>().text = P_mol.atomNames[A_atoms[i]];
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().protein_id = protein_id;
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().atom_id = A_atoms[i];
                 temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().amino_child_index = AminoButtonID;
@@ -246,4 +248,21 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     //        current_atom_child_id = current_child_index;
     //    }
     //}
+
+    public void CloseAtomPanel_deselect()
+    {
+        if (protein_id == 0)
+        {
+            ui.EraseAminoButton_Atom_reference_0();
+            ui.AminoButton_Atom_reference_0 = null;
+            ui.AminoButton_reference_0 = null;
+        }
+        else
+        {
+            ui.EraseAminoButton_Atom_reference_1();
+            ui.AminoButton_Atom_reference_1 = null;
+            ui.AminoButton_reference_1 = null;
+        }
+        is_AminoButton_Atom_open = false;
+    }
 }

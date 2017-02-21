@@ -138,8 +138,6 @@ public class ConnectionManager : MonoBehaviour
         int[] atoms1 = mol1.mol.aminoAcidsAtomIds [amino_acid_index1];
         //picking the last atom of the chain of the amino acid 1
         //if no atom clicked - normal
-        Debug.Log("asc.atom_selected_p1 :"+ asc.atom_selected_p1);
-
         int index1 = asc.atom_selected_p1 == -1 ? atoms1 [atoms1.Length - 1] : atoms1[asc.atom_selected_p1];
 
         int[] atoms2 = mol2.mol.aminoAcidsAtomIds [amino_acid_index2];

@@ -318,7 +318,7 @@ public class BioBlox : MonoBehaviour
 
         molecules_PDB_mesh[0].DeselectAminoAcid();
         molecules_PDB_mesh[1].DeselectAminoAcid();
-        aminoSlider.DeselectAmino();
+        //aminoSlider.DeselectAmino();
 
         r0 = molecules[0].GetComponent<Rigidbody>();
         r1 = molecules[1].GetComponent<Rigidbody>();
