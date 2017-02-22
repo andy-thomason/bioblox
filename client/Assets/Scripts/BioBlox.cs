@@ -257,7 +257,6 @@ public class BioBlox : MonoBehaviour
     float max_game_score = 0;
     public Image score_bar;
     //score
-    enum game_type_mode { science_mode, game_mode };
     public CanvasGroup science_score;
     public Transform amino_links;
     public CanvasGroup game_bar;
@@ -2042,5 +2041,20 @@ public class BioBlox : MonoBehaviour
         }
     }
     #endregion
+
+    public void SwitchScienceMode()
+    {
+        game_bar.alpha = 0;
+        science_score.alpha = 1;
+        amino_links.transform.Translate(new Vector3(131, 0, 0));
+    }
+
+    public void SwitchGameMode()
+    {
+        science_score.alpha = 0;
+        game_bar.alpha = 1;
+        amino_links.transform.Translate(new Vector3(-131, 0, 0));
+    }
+
 }
 

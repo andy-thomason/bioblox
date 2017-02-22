@@ -97,6 +97,7 @@ public class GameManager : MonoBehaviour {
         science_mode_image.color = Color.white;
         game_type = game_type_mode.science_mode.GetHashCode();
         game_mode_image.color = deactivated_game_mode;
+        FindObjectOfType<BioBlox>().SwitchScienceMode();
     }
 
     public void switch_to_game_mode()
@@ -104,5 +105,6 @@ public class GameManager : MonoBehaviour {
         game_mode_image.color = Color.white;
         game_type = game_type_mode.game_mode.GetHashCode();
         science_mode_image.color = deactivated_game_mode;
+        FindObjectOfType<BioBlox>().SwitchGameMode();
     }
 }
