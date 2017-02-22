@@ -139,7 +139,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
             for (int i = 0; i < dock_amino_id.Count; i++)
             {
-                //Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
+                Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
                 //no help, just info of the button
                 GameObject AminoInfoPanel_element_temp = Instantiate(AminoInfoPanel_element);
                 AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform.GetChild(0).transform, false);

@@ -205,6 +205,10 @@ public class BioBlox : MonoBehaviour
     public Image connection_slider_image;
     public Color slider_valid_color;
 
+    //game score
+    public List<int> atom_touching_p1;
+    public List<int> atom_touching_p2;
+
     public enum GameState
     {
         Setup,
@@ -229,7 +233,7 @@ public class BioBlox : MonoBehaviour
     //scoring
     public PDB_score scoring;
 
-    public GameObject GameManager;
+    public GameObject GameManager_object;
     public GameObject MenuButtons;
     DataManager dm;
     public Transform level_holder;
@@ -250,12 +254,20 @@ public class BioBlox : MonoBehaviour
 
     public Text[] protein_name_text;
 
+    float max_game_score = 0;
+    public Image score_bar;
+    //score
+    enum game_type_mode { science_mode, game_mode };
+    public CanvasGroup science_score;
+    public Transform amino_links;
+    public CanvasGroup game_bar;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
         if (GameObject.FindGameObjectWithTag("GameManager") == null)
         {
-            Instantiate(GameManager);
+            Instantiate(GameManager_object);
         }
     }
 
@@ -289,6 +301,14 @@ public class BioBlox : MonoBehaviour
         else
         {
             GameObject.Find("CanvasDemo").SetActive(false);
+        }
+
+        //game type
+        if(FindObjectOfType<GameManager>().game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        {
+            science_score.alpha = 0;
+            game_bar.alpha = 1;
+            amino_links.transform.Translate(new Vector3(-131, 0, 0));
         }
 
 
@@ -343,9 +363,9 @@ public class BioBlox : MonoBehaviour
     {
         level_scores_from_server = level_scores;
         //before start the game loop load the score and check if set the tutorial or not
-        if (current_level == 0 && level_scores_from_server == "0")
-            ToggleMode.isOn = true;
-        else
+        //if (current_level == 0 && level_scores_from_server == "0")
+        //    ToggleMode.isOn = true;
+        //else
             ToggleMode.isOn = false;
 
         StartCoroutine(game_loop());
@@ -1185,6 +1205,25 @@ public class BioBlox : MonoBehaviour
                 //    }
                 //}
 
+
+                #region GAME SCORE
+                float current_game_score = 0;
+                //chheck if the atoms are in touch
+                for (int i = 0; i < atom_touching_p1.Count; i++)
+                {
+                    Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
+                    Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
+                    Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
+                    Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
+
+                    if((c1_t - c0_t).magnitude <= 6.0f)
+                    {
+                        current_game_score++;
+                    }
+                }
+                score_bar.fillAmount = current_game_score / max_game_score;
+                //Debug.Log(current_game_score);
+                #endregion
             }
 
             is_score_valid = num_invalid == 0;
@@ -1202,6 +1241,7 @@ public class BioBlox : MonoBehaviour
             }
 
             number_total_atoms = num_touching_0 + num_touching_1;
+           
         }
     }
 
@@ -1927,10 +1967,15 @@ public class BioBlox : MonoBehaviour
                                 aminoSlider.A1Buttons[a0].dock_amino_id.Add(a1);
                                 aminoSlider.A1Buttons[a0].dock_atom_id.Add(i1);
                                 aminoSlider.A1Buttons[a0].dock_amino_name_tag_atom.Add(mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1]);
+                                atom_touching_p2.Add(i1);
 
                                 aminoSlider.A2Buttons[a1].dock_amino_id.Add(a0);
                                 aminoSlider.A2Buttons[a1].dock_atom_id.Add(i0);
                                 aminoSlider.A2Buttons[a1].dock_amino_name_tag_atom.Add(mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0]);
+                                atom_touching_p1.Add(i0);
+
+                                //get the maximum game score
+                                max_game_score++;
 
                             }
                         }
@@ -1938,6 +1983,7 @@ public class BioBlox : MonoBehaviour
                 }
             }
         }
+        Debug.Log("max_game_score: " + max_game_score);
     }
 
     public void ResetDisabledAminoAcids()
