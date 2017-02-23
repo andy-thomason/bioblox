@@ -2046,14 +2046,14 @@ public class BioBlox : MonoBehaviour
     {
         game_bar.alpha = 0;
         science_score.alpha = 1;
-        amino_links.transform.Translate(new Vector3(131, 0, 0));
+        amino_links.transform.Translate(new Vector3(161, 0, 0));
     }
 
     public void SwitchGameMode()
     {
         science_score.alpha = 0;
         game_bar.alpha = 1;
-        amino_links.transform.Translate(new Vector3(-131, 0, 0));
+        amino_links.transform.Translate(new Vector3(-161, 0, 0));
     }
 
 }
