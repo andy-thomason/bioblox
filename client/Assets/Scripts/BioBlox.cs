@@ -314,6 +314,8 @@ public class BioBlox : MonoBehaviour
         //set the trypsin fiesr level temp
         current_level = FindObjectOfType<GameManager>().current_level;
 
+        get_spheres();
+
         if (current_level != -1)
             StartCoroutine(DownloadMolecules());
     }
@@ -1747,6 +1749,16 @@ public class BioBlox : MonoBehaviour
         molecule_1_views.name = "molecule_1";
         molecule_1_views.transform.SetParent(mol2.transform);
 
+        //disabled atoms holder 1
+        GameObject temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_1";
+        temp_atom_disable_holder.transform.SetParent(mol1.transform);
+
+        //disabled atoms holder 2
+        temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_2";
+        temp_atom_disable_holder.transform.SetParent(mol2.transform);
+
         molecules[0] = mol1.gameObject;
         molecules[1] = mol2.gameObject;
         molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
@@ -1912,6 +1924,8 @@ public class BioBlox : MonoBehaviour
             {
                 mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_1 : protein_view == protein_view.bs ? bs_1 : transparent_1;
             }
+
+            mesh_reference.AddComponent<SetRenderQueue>();
             mesh_reference.transform.SetParent(parent_molecule);
             // System.GC.Collect();
         }
@@ -2055,6 +2069,76 @@ public class BioBlox : MonoBehaviour
         game_bar.alpha = 1;
         amino_links.transform.Translate(new Vector3(-161, 0, 0));
     }
+
+    #region DISABLED SPHERES
+
+    List<GameObject> icons_spheres = new List<GameObject>();
+    List<GameObject> icons_spheres_store = new List<GameObject>();
+    //GameObject Sphere_atom_reference;
+    public GameObject Sphere_atom_holder;
+    int sphere_index = 0;
+    public Material Atom_1;
+    public Material Atom_2;
+
+    public Transform SpawnDisabledAtomsSpheres(int protein_id, int atom_id)
+    {
+        if (sphere_index < icons_spheres_store.Count)
+        {
+            icons_spheres_store[sphere_index].transform.parent = null;
+            icons_spheres_store[sphere_index].transform.localPosition = molecules[protein_id].transform.TransformPoint(molecules_PDB_mesh[protein_id].mol.atom_centres[atom_id]);
+            icons_spheres_store[sphere_index].transform.SetParent(molecules[protein_id].transform.GetChild(1).transform);
+            //color
+           // icons_spheres_store[sphere_index].transform.GetChild(0).GetComponent<Renderer>().material = protein_id == 0 ? Atom_1 : Atom_2;
+            sphere_index++;
+        }
+        return icons_spheres_store[sphere_index-1].transform;
+    }
+
+    //public GameObject add_Icon_sphere(GameObject Icon)
+    //{
+    //    icons_spheres.Add(Icon);
+    //    return Icon;
+    //}
+
+    public void clear_disabled_sphere(List<Transform> spheres)
+    {
+        foreach (Transform sphere in spheres)
+        {
+            sphere.transform.SetParent(Sphere_atom_holder.transform);
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+    }
+
+    //shperes
+    public void clear_spheres()
+    {
+        foreach (GameObject sphere in molecules[0].transform.GetChild(1))
+        {
+            sphere.transform.parent = null;
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+
+        foreach (GameObject sphere in molecules[1].transform.GetChild(1))
+        {
+            sphere.transform.parent = null;
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+        icons_spheres.Clear();
+    }
+
+    public void delete_Icon_sphere(GameObject Icon)
+    {
+        icons_spheres.Remove(Icon);
+    }
+
+    void get_spheres()
+    {
+        foreach (Transform sphere_son in Sphere_atom_holder.transform)
+        {
+            icons_spheres_store.Add(sphere_son.gameObject);
+        }
+    }
+    #endregion
 
 }
 

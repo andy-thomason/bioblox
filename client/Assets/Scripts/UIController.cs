@@ -616,7 +616,7 @@ public class UIController : MonoBehaviour {
             Shadows(false, 0);
             Shadows(false, 1);
             //delete overlays - when cutaway active
-            or.clear_spheres();
+            //or.clear_spheres();
             or.clear();
         }
 

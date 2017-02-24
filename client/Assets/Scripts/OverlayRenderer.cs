@@ -36,8 +36,6 @@ public class OverlayRenderer : MonoBehaviour {
     //};
 
     List<Icon> icons = new List<Icon>();
-    List<GameObject> icons_spheres = new List<GameObject>();
-    List<GameObject> icons_spheres_store = new List<GameObject>();
 
     public Material Atom_1;
     public Material Atom_2;
@@ -50,8 +48,6 @@ public class OverlayRenderer : MonoBehaviour {
 
     public Camera lookat_camera;
     public GameObject Sphere_atom;
-    //GameObject Sphere_atom_reference;
-    public GameObject Sphere_atom_holder;
     BioBlox bb;
     SFX sfx;
     AminoSliderController asc;
@@ -83,17 +79,14 @@ public class OverlayRenderer : MonoBehaviour {
         asc = FindObjectOfType<AminoSliderController>();
         camera_script = FindObjectOfType<MouseOrbitImproved_main>();
         mr.material.renderQueue = 4000;
-        get_spheres();
     }
 
     // Update is called once per frame
     void Update () {
         if (bb && bb.game_status == BioBlox.GameStatus.GameScreen && !ui.cutawayON)
         {
-            clear_spheres();
             clear();
 
-            int sphere_index = 0;
             for (int i = 0; i != bb.molecules.Length; ++i)
             {
                 GameObject obj = bb.molecules[i];
@@ -190,6 +183,16 @@ public class OverlayRenderer : MonoBehaviour {
 
                         
                     }
+                    //if (is_disabled)
+                    //{
+                    //    if (sphere_index < icons_spheres_store.Count)
+                    //    {
+                    //        icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                    //        add_Icon_sphere(icons_spheres_store[sphere_index]);
+                    //        sphere_index++;
+                    //    }
+                    //}
+
                     //else if (is_selected && ui.is_hovering)
                     //{
                     //    if (sphere_index < icons_spheres_store.Count)
@@ -328,30 +331,5 @@ public class OverlayRenderer : MonoBehaviour {
 		icons.Remove (Icon);
 	}
 
-    //shperes
-
-    public GameObject add_Icon_sphere(GameObject Icon)
-    {
-        icons_spheres.Add(Icon);
-        return Icon;
-    }
-
-    public void clear_spheres()
-    {
-        foreach (GameObject sphere in icons_spheres) sphere.transform.position = new Vector3(1000.0f,-500.0f,0);
-        icons_spheres.Clear();
-    }
-
-    public void delete_Icon_sphere(GameObject Icon)
-    {
-        icons_spheres.Remove(Icon);
-    }
-
-    void get_spheres()
-    {
-        foreach(Transform sphere_son in Sphere_atom_holder.transform)
-        {
-            icons_spheres_store.Add(sphere_son.gameObject);
-        }
-    }
+   
 }

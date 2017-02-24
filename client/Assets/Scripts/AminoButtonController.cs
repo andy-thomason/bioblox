@@ -30,6 +30,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public List<int> dock_atom_id;
     public List<string> dock_amino_name_tag_atom;
 
+    public List<Transform> disabled_spheres;
+
     //infi poanels
     public GameObject AminoInfoPanel_simple;
     public GameObject AminoInfoPanel_multi;
@@ -99,10 +101,18 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public void DisableAmino()
     {
-        is_disabled = !is_disabled;
         //transform.GetChild(4).gameObject.SetActive(is_disabled);
-        for (int i = 0; i < amino_id.Length; i++)
-            bb.atoms_disabled[protein_id][amino_id[i]] = is_disabled;
+        if(!is_disabled)
+        {
+            for (int i = 0; i < amino_id.Length; i++)
+                disabled_spheres.Add(bb.SpawnDisabledAtomsSpheres(protein_id, amino_id[i]));
+        }
+        else
+        {
+            bb.clear_disabled_sphere(disabled_spheres);
+        }
+
+        is_disabled = !is_disabled;
 
         //HighLightOnClick();
     }
