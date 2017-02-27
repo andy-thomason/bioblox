@@ -276,7 +276,8 @@ public class OverlayRenderer : MonoBehaviour {
 		Vector3 camera_pos = lookat_camera.transform.position;
         Vector3 up = Vector3.up; // lookat_camera.transform.up;
         Vector3 right = Vector3.right; // lookat_camera.transform.right;
-        //float plane_distance = lookat_camera.nearClipPlane + 1.0f; camera_script
+        float scale_factor = camera_script.distance < 44 ? (2.0f / ((200.0f - camera_script.distance))) : 0.01282051f;
+        //Debug.Log(scale_factor);
         float plane_distance = lookat_camera.nearClipPlane + 1.0f;
         for (int i = 0; i != icons.Count; ++i) {
             Icon icon = icons[i];
@@ -285,7 +286,7 @@ public class OverlayRenderer : MonoBehaviour {
             centre.x = centre.x * scale;
             centre.y = centre.y * scale;
             centre.z = plane_distance;
-            float r = icon.r * scale;
+            float r = icon.r * scale_factor; //scale;
             vertices[i*4+0] = centre + (  up - right) * r;
 			vertices[i*4+1] = centre + (- up - right) * r;
             vertices[i*4+2] = centre + (- up + right) * r;

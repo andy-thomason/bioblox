@@ -216,8 +216,6 @@ public class PDB_mesh : MonoBehaviour
     ButtonStructure buttonStructure;
     UIController uIController;
     MeshRenderer[] meshes;
-    //Vector3 light_pos;
-    ExploreController exploreController;
     GameObject camera_first_person;
     Transform mo_m;
     Vector3 camera_position;
@@ -233,7 +231,6 @@ public class PDB_mesh : MonoBehaviour
         buttonStructure = FindObjectOfType<ButtonStructure>();
         uIController = FindObjectOfType<UIController>();
         camera_first_person = GameObject.Find("CameraFirstPerson");
-        exploreController = FindObjectOfType<ExploreController>();
         mo_m = GameObject.FindGameObjectWithTag("camera_holder").transform;
     }
 

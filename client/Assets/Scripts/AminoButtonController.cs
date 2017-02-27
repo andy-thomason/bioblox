@@ -49,7 +49,10 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            HighLightOnClick();
             DisplayAminoInfo();
+        }
             //DisableAmino();
 
         sfx.PlayTrack(SFX.sound_index.amino_click);
@@ -178,7 +181,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             //set the reference in the onjkect
             AminoInfoPanel_temp.GetComponent<InfoPanelController>().AminoObject = gameObject;
             //set the toggle
-            Debug.Log(is_disabled);
+            //Debug.Log(is_disabled);
             AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(!is_disabled);
 
             AminoInfoPanel_temp.transform.position = Input.mousePosition;

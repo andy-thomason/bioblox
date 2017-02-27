@@ -56,7 +56,6 @@ public class UIController : MonoBehaviour {
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
-    ExploreController explorerController;
 
 	public Toggle[] ToggleButtonFunctionsView;
     Camera MainCameraComponent;
@@ -192,7 +191,6 @@ public class UIController : MonoBehaviour {
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
-        explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.transform.GetChild(0).GetComponent<Camera>();
         lr = FindObjectOfType<LineRenderer>();
         //button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
@@ -243,16 +241,22 @@ public class UIController : MonoBehaviour {
                     //DeselectAtoms();
                 }
             }
-            if(Input.GetMouseButtonDown(1))
+            if(!is_over_amino_info_panel && (Input.GetMouseButton(0) || Input.GetMouseButtonDown(1)))
+            {
                 aminoSliderController.DeleteCurrentAminoInfoPanel();
+
+            }
 
             //esc to spawn the menu
             if (Input.GetKey(KeyCode.Escape))
                 OpenLevelSelectionPanel();
         }
 
-        if (!is_over_amino_info_panel && Input.GetMouseButton(0))
-            aminoSliderController.DeleteCurrentAminoInfoPanel();
+        //if (!is_over_amino_info_panel && Input.GetMouseButton(0))
+        //{
+        //    Debug.Log("acaaaaaaaaaaaaa");
+        //    aminoSliderController.DeleteCurrentAminoInfoPanel();
+        //}
     }
 
     public void DeselectOnClick()

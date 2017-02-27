@@ -261,6 +261,9 @@ public class BioBlox : MonoBehaviour
     public Transform amino_links;
     public CanvasGroup game_bar;
 
+    public Text game_score_value_bar;
+    public enum game_type_mode { science_mode, game_mode };
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -1206,24 +1209,28 @@ public class BioBlox : MonoBehaviour
                 //    }
                 //}
 
-
                 #region GAME SCORE
-                float current_game_score = 0;
-                //chheck if the atoms are in touch
-                for (int i = 0; i < atom_touching_p1.Count; i++)
+                if (current_game_type == game_type_mode.game_mode.GetHashCode())
                 {
-                    Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
-                    Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
-                    Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
-                    Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
-
-                    if((c1_t - c0_t).magnitude <= 6.0f)
+                    float current_game_score = 0;
+                    //chheck if the atoms are in touch
+                    for (int i = 0; i < atom_touching_p1.Count; i++)
                     {
-                        current_game_score++;
+                        Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
+                        Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
+                        Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
+                        Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
+
+                        if ((c1_t - c0_t).magnitude <= 6.0f)
+                        {
+                            current_game_score++;
+                        }
                     }
+                    float bar_value = current_game_score / max_game_score;
+                    score_bar.fillAmount = current_game_score / max_game_score;
+                    game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
+                    //Debug.Log(current_game_score);
                 }
-                score_bar.fillAmount = current_game_score / max_game_score;
-                //Debug.Log(current_game_score);
                 #endregion
             }
 
@@ -2056,19 +2063,27 @@ public class BioBlox : MonoBehaviour
     }
     #endregion
 
+    #region SWITCH MODES
+    public Transform science_mode;
+    public Transform game_mode;
+    int current_game_type = 0;
+
     public void SwitchScienceMode()
     {
         game_bar.alpha = 0;
         science_score.alpha = 1;
-        amino_links.transform.Translate(new Vector3(161, 0, 0));
+        current_game_type = game_type_mode.science_mode.GetHashCode();
+        amino_links.SetParent(game_mode, false);
     }
 
     public void SwitchGameMode()
     {
         science_score.alpha = 0;
         game_bar.alpha = 1;
-        amino_links.transform.Translate(new Vector3(-161, 0, 0));
+        current_game_type = game_type_mode.game_mode.GetHashCode();
+        amino_links.SetParent(science_mode, false);
     }
+    #endregion
 
     #region DISABLED SPHERES
 
