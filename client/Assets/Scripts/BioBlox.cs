@@ -1049,6 +1049,7 @@ public class BioBlox : MonoBehaviour
     // Physics simulation
     void FixedUpdate()
     {
+        List<float> ljp_atom_points = new List<float>();
 
         if (game_status == GameStatus.GameScreen && !is_hint_moving)
         {
@@ -1114,9 +1115,12 @@ public class BioBlox : MonoBehaviour
                     float lennard_jones_force = 12 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
                     */
 
-                    /*float ljr = distance / min_d;
+                    float ljr = distance / min_d;
                     float lennard_jones_potential = Mathf.Pow(ljr, -12) - Mathf.Pow(ljr, -6);
-                    float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);*/
+                    //float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
+                    ljp_atom_points.Add(ljr);
+                    ljp_atom_points.Add(lennard_jones_potential);
+
 
                     // 8-6 potential (force is the differential)
                     //REAL PHYSICS HERE **
@@ -1202,6 +1206,11 @@ public class BioBlox : MonoBehaviour
             }
 
             number_total_atoms = num_touching_0 + num_touching_1;
+        }
+
+        LennardJonesGraph lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
+        if (lj_atom_graph != null && ljp_atom_points != null) {
+            lj_atom_graph.points = ljp_atom_points;
         }
     }
 
