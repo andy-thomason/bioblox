@@ -19,7 +19,7 @@ public class CreateConnectionInfopanel : MonoBehaviour, IPointerClickHandler
         if (protein_id == 0)
             asc.atom_selected_p2 = atom_id;
         else
-             asc.atom_selected_p1 = atom_id;
+            asc.atom_selected_p1 = atom_id;
 
         asc.AddConnectionButton_from_amino_info_panel(A1Button, A2Button, amino_id_0, amino_id_1);
     }

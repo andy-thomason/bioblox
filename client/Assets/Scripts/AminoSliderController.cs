@@ -189,13 +189,10 @@ public class AminoSliderController : MonoBehaviour
         GetNumberOfAmino_0();
         GetNumberOfAmino_1();
         //create a custom state
-        GameObject.FindGameObjectWithTag("data_1").GetComponent<ButtonGameState>().SaveCustom();
+        //GameObject.FindGameObjectWithTag("data_1").GetComponent<ButtonGameState>().SaveCustom();
 
         step_for_A1 = 1.0f / (number_childs_A1 / 1.03168f);
         step_for_A2 = 1.0f / (number_childs_A2 / 1.035f);
-
-        CurrentButtonA1 = LastButtonA1 = number_childs_A1 / 2;
-        CurrentButtonA2 = LastButtonA2 = number_childs_A2 / 2;
     }
 
     public void Reset()
@@ -213,6 +210,7 @@ public class AminoSliderController : MonoBehaviour
 
             if (ButtonA1LDown)
             {
+
                 LastButtonA1 = CurrentButtonA1;
 
                 CurrentButtonA1++;
@@ -382,6 +380,10 @@ public class AminoSliderController : MonoBehaviour
         //amino buttons
         //A1Buttons[CurrentButtonA1].transform.localScale = normal_scale;
         //A2Buttons[CurrentButtonA2].transform.localScale = normal_scale;
+        if(ButtonPickedA1 != null)
+            A1Buttons[CurrentButtonA1].CloseAtomPanel_deselect();
+        if(ButtonPickedA2 != null)
+            A2Buttons[CurrentButtonA2].CloseAtomPanel_deselect();
         ButtonPickedA1 = ButtonPickedA2 = null;
         AddConnection.interactable = false;
         SetColorTextToNormalFromButtonA1(CurrentButtonA1);

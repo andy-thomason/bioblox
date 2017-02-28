@@ -86,6 +86,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 224634013288987302}
+  - component: {fileID: 114691786004213880}
   m_Layer: 5
   m_Name: AminoInfoPanelSimple
   m_TagString: Untagged
@@ -225,8 +226,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: GLU I 298
 --- !u!114 &114361983013029936
@@ -285,8 +286,8 @@ MonoBehaviour:
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: Glutamic acid
 --- !u!114 &114414790716060472
@@ -336,15 +337,26 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 114966985452398170}
-  toggleTransition: 1
+  toggleTransition: 0
   graphic: {fileID: 114880264077672502}
   m_Group: {fileID: 0}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 114691786004213880}
+        m_MethodName: DisableAminoToggleSingle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!114 &114687922640789226
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -372,6 +384,18 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114691786004213880
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1516634765684576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebb0954ae8f248a45a5129e332603a00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AminoObject: {fileID: 0}
 --- !u!114 &114825545247512906
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -628,7 +652,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 95.7, y: -47.4}
+  m_AnchoredPosition: {x: 136, y: -47.4}
   m_SizeDelta: {x: 216, y: 101}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224917538050891930

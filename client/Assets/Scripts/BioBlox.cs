@@ -205,6 +205,10 @@ public class BioBlox : MonoBehaviour
     public Image connection_slider_image;
     public Color slider_valid_color;
 
+    //game score
+    public List<int> atom_touching_p1;
+    public List<int> atom_touching_p2;
+
     public enum GameState
     {
         Setup,
@@ -229,7 +233,7 @@ public class BioBlox : MonoBehaviour
     //scoring
     public PDB_score scoring;
 
-    public GameObject GameManager;
+    public GameObject GameManager_object;
     public GameObject MenuButtons;
     DataManager dm;
     public Transform level_holder;
@@ -250,12 +254,22 @@ public class BioBlox : MonoBehaviour
 
     public Text[] protein_name_text;
 
+    float max_game_score = 0;
+    public Image score_bar;
+    //score
+    public CanvasGroup science_score;
+    public Transform amino_links;
+    public CanvasGroup game_bar;
+
+    public Text game_score_value_bar;
+    public enum game_type_mode { science_mode, game_mode };
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
         if (GameObject.FindGameObjectWithTag("GameManager") == null)
         {
-            Instantiate(GameManager);
+            Instantiate(GameManager_object);
         }
     }
 
@@ -291,9 +305,19 @@ public class BioBlox : MonoBehaviour
             GameObject.Find("CanvasDemo").SetActive(false);
         }
 
+        //game type
+        if(FindObjectOfType<GameManager>().game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        {
+            science_score.alpha = 0;
+            game_bar.alpha = 1;
+            amino_links.transform.Translate(new Vector3(-131, 0, 0));
+        }
+
 
         //set the trypsin fiesr level temp
         current_level = FindObjectOfType<GameManager>().current_level;
+
+        get_spheres();
 
         if (current_level != -1)
             StartCoroutine(DownloadMolecules());
@@ -318,7 +342,7 @@ public class BioBlox : MonoBehaviour
 
         molecules_PDB_mesh[0].DeselectAminoAcid();
         molecules_PDB_mesh[1].DeselectAminoAcid();
-        aminoSlider.DeselectAmino();
+        //aminoSlider.DeselectAmino();
 
         r0 = molecules[0].GetComponent<Rigidbody>();
         r1 = molecules[1].GetComponent<Rigidbody>();
@@ -343,9 +367,9 @@ public class BioBlox : MonoBehaviour
     {
         level_scores_from_server = level_scores;
         //before start the game loop load the score and check if set the tutorial or not
-        if (current_level == 0 && level_scores_from_server == "0")
-            ToggleMode.isOn = true;
-        else
+        //if (current_level == 0 && level_scores_from_server == "0")
+        //    ToggleMode.isOn = true;
+        //else
             ToggleMode.isOn = false;
 
         StartCoroutine(game_loop());
@@ -1189,6 +1213,29 @@ public class BioBlox : MonoBehaviour
                 //    }
                 //}
 
+                #region GAME SCORE
+                if (current_game_type == game_type_mode.game_mode.GetHashCode())
+                {
+                    float current_game_score = 0;
+                    //chheck if the atoms are in touch
+                    for (int i = 0; i < atom_touching_p1.Count; i++)
+                    {
+                        Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
+                        Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
+                        Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
+                        Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
+
+                        if ((c1_t - c0_t).magnitude <= 6.0f)
+                        {
+                            current_game_score++;
+                        }
+                    }
+                    float bar_value = current_game_score / max_game_score;
+                    score_bar.fillAmount = current_game_score / max_game_score;
+                    game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
+                    //Debug.Log(current_game_score);
+                }
+                #endregion
             }
 
             is_score_valid = num_invalid == 0;
@@ -1206,6 +1253,7 @@ public class BioBlox : MonoBehaviour
             }
 
             number_total_atoms = num_touching_0 + num_touching_1;
+           
         }
 
         LennardJonesGraph lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
@@ -1717,6 +1765,16 @@ public class BioBlox : MonoBehaviour
         molecule_1_views.name = "molecule_1";
         molecule_1_views.transform.SetParent(mol2.transform);
 
+        //disabled atoms holder 1
+        GameObject temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_1";
+        temp_atom_disable_holder.transform.SetParent(mol1.transform);
+
+        //disabled atoms holder 2
+        temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_2";
+        temp_atom_disable_holder.transform.SetParent(mol2.transform);
+
         molecules[0] = mol1.gameObject;
         molecules[1] = mol2.gameObject;
         molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
@@ -1882,6 +1940,8 @@ public class BioBlox : MonoBehaviour
             {
                 mr.GetComponent<Renderer>().material = protein_view == protein_view.normal ? normal_1 : protein_view == protein_view.bs ? bs_1 : transparent_1;
             }
+
+            mesh_reference.AddComponent<SetRenderQueue>();
             mesh_reference.transform.SetParent(parent_molecule);
             // System.GC.Collect();
         }
@@ -1936,10 +1996,15 @@ public class BioBlox : MonoBehaviour
                                 aminoSlider.A1Buttons[a0].dock_amino_id.Add(a1);
                                 aminoSlider.A1Buttons[a0].dock_atom_id.Add(i1);
                                 aminoSlider.A1Buttons[a0].dock_amino_name_tag_atom.Add(mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1]);
+                                atom_touching_p2.Add(i1);
 
                                 aminoSlider.A2Buttons[a1].dock_amino_id.Add(a0);
                                 aminoSlider.A2Buttons[a1].dock_atom_id.Add(i0);
                                 aminoSlider.A2Buttons[a1].dock_amino_name_tag_atom.Add(mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0]);
+                                atom_touching_p1.Add(i0);
+
+                                //get the maximum game score
+                                max_game_score++;
 
                             }
                         }
@@ -1947,6 +2012,7 @@ public class BioBlox : MonoBehaviour
                 }
             }
         }
+        Debug.Log("max_game_score: " + max_game_score);
     }
 
     public void ResetDisabledAminoAcids()
@@ -2005,5 +2071,98 @@ public class BioBlox : MonoBehaviour
         }
     }
     #endregion
+
+    #region SWITCH MODES
+    public Transform science_mode;
+    public Transform game_mode;
+    int current_game_type = 0;
+
+    public void SwitchScienceMode()
+    {
+        game_bar.alpha = 0;
+        science_score.alpha = 1;
+        current_game_type = game_type_mode.science_mode.GetHashCode();
+        amino_links.SetParent(game_mode, false);
+    }
+
+    public void SwitchGameMode()
+    {
+        science_score.alpha = 0;
+        game_bar.alpha = 1;
+        current_game_type = game_type_mode.game_mode.GetHashCode();
+        amino_links.SetParent(science_mode, false);
+    }
+    #endregion
+
+    #region DISABLED SPHERES
+
+    List<GameObject> icons_spheres = new List<GameObject>();
+    List<GameObject> icons_spheres_store = new List<GameObject>();
+    //GameObject Sphere_atom_reference;
+    public GameObject Sphere_atom_holder;
+    int sphere_index = 0;
+    public Material Atom_1;
+    public Material Atom_2;
+
+    public Transform SpawnDisabledAtomsSpheres(int protein_id, int atom_id)
+    {
+        if (sphere_index < icons_spheres_store.Count)
+        {
+            icons_spheres_store[sphere_index].transform.parent = null;
+            icons_spheres_store[sphere_index].transform.localPosition = molecules[protein_id].transform.TransformPoint(molecules_PDB_mesh[protein_id].mol.atom_centres[atom_id]);
+            icons_spheres_store[sphere_index].transform.SetParent(molecules[protein_id].transform.GetChild(1).transform);
+            //color
+           // icons_spheres_store[sphere_index].transform.GetChild(0).GetComponent<Renderer>().material = protein_id == 0 ? Atom_1 : Atom_2;
+            sphere_index++;
+        }
+        return icons_spheres_store[sphere_index-1].transform;
+    }
+
+    //public GameObject add_Icon_sphere(GameObject Icon)
+    //{
+    //    icons_spheres.Add(Icon);
+    //    return Icon;
+    //}
+
+    public void clear_disabled_sphere(List<Transform> spheres)
+    {
+        foreach (Transform sphere in spheres)
+        {
+            sphere.transform.SetParent(Sphere_atom_holder.transform);
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+    }
+
+    //shperes
+    public void clear_spheres()
+    {
+        foreach (GameObject sphere in molecules[0].transform.GetChild(1))
+        {
+            sphere.transform.parent = null;
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+
+        foreach (GameObject sphere in molecules[1].transform.GetChild(1))
+        {
+            sphere.transform.parent = null;
+            sphere.transform.position = new Vector3(1000.0f, 1000.0f, 0);
+        }
+        icons_spheres.Clear();
+    }
+
+    public void delete_Icon_sphere(GameObject Icon)
+    {
+        icons_spheres.Remove(Icon);
+    }
+
+    void get_spheres()
+    {
+        foreach (Transform sphere_son in Sphere_atom_holder.transform)
+        {
+            icons_spheres_store.Add(sphere_son.gameObject);
+        }
+    }
+    #endregion
+
 }
 

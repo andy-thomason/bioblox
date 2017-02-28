@@ -56,7 +56,6 @@ public class UIController : MonoBehaviour {
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
-    ExploreController explorerController;
 
 	public Toggle[] ToggleButtonFunctionsView;
     Camera MainCameraComponent;
@@ -192,7 +191,6 @@ public class UIController : MonoBehaviour {
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
         BioBloxReference = FindObjectOfType<BioBlox>();
-        explorerController = FindObjectOfType<ExploreController>();
         MainCameraComponent = MainCamera.transform.GetChild(0).GetComponent<Camera>();
         lr = FindObjectOfType<LineRenderer>();
         //button_erase_connections_1p_button = button_erase_connections_1p.GetComponent<Button>();
@@ -229,7 +227,7 @@ public class UIController : MonoBehaviour {
         if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
             //deselection aminoacids
-            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1)) && !first_person && BioBloxReference.molecules.Length != 0)
+            if ((Input.GetMouseButtonDown(0)) && !first_person && BioBloxReference.molecules.Length != 0)
             {
                 Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
                 int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules_PDB_mesh[0].mol, BioBloxReference.molecules[0].transform, ray);
@@ -243,14 +241,22 @@ public class UIController : MonoBehaviour {
                     //DeselectAtoms();
                 }
             }
+            if(!is_over_amino_info_panel && (Input.GetMouseButton(0) || Input.GetMouseButtonDown(1)))
+            {
+                aminoSliderController.DeleteCurrentAminoInfoPanel();
+
+            }
 
             //esc to spawn the menu
             if (Input.GetKey(KeyCode.Escape))
                 OpenLevelSelectionPanel();
         }
 
-        if (!is_over_amino_info_panel && Input.GetMouseButton(0))
-            aminoSliderController.DeleteCurrentAminoInfoPanel();
+        //if (!is_over_amino_info_panel && Input.GetMouseButton(0))
+        //{
+        //    Debug.Log("acaaaaaaaaaaaaa");
+        //    aminoSliderController.DeleteCurrentAminoInfoPanel();
+        //}
     }
 
     public void DeselectOnClick()
@@ -614,7 +620,7 @@ public class UIController : MonoBehaviour {
             Shadows(false, 0);
             Shadows(false, 1);
             //delete overlays - when cutaway active
-            or.clear_spheres();
+            //or.clear_spheres();
             or.clear();
         }
 

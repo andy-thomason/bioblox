@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour {
     public GameObject tutorial_panel;
     SFX sfx;
     bool open_selection_once_at_start = false;
+    public enum game_type_mode { science_mode, game_mode };
+    public int game_type = 0;
+    public Color deactivated_game_mode;
+    public Image science_mode_image;
+    public Image game_mode_image;
 
     void Awake()
     {
@@ -85,5 +90,21 @@ public class GameManager : MonoBehaviour {
             open_selection_once_at_start = true;
         }
         FindObjectOfType<UIController>().isOverUI = false;
+    }
+
+    public void switch_to_science_mode()
+    {
+        science_mode_image.color = Color.white;
+        game_type = game_type_mode.science_mode.GetHashCode();
+        game_mode_image.color = deactivated_game_mode;
+        FindObjectOfType<BioBlox>().SwitchScienceMode();
+    }
+
+    public void switch_to_game_mode()
+    {
+        game_mode_image.color = Color.white;
+        game_type = game_type_mode.game_mode.GetHashCode();
+        science_mode_image.color = deactivated_game_mode;
+        FindObjectOfType<BioBlox>().SwitchGameMode();
     }
 }
