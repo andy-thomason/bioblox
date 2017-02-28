@@ -28,6 +28,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
     public List<int> dock_amino_id;
     public List<int> dock_atom_id;
+    public List<int> dock_atom_id_self;
     public List<string> dock_amino_name_tag_atom;
 
     public List<Transform> disabled_spheres;
@@ -152,17 +153,16 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
 
             for (int i = 0; i < dock_amino_id.Count; i++)
             {
-                Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i]);
+                //Debug.Log("AminoID: " + dock_amino_id[i] + " AtomID: " + dock_atom_id[i] + " Amino name: " + dock_amino_name_tag_atom[i] + " AtomID_Self: " + dock_atom_id_self[i]);
                 //no help, just info of the button
                 GameObject AminoInfoPanel_element_temp = Instantiate(AminoInfoPanel_element);
                 AminoInfoPanel_element_temp.transform.SetParent(AminoInfoPanel_temp.transform.GetChild(0).transform.GetChild(3).transform.GetChild(0).transform.GetChild(0).transform, false);
 
                 AminoInfoPanel_element_temp.transform.GetChild(0).GetComponent<Text>().text = dock_amino_name_tag_atom[i];
                 if(protein_id == 0)
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(AminoButtonID, dock_amino_id[i], System.Array.IndexOf(amino_id, dock_atom_id_self[i]), System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), protein_id, gameObject, FindObjectOfType<AminoSliderController>().SliderMol[1].transform.GetChild(dock_amino_id[i]).gameObject);
                 else
-                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).gameObject, gameObject);
-
+                    AminoInfoPanel_element_temp.transform.GetChild(1).GetComponent<CreateConnectionInfopanel>().SetValues(dock_amino_id[i], AminoButtonID, System.Array.IndexOf(FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).GetComponent<AminoButtonController>().amino_id, dock_atom_id[i]), System.Array.IndexOf(amino_id, dock_atom_id_self[i]), protein_id, FindObjectOfType<AminoSliderController>().SliderMol[0].transform.GetChild(dock_amino_id[i]).gameObject, gameObject);
             }
             
             AminoInfoPanel_temp.transform.position = Input.mousePosition;
