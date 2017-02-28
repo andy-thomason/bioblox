@@ -7,8 +7,13 @@ public class LennardJonesGraph : Graphic
 {
   delegate void AddQuad(Color32 c, float x0, float y0, float x1, float y1);
 
-  public List<float> points;
   public float point_size = 0.01f;
+  public Vector2 offset = new Vector2(-0.7f, 0.6f);
+  public Vector2 scale = new Vector2(1.0f, 0.5f);
+  public Color bad_color = new Color(1, 0, 0, 1);
+  public Color axis_color = new Color(0.5f, 0.5f, 0.5f, 1);
+
+  public List<float> points;
 
 	protected override void OnPopulateMesh(VertexHelper vh)
 	{
@@ -43,15 +48,19 @@ public class LennardJonesGraph : Graphic
 		  vert.color = c;
 
 		  vert.position = new Vector2(x + x0 * w, y + y0 * h);
+      vert.uv0 = new Vector2(0, 0);
 		  vh.AddVert(vert);
 
 		  vert.position = new Vector2(x + x0 * w, y + y1 * h);
+      vert.uv0 = new Vector2(0, 1);
 		  vh.AddVert(vert);
 
 		  vert.position = new Vector2(x + x1 * w, y + y1 * h);
+      vert.uv0 = new Vector2(1, 1);
 		  vh.AddVert(vert);
 
 		  vert.position = new Vector2(x + x1 * w, y + y0 * h);
+      vert.uv0 = new Vector2(1, 0);
 		  vh.AddVert(vert);
 
 		  vh.AddTriangle(index + 0, index + 1, index + 2);
@@ -59,11 +68,17 @@ public class LennardJonesGraph : Graphic
       index += 4;
     };
 
+    addQuad(axis_color, offset.x + scale.x * 0.5f, offset.y - point_size, offset.x + scale.x * 1.8f, offset.y + point_size);
+    addQuad(axis_color, offset.x + scale.x * 1.0f - point_size, offset.y - scale.y * 1.0f, offset.x + scale.x * 1.0f + point_size, offset.y + scale.y * 1.0f);
     if (points != null) {
       for (int i = 0; i != points.Count/2; ++i) {
-        float vx = points[i*2+0];
-        float vy = points[i*2+1];
-        addQuad(color, vx - point_size, vy - point_size, vx + point_size, vy + point_size);
+        float vx = points[i*2+0] * scale.x + offset.x;
+        float vy = points[i*2+1] * scale.y + offset.y;
+        vx = Mathf.Min(1.0f, vx);
+        vx = Mathf.Max(0.0f, vx);
+        vy = Mathf.Min(1.0f, vy);
+        vy = Mathf.Max(0.0f, vy);
+        addQuad(vy >= 1.0f ? bad_color : color, vx - point_size, vy - point_size, vx + point_size, vy + point_size);
       }
     }
 	}

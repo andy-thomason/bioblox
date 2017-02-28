@@ -1139,12 +1139,16 @@ public class BioBlox : MonoBehaviour
                     float lennard_jones_force = 12 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
                     */
 
-                    float ljr = distance / min_d;
-                    float lennard_jones_potential = Mathf.Pow(ljr, -12) - Mathf.Pow(ljr, -6);
+                    float ljr = distance / (min_d * 1.1547f);
+                    float iljr = (min_d * 1.1547f) / distance;
+                    float iljr2 = iljr * iljr;
+                    float iljr6 = (iljr2 * iljr2) * iljr2;
+                    float iljr8 = iljr6 * iljr2;
+                    float lennard_jones_potential = 3 * iljr8 - 4 * iljr6;
+                    //float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
                     //float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
                     ljp_atom_points.Add(ljr);
                     ljp_atom_points.Add(lennard_jones_potential);
-
 
                     // 8-6 potential (force is the differential)
                     //REAL PHYSICS HERE **
@@ -1257,8 +1261,10 @@ public class BioBlox : MonoBehaviour
         }
 
         LennardJonesGraph lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
+        //Debug.Log("lj_atom_graph=" + lj_atom_graph);
         if (lj_atom_graph != null && ljp_atom_points != null) {
             lj_atom_graph.points = ljp_atom_points;
+            lj_atom_graph.SetVerticesDirty();
         }
     }
 
