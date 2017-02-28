@@ -264,6 +264,8 @@ public class BioBlox : MonoBehaviour
     public Text game_score_value_bar;
     public enum game_type_mode { science_mode, game_mode };
 
+    GameManager gm;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -271,6 +273,8 @@ public class BioBlox : MonoBehaviour
         {
             Instantiate(GameManager_object);
         }
+
+        gm = FindObjectOfType<GameManager>();
     }
 
     // Use this for initialization
@@ -306,7 +310,7 @@ public class BioBlox : MonoBehaviour
         }
 
         //game type
-        if(FindObjectOfType<GameManager>().game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
         {
             science_score.alpha = 0;
             game_bar.alpha = 1;
@@ -315,7 +319,7 @@ public class BioBlox : MonoBehaviour
 
 
         //set the trypsin fiesr level temp
-        current_level = FindObjectOfType<GameManager>().current_level;
+        current_level = gm.current_level;
 
         get_spheres();
 
@@ -370,7 +374,7 @@ public class BioBlox : MonoBehaviour
         //if (current_level == 0 && level_scores_from_server == "0")
         //    ToggleMode.isOn = true;
         //else
-            ToggleMode.isOn = false;
+        ToggleMode.isOn = false;
 
         StartCoroutine(game_loop());
     }
@@ -1023,7 +1027,7 @@ public class BioBlox : MonoBehaviour
                     mol2.GetComponent<Rigidbody>().isKinematic = false;
                 }
 
-                FindObjectOfType<GameManager>().EndLoading();
+                gm.EndLoading();
 
 
                 // Enter waiting state
@@ -1216,6 +1220,8 @@ public class BioBlox : MonoBehaviour
                 //        uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
                 //    }
                 //}
+                
+                is_score_valid = num_invalid == 0;
 
                 #region GAME SCORE
                 if (current_game_type == game_type_mode.game_mode.GetHashCode())
@@ -1234,6 +1240,7 @@ public class BioBlox : MonoBehaviour
                             current_game_score++;
                         }
                     }
+
                     float bar_value = current_game_score / max_game_score;
                     score_bar.fillAmount = current_game_score / max_game_score;
                     game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
@@ -1241,8 +1248,6 @@ public class BioBlox : MonoBehaviour
                 }
                 #endregion
             }
-
-            is_score_valid = num_invalid == 0;
 
             if (eventSystem != null && eventSystem.IsActive())
             {
@@ -1257,7 +1262,10 @@ public class BioBlox : MonoBehaviour
             }
 
             number_total_atoms = num_touching_0 + num_touching_1;
-           
+
+
+            //change color here
+            //Debug.Log(is_score_valid);
         }
 
         LennardJonesGraph lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
@@ -1272,45 +1280,53 @@ public class BioBlox : MonoBehaviour
     {
         if (!is_hint_moving && scoring != null)
         {
-            scoring.calcScore2();
+            game_score_value = 0;
 
-            ie_score = Mathf.Round(scoring.elecScore);
-            lpj_score = Mathf.Round(-1 * scoring.vdwScore);
-            t_atoms_score = num_touching_0 + num_touching_1;
-            //game_score_value = Mathf.Round(-1 * (scoring.elecScore + scoring.vdwScore) * 100);
-
-            if (t_atoms_score == 0)
-                game_score_value = 0;
-            else
-                game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
-
-            //if (uiController.expert_mode)
-            //{
-            ElectricScore.text = "" + ie_score;
-            LennardScore.text = "" + lpj_score;
-            touching_atoms.text = "" + t_atoms_score;
-            //}
-
-            //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
-            game_score.text = "" + game_score_value;
-
-            //when saved panel is on
-            if (uiController.SavePanel.activeSelf)
+            if (gm.game_type == game_type_mode.science_mode.GetHashCode() || uiController.SavePanel.activeSelf)
             {
-                uiController.n_atoms.text = "" + t_atoms_score;
-                uiController.lpj.text = "" + lpj_score;
-                uiController.ei.text = "" + ie_score;
-                uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+
+                scoring.calcScore2();
+
+                ie_score = Mathf.Round(scoring.elecScore);
+                lpj_score = Mathf.Round(-1 * scoring.vdwScore);
+
+                if ((num_touching_0 + num_touching_1) == 0)
+                    game_score_value = 0;
+                else
+                    game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
+
+                //if (uiController.expert_mode)
+                //{
+                ElectricScore.text = "" + ie_score;
+                LennardScore.text = "" + lpj_score;
+                touching_atoms.text = "" + (num_touching_0 + num_touching_1);
+                //}
+
+                //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
+                game_score.text = "" + game_score_value;
+
+                //when saved panel is on
+                if (uiController.SavePanel.activeSelf)
+                {
+                    uiController.n_atoms.text = "" + (num_touching_0 + num_touching_1);
+                    uiController.lpj.text = "" + lpj_score;
+                    uiController.ei.text = "" + ie_score;
+                    uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+                }
+
             }
 
+
             connection_slider_image.color = !(num_invalid != 0 || game_score_value < 0) ? slider_valid_color : Color.red;
+            //set color depending if its valid
+            score_bar.color = is_score_valid ? Color.green : Color.red;
 
             //if (number_total_atoms != 0)
             //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
             //else
             //    current_score_sprite.sprite = sprite_score_normal;
 
-            if (t_atoms_score == 0)
+            if ((num_touching_0 + num_touching_1) == 0)
                 current_score_sprite.color = Color.white;
             else if (!is_score_valid || game_score_value < 0)
                 current_score_sprite.color = Color.red;
@@ -2001,11 +2017,13 @@ public class BioBlox : MonoBehaviour
                                 //Debug.Log("ID0: " + a0 + " ID1: " + a1 + "IDA0: " + i0 + " IDA1: " + i1 + " [" + pos0 + "] [" + pos1 + "] d0=" + d0 + " d1=" + d1 + " " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
                                 aminoSlider.A1Buttons[a0].dock_amino_id.Add(a1);
                                 aminoSlider.A1Buttons[a0].dock_atom_id.Add(i1);
+                                aminoSlider.A1Buttons[a0].dock_atom_id_self.Add(i0);
                                 aminoSlider.A1Buttons[a0].dock_amino_name_tag_atom.Add(mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1]);
                                 atom_touching_p2.Add(i1);
 
                                 aminoSlider.A2Buttons[a1].dock_amino_id.Add(a0);
                                 aminoSlider.A2Buttons[a1].dock_atom_id.Add(i0);
+                                aminoSlider.A2Buttons[a1].dock_atom_id_self.Add(i1);
                                 aminoSlider.A2Buttons[a1].dock_amino_name_tag_atom.Add(mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0]);
                                 atom_touching_p1.Add(i0);
 
@@ -2118,10 +2136,10 @@ public class BioBlox : MonoBehaviour
             icons_spheres_store[sphere_index].transform.localPosition = molecules[protein_id].transform.TransformPoint(molecules_PDB_mesh[protein_id].mol.atom_centres[atom_id]);
             icons_spheres_store[sphere_index].transform.SetParent(molecules[protein_id].transform.GetChild(1).transform);
             //color
-           // icons_spheres_store[sphere_index].transform.GetChild(0).GetComponent<Renderer>().material = protein_id == 0 ? Atom_1 : Atom_2;
+            // icons_spheres_store[sphere_index].transform.GetChild(0).GetComponent<Renderer>().material = protein_id == 0 ? Atom_1 : Atom_2;
             sphere_index++;
         }
-        return icons_spheres_store[sphere_index-1].transform;
+        return icons_spheres_store[sphere_index - 1].transform;
     }
 
     //public GameObject add_Icon_sphere(GameObject Icon)
