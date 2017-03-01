@@ -47,19 +47,19 @@ public class LennardJonesGraph : Graphic
 		  UIVertex vert = UIVertex.simpleVert;
 		  vert.color = c;
 
-		  vert.position = new Vector2(x + x0 * w, y + y0 * h);
+		  vert.position = new Vector2(x0, y0);
       vert.uv0 = new Vector2(0, 0);
 		  vh.AddVert(vert);
 
-		  vert.position = new Vector2(x + x0 * w, y + y1 * h);
+		  vert.position = new Vector2(x0, y1);
       vert.uv0 = new Vector2(0, 1);
 		  vh.AddVert(vert);
 
-		  vert.position = new Vector2(x + x1 * w, y + y1 * h);
+		  vert.position = new Vector2(x1, y1);
       vert.uv0 = new Vector2(1, 1);
 		  vh.AddVert(vert);
 
-		  vert.position = new Vector2(x + x1 * w, y + y0 * h);
+		  vert.position = new Vector2(x1, y0);
       vert.uv0 = new Vector2(1, 0);
 		  vh.AddVert(vert);
 
@@ -68,8 +68,13 @@ public class LennardJonesGraph : Graphic
       index += 4;
     };
 
-    addQuad(axis_color, offset.x + scale.x * 0.5f, offset.y - point_size, offset.x + scale.x * 1.8f, offset.y + point_size);
-    addQuad(axis_color, offset.x + scale.x * 1.0f - point_size, offset.y - scale.y * 1.0f, offset.x + scale.x * 1.0f + point_size, offset.y + scale.y * 1.0f);
+    float axis_x = x + (offset.x + scale.x * 1.0f) * w;
+    float axis_y = y + offset.y * h;
+    int ps = (int)(point_size * w / 300.0f);
+    addQuad(axis_color, (int)x, (int)(axis_y), (int)(x+w), (int)(axis_y)+ps);
+    addQuad(axis_color, (int)axis_x, (int)y, (int)(axis_x)+ps, (int)(y+h));
+    //addQuad(axis_color, offset.x + scale.x * 0.5f, offset.y - point_size, offset.x + scale.x * 1.8f, offset.y + point_size);
+    //addQuad(axis_color, offset.x + scale.x * 1.0f - point_size, offset.y - scale.y * 1.0f, offset.x + scale.x * 1.0f + point_size, offset.y + scale.y * 1.0f);
     if (points != null) {
       for (int i = 0; i != points.Count/2; ++i) {
         float vx = points[i*2+0] * scale.x + offset.x;
@@ -78,7 +83,9 @@ public class LennardJonesGraph : Graphic
         vx = Mathf.Max(0.0f, vx);
         vy = Mathf.Min(1.0f, vy);
         vy = Mathf.Max(0.0f, vy);
-        addQuad(vy >= 1.0f ? bad_color : color, vx - point_size, vy - point_size, vx + point_size, vy + point_size);
+        float ix = (int)(x + vx * w);
+        float iy = (int)(y + vy * h);
+        addQuad(vy >= 1.0f ? bad_color : color, ix, iy, ix+ps, iy+ps);
       }
     }
 	}
