@@ -1284,7 +1284,7 @@ public class BioBlox : MonoBehaviour
                 //}
 
                 //if (scoring.elecScore <= 0 && scoring.vdwScore <= 0)
-                game_score.text = "" + game_score_value;
+                //game_score.text = "" + game_score_value;
 
                 //when saved panel is on
                 if (uiController.SavePanel.activeSelf)
@@ -1307,12 +1307,12 @@ public class BioBlox : MonoBehaviour
             //else
             //    current_score_sprite.sprite = sprite_score_normal;
 
-            if ((num_touching_0 + num_touching_1) == 0)
-                current_score_sprite.color = Color.white;
-            else if (!is_score_valid || game_score_value < 0)
-                current_score_sprite.color = Color.red;
-            else
-                current_score_sprite.color = Color.green;
+            //if ((num_touching_0 + num_touching_1) == 0)
+            //    current_score_sprite.color = Color.white;
+            //else if (!is_score_valid || game_score_value < 0)
+            //    current_score_sprite.color = Color.red;
+            //else
+            //    current_score_sprite.color = Color.green;
 
         }
     }
