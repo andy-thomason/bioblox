@@ -270,6 +270,8 @@ public class BioBlox : MonoBehaviour
 
     LennardJonesGraph lj_atom_graph;
 
+    public float bar_value;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -1205,7 +1207,7 @@ public class BioBlox : MonoBehaviour
                 is_score_valid = num_invalid == 0;
 
                 #region GAME SCORE
-                if (current_game_type == game_type_mode.game_mode.GetHashCode())
+                if (current_game_type == game_type_mode.game_mode.GetHashCode() || uiController.SavePanel.activeSelf)
                 {
                     float current_game_score = 0;
                     //chheck if the atoms are in touch
@@ -1222,7 +1224,7 @@ public class BioBlox : MonoBehaviour
                         }
                     }
 
-                    float bar_value = current_game_score / max_game_score;
+                    bar_value = current_game_score / max_game_score;
                     score_bar.fillAmount = current_game_score / max_game_score;
                     game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
                     //Debug.Log(current_game_score);
@@ -1290,7 +1292,7 @@ public class BioBlox : MonoBehaviour
                     uiController.n_atoms.text = "" + (num_touching_0 + num_touching_1);
                     uiController.lpj.text = "" + lpj_score;
                     uiController.ei.text = "" + ie_score;
-                    uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
+                    //uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
                 }
 
             }
@@ -1298,7 +1300,7 @@ public class BioBlox : MonoBehaviour
 
             connection_slider_image.color = !(num_invalid != 0 || game_score_value < 0) ? slider_valid_color : Color.red;
             //set color depending if its valid
-            score_bar.color = is_score_valid ? Color.green : Color.red;
+            //score_bar.color = is_score_valid ? Color.green : Color.red;
 
             //if (number_total_atoms != 0)
             //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
@@ -2060,16 +2062,16 @@ public class BioBlox : MonoBehaviour
         else
         {
             is_hint_moving = !is_hint_moving;
-            //molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
-            //molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
+            molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
+            molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
 
-            //molecules[0].transform.localPosition = default_position_molecule_0;
-            //molecules[0].transform.localRotation = default_rotation_molecule_0;
-            //molecules[1].transform.localPosition = default_position_molecule_1;
-            //molecules[1].transform.localRotation = default_rotation_molecule_1;
-            ////restart camera
-            //molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
-            ////show the chain
+            molecules[0].transform.localPosition = default_position_molecule_0;
+            molecules[0].transform.localRotation = default_rotation_molecule_0;
+            molecules[1].transform.localPosition = default_position_molecule_1;
+            molecules[1].transform.localRotation = default_rotation_molecule_1;
+            //restart camera
+            molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
+            //show the chain
             line_renderer_object.SetActive(!is_hint_moving);
         }
 
