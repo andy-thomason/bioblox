@@ -522,16 +522,14 @@ public class UIController : MonoBehaviour {
         isProtein2Fixed = !isProtein2Fixed;
     }
 
-    public void FixProtein1_save()
+    public void FixProtein1_save(bool status)
     {
-        BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = !isProtein1Fixed;
-        isProtein1Fixed = !isProtein1Fixed;
+        BioBloxReference.molecules[0].GetComponent<Rigidbody>().isKinematic = status;
     }
 
-    public void FixProtein2_save()
+    public void FixProtein2_save(bool status)
     {
-        BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = !isProtein2Fixed;
-        isProtein2Fixed = !isProtein2Fixed;
+        BioBloxReference.molecules[1].GetComponent<Rigidbody>().isKinematic = status;
     }
 
 
@@ -1084,8 +1082,8 @@ public class UIController : MonoBehaviour {
     public void OpenSavePanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
-        FixProtein1_save();
-        FixProtein2_save();
+        FixProtein1_save(true);
+        FixProtein2_save(true);
         SavePanel.SetActive(true);
     }
 
@@ -1094,13 +1092,12 @@ public class UIController : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.button_click);
         SavePanel.SetActive(false);
         isOverUI = false;
-        FixProtein1_save();
-        FixProtein2_save();
+        FixProtein1_save(false);
+        FixProtein2_save(false);
     }
 
     public void SubmitSaveToServer(int slot)
     {
-        BioBloxReference.is_validating = false;
         sfx.PlayTrack(SFX.sound_index.end_level);
         BioBloxReference.SlotButtons.alpha = 0.0f;
         BioBloxReference.SlotButtons.blocksRaycasts = false;
@@ -1129,13 +1126,11 @@ public class UIController : MonoBehaviour {
     IEnumerator WaitForSec()
     {
         yield return new WaitForSeconds(2);
-        SavePanel.SetActive(false);
+        BioBloxReference.SlotButtons.alpha = 1.0f;
+        BioBloxReference.SlotButtons.blocksRaycasts = true;
         Tick.SetActive(false);
-        BioBloxReference.validating_holder.SetActive(true);
+        SavePanel.SetActive(false);
         isOverUI = false;
-        BioBloxReference.is_validating = true;
-        FixProtein1_save();
-        FixProtein2_save();
     }
 
     void UpdateLocalScore(int slot, string n_atoms, string lpj, string ei, string game_score)

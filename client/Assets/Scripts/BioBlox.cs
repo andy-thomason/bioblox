@@ -264,7 +264,11 @@ public class BioBlox : MonoBehaviour
     public Text game_score_value_bar;
     public enum game_type_mode { science_mode, game_mode };
 
+    public GameObject is_docking_panel;
+
     GameManager gm;
+
+    LennardJonesGraph lj_atom_graph;
 
     void Awake()
     {
@@ -296,6 +300,7 @@ public class BioBlox : MonoBehaviour
         //first eprson
         aminoSlider = FindObjectOfType<AminoSliderController>();
         dm = FindObjectOfType<DataManager>();
+        lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
 
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
@@ -493,7 +498,6 @@ public class BioBlox : MonoBehaviour
     float time_valid_score = 0;
     public CanvasGroup SlotButtons;
     public GameObject validating_holder;
-    public bool is_validating = true;
 
     // Update handles (badly) a few things that dont fit anywhere else.
     void Update()
@@ -512,29 +516,6 @@ public class BioBlox : MonoBehaviour
 
             if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
                 UpdateHint();
-        }
-
-        if (is_validating)
-        {
-            //check if score is valid
-            if (is_score_valid)
-            {
-                time_valid_score += Time.deltaTime;
-            }
-            else
-            {
-                time_valid_score = 0;
-                SlotButtons.alpha = 0.0f;
-                SlotButtons.blocksRaycasts = false;
-                validating_holder.SetActive(true);
-            }
-
-            if (time_valid_score > 5.0f)
-            {
-                validating_holder.SetActive(false);
-                SlotButtons.alpha = 1.0f;
-                SlotButtons.blocksRaycasts = true;
-            }
         }
 
         if (is_hint_moving)
@@ -1267,8 +1248,6 @@ public class BioBlox : MonoBehaviour
             //change color here
             //Debug.Log(is_score_valid);
         }
-
-        LennardJonesGraph lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
         //Debug.Log("lj_atom_graph=" + lj_atom_graph);
         if (lj_atom_graph != null && ljp_atom_points != null) {
             lj_atom_graph.points = ljp_atom_points;
@@ -2081,23 +2060,26 @@ public class BioBlox : MonoBehaviour
         else
         {
             is_hint_moving = !is_hint_moving;
-            molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
-            molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
+            //molecules[0].transform.GetChild(0).transform.localPosition = position_molecule_0;
+            //molecules[1].transform.GetChild(0).transform.localPosition = position_molecule_1;
 
-            molecules[0].transform.localPosition = default_position_molecule_0;
-            molecules[0].transform.localRotation = default_rotation_molecule_0;
-            molecules[1].transform.localPosition = default_position_molecule_1;
-            molecules[1].transform.localRotation = default_rotation_molecule_1;
-            //restart camera
-            molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
-            //show the chain
+            //molecules[0].transform.localPosition = default_position_molecule_0;
+            //molecules[0].transform.localRotation = default_rotation_molecule_0;
+            //molecules[1].transform.localPosition = default_position_molecule_1;
+            //molecules[1].transform.localRotation = default_rotation_molecule_1;
+            ////restart camera
+            //molecules[0].transform.parent.transform.localRotation = Quaternion.identity;
+            ////show the chain
             line_renderer_object.SetActive(!is_hint_moving);
         }
+
+        is_docking_panel.SetActive(is_hint_moving);
     }
     #endregion
 
     #region SWITCH MODES
     public Transform science_mode;
+    public CanvasGroup graph;
     public Transform game_mode;
     int current_game_type = 0;
 
@@ -2105,6 +2087,7 @@ public class BioBlox : MonoBehaviour
     {
         game_bar.alpha = 0;
         science_score.alpha = 1;
+        graph.alpha = 1;
         current_game_type = game_type_mode.science_mode.GetHashCode();
         amino_links.SetParent(game_mode, false);
     }
@@ -2112,6 +2095,7 @@ public class BioBlox : MonoBehaviour
     public void SwitchGameMode()
     {
         science_score.alpha = 0;
+        graph.alpha = 0;
         game_bar.alpha = 1;
         current_game_type = game_type_mode.game_mode.GetHashCode();
         amino_links.SetParent(science_mode, false);
