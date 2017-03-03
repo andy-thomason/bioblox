@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class SFX : MonoBehaviour {
+public class SFX : MonoBehaviour
+{
 
     public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand, ship, ship_scanning };
     public AudioClip ReelIn;
@@ -12,7 +13,7 @@ public class SFX : MonoBehaviour {
     public AudioSource[] audioSource_collision;
     // Use this for initialization
 
-    void Awake ()
+    void Awake()
     {
         audioSource = GetComponents<AudioSource>();
         audioSource_collision = transform.GetChild(0).GetComponents<AudioSource>();
@@ -88,7 +89,7 @@ public class SFX : MonoBehaviour {
 
     public void ReelSound(sound_index index)
     {
-        if(index == sound_index.string_reel_in)
+        if (index == sound_index.string_reel_in)
         {
             audioSource[sound_index.string_reel_out.GetHashCode()].clip = ReelIn;
             audioSource[sound_index.string_reel_out.GetHashCode()].Play();
@@ -119,7 +120,7 @@ public class SFX : MonoBehaviour {
 
     public void Mute_SFX(bool status)
     {
-        foreach(AudioSource aus in audioSource)
+        foreach (AudioSource aus in audioSource)
         {
             aus.mute = status;
         }
@@ -134,5 +135,17 @@ public class SFX : MonoBehaviour {
     public void Mute_Music(bool status)
     {
         audioSource[0].mute = status;
+        foreach (AudioSource audio in GameObject.FindGameObjectWithTag("game_sounds").GetComponents<AudioSource>())
+        {
+            if (!status)
+                audio.Play();
+            else
+                audio.Stop();
+        }
+    }
+
+    public void Mute_Track(sound_index index, bool status)
+    {
+        audioSource[index.GetHashCode()].mute = status;
     }
 }

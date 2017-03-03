@@ -272,6 +272,9 @@ public class BioBlox : MonoBehaviour
 
     public float bar_value;
 
+    public GameObject GameSounds;
+    AudioSource[] game_sounds;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -304,6 +307,8 @@ public class BioBlox : MonoBehaviour
         dm = FindObjectOfType<DataManager>();
         lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
 
+        game_sounds = GameSounds.GetComponents<AudioSource>();
+
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
 
@@ -319,9 +324,11 @@ public class BioBlox : MonoBehaviour
         //game type
         if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
         {
-            science_score.alpha = 0;
-            game_bar.alpha = 1;
-            amino_links.transform.Translate(new Vector3(-131, 0, 0));
+            SwitchGameMode();
+        }
+        else
+        {
+            SwitchScienceMode();
         }
 
 
@@ -1203,32 +1210,52 @@ public class BioBlox : MonoBehaviour
                 //        uiController.game_score.text = game_score_value >= 0 ? "" + game_score_value : "0";
                 //    }
                 //}
-                
+
                 is_score_valid = num_invalid == 0;
 
                 #region GAME SCORE
-                if (current_game_type == game_type_mode.game_mode.GetHashCode() || uiController.SavePanel.activeSelf)
+
+                float current_game_score = 0;
+                //chheck if the atoms are in touch
+                for (int i = 0; i < atom_touching_p1.Count; i++)
                 {
-                    float current_game_score = 0;
-                    //chheck if the atoms are in touch
-                    for (int i = 0; i < atom_touching_p1.Count; i++)
+                    Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
+                    Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
+                    Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
+                    Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
+
+                    if ((c1_t - c0_t).magnitude <= 6.0f)
                     {
-                        Vector3 pos0 = molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]];
-                        Vector3 pos1 = molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]];
-                        Vector3 c0_t = t0mx.MultiplyPoint3x4(pos0);
-                        Vector3 c1_t = t1mx.MultiplyPoint3x4(pos1);
-
-                        if ((c1_t - c0_t).magnitude <= 6.0f)
-                        {
-                            current_game_score++;
-                        }
+                        current_game_score++;
                     }
-
-                    bar_value = current_game_score / max_game_score;
-                    score_bar.fillAmount = current_game_score / max_game_score;
-                    game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
-                    //Debug.Log(current_game_score);
                 }
+
+                bar_value = current_game_score / max_game_score;
+                score_bar.fillAmount = bar_value;
+                game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
+                //Debug.Log(current_game_score);
+
+
+                if (bar_value >= 0.2f)
+                    game_sounds[0].mute = false;
+                else
+                    game_sounds[0].mute = true;
+
+                if (bar_value >= 0.4f)
+                    game_sounds[1].mute = false;
+                else
+                    game_sounds[1].mute = true;
+
+                if (bar_value >= 0.6f)
+                    game_sounds[2].mute = false;
+                else
+                    game_sounds[2].mute = true;
+
+                if (bar_value >= 0.9f)
+                    game_sounds[3].mute = false;
+                else
+                    game_sounds[3].mute = true;
+
                 #endregion
             }
 
@@ -1251,7 +1278,8 @@ public class BioBlox : MonoBehaviour
             //Debug.Log(is_score_valid);
         }
         //Debug.Log("lj_atom_graph=" + lj_atom_graph);
-        if (lj_atom_graph != null && ljp_atom_points != null) {
+        if (lj_atom_graph != null && ljp_atom_points != null)
+        {
             lj_atom_graph.points = ljp_atom_points;
             lj_atom_graph.SetVerticesDirty();
         }
@@ -1298,9 +1326,16 @@ public class BioBlox : MonoBehaviour
             }
 
 
-            connection_slider_image.color = !(num_invalid != 0 || game_score_value < 0) ? slider_valid_color : Color.red;
+            connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
             //set color depending if its valid
-            //score_bar.color = is_score_valid ? Color.green : Color.red;
+            score_bar.color = is_score_valid ? Color.green : Color.red;
+            lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+
+            if(!is_score_valid)
+                sfx.Mute_Track(SFX.sound_index.warning,false);
+            else
+                sfx.Mute_Track(SFX.sound_index.warning, true);
+
 
             //if (number_total_atoms != 0)
             //    current_score_sprite.sprite = num_invalid == 0 ? sprite_score_good : sprite_score_error;
