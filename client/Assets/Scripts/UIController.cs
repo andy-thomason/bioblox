@@ -187,6 +187,8 @@ public class UIController : MonoBehaviour {
 
     public bool is_over_amino_info_panel = false;
 
+    CUIColorPicker cui;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -199,6 +201,8 @@ public class UIController : MonoBehaviour {
         dm = FindObjectOfType<DataManager>();
         cm = FindObjectOfType<ConnectionManager>();
         gm = FindObjectOfType<GameManager>();
+        cui = FindObjectOfType<CUIColorPicker>();
+
     }
 
     public void init()
@@ -227,17 +231,22 @@ public class UIController : MonoBehaviour {
         if (BioBloxReference && BioBloxReference.game_status == BioBlox.GameStatus.GameScreen)
         {
             //deselection aminoacids
-            if ((Input.GetMouseButtonDown(0)) && !first_person && BioBloxReference.molecules.Length != 0)
+            if ((Input.GetMouseButtonDown(0)) && BioBloxReference.molecules.Length != 0)
             {
                 Ray ray = MainCameraComponent.ScreenPointToRay(Input.mousePosition);
                 int atomID_molecule_temp_0 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules_PDB_mesh[0].mol, BioBloxReference.molecules[0].transform, ray);
                 int atomID_molecule_temp_1 = PDB_molecule.collide_ray(FirstPersonCameraReference, BioBloxReference.molecules_PDB_mesh[1].mol, BioBloxReference.molecules[1].transform, ray);
-                if (!isOverUI && atomID_molecule_temp_0 == -1 && atomID_molecule_temp_1 == -1)
+                if (!isOverUI)
                 {
-                    BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
-                    BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
-                    aminoSliderController.DeselectAmino();
-                    aminoSliderController.DeleteCurrentAminoInfoPanel();
+                    cui.SpawnColorPanel(false);
+
+                    if (atomID_molecule_temp_0 == -1 && atomID_molecule_temp_1 == -1)
+                    {
+                        BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
+                        BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
+                        aminoSliderController.DeselectAmino();
+                        aminoSliderController.DeleteCurrentAminoInfoPanel();
+                    }
                     //DeselectAtoms();
                 }
             }

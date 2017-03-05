@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour {
     public Color deactivated_game_mode;
     public Image science_mode_image;
     public Image game_mode_image;
+    public Color default_background_color;
 
     void Awake()
     {
