@@ -214,10 +214,10 @@ public class UIController : MonoBehaviour {
         transparent_render = BioBloxReference.molecules[0].transform.GetChild(0).transform.childCount - 1;
         //SET VALUES TO SAVE BUTTONS
         Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;//slots holder
-        int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
-        slot_score[0].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(0).GetComponent<SlotController>().total_score;
-        slot_score[1].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(1).GetComponent<SlotController>().total_score;
-        slot_score[2].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(2).GetComponent<SlotController>().total_score;
+        //int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
+        //slot_score[0].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(0).GetComponent<SlotController>().total_score;
+        //slot_score[1].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(1).GetComponent<SlotController>().total_score;
+        //slot_score[2].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(2).GetComponent<SlotController>().total_score;
     }
 
 
@@ -1081,6 +1081,8 @@ public class UIController : MonoBehaviour {
     public Text lpj;
     public Text ei;
     public Text game_score;
+    public GameObject SavePanel_game;
+    public GameObject SavePanel_science;
     public GameObject SavePanel;
     public GameObject Tick;
     string P1_connections;
@@ -1093,12 +1095,25 @@ public class UIController : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.button_click);
         FixProtein1_save(true);
         FixProtein2_save(true);
+
         SavePanel.SetActive(true);
+        if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        {
+            game_score.text = "" + (int)(BioBloxReference.bar_value * 100) + "%";
+            SavePanel_game.SetActive(true);
+        }
+        else
+        {
+            SavePanel_science.SetActive(true);
+        }
     }
 
     public void CloseSavePanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);
+
+        SavePanel_game.SetActive(false);
+        SavePanel_science.SetActive(false);
         SavePanel.SetActive(false);
         isOverUI = false;
         FixProtein1_save(false);
@@ -1126,10 +1141,21 @@ public class UIController : MonoBehaviour {
         dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections, BioBloxReference.bar_value);
         UpdateLocalScore(slot, n_atoms.text, lpj.text, ei.text, game_score.text);
         //update button save
-        slot_score[slot].text = "score: " + BioBloxReference.game_score.text;
+        //slot_score[slot].text = "score: " + BioBloxReference.game_score.text;
 
-        Tick.SetActive(true);
-        StartCoroutine(WaitForSec());
+        BioBloxReference.SlotButtons.alpha = 1.0f;
+        BioBloxReference.SlotButtons.blocksRaycasts = true;
+        //Tick.SetActive(false);
+        SavePanel_game.SetActive(false);
+        SavePanel_science.SetActive(false);
+        SavePanel.SetActive(false);
+
+        FixProtein1_save(false);
+        FixProtein2_save(false);
+        isOverUI = false;
+
+        //Tick.SetActive(true);
+        //StartCoroutine(WaitForSec());
     }
 
     IEnumerator WaitForSec()
@@ -1138,7 +1164,7 @@ public class UIController : MonoBehaviour {
         BioBloxReference.SlotButtons.alpha = 1.0f;
         BioBloxReference.SlotButtons.blocksRaycasts = true;
         Tick.SetActive(false);
-        SavePanel.SetActive(false);
+        //SavePanel.SetActive(false);
         isOverUI = false;
     }
 

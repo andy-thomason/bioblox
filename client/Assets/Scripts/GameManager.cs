@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour {
     SFX sfx;
     bool open_selection_once_at_start = false;
     public enum game_type_mode { science_mode, game_mode };
-    public int game_type = 0;
+    public int game_type = 1;
     public Color deactivated_game_mode;
     public Image science_mode_image;
     public Image game_mode_image;

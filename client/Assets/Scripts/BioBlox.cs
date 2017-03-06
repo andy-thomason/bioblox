@@ -293,7 +293,7 @@ public class BioBlox : MonoBehaviour
         Application.targetFrameRate = -1;
 #endif
 
-        game_status = BioBlox.GameStatus.MainScreen;
+        game_status = GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
 
@@ -1291,7 +1291,7 @@ public class BioBlox : MonoBehaviour
         {
             game_score_value = 0;
 
-            if (gm.game_type == game_type_mode.science_mode.GetHashCode() || uiController.SavePanel.activeSelf)
+            if (gm.game_type == game_type_mode.science_mode.GetHashCode() || uiController.SavePanel_science.activeSelf || uiController.SavePanel_game.activeSelf)
             {
 
                 scoring.calcScore2();
@@ -1315,7 +1315,7 @@ public class BioBlox : MonoBehaviour
                 //game_score.text = "" + game_score_value;
 
                 //when saved panel is on
-                if (uiController.SavePanel.activeSelf)
+                if (uiController.SavePanel_science.activeSelf)
                 {
                     uiController.n_atoms.text = "" + (num_touching_0 + num_touching_1);
                     uiController.lpj.text = "" + lpj_score;
@@ -2116,7 +2116,6 @@ public class BioBlox : MonoBehaviour
 
     #region SWITCH MODES
     public Transform science_mode;
-    public CanvasGroup graph;
     public Transform game_mode;
     int current_game_type = 0;
 
@@ -2124,7 +2123,6 @@ public class BioBlox : MonoBehaviour
     {
         game_bar.alpha = 0;
         science_score.alpha = 1;
-        graph.alpha = 1;
         current_game_type = game_type_mode.science_mode.GetHashCode();
         amino_links.SetParent(game_mode, false);
     }
@@ -2132,7 +2130,6 @@ public class BioBlox : MonoBehaviour
     public void SwitchGameMode()
     {
         science_score.alpha = 0;
-        graph.alpha = 0;
         game_bar.alpha = 1;
         current_game_type = game_type_mode.game_mode.GetHashCode();
         amino_links.SetParent(science_mode, false);
