@@ -1283,6 +1283,16 @@ public class BioBlox : MonoBehaviour
             lj_atom_graph.points = ljp_atom_points;
             lj_atom_graph.SetVerticesDirty();
         }
+
+        connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
+        //set color depending if its valid
+        score_bar.color = is_score_valid ? Color.green : Color.red;
+        lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+
+        if (!is_score_valid)
+            sfx.Mute_Track(SFX.sound_index.warning, false);
+        else
+            sfx.Mute_Track(SFX.sound_index.warning, true);
     }
 
     void CalcScore()
@@ -1326,15 +1336,7 @@ public class BioBlox : MonoBehaviour
             }
 
 
-            connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
-            //set color depending if its valid
-            score_bar.color = is_score_valid ? Color.green : Color.red;
-            lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
-            if(!is_score_valid)
-                sfx.Mute_Track(SFX.sound_index.warning,false);
-            else
-                sfx.Mute_Track(SFX.sound_index.warning, true);
 
 
             //if (number_total_atoms != 0)

@@ -181,7 +181,7 @@ namespace AssemblyCSharp
 				{
 					if(i>0)
 					{
-						Debug.DrawLine(points[i-1].pos,points[i].pos);
+						//Debug.DrawLine(points[i-1].pos,points[i].pos);
 						line_renderer.add_line (new LineRenderer.Line(points[i-1].pos,points[i].pos));
 					}
 				}
@@ -245,7 +245,7 @@ namespace AssemblyCSharp
 				Vector3 worldAtomPos1 = molecules [0].transform.TransformPoint (molecules [0].mol.atom_centres [atomIndex1]);
 				Vector3 worldAtomPos2 = molecules [1].transform.TransformPoint (molecules [1].mol.atom_centres [atomIndex2]);
 
-				Debug.DrawLine(worldAtomPos1,worldAtomPos2);
+				//Debug.DrawLine(worldAtomPos1,worldAtomPos2);
 			}
 		}
 	}
