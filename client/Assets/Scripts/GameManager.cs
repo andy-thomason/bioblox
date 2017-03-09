@@ -68,13 +68,19 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
+    bool hit_level = false;
+
     public void ChangeLevel(int level)
     {
-        loading_panel.SetActive(true);
-        selection_panel.alpha = 0;
-        selection_panel.blocksRaycasts = false;
-        current_level = level;
-        SceneManager.LoadScene(0, LoadSceneMode.Single);
+        if(!hit_level)
+        {
+            hit_level = true;
+            loading_panel.SetActive(true);
+            selection_panel.alpha = 0;
+            selection_panel.blocksRaycasts = false;
+            current_level = level;
+            StartCoroutine(WaitForSec());
+        }
     }
 
     public void EndLoading()
@@ -116,5 +122,11 @@ public class GameManager : MonoBehaviour {
         game_type = game_type_mode.game_mode.GetHashCode();
         science_mode_image.color = deactivated_game_mode;
         FindObjectOfType<BioBlox>().SwitchGameMode();
+    }
+
+    IEnumerator WaitForSec()
+    {
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 }
