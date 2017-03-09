@@ -182,7 +182,7 @@ namespace AssemblyCSharp
 					if(i>0)
 					{
 						//Debug.DrawLine(points[i-1].pos,points[i].pos);
-						line_renderer.add_line (new LineRenderer.Line(points[i-1].pos,points[i].pos));
+						//line_renderer.add_line (new LineRenderer.Line(points[i-1].pos,points[i].pos));
 					}
 				}
 			}

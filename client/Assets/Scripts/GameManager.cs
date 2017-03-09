@@ -68,6 +68,15 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
+    public void ChangeLevel(int level)
+    {
+        loading_panel.SetActive(true);
+        selection_panel.alpha = 0;
+        selection_panel.blocksRaycasts = false;
+        current_level = level;
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+
     public void EndLoading()
     {
         loading_panel.SetActive(false);

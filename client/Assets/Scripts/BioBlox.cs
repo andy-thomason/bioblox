@@ -299,8 +299,8 @@ public class BioBlox : MonoBehaviour
 
         eventSystem = EventSystem.current;
         //update
-        line_renderer = FindObjectOfType<LineRenderer>() as LineRenderer;
-        line_renderer_object = FindObjectOfType<LineRenderer>().gameObject;
+        //line_renderer = FindObjectOfType<LineRenderer>() as LineRenderer;
+        //line_renderer_object = FindObjectOfType<LineRenderer>().gameObject;
         camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         //first eprson
         aminoSlider = FindObjectOfType<AminoSliderController>();
@@ -362,8 +362,8 @@ public class BioBlox : MonoBehaviour
         molecules_PDB_mesh[1].DeselectAminoAcid();
         //aminoSlider.DeselectAmino();
 
-        r0 = molecules[0].GetComponent<Rigidbody>();
-        r1 = molecules[1].GetComponent<Rigidbody>();
+        //r0 = molecules[0].GetComponent<Rigidbody>();
+        //r1 = molecules[1].GetComponent<Rigidbody>();
 
         //set names on the amino panels
         protein_name_text[0].text = molecules_PDB_mesh[0].mol.name;
@@ -376,9 +376,39 @@ public class BioBlox : MonoBehaviour
         dm.GetLevelScore();
         //set the hint on the amino buttons
         find_hint_pairs(molecules_PDB_mesh[0].mol, molecules_PDB_mesh[1].mol);
+        spawn_contact_atoms();
 
-        InvokeRepeating("CalcScore", 1.0f, 0.5f);
+        //InvokeRepeating("CalcScore", 1.0f, 0.5f);
 
+    }
+
+    public Material[] VR_atoms_mat;
+    public Transform VR_spheres_atoms;
+    int current_mat = 0;
+
+    void spawn_contact_atoms()
+    {
+        GameObject current_sphere;
+        int step_mat = (int)((atom_touching_p1.Count / 4.0f));
+
+        //chheck if the atoms are in touch
+        for (int i = 0; i < atom_touching_p1.Count; i++)
+        {
+            current_sphere = VR_spheres_atoms.GetChild(0).gameObject;
+            Debug.Log(current_sphere.name);
+            current_sphere.transform.position = molecules[0].transform.TransformPoint(molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]]);
+            current_sphere.transform.SetParent(molecules[0].transform);
+            current_sphere.GetComponent<Renderer>().material = VR_atoms_mat[current_mat];
+            current_sphere = VR_spheres_atoms.GetChild(0).gameObject;
+            current_sphere.transform.position = molecules[1].transform.TransformPoint(molecules_PDB_mesh[1].mol.atom_centres[atom_touching_p2[i]]);
+            current_sphere.transform.SetParent(molecules[1].transform);
+            current_sphere.GetComponent<Renderer>().material = VR_atoms_mat[current_mat];
+
+            if (i % step_mat == 0 && i != 0 && current_mat != 3)
+            {
+                current_mat++;
+            }
+        }
     }
 
     public void SetLevelScoresBeforeStartGame(string level_scores)
@@ -517,10 +547,7 @@ public class BioBlox : MonoBehaviour
             if (playing)
                 game_time += Time.deltaTime;
 
-            if (line_renderer && camera)
-            {
-                line_renderer.clear();
-            }
+           
 
 
             if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
@@ -1064,6 +1091,8 @@ public class BioBlox : MonoBehaviour
     int number_total_atoms = 0;
     int sound_to_play;
 
+    public bool is_grabbed = false;
+
     // Physics simulation
     void FixedUpdate()
     {
@@ -1101,12 +1130,12 @@ public class BioBlox : MonoBehaviour
                 GridCollider b = new GridCollider(mol0, t0, mol1, t1, LJinflation);
                 work_done = b.work_done;
 
-                BitArray ba0 = new BitArray(mol0.atom_centres.Length);
-                BitArray ba1 = new BitArray(mol1.atom_centres.Length);
-                BitArray bab0 = new BitArray(mol0.atom_centres.Length);
-                BitArray bab1 = new BitArray(mol1.atom_centres.Length);
-                atoms_touching = new BitArray[] { ba0, ba1 };
-                atoms_bad = new BitArray[] { bab0, bab1 };
+                //BitArray ba0 = new BitArray(mol0.atom_centres.Length);
+                //BitArray ba1 = new BitArray(mol1.atom_centres.Length);
+                //BitArray bab0 = new BitArray(mol0.atom_centres.Length);
+                //BitArray bab1 = new BitArray(mol1.atom_centres.Length);
+                //atoms_touching = new BitArray[] { ba0, ba1 };
+                //atoms_bad = new BitArray[] { bab0, bab1 };
                 Matrix4x4 t0mx = t0.localToWorldMatrix;
                 Matrix4x4 t1mx = t1.localToWorldMatrix;
                 //lennard_jones = 0.0f;
@@ -1115,8 +1144,8 @@ public class BioBlox : MonoBehaviour
                 // Apply forces to the rigid bodies.
                 foreach (GridCollider.Result r in b.results)
                 {
-                    // turn off collision for some atoms.
-                    if (atoms_disabled[0][r.i0] || atoms_disabled[1][r.i1]) continue;
+                    //// turn off collision for some atoms.
+                    //if (atoms_disabled[0][r.i0] || atoms_disabled[1][r.i1]) continue;
 
                     Vector3 ac0 = mol0.atom_centres[r.i0];
                     Vector3 ac1 = mol1.atom_centres[r.i1];
@@ -1133,16 +1162,16 @@ public class BioBlox : MonoBehaviour
                     float lennard_jones_force = 12 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
                     */
 
-                    float ljr = distance / (min_d * 1.1547f);
-                    float iljr = (min_d * 1.1547f) / distance;
-                    float iljr2 = iljr * iljr;
-                    float iljr6 = (iljr2 * iljr2) * iljr2;
-                    float iljr8 = iljr6 * iljr2;
-                    float lennard_jones_potential = 3 * iljr8 - 4 * iljr6;
-                    //float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
-                    //float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
-                    ljp_atom_points.Add(ljr);
-                    ljp_atom_points.Add(lennard_jones_potential);
+                    //float ljr = distance / (min_d * 1.1547f);
+                    //float iljr = (min_d * 1.1547f) / distance;
+                    //float iljr2 = iljr * iljr;
+                    //float iljr6 = (iljr2 * iljr2) * iljr2;
+                    //float iljr8 = iljr6 * iljr2;
+                    //float lennard_jones_potential = 3 * iljr8 - 4 * iljr6;
+                    ////float lennard_jones_force = (-8 * 3) * Mathf.Pow(ljr, -9) - (-6 * 4) * Mathf.Pow(ljr, -7);
+                    ////float lennard_jones_force = 6 * Mathf.Pow(ljr, -7) - 12 * Mathf.Pow(ljr, -13);
+                    //ljp_atom_points.Add(ljr);
+                    //ljp_atom_points.Add(lennard_jones_potential);
 
                     // 8-6 potential (force is the differential)
                     //REAL PHYSICS HERE **
@@ -1156,27 +1185,27 @@ public class BioBlox : MonoBehaviour
                     //lennard_jones += lennard_jones_potential;
                     //REAL PHYSICS HERE **
 
-                    num_connections++;
+                    //num_connections++;
 
-                    Vector3 normal = (c0 - c1).normalized;
-                    //normal *= seperationForce * (min_d - distance);
+                    //Vector3 normal = (c0 - c1).normalized;
+                    ////normal *= seperationForce * (min_d - distance);
 
-                    //normal *= lennard_jones_force * LJseperationForce;
-                    normal *= 2000.0f;
-                    r0.AddForceAtPosition(normal, c0);
-                    r1.AddForceAtPosition(-normal, c1);
+                    ////normal *= lennard_jones_force * LJseperationForce;
+                    //normal *= 2000.0f;
+                    //r0.AddForceAtPosition(normal, c0);
+                    //r1.AddForceAtPosition(-normal, c1);
 
                     if (distance < min_d * 0.5f)
                     {
                         num_invalid++;
-                        bab0.Set(r.i0, true);
-                        bab1.Set(r.i1, true);
+                        //bab0.Set(r.i0, true);
+                        //bab1.Set(r.i1, true);
                     }
-                    else if (distance < min_d * 1.2f)
-                    {
-                        if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-                        if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                    }
+                    //else if (distance < min_d * 1.2f)
+                    //{
+                    //    if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+                    //    if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+                    //}
                 }
 
                 //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
@@ -1259,7 +1288,7 @@ public class BioBlox : MonoBehaviour
                 #endregion
             }
 
-            if (eventSystem != null && eventSystem.IsActive())
+            if (eventSystem != null && eventSystem.IsActive() && !is_grabbed)
             {
                 ApplyReturnToOriginForce();
             }
@@ -1278,11 +1307,11 @@ public class BioBlox : MonoBehaviour
             //Debug.Log(is_score_valid);
         }
         //Debug.Log("lj_atom_graph=" + lj_atom_graph);
-        if (lj_atom_graph != null && ljp_atom_points != null)
-        {
-            lj_atom_graph.points = ljp_atom_points;
-            lj_atom_graph.SetVerticesDirty();
-        }
+        //if (lj_atom_graph != null && ljp_atom_points != null)
+        //{
+        //    lj_atom_graph.points = ljp_atom_points;
+        //    lj_atom_graph.SetVerticesDirty();
+        //}
 
         connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         //set color depending if its valid
@@ -1791,8 +1820,14 @@ public class BioBlox : MonoBehaviour
 
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
+        mol1.AddComponent<SphereCollider>();
+        mol1.GetComponent<SphereCollider>().radius = 15.0f;
+        mol1.GetComponent<SphereCollider>().isTrigger = true;
         mol1.transform.SetParent(Molecules);
         mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
+        mol2.AddComponent<SphereCollider>();
+        mol2.GetComponent<SphereCollider>().radius = 15.0f;
+        mol2.GetComponent<SphereCollider>().isTrigger = true;
         mol2.transform.SetParent(Molecules);
 
         //create holder of amino views
@@ -2033,16 +2068,16 @@ public class BioBlox : MonoBehaviour
                             if (d0 > 0.3f && d1 > 0.3f)
                             {
                                 //Debug.Log("ID0: " + a0 + " ID1: " + a1 + "IDA0: " + i0 + " IDA1: " + i1 + " [" + pos0 + "] [" + pos1 + "] d0=" + d0 + " d1=" + d1 + " " + mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0] + " : " + mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1] + " @ " + (pos0 - pos1).sqrMagnitude);
-                                aminoSlider.A1Buttons[a0].dock_amino_id.Add(a1);
-                                aminoSlider.A1Buttons[a0].dock_atom_id.Add(i1);
-                                aminoSlider.A1Buttons[a0].dock_atom_id_self.Add(i0);
-                                aminoSlider.A1Buttons[a0].dock_amino_name_tag_atom.Add(mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1]);
+                                //aminoSlider.A1Buttons[a0].dock_amino_id.Add(a1);
+                                //aminoSlider.A1Buttons[a0].dock_atom_id.Add(i1);
+                                //aminoSlider.A1Buttons[a0].dock_atom_id_self.Add(i0);
+                                //aminoSlider.A1Buttons[a0].dock_amino_name_tag_atom.Add(mol1.aminoAcidsNames[a1] + mol1.aminoAcidsTags[a1] + "/" + mol1.atomNames[i1]);
                                 atom_touching_p2.Add(i1);
 
-                                aminoSlider.A2Buttons[a1].dock_amino_id.Add(a0);
-                                aminoSlider.A2Buttons[a1].dock_atom_id.Add(i0);
-                                aminoSlider.A2Buttons[a1].dock_atom_id_self.Add(i1);
-                                aminoSlider.A2Buttons[a1].dock_amino_name_tag_atom.Add(mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0]);
+                                //aminoSlider.A2Buttons[a1].dock_amino_id.Add(a0);
+                                //aminoSlider.A2Buttons[a1].dock_atom_id.Add(i0);
+                                //aminoSlider.A2Buttons[a1].dock_atom_id_self.Add(i1);
+                                //aminoSlider.A2Buttons[a1].dock_amino_name_tag_atom.Add(mol0.aminoAcidsNames[a0] + mol0.aminoAcidsTags[a0] + "/" + mol0.atomNames[i0]);
                                 atom_touching_p1.Add(i0);
 
                                 //get the maximum game score
@@ -2207,6 +2242,105 @@ public class BioBlox : MonoBehaviour
         }
     }
     #endregion
+
+
+
+    int current_render_p1 = 0;
+    int current_render_p2 = 0;
+
+    public void ChangeProteinRenderer(int protein_id)
+    {
+        if (protein_id == 0)
+        {
+            current_render_p1++;
+
+            switch (current_render_p1)
+            {
+                case 0:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.transparent.GetHashCode();
+                    }
+                    break;
+                case 1:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.bs.GetHashCode();
+                    }
+                    break;
+                case 2:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.carbon.GetHashCode();
+                    }
+                    break;
+                case 3:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.normal.GetHashCode();
+                        current_render_p1 = 0;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            current_render_p2++;
+
+            switch (current_render_p2)
+            {
+                case 0:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.transparent.GetHashCode();
+                    }
+                    break;
+                case 1:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.bs.GetHashCode();
+                    }
+                    break;
+                case 2:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.carbon.GetHashCode();
+                    }
+                    break;
+                case 3:
+                    {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.normal.GetHashCode();
+                        current_render_p2 = 0;
+                    }
+                    break;
+            }
+        }
+    }
 
 }
 

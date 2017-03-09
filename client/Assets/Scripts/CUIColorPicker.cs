@@ -137,7 +137,7 @@ public class CUIColorPicker : MonoBehaviour
             var c3 = sv.x * sv.y * satvalColors[3];
             var resultColor = c0 + c1 + c2 + c3;
             var resImg = result.GetComponent<Image>();
-            MainCamera.backgroundColor = resImg.color = gm.default_background_color = resultColor;
+            //MainCamera.backgroundColor = resImg.color = gm.default_background_color = resultColor;
             if (_color != resultColor)
             {
                 if (_onValueChange != null)
