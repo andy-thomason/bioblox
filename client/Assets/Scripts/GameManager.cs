@@ -128,5 +128,6 @@ public class GameManager : MonoBehaviour {
     {
         yield return new WaitForSeconds(2);
         SceneManager.LoadScene(0, LoadSceneMode.Single);
+        hit_level = false;
     }
 }

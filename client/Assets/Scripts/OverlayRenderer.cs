@@ -65,6 +65,9 @@ public class OverlayRenderer : MonoBehaviour {
     public int P1_selected_atom_id = -1;
     public int P2_selected_atom_id = -1;
 
+    public Transform icons_spheres_store;
+    public int sphere_index = 0;
+
     // Use this for initialization
     void Start ()
     {
@@ -126,37 +129,51 @@ public class OverlayRenderer : MonoBehaviour {
                     //}
 
                     //2D OVERLAY
-                    if ((is_touching || is_bad) && atom_2d_overlay)
-                    {
-                        add_Icon(
-                            new Icon(
-                                t.TransformPoint(mol.atom_centres[j]),
-                                mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f),
-                                is_bad ? bad : selected
-                            )
-                        );
-                    }
+                    //if ((is_touching || is_bad) && atom_2d_overlay)
+                    //{
+                    //    add_Icon(
+                    //        new Icon(
+                    //            t.TransformPoint(mol.atom_centres[j]),
+                    //            mol.atom_radii[j], new Vector2(uvx * 0.25f, (uvy + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, uvy * 0.25f),
+                    //            is_bad ? bad : selected
+                    //        )
+                    //    );
+                    //}
                     //show selected always and only in the protein which the camera is when first eprson
                     //HERE TO SYNC THE PDB WITH THE MESH - is_selected && 
                     if (is_selected)
                     {
-                        if (j == P1_selected_atom_id || j == P2_selected_atom_id)
+                        //if (j == P1_selected_atom_id || j == P2_selected_atom_id)
+                        //{
+                        //    add_Icon(
+                        //       new Icon(
+                        //           t.TransformPoint(mol.atom_centres[j]),
+                        //           mol.atom_radii[j], new Vector2(uvx * 0.25f, (9 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 9 * 0.25f), selected
+                        //       )
+                        //   );
+                        //}
+                        //else
+                        //{
+                        //    add_Icon(
+                        //       new Icon(
+                        //           t.TransformPoint(mol.atom_centres[j]),
+                        //           mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), selected
+                        //       )
+                        //   );
+                        //}
+
+                        if (is_selected)
                         {
-                            add_Icon(
-                               new Icon(
-                                   t.TransformPoint(mol.atom_centres[j]),
-                                   mol.atom_radii[j], new Vector2(uvx * 0.25f, (9 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 9 * 0.25f), selected
-                               )
-                           );
-                        }
-                        else
-                        {
-                            add_Icon(
-                               new Icon(
-                                   t.TransformPoint(mol.atom_centres[j]),
-                                   mol.atom_radii[j], new Vector2(uvx * 0.25f, (6 + 1) * 0.25f), new Vector2((uvx + 1) * 0.25f, 6 * 0.25f), selected
-                               )
-                           );
+                            //if (sphere_index < icons_spheres_store.Count)
+                            //{
+                                //if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
+                                //{
+                                    icons_spheres_store.GetChild(sphere_index).GetComponent<Renderer>().material = P2atom_material[atom];
+                                    icons_spheres_store.GetChild(sphere_index).transform.position = t.TransformPoint(mol.atom_centres[j]);
+                                    //add_Icon_sphere(icons_spheres_store.GetChild(sphere_index));
+                                    sphere_index++;
+                                //}
+                            //}
                         }
 
                         //if (sphere_index < icons_spheres_store.Count)
@@ -178,10 +195,10 @@ public class OverlayRenderer : MonoBehaviour {
                         //    icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
                         //    sphere_index++;
                         //}
-                       
 
 
-                        
+
+
                     }
                     //if (is_disabled)
                     //{
@@ -264,7 +281,7 @@ public class OverlayRenderer : MonoBehaviour {
         }
 
         if (lookat_camera == null) {
-			//Debug.Log("warning: lookat_camera missing");
+			Debug.Log("warning: lookat_camera missing");
 			return;
 		}
 
@@ -333,5 +350,10 @@ public class OverlayRenderer : MonoBehaviour {
 		icons.Remove (Icon);
 	}
 
-   
+    public Icon add_Icon_sphere(GameObject sphere)
+    {
+        icons.Add(Icon);
+        return Icon;
+    }
+
 }

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class VRGrabObject : MonoBehaviour
 {
-
     BioBlox bb;
     // control
     private SteamVR_TrackedObject trackedObj;
@@ -91,8 +90,8 @@ public class VRGrabObject : MonoBehaviour
             Destroy(GetComponent<FixedJoint>());
             // 3
             objectInHand.GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
-            objectInHand.GetComponent<Rigidbody>().angularVelocity = Controller.angularVelocity * 100;
-            objectInHand.GetComponent<SphereCollider>().isTrigger = false;
+            //objectInHand.GetComponent<Rigidbody>().angularVelocity = Controller.angularVelocity * 100;
+            //objectInHand.GetComponent<SphereCollider>().isTrigger = false;
         }
         // 4
         objectInHand = null;
@@ -127,7 +126,6 @@ public class VRGrabObject : MonoBehaviour
                 bb.ChangeProteinRenderer(collidingObject.GetComponent<PDB_mesh>().protein_id);
             }
         }
-
         ////position on the pad
         //if (Controller.GetAxis() != Vector2.zero)
         //{

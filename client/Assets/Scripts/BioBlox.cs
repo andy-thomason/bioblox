@@ -275,6 +275,8 @@ public class BioBlox : MonoBehaviour
     public GameObject GameSounds;
     AudioSource[] game_sounds;
 
+    public bool is_scanning_amino = false;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -404,7 +406,7 @@ public class BioBlox : MonoBehaviour
             current_sphere.transform.SetParent(molecules[1].transform);
             current_sphere.GetComponent<Renderer>().material = VR_atoms_mat[current_mat];
 
-            if (i % step_mat == 0 && i != 0 && current_mat != 3)
+            if (step_mat != 0 && i % step_mat == 0 && i != 0 && current_mat != 3)
             {
                 current_mat++;
             }
