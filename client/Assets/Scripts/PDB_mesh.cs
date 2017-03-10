@@ -28,6 +28,8 @@ public class PDB_mesh : MonoBehaviour
 
     public int number_of_current_atoms;
 
+    Transform VR_right_controller;
+
     //public bool hasCollided=false;
 
     // Use this for initialization
@@ -38,6 +40,7 @@ public class PDB_mesh : MonoBehaviour
         meshes = GetComponentsInChildren<MeshRenderer>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
+        VR_right_controller = GameObject.FindGameObjectWithTag("VR_C_R").transform;
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)
@@ -234,115 +237,115 @@ public class PDB_mesh : MonoBehaviour
         //mo_m = GameObject.FindGameObjectWithTag("camera_holder").transform;
     }
 
-    //Camera main_camera;
-    //bool testi = false;
+    Camera main_camera;
+    bool testi = false;
 
-    // Update is called once per frame
-    //void Update()
-    //{
+    //Update is called once per frame
+    void Update()
+    {
 
-    //    if (!uIController.isOverUI)
-    //    {
-    //        //get if the camera is rotating - for desabling the amino
-    //        if (Input.GetMouseButtonDown(1))
-    //        {
-    //            camera_rotation = mo_m.localRotation;
-    //            camera_position = mo_m.localPosition;
-    //        }
+        if (!uIController.isOverUI)
+        {
+            //get if the camera is rotating - for desabling the amino
+            if (Input.GetMouseButtonDown(1))
+            {
+                camera_rotation = mo_m.localRotation;
+                camera_position = mo_m.localPosition;
+            }
 
-    //        //create the ray
-    //        ray = cam.ScreenPointToRay(Input.mousePosition);
+            //create the ray
+            ray = cam.ScreenPointToRay(Input.mousePosition);
 
-    //        // reduce this to 0.3 or so if in Skeleton mode.
-    //        // shrink ray PEDRO!
-    //        float shrinker = protein_render == protein_render_options.normal.GetHashCode() ? 1.0f : protein_render == protein_render_options.transparent.GetHashCode() ? 1.0f : 0.3f;
-    //        //create a ray to the cursor and cast it, if it hits at all
-    //        int atomID = PDB_molecule.collide_ray(gameObject, mol, transform, ray, shrinker);
+            // reduce this to 0.3 or so if in Skeleton mode.
+            // shrink ray PEDRO!
+            float shrinker = protein_render == protein_render_options.normal.GetHashCode() ? 1.0f : protein_render == protein_render_options.transparent.GetHashCode() ? 1.0f : 0.3f;
+            //create a ray to the cursor and cast it, if it hits at all
+            int atomID = PDB_molecule.collide_ray(gameObject, mol, transform, ray, shrinker);
 
-    //        //activate higghlight
-    //        bb.amino_panel_highlight[protein_id].active = atomID != -1 ? true : false;
+            //activate higghlight
+            bb.amino_panel_highlight[protein_id].active = atomID != -1 ? true : false;
 
-    //        Vector3 mousePos = Input.mousePosition;
+            Vector3 mousePos = Input.mousePosition;
 
-    //        if (Input.GetMouseButtonDown(0))
-    //        {
-    //            if (atomID != -1)
-    //            {
-    //                // "rotating" only gets set if we first click on an atom.
-    //                rotating = true;
-    //                has_rotated = false;
-    //            }
-    //        }
-    //        else if (Input.GetMouseButton(0))
-    //        { //left mouse button
-    //            if (rotating)
-    //            {
-    //                if (t > 0.3f)
-    //                {
-    //                    //if there is no recent input reset previous position
-    //                    lastMousePos = Input.mousePosition;
-    //                }
-    //                //t = 0.0f;
-    //                Vector3 mouseDelta = mousePos - lastMousePos;
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (atomID != -1)
+                {
+                    // "rotating" only gets set if we first click on an atom.
+                    rotating = true;
+                    has_rotated = false;
+                }
+            }
+            else if (Input.GetMouseButton(0))
+            { //left mouse button
+                if (rotating)
+                {
+                    if (t > 0.3f)
+                    {
+                        //if there is no recent input reset previous position
+                        lastMousePos = Input.mousePosition;
+                    }
+                    //t = 0.0f;
+                    Vector3 mouseDelta = mousePos - lastMousePos;
 
-    //                if (mouseDelta.magnitude != 0)
-    //                {
-    //                    has_rotated = true;
-    //                }
-    //                Vector3 dirRight = Vector3.right;
-    //                Vector3 dirUp = Vector3.up;
+                    if (mouseDelta.magnitude != 0)
+                    {
+                        has_rotated = true;
+                    }
+                    Vector3 dirRight = Vector3.right;
+                    Vector3 dirUp = Vector3.up;
 
-    //                transform.RotateAround(transform.position, dirRight, mouseDelta.y);
-    //                transform.RotateAround(transform.position, dirUp, -mouseDelta.x);
-    //            }
-    //        }
-    //        else if (Input.GetMouseButtonUp(0))
-    //        {
-    //            // click without movement selects an atom/amino acid.
-    //            if (rotating && !has_rotated)
-    //            {
-    //                Ray r = cam.ScreenPointToRay(Input.mousePosition);
-    //                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
-    //                if (atom != -1)
-    //                {
-    //                    SelectAtom(atom);
-    //                    sfx.PlayTrack(SFX.sound_index.amino_click);
-    //                }
-    //            }
-    //            has_rotated = false;
-    //            rotating = false;
-    //        }
-    //        else if (Input.GetMouseButtonUp(1))
-    //        {
-    //            if (camera_rotation == mo_m.localRotation && camera_position == mo_m.localPosition)
-    //            {
-    //                Ray r = cam.ScreenPointToRay(Input.mousePosition);
-    //                atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
-    //                if (atom != -1)
-    //                {
-    //                    GetAminoId(atom);
-    //                }
-    //            }
-    //            //Ray r = cam.ScreenPointToRay(Input.mousePosition);
-    //            //atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
-    //            //if (atom != -1 && last_atom_scanned != atom)
-    //            //{
-    //            //    SelectAtom(atom);
-    //            //    uIController.SetAtomNameExplorerView(mol.aminoAcidsNames[return_atom_id(atom)] + " - " + mol.aminoAcidsTags[return_atom_id(atom)]);
-    //            //    last_atom_scanned = atom;
-    //            //}
-    //        }
-    //        else
-    //        {
-    //            has_rotated = false;
-    //            rotating = false;
-    //        }
+                    transform.RotateAround(transform.position, dirRight, mouseDelta.y);
+                    transform.RotateAround(transform.position, dirUp, -mouseDelta.x);
+                }
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                // click without movement selects an atom/amino acid.
+                if (rotating && !has_rotated)
+                {
+                    Ray r = cam.ScreenPointToRay(Input.mousePosition);
+                    atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
+                    if (atom != -1)
+                    {
+                        SelectAtom(atom);
+                        sfx.PlayTrack(SFX.sound_index.amino_click);
+                    }
+                }
+                has_rotated = false;
+                rotating = false;
+            }
+            else if (Input.GetMouseButtonUp(1))
+            {
+                if (camera_rotation == mo_m.localRotation && camera_position == mo_m.localPosition)
+                {
+                    Ray r = cam.ScreenPointToRay(Input.mousePosition);
+                    atom = PDB_molecule.collide_ray(gameObject, mol, transform, r, shrinker);
+                    if (atom != -1)
+                    {
+                        GetAminoId(atom);
+                    }
+                }
+                //Ray r = cam.ScreenPointToRay(Input.mousePosition);
+                //atom = PDB_molecule.collide_ray(gameObject, mol, transform, r);
+                //if (atom != -1 && last_atom_scanned != atom)
+                //{
+                //    SelectAtom(atom);
+                //    uIController.SetAtomNameExplorerView(mol.aminoAcidsNames[return_atom_id(atom)] + " - " + mol.aminoAcidsTags[return_atom_id(atom)]);
+                //    last_atom_scanned = atom;
+                //}
+            }
+            else
+            {
+                has_rotated = false;
+                rotating = false;
+            }
 
 
-    //        lastMousePos = mousePos;
+            lastMousePos = mousePos;
 
-    //    }
-    //}
+        }
+    }
 
     public float select_fudge = 0.67f;
 
