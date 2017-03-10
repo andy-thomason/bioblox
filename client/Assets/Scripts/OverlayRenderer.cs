@@ -36,18 +36,21 @@ public class OverlayRenderer : MonoBehaviour {
     //};
 
     List<Icon> icons = new List<Icon>();
+    List<GameObject> icons_spheres = new List<GameObject>();
+    List<GameObject> icons_spheres_store = new List<GameObject>();
 
     public Material Atom_1;
     public Material Atom_2;
     public Material Atom_selected;
     public Material Atom_selected_fp;
-    public Material disabled_material;
 
     //Material material_to_use;
     UIController ui;
 
     public Camera lookat_camera;
     public GameObject Sphere_atom;
+    //GameObject Sphere_atom_reference;
+    public GameObject Sphere_atom_holder;
     BioBlox bb;
     SFX sfx;
     AminoSliderController asc;
@@ -56,7 +59,6 @@ public class OverlayRenderer : MonoBehaviour {
     public Material[] P1atom_material_o;
     public Material[] P2atom_material_o;
     public Material overlaping;
-    MouseOrbitImproved_main camera_script;
     //List<Atom> p1_atomos = new List<Atom>();
     //List<Atom> p2_atomos = new List<Atom>();
     public bool atom_2d_overlay = false;
@@ -64,9 +66,6 @@ public class OverlayRenderer : MonoBehaviour {
 
     public int P1_selected_atom_id = -1;
     public int P2_selected_atom_id = -1;
-
-    public Transform icons_spheres_store;
-    public int sphere_index = 0;
 
     // Use this for initialization
     void Start ()
@@ -80,16 +79,18 @@ public class OverlayRenderer : MonoBehaviour {
 		mesh.MarkDynamic ();
         MeshRenderer mr = GetComponent<MeshRenderer>();
         asc = FindObjectOfType<AminoSliderController>();
-        camera_script = FindObjectOfType<MouseOrbitImproved_main>();
         mr.material.renderQueue = 4000;
+        get_spheres();
     }
 
     // Update is called once per frame
     void Update () {
         if (bb && bb.game_status == BioBlox.GameStatus.GameScreen && !ui.cutawayON)
         {
+            clear_spheres();
             clear();
 
+            int sphere_index = 0;
             for (int i = 0; i != bb.molecules.Length; ++i)
             {
                 GameObject obj = bb.molecules[i];
@@ -166,13 +167,13 @@ public class OverlayRenderer : MonoBehaviour {
                         {
                             //if (sphere_index < icons_spheres_store.Count)
                             //{
-                                //if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
-                                //{
-                                    icons_spheres_store.GetChild(sphere_index).GetComponent<Renderer>().material = P2atom_material[atom];
-                                    icons_spheres_store.GetChild(sphere_index).transform.position = t.TransformPoint(mol.atom_centres[j]);
-                                    //add_Icon_sphere(icons_spheres_store.GetChild(sphere_index));
-                                    sphere_index++;
-                                //}
+                            //if (bb.molecules_PDB_mesh[0].protein_render != UIController.protein_render.normal.GetHashCode() || bb.molecules_PDB_mesh[1].protein_render != UIController.protein_render.normal.GetHashCode())
+                            //{
+                            icons_spheres_store[sphere_index].GetComponent<Renderer>().material = P2atom_material[atom];
+                            icons_spheres_store[sphere_index].transform.position = t.TransformPoint(mol.atom_centres[j]);
+                            add_Icon_sphere(icons_spheres_store[sphere_index]);
+                            sphere_index++;
+                            //}
                             //}
                         }
 
@@ -350,10 +351,31 @@ public class OverlayRenderer : MonoBehaviour {
 		icons.Remove (Icon);
 	}
 
-    public Icon add_Icon_sphere(GameObject sphere)
+    //shperes
+
+    public GameObject add_Icon_sphere(GameObject Icon)
     {
-        icons.Add(Icon);
+        icons_spheres.Add(Icon);
         return Icon;
+    }
+
+    public void clear_spheres()
+    {
+        foreach (GameObject sphere in icons_spheres) sphere.transform.position = new Vector3(1000.0f, -500.0f, 0);
+        icons_spheres.Clear();
+    }
+
+    public void delete_Icon_sphere(GameObject Icon)
+    {
+        icons_spheres.Remove(Icon);
+    }
+
+    void get_spheres()
+    {
+        foreach (Transform sphere_son in Sphere_atom_holder.transform)
+        {
+            icons_spheres_store.Add(sphere_son.gameObject);
+        }
     }
 
 }

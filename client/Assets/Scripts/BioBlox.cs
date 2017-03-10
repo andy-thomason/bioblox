@@ -1290,7 +1290,7 @@ public class BioBlox : MonoBehaviour
                 #endregion
             }
 
-            if (eventSystem != null && eventSystem.IsActive() && !is_grabbed)
+            if (eventSystem != null && eventSystem.IsActive() && !is_grabbed && bar_value == 0)
             {
                 ApplyReturnToOriginForce();
             }
