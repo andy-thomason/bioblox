@@ -279,11 +279,11 @@ public class BioBlox : MonoBehaviour
 
     void Awake()
     {
-        //creatt ehe sene manager to keep track of the level
-        if (GameObject.FindGameObjectWithTag("GameManager") == null)
-        {
-            Instantiate(GameManager_object);
-        }
+        ////creatt ehe sene manager to keep track of the level
+        //if (GameObject.FindGameObjectWithTag("GameManager") == null)
+        //{
+        //    Instantiate(GameManager_object);
+        //}
 
         gm = FindObjectOfType<GameManager>();
     }
@@ -1267,25 +1267,20 @@ public class BioBlox : MonoBehaviour
                 //Debug.Log(current_game_score);
 
 
-                if (bar_value >= 0.2f)
+                if (bar_value >= 0.3f)
                     game_sounds[0].mute = false;
                 else
                     game_sounds[0].mute = true;
 
-                if (bar_value >= 0.4f)
+                if (bar_value >= 0.6f)
                     game_sounds[1].mute = false;
                 else
                     game_sounds[1].mute = true;
 
-                if (bar_value >= 0.6f)
+                if (bar_value >= 0.9f)
                     game_sounds[2].mute = false;
                 else
                     game_sounds[2].mute = true;
-
-                if (bar_value >= 0.9f)
-                    game_sounds[3].mute = false;
-                else
-                    game_sounds[3].mute = true;
 
                 #endregion
             }

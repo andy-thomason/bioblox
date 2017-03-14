@@ -213,7 +213,7 @@ public class UIController : MonoBehaviour {
         p2_atom_status = 0;
         transparent_render = BioBloxReference.molecules[0].transform.GetChild(0).transform.childCount - 1;
         //SET VALUES TO SAVE BUTTONS
-        Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;//slots holder
+        //Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;//slots holder
         //int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
         //slot_score[0].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(0).GetComponent<SlotController>().total_score;
         //slot_score[1].text = "score: " + level_holder.GetChild(gm.current_level).transform.GetChild(slot_holder_index).transform.GetChild(1).GetComponent<SlotController>().total_score;
