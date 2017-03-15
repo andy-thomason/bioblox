@@ -1235,26 +1235,52 @@ public class BioBlox : MonoBehaviour
                 game_score_value_bar.text = "" + (int)(bar_value * 100) + "%";
                 //Debug.Log(current_game_score);
 
-
-                if (bar_value >= 0.2f)
+                Debug.Log(bar_value);
+                if (bar_value >= 0 && bar_value < 0.2f)
+                {
                     game_sounds[0].mute = false;
-                else
-                    game_sounds[0].mute = true;
-
-                if (bar_value >= 0.4f)
-                    game_sounds[1].mute = false;
-                else
                     game_sounds[1].mute = true;
-
-                if (bar_value >= 0.6f)
-                    game_sounds[2].mute = false;
-                else
                     game_sounds[2].mute = true;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+
+                }
+
+                if (bar_value >= 0.2f && bar_value < 0.4f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = false;
+                    game_sounds[2].mute = true;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.4f && bar_value < 0.6f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = false;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.6f && bar_value < 0.8f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = true;
+                    game_sounds[3].mute = false;
+                    game_sounds[4].mute = true;
+                }
 
                 if (bar_value >= 0.9f)
-                    game_sounds[3].mute = false;
-                else
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = true;
                     game_sounds[3].mute = true;
+                    game_sounds[4].mute = false;
+                }
 
                 #endregion
             }
