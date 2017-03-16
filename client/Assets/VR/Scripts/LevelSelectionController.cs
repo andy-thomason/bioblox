@@ -33,18 +33,10 @@ public class LevelSelectionController : MonoBehaviour
 
         if (first_time)
         {
-
             float distCovered = (Time.time - startTime) * speed;
             float fracJourney = distCovered / journeyLength_0;
-
-            //Debug.Log(molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos);
-
             transform.localPosition = Vector3.Lerp(from, to, fracJourney);
-
-            //molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
-
         }
-
     }
 
     public void StartHintMovement()

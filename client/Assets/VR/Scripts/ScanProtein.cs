@@ -17,19 +17,19 @@ public class ScanProtein : MonoBehaviour {
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
-        laser = transform.GetChild(1).gameObject;
+        laser = transform.GetChild(2).gameObject;
         bb = FindObjectOfType<BioBlox>();
     }
 
     // Update is called once per frame
     void Update ()
     {
-        if (Controller.GetAxis() != Vector2.zero)
+        if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
             bb.is_scanning_amino = true;
             laser.SetActive(true);
         }
-        else
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
         {
             bb.is_scanning_amino = false;
             laser.SetActive(false);

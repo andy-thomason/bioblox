@@ -70,25 +70,25 @@ public class GameManager : MonoBehaviour {
 
     bool hit_level = false;
 
+    public void ChangeLevel()
+    {
+        if (current_level == 11)
+            current_level = 0;
+        else
+            current_level++;
+
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
+    }
+
     public void ChangeLevel(int level)
     {
-        if(!hit_level)
-        {
-            hit_level = true;
-            loading_panel.SetActive(true);
-            selection_panel.alpha = 0;
-            selection_panel.blocksRaycasts = false;
-            current_level = level;
-            //StartCoroutine(WaitForSec());
-            SceneManager.LoadScene(1, LoadSceneMode.Single);
-            GameObject.FindGameObjectWithTag("gm_canvas").GetComponent<Canvas>().worldCamera = GameObject.Find("Camera (eye)").GetComponent<Camera>();
-            hit_level = false;
-        }
+        current_level = level;
+        SceneManager.LoadScene(1, LoadSceneMode.Single);
     }
 
     public void EndLoading()
     {
-        loading_panel.SetActive(false);
+        //loading_panel.SetActive(false);
         FindObjectOfType<UIController>().isOverUI = false;
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
     }

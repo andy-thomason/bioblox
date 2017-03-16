@@ -6,11 +6,9 @@ using UnityEngine.UI;
 public class SelectLevel : MonoBehaviour {
 
     private SteamVR_TrackedObject trackedObj;// 1
-    public GameObject laserPrefab;
     // 2
-    private GameObject laser;
+    public GameObject laser;
     // 3
-    private Transform laserTransform;
     // 4
     private Vector3 hitPoint;
 
@@ -24,6 +22,10 @@ public class SelectLevel : MonoBehaviour {
     public Text name_level;
     public GameObject panel;
 
+    public Material laser_off;
+    public Material laser_on;
+    Renderer laser_mat;
+
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
@@ -31,10 +33,7 @@ public class SelectLevel : MonoBehaviour {
 
     void Start()
     {
-        // 1
-        laser = Instantiate(laserPrefab);
-        // 2
-        laserTransform = laser.transform;
+        laser_mat = laser.GetComponent<Renderer>();
     }
 
     // Update is called once per frame
@@ -52,28 +51,28 @@ public class SelectLevel : MonoBehaviour {
             }
             else
             {
-                laser.SetActive(false);
+                laser_mat.material = laser_off;
             }
         }
 
         if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
         {
-            laser.SetActive(false);
+            laser_mat.material = laser_off;
         }
     }
 
     private void ShowLaser(RaycastHit hit)
     {
         // 1
-        laser.SetActive(true);
+        laser_mat.material = laser_on;
         // 2
-        laserTransform.position = Vector3.Lerp(trackedObj.transform.position, hitPoint, .5f);
+        //laser.transform.position = Vector3.Lerp(trackedObj.transform.position, hitPoint, .5f);
         // 3
-        laserTransform.LookAt(hitPoint);
+        //laserTransform.LookAt(hitPoint);
         // 4
-        laserTransform.localScale = new Vector3(laserTransform.localScale.x, laserTransform.localScale.y, hit.distance);
+        //laser.transform.localScale = new Vector3(laser.transform.localScale.x, laser.transform.localScale.y, hit.distance);
 
-        if(current_level_id != hit.transform.GetComponent<LevelSelectionController>().level_id)
+        if (current_level_id != hit.transform.GetComponent<LevelSelectionController>().level_id)
         {
             if (current_level_id != -1)
                 current_level_selected.GetComponent<LevelSelectionController>().StopHintMovement();

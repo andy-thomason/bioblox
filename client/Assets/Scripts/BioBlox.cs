@@ -52,11 +52,11 @@ public class BioBlox : MonoBehaviour
     };
 
     Level[] levels = {
-       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90),
-       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45),
-       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("2PTC", "E", "I", "1", "1", new Vector3(0, 0, 0), 35, -90),
+       new Level("4KC3", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1FSS", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 45),
+       new Level("1EMV", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
+       new Level("1GRN", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
        new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40, 0),
        new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40, 0),
        new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
@@ -295,6 +295,7 @@ public class BioBlox : MonoBehaviour
         Application.targetFrameRate = -1;
 #endif
 
+       
         game_status = GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
@@ -313,34 +314,37 @@ public class BioBlox : MonoBehaviour
 
         molecules = new GameObject[2];
         molecules_PDB_mesh = new PDB_mesh[2];
+        current_level = gm.current_level;
+        DownloadMolecules_VR();
 
-        if (isDemo)
-        {
-            GameObject.Find("SaveButton").SetActive(false);
-        }
-        else
-        {
-            GameObject.Find("CanvasDemo").SetActive(false);
-        }
+        //if (isDemo)
+        //{
+        //    GameObject.Find("SaveButton").SetActive(false);
+        //}
+        //else
+        //{
+        //    GameObject.Find("CanvasDemo").SetActive(false);
+        //}
 
-        //game type
-        if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
-        {
-            SwitchGameMode();
-        }
-        else
-        {
-            SwitchScienceMode();
-        }
+        ////game type
+        //if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        //{
+        //    SwitchGameMode();
+        //}
+        //else
+        //{
+        //    SwitchScienceMode();
+        //}
 
 
         //set the trypsin fiesr level temp
-        current_level = gm.current_level;
 
         get_spheres();
 
-        if (current_level != -1)
-            StartCoroutine(DownloadMolecules());
+
+        StartGame();
+
+        //if (current_level != -1)
     }
 
     Rigidbody r0;
@@ -358,24 +362,24 @@ public class BioBlox : MonoBehaviour
 
         game_state = GameState.Setup;
 
-        aminoSlider.init();
+        //aminoSlider.init();
 
-        molecules_PDB_mesh[0].DeselectAminoAcid();
-        molecules_PDB_mesh[1].DeselectAminoAcid();
+       // molecules_PDB_mesh[0].DeselectAminoAcid();
+        //molecules_PDB_mesh[1].DeselectAminoAcid();
         //aminoSlider.DeselectAmino();
 
         //r0 = molecules[0].GetComponent<Rigidbody>();
         //r1 = molecules[1].GetComponent<Rigidbody>();
 
         //set names on the amino panels
-        protein_name_text[0].text = molecules_PDB_mesh[0].mol.name;
-        protein_name_text[1].text = molecules_PDB_mesh[1].mol.name;
+        //protein_name_text[0].text = molecules_PDB_mesh[0].mol.name;
+        //protein_name_text[1].text = molecules_PDB_mesh[1].mol.name;
 
         //UI INIT
-        uiController.init();
+        //uiController.init();
 
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
-        dm.GetLevelScore();
+        //dm.GetLevelScore();
         //set the hint on the amino buttons
         find_hint_pairs(molecules_PDB_mesh[0].mol, molecules_PDB_mesh[1].mol);
         spawn_contact_atoms();
@@ -397,7 +401,7 @@ public class BioBlox : MonoBehaviour
         for (int i = 0; i < atom_touching_p1.Count; i++)
         {
             current_sphere = VR_spheres_atoms.GetChild(0).gameObject;
-            Debug.Log(current_sphere.name);
+            //Debug.Log(current_sphere.name);
             current_sphere.transform.position = molecules[0].transform.TransformPoint(molecules_PDB_mesh[0].mol.atom_centres[atom_touching_p1[i]]);
             current_sphere.transform.SetParent(molecules[0].transform);
             current_sphere.GetComponent<Renderer>().material = VR_atoms_mat[current_mat];
@@ -552,8 +556,8 @@ public class BioBlox : MonoBehaviour
            
 
 
-            if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
-                UpdateHint();
+            //if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
+            //    UpdateHint();
         }
 
         if (is_hint_moving)
@@ -1267,20 +1271,50 @@ public class BioBlox : MonoBehaviour
                 //Debug.Log(current_game_score);
 
 
-                if (bar_value >= 0.3f)
+                if (bar_value >= 0 && bar_value < 0.2f)
+                {
                     game_sounds[0].mute = false;
-                else
-                    game_sounds[0].mute = true;
-
-                if (bar_value >= 0.6f)
-                    game_sounds[1].mute = false;
-                else
                     game_sounds[1].mute = true;
-
-                if (bar_value >= 0.9f)
-                    game_sounds[2].mute = false;
-                else
                     game_sounds[2].mute = true;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.2f && bar_value < 0.4f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = false;
+                    game_sounds[2].mute = true;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.4f && bar_value < 0.6f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = false;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.6f && bar_value < 0.8f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = true;
+                    game_sounds[3].mute = false;
+                    game_sounds[4].mute = true;
+                }
+
+                if (bar_value >= 0.8f)
+                {
+                    game_sounds[0].mute = true;
+                    game_sounds[1].mute = true;
+                    game_sounds[2].mute = true;
+                    game_sounds[3].mute = true;
+                    game_sounds[4].mute = false;
+                }
 
                 #endregion
             }
@@ -1774,46 +1808,55 @@ public class BioBlox : MonoBehaviour
     GameObject transparency_1;
     Vector3 position_molecule_0;
     Vector3 position_molecule_1;
+    public Text prot_name_VR;
 
-
-    IEnumerator DownloadMolecules()
+    void DownloadMolecules_VR()
     {
         level = levels[current_level];
-
-#if UNITY_WEBGL
-        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWebGL/" + level.pdbFile.ToLower();
-#endif
-
-#if UNITY_STANDALONE
-        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWindows/" + level.pdbFile.ToLower();
-#endif
-
+        prot_name_VR.text = level.pdbFile;
         // These filenames refer to the fbx in the asset bundle in the server
-        mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
-        mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
-        mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
-        mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
-        mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs + ".bytes";
-        mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs + ".bytes";
+        mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod;
+        mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod;
+        mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs;
+        mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
+        mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs;
+        mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs;
 
-        using (WWW www = new WWW(BundleURL))
-        {
-            yield return www;
+        //using (WWW www = new WWW(BundleURL))
+        //{
+        //    yield return www;
 
-            if (www.error != null)
-                throw new System.Exception("WWW download had an error:" + www.error);
+        //    if (www.error != null)
+        //        throw new System.Exception("WWW download had an error:" + www.error);
 
-            AssetBundle bundle = www.assetBundle;
+        //    AssetBundle bundle = WWW.LoadFromCacheOrDownload(Application.dataPath+"/Resources/AssetBundle/"+level.pdbFile.ToLower(),2).assetBundle;
+        //    Debug.Log(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower());
+        //    Debug.Log(bundle);
 
-            mol1_se_filename_txt = bundle.LoadAsset(mol1_se_filename, typeof(TextAsset)) as TextAsset;
-            mol2_se_filename_txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
-            mol1_bs_filename_txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
-            mol2_bs_filename_txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
-            mol1_ca_filename_txt = bundle.LoadAsset(mol1_ca_filename, typeof(TextAsset)) as TextAsset;
-            mol2_ca_filename_txt = bundle.LoadAsset(mol2_ca_filename, typeof(TextAsset)) as TextAsset;
+        //    mol1_se_filename_txt = bundle.LoadAsset(mol1_se_filename, typeof(TextAsset)) as TextAsset;
+        //    mol2_se_filename_txt = bundle.LoadAsset(mol2_se_filename, typeof(TextAsset)) as TextAsset;
+        //    mol1_bs_filename_txt = bundle.LoadAsset(mol1_bs_filename, typeof(TextAsset)) as TextAsset;
+        //    mol2_bs_filename_txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
+        //    mol1_ca_filename_txt = bundle.LoadAsset(mol1_ca_filename, typeof(TextAsset)) as TextAsset;
+        //    mol2_ca_filename_txt = bundle.LoadAsset(mol2_ca_filename, typeof(TextAsset)) as TextAsset;
 
-            bundle.Unload(false);
-        }
+        //    bundle.Unload(false);
+        //}
+
+       
+            
+        //AssetBundle bundle = WWW.LoadFromCacheOrDownload(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower(), 2).assetBundle;
+        //Debug.Log(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower());
+        //Debug.Log(bundle);
+
+        mol1_se_filename_txt = Resources.Load("ply/"+mol1_se_filename) as TextAsset;
+        mol2_se_filename_txt = Resources.Load("ply/" + mol2_se_filename) as TextAsset;
+        mol1_bs_filename_txt = Resources.Load("ply/" + mol1_bs_filename) as TextAsset;
+        mol2_bs_filename_txt = Resources.Load("ply/" + mol2_bs_filename) as TextAsset;
+        mol1_ca_filename_txt = Resources.Load("ply/" + mol1_ca_filename) as TextAsset;
+        mol2_ca_filename_txt = Resources.Load("ply/" + mol2_ca_filename) as TextAsset;
+
+        //bundle.Unload(false);
 
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
@@ -1980,8 +2023,6 @@ public class BioBlox : MonoBehaviour
 
         //uiController.SetHintImage(level.pdbFile); //HINT
 
-        StartGame();
-
         //create_mesh_1();
         //create_mesh_11();
         //create_mesh2();
@@ -2022,7 +2063,7 @@ public class BioBlox : MonoBehaviour
 
     public void download()
     {
-        StartCoroutine(DownloadMolecules());
+        DownloadMolecules_VR();
     }
 
     public void RestartProteinPositions()
