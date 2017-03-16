@@ -1319,10 +1319,10 @@ public class BioBlox : MonoBehaviour
                 #endregion
             }
 
-            if (eventSystem != null && eventSystem.IsActive() && !is_grabbed && bar_value == 0)
-            {
-                ApplyReturnToOriginForce();
-            }
+            //if (eventSystem != null && eventSystem.IsActive() && !is_grabbed && bar_value == 0)
+            //{
+            //    ApplyReturnToOriginForce();
+            //}
 
             if (number_total_atoms + 2 < num_touching_0 + num_touching_1)
             {

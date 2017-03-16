@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(transform.gameObject);
         sfx = FindObjectOfType<SFX>();
 
-        DidYouKnow.text = loading_facts[Random.Range(0, 11)];
+        //DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 
         ////if NOT DEMO, GET THE USER ID
         //if (!FindObjectOfType<BioBlox>().isDemo)
