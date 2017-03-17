@@ -1094,7 +1094,7 @@ public class BioBlox : MonoBehaviour
     }
 
     public int work_done = 0;
-    int number_total_atoms = 0;
+    public int number_total_atoms = 0;
     int sound_to_play;
 
     public bool is_grabbed = false;
@@ -1136,8 +1136,8 @@ public class BioBlox : MonoBehaviour
                 GridCollider b = new GridCollider(mol0, t0, mol1, t1, LJinflation);
                 work_done = b.work_done;
 
-                //BitArray ba0 = new BitArray(mol0.atom_centres.Length);
-                //BitArray ba1 = new BitArray(mol1.atom_centres.Length);
+                BitArray ba0 = new BitArray(mol0.atom_centres.Length);
+                BitArray ba1 = new BitArray(mol1.atom_centres.Length);
                 //BitArray bab0 = new BitArray(mol0.atom_centres.Length);
                 //BitArray bab1 = new BitArray(mol1.atom_centres.Length);
                 //atoms_touching = new BitArray[] { ba0, ba1 };
@@ -1207,11 +1207,11 @@ public class BioBlox : MonoBehaviour
                         //bab0.Set(r.i0, true);
                         //bab1.Set(r.i1, true);
                     }
-                    //else if (distance < min_d * 1.2f)
-                    //{
-                    //    if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
-                    //    if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
-                    //}
+                    else if (distance < min_d * 1.2f)
+                    {
+                        if (!ba0[r.i0]) { num_touching_0++; ba0.Set(r.i0, true); }
+                        if (!ba1[r.i1]) { num_touching_1++; ba1.Set(r.i1, true); }
+                    }
                 }
 
                 //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
@@ -1324,12 +1324,12 @@ public class BioBlox : MonoBehaviour
             //    ApplyReturnToOriginForce();
             //}
 
-            if (number_total_atoms + 2 < num_touching_0 + num_touching_1)
-            {
-                sound_to_play = Random.Range(0, 4);
-                if (!sfx.isPlaying_collision(sound_to_play))
-                    sfx.PlayTrackChild(sound_to_play);
-            }
+            //if (number_total_atoms + 2 < num_touching_0 + num_touching_1)
+            //{
+            //    sound_to_play = Random.Range(0, 4);
+            //    if (!sfx.isPlaying_collision(sound_to_play))
+            //        sfx.PlayTrackChild(sound_to_play);
+            //}
 
             number_total_atoms = num_touching_0 + num_touching_1;
 
@@ -1344,10 +1344,10 @@ public class BioBlox : MonoBehaviour
         //    lj_atom_graph.SetVerticesDirty();
         //}
 
-        connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
+        //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         //set color depending if its valid
         score_bar.color = is_score_valid ? Color.green : Color.red;
-        lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+       // lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)
             sfx.Mute_Track(SFX.sound_index.warning, false);

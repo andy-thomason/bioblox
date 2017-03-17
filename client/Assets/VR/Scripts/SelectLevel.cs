@@ -20,6 +20,7 @@ public class SelectLevel : MonoBehaviour {
     int current_level_id = -1;
     GameObject current_level_selected;
     public Text name_level;
+    public Text description;
     public GameObject panel;
 
     public Material laser_off;
@@ -85,6 +86,7 @@ public class SelectLevel : MonoBehaviour {
             current_level_selected.GetComponent<LevelSelectionController>().StartHintMovement();
             current_level_id = current_level_selected.GetComponent<LevelSelectionController>().level_id;
             name_level.text = current_level_selected.GetComponent<LevelSelectionController>().level_name;
+            description.text = current_level_selected.GetComponent<LevelSelectionController>().description;
         }
     }
 }

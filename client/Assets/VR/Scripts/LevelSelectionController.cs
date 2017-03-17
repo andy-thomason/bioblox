@@ -18,6 +18,7 @@ public class LevelSelectionController : MonoBehaviour
 
     public int level_id;
     public string level_name;
+    public string description;
     Transform mc;
 
     // Use this for initialization
@@ -30,7 +31,6 @@ public class LevelSelectionController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (first_time)
         {
             float distCovered = (Time.time - startTime) * speed;

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ChangeControlModel : MonoBehaviour {
+public class ChangeControlModeMain : MonoBehaviour {
 
     GameObject default_hand;
     GameObject point_hand;
@@ -19,27 +20,37 @@ public class ChangeControlModel : MonoBehaviour {
         get { return SteamVR_Controller.Input((int)trackedObj.index); }
     }
 
+    BioBlox bb;
+    Text amino_text;
+    int previous_atoms = -1;
+
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
+        bb = FindObjectOfType<BioBlox>();
     }
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         default_hand = transform.GetChild(0).transform.GetChild(0).gameObject;
         point_hand = transform.GetChild(0).transform.GetChild(1).gameObject;
         close_hand = transform.GetChild(0).transform.GetChild(2).gameObject;
+        amino_text = GameObject.FindGameObjectWithTag("amino_name").GetComponent<Text>();
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         if (Controller.GetHairTriggerDown())
         {
             default_hand.SetActive(false);
             point_hand.SetActive(false);
             close_hand.SetActive(true);
+            //deselect
+            bb.molecules_PDB_mesh[0].DeselectAminoAcid();
+            bb.molecules_PDB_mesh[1].DeselectAminoAcid();
+            amino_text.text = "";
         }
 
         // release trigger
@@ -56,6 +67,10 @@ public class ChangeControlModel : MonoBehaviour {
             default_hand.SetActive(false);
             point_hand.SetActive(true);
             close_hand.SetActive(false);
+            //deselect
+            bb.molecules_PDB_mesh[0].DeselectAminoAcid();
+            bb.molecules_PDB_mesh[1].DeselectAminoAcid();
+            amino_text.text = "";
         }
 
         // press grip
@@ -65,7 +80,7 @@ public class ChangeControlModel : MonoBehaviour {
             point_hand.SetActive(false);
             close_hand.SetActive(false);
         }
-        
+
         if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
             default_hand.SetActive(false);
@@ -80,18 +95,11 @@ public class ChangeControlModel : MonoBehaviour {
             close_hand.SetActive(false);
         }
 
-        //if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-        //{
-        //    default_hand.SetActive(true);
-        //    point_hand.SetActive(false);
-        //    close_hand.SetActive(false);
-        //}
-
-        //else
-        //{
-        //    default_hand.SetActive(true);
-        //    point_hand.SetActive(false);
-        //    close_hand.SetActive(false);
-        //}
+        //vibration
+        if (bb.number_total_atoms > 0 && bb.number_total_atoms != previous_atoms)
+        {
+            Controller.TriggerHapticPulse(400);
+            previous_atoms = bb.number_total_atoms;
+        }
     }
 }
