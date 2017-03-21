@@ -28,7 +28,7 @@ public class SFX : MonoBehaviour
     }
 
     #region MUTE BUTTON
-    bool is_audio_playing = true;
+    public bool is_audio_playing = true;
     bool is_sfx_playing = true;
     public Sprite audio_off;
     public Sprite audio_on;
@@ -134,13 +134,10 @@ public class SFX : MonoBehaviour
 
     public void Mute_Music(bool status)
     {
-        audioSource[0].mute = status;
+        //audioSource[0].mute = status;
         foreach (AudioSource audio in GameObject.FindGameObjectWithTag("game_sounds").GetComponents<AudioSource>())
         {
-            if (!status)
-                audio.Play();
-            else
-                audio.Stop();
+            audio.mute = true;
         }
     }
 
