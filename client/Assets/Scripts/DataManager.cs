@@ -9,7 +9,7 @@ public class DataManager : MonoBehaviour {
     GameManager gm;
     WWWForm www_form;
     public string id_user;
-    public int number_of_level;
+    int number_of_level;
     Transform level_holder;
 
     // Use this for initialization
@@ -33,6 +33,9 @@ public class DataManager : MonoBehaviour {
         id_user = splitArray[0];
         string username = splitArray[1];
 
+        //get nubmer of levels
+        number_of_level = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.childCount - 1;
+
         www_form = new WWWForm();
         www_form.AddField("id_user", id_user);
         www_form.AddField("username", username);
@@ -43,13 +46,14 @@ public class DataManager : MonoBehaviour {
 
     IEnumerator insertUser()
     {
-        ////temp
+        //temp
+        //number_of_level = 7;
         //www_form = new WWWForm();
         //www_form.AddField("id_user", 2);
         //www_form.AddField("username", "pedro");
         //www_form.AddField("number_of_levels", number_of_level);
         //gm.id_user = 2;
-        ////temp
+        //temp
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
         gm.SetID();
@@ -76,7 +80,7 @@ public class DataManager : MonoBehaviour {
                     //assign score ui
                     for (int l = 0; l <= 3; l++)
                     {
-                        level_holder.GetChild(i).transform.GetChild(l + 1).GetComponent<Text>().text = splitScoresLevel[l];
+                        level_holder.GetChild(i).transform.GetChild(0).transform.GetChild(l + 1).GetComponent<Text>().text = splitScoresLevel[l];
                     }
                 }
             }
