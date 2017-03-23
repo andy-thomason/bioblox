@@ -65,7 +65,7 @@ public class PDB_parser {
     };
 
     // Build a PDB_molecule instance from a set of chains (eg. "E" or "ACBD")
-    static public PDB_molecule parse(string asset_name, string chains) {
+    static public PDB_molecule parse(string asset_name, string chains, string pdb_file) {
         List<Vector3> atom_centres = new List<Vector3>();
         List<float> atom_radii = new List<float>();
         List<Color> atom_colours = new List<Color>();
@@ -78,13 +78,13 @@ public class PDB_parser {
         List<string> aminoAcidTag = new List<string>();
         List<List<int>> aminoAcidAtomIDs = new List<List<int>> ();
 
-        TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
+        //TextAsset pdbTA = (TextAsset)Resources.Load(asset_name, typeof(TextAsset));
         PDB_molecule cur = new PDB_molecule();
         float minx = 1e37f, miny = 1e37f, minz = 1e37f;
         float maxx = -1e37f, maxy = -1e37f, maxz = -1e37f;
 
         List<int> serial_to_atom = new List<int>();
-        using (StringReader reader = new StringReader(pdbTA.text)) {
+        using (StringReader reader = new StringReader(pdb_file)) {
             string line;
             int index = 0;
             ButtonStructure buttons = GameObject.FindObjectOfType<ButtonStructure>();
@@ -247,10 +247,10 @@ public class PDB_parser {
 
     static public Dictionary<string, PDB_molecule> mols = new Dictionary<string, PDB_molecule>();
 
-    public static PDB_molecule get_molecule(string name) {
+    public static PDB_molecule get_molecule(string name, string pdb_file) {
         if (!mols.ContainsKey(name)) {
             string[] parts = name.Split('.');
-            PDB_molecule mol = parse(parts[0], parts[1]);
+            PDB_molecule mol = parse(parts[0], parts[1], pdb_file);
             mols[name] = mol;
         }
         return mols[name];

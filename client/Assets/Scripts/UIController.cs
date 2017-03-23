@@ -1135,7 +1135,7 @@ public class UIController : MonoBehaviour {
             ach = AminoLinkChild.GetComponent<AminoConnectionHolder>();
             P1_connections += ach.A1_name + "-" + ach.AT1_name + " / ";
             P2_connections += ach.A2_name + "-" + ach.AT2_name + " / ";
-            connections += ach.ID_button1 + "-" + ach.ID_button2 + "/";
+            connections += ach.ID_button1 + "," + ach.AT1_index + "-" + ach.ID_button2 + "," + ach.AT2_index + "/";
         }
         
         dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections, BioBloxReference.bar_value);

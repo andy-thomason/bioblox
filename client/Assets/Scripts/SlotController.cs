@@ -30,7 +30,8 @@ public class SlotController : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if(!is_empty)
+        FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
+        if (!is_empty)
         {
             transform.parent.transform.parent.transform.GetChild(0).GetComponent<CanvasGroup>().alpha = 1;
             transform.parent.transform.parent.transform.GetChild(0).GetComponent<CanvasGroup>().interactable = true;
