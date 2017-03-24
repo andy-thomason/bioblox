@@ -811,8 +811,8 @@ public class UIController : MonoBehaviour {
         BioBloxReference.game_time = 0;
         Reset_UI();
         CutAway.value = CutAway.minValue;
-        if (BioBloxReference.current_level == 0)
-            BioBloxReference.ToggleMode.isOn = true;
+        //if (BioBloxReference.current_level == 0)
+        //    BioBloxReference.ToggleMode.isOn = true;
 
         sfx.StopTrack(SFX.sound_index.warning);
         isOverUI = false;
@@ -826,9 +826,9 @@ public class UIController : MonoBehaviour {
         FixProtein2Toggle.isOn = false;
         CutAway.value = CutAway.minValue;
         //ExpertModeOffStart();
-        RestartCameraFromIntro();
-        DropDownP1.value = 0;
-        DropDownP2.value = 0;
+        //RestartCameraFromIntro();
+        //DropDownP1.value = 0;
+        //DropDownP2.value = 0;
         BioBloxReference.molecules_PDB_mesh[0].DeselectAminoAcid();
         BioBloxReference.molecules_PDB_mesh[1].DeselectAminoAcid();
         aminoSliderController.DeselectAmino();
