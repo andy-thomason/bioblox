@@ -27,7 +27,7 @@ public class BioBlox : MonoBehaviour
     // the level we are currently on, incremented at the end of a level
     public int current_level;
 
-    struct Level
+    public struct Level
     {
         public string pdbFile;
         public string chainsA;
@@ -51,7 +51,7 @@ public class BioBlox : MonoBehaviour
         }
     };
 
-    Level[] levels = {
+    public Level[] levels = {
        new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90),
        new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
        new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45),
@@ -329,7 +329,6 @@ public class BioBlox : MonoBehaviour
         {
             SwitchScienceMode();
         }
-
 
         //set the trypsin fiesr level temp
         current_level = gm.current_level;

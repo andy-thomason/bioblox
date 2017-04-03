@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour {
     public GameObject loading_panel;
     public GameObject MenuButtons;
     public int id_user;
-    DataManager dm;
     public string[] level_scores;
     public int number_of_level;
     public CanvasGroup selection_panel;
@@ -25,11 +24,14 @@ public class GameManager : MonoBehaviour {
     public Image science_mode_image;
     public Image game_mode_image;
     public Color default_background_color;
+    public Dropdown leader_board_dropdown;
+    BioBlox bb;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
         sfx = FindObjectOfType<SFX>();
+        bb = FindObjectOfType<BioBlox>();
 
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 

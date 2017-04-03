@@ -11,12 +11,14 @@ public class DataManager : MonoBehaviour {
     public string id_user;
     int number_of_level;
     Transform level_holder;
+    Transform scores_leaderboard;
 
     // Use this for initialization
     void Start ()
     {
         bb = FindObjectOfType<BioBlox>();
         gm = FindObjectOfType<GameManager>();
+        scores_leaderboard = GameObject.FindGameObjectWithTag("scores_leaderboard").transform;
         ////temp
         //StartCoroutine(insertUser());
         ////temp
@@ -88,7 +90,7 @@ public class DataManager : MonoBehaviour {
         }
     }
 
-    public void SendSaveData(int slot, string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections, float bar_game_score)
+    public void SendSaveData(int slot, string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections, float bar_game_score, int n_connections)
     {
         //create position/rotation
         string p1_position = bb.molecules[0].transform.localPosition.x.ToString("F2") + "," + bb.molecules[0].transform.localPosition.y.ToString("F2") + "," + bb.molecules[0].transform.localPosition.z.ToString("F2");
@@ -113,6 +115,7 @@ public class DataManager : MonoBehaviour {
         www_form.AddField("slider_value", slider_value.ToString());
         www_form.AddField("connections", connections);
         www_form.AddField("bar_game_score", bar_game_score.ToString());
+        www_form.AddField("n_connections", n_connections.ToString());
         StartCoroutine(insertSave());
     }
 
@@ -137,5 +140,31 @@ public class DataManager : MonoBehaviour {
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/load_level.php", www_form);
         yield return SQLQuery;
         bb.SetLevelScoresBeforeStartGame(SQLQuery.text);
+    }
+
+    public void load_leaderboard(int value)
+    {
+        www_form = new WWWForm();
+        //www_form.AddField("level", value.ToString());
+        StartCoroutine(get_leaderboard());
+    }
+
+    IEnumerator get_leaderboard()
+    {
+        WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/leaderboard.php", www_form);
+        yield return SQLQuery;
+
+        //split the leaderboard
+        string[] splitScores = (SQLQuery.text).Split('*');
+        //Debug.Log(SQLQuery.text);
+        //Debug.Log(splitScores.Length);
+        //EmptyLeaderboard();
+        //fill the scores
+        for (int i = 0; i < splitScores.Length - 1; i++)
+        {
+            string[] splitScores_slot = splitScores[i].Split('+');
+            scores_leaderboard.GetChild(i).GetChild(0).GetComponent<Text>().text = splitScores_slot[1];
+            scores_leaderboard.GetChild(i).GetChild(1).GetComponent<Text>().text = splitScores_slot[2];
+        }
     }
 }

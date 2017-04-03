@@ -1138,7 +1138,7 @@ public class UIController : MonoBehaviour {
             connections += ach.ID_button1 + "," + ach.AT1_index + "-" + ach.ID_button2 + "," + ach.AT2_index + "/";
         }
         
-        dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections, BioBloxReference.bar_value);
+        dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections, BioBloxReference.bar_value, AminoLinkPanel.transform.childCount);
         UpdateLocalScore(slot, n_atoms.text, lpj.text, ei.text, game_score.text);
         //update button save
         //slot_score[slot].text = "score: " + BioBloxReference.game_score.text;
