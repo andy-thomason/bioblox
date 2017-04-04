@@ -24,14 +24,15 @@ public class GameManager : MonoBehaviour {
     public Image science_mode_image;
     public Image game_mode_image;
     public Color default_background_color;
-    public Dropdown leader_board_dropdown;
-    BioBlox bb;
+    public Text ranking_user;
+    public Text total_number_users;
+    public Transform ranking_container;
+    WWWForm www_form;
 
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
         sfx = FindObjectOfType<SFX>();
-        bb = FindObjectOfType<BioBlox>();
 
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 
@@ -55,9 +56,12 @@ public class GameManager : MonoBehaviour {
             }
             //disable load slots from the first level
             level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(false);
-            //level_holder.GetChild(0).transform.GetChild(button_child - 1).GetComponent<Button>().interactable = true;
-            //level_holder.GetChild(0).transform.GetChild(button_child - 1).transform.GetChild(0).GetComponent<Text>().text = "Load";
+            //disable ranking
+            ranking_user.transform.parent.gameObject.SetActive(false);
         }
+
+        //LOAD LEAVERBOARD
+        load_leaderboard();
     }
     
     public void ChangeLevel(int level, int slot)
@@ -109,5 +113,46 @@ public class GameManager : MonoBehaviour {
         game_type = game_type_mode.game_mode.GetHashCode();
         science_mode_image.color = deactivated_game_mode;
         FindObjectOfType<BioBlox>().SwitchGameMode();
+    }
+
+    //GET THE LEADERBOARD
+    public void load_leaderboard()
+    {
+        www_form = new WWWForm();
+        www_form.AddField("id_user", id_user);
+        StartCoroutine(get_leaderboard());
+    }
+
+    IEnumerator get_leaderboard()
+    {
+        WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/leaderboard.php", www_form);
+        yield return SQLQuery;
+
+        //split the leaderboard
+        string[] splitScores = (SQLQuery.text).Split('/');
+        int user_rank = int.Parse(splitScores[1]) - 1;
+        total_number_users.text = splitScores[0];
+
+        string[] splitScores_each = (splitScores[2]).Split('*');
+        //Debug.Log(SQLQuery.text);
+        //Debug.Log(splitScores.Length);
+        //EmptyLeaderboard();
+
+        //dont highlight
+        if (FindObjectOfType<BioBlox>().isDemo)
+            user_rank = -1;
+
+        //fill the scores
+        for (int i = 0; i < splitScores_each.Length - 1; i++)
+        {
+            string[] splitScores_slot = splitScores_each[i].Split('+');
+            ranking_container.GetChild(i).GetChild(1).GetComponent<Text>().text = splitScores_slot[0];
+            ranking_container.GetChild(i).GetChild(2).GetComponent<Text>().text = splitScores_slot[1];
+
+            if(i == user_rank)
+            {
+                ranking_container.GetChild(i).GetComponent<Image>().color = default_background_color;
+            }
+        }
     }
 }
