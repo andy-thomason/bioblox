@@ -37,8 +37,9 @@ public class BioBlox : MonoBehaviour
         public Vector3 offset;
         public float separation;
         public float docking_degrees;
+        public int dificulty;
 
-        public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_bs, Vector3 offset, float separation, float docking_degrees)
+        public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_bs, Vector3 offset, float separation, float docking_degrees, int dificulty)
         {
             this.pdbFile = pdbFile;
             this.chainsA = chainsA;
@@ -48,22 +49,23 @@ public class BioBlox : MonoBehaviour
             this.offset = offset;
             this.separation = separation;
             this.docking_degrees = docking_degrees;
+            this.dificulty = dificulty;
         }
     };
 
     public Level[] levels = {
-       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90),
-       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45),
-       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40, 0),
-       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40, 0)
+       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90, 2),
+       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 3),
+       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45, 3),
+       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40, 0, 2)
     };
 
     enum protein_view { normal, transparent, bs };
@@ -1775,7 +1777,7 @@ public class BioBlox : MonoBehaviour
     TextAsset mol2_ca_filename_txt;
     string pdb_file;
     byte[] txt_bytes;
-    Level level;
+    public Level level;
     GameObject mol1;
     GameObject mol2;
     Vector3 offset_position_0;

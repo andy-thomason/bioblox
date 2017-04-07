@@ -114,6 +114,8 @@ public class DataManager : MonoBehaviour {
         www_form.AddField("connections", connections);
         www_form.AddField("bar_game_score", bar_game_score.ToString());
         www_form.AddField("n_connections", n_connections.ToString());
+        www_form.AddField("dificulty", bb.level.dificulty.ToString());
+        Debug.Log(bb.level.dificulty.ToString());
         StartCoroutine(insertSave());
     }
 
