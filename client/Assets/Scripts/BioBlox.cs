@@ -1667,52 +1667,52 @@ public class BioBlox : MonoBehaviour
     //    }
     //}
 
-    public void ToggleGameMode()
-    {
-        bool status = ToggleMode.isOn;
-        //ScorePanel.alpha = status ? 0 : 1;
-        //Filter.SetActive(!status);
-        //SimpleScoretemp.SetActive(status);
-        HintText.SetActive(status);
-        HintTextPanel.gameObject.SetActive(status);
-        ExitTutorialButton.SetActive(status);
+    //public void ToggleGameMode()
+    //{
+    //    bool status = ToggleMode.isOn;
+    //    //ScorePanel.alpha = status ? 0 : 1;
+    //    //Filter.SetActive(!status);
+    //    //SimpleScoretemp.SetActive(status);
+    //    HintText.SetActive(status);
+    //    HintTextPanel.gameObject.SetActive(status);
+    //    ExitTutorialButton.SetActive(status);
 
-        if (!status)
-        {
-            TutorialHand.position = new Vector3(5000.0f, 0, 0);
-            TutorialHand.gameObject.SetActive(false);
-        }
-        else
-        {
-            TutorialHand.gameObject.SetActive(true);
-        }
+    //    if (!status)
+    //    {
+    //        TutorialHand.position = new Vector3(5000.0f, 0, 0);
+    //        TutorialHand.gameObject.SetActive(false);
+    //    }
+    //    else
+    //    {
+    //        TutorialHand.gameObject.SetActive(true);
+    //    }
 
-        Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
-        Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
+    //    Transform Amino1 = GameObject.Find("ContentPanelA1").transform;
+    //    Transform Amino2 = GameObject.Find("ContentPanelA2").transform;
 
-        if (!status)
-        {
-            //actgive all amino
-            foreach (Transform childTransform in Amino1)
-            {
-                childTransform.gameObject.SetActive(true);
-            }
-            foreach (Transform childTransform in Amino2)
-            {
-                childTransform.gameObject.SetActive(true);
-            }
-        }
-        uiController.ToggleAminoButtonRL(!status);
-    }
+    //    if (!status)
+    //    {
+    //        //actgive all amino
+    //        foreach (Transform childTransform in Amino1)
+    //        {
+    //            childTransform.gameObject.SetActive(true);
+    //        }
+    //        foreach (Transform childTransform in Amino2)
+    //        {
+    //            childTransform.gameObject.SetActive(true);
+    //        }
+    //    }
+    //    uiController.ToggleAminoButtonRL(!status);
+    //}
 
-    public void ExitTutorial()
-    {
-        ToggleMode.isOn = false;
-        ToggleGameMode();
-        aminoSlider.DeleteAllAminoConnections();
-        TutorialHand.position = new Vector3(6000.0f, 0, 0);
-        uiController.isOverUI = false;
-    }
+    //public void ExitTutorial()
+    //{
+    //    ToggleMode.isOn = false;
+    //    ToggleGameMode();
+    //    aminoSlider.DeleteAllAminoConnections();
+    //    TutorialHand.position = new Vector3(6000.0f, 0, 0);
+    //    uiController.isOverUI = false;
+    //}
 
     public Material transparent_0;
     public Material transparent_1;

@@ -59,9 +59,6 @@ public class GameManager : MonoBehaviour {
             //disable ranking
             ranking_user.transform.parent.gameObject.SetActive(false);
         }
-
-        //LOAD LEAVERBOARD
-        load_leaderboard();
     }
     
     public void ChangeLevel(int level, int slot)
@@ -84,6 +81,8 @@ public class GameManager : MonoBehaviour {
     public void SetID()
     {
         id_user = int.Parse(FindObjectOfType<DataManager>().id_user);
+        //LOAD LEAVERBOARD
+        load_leaderboard();
     }
 
     public void CloseTutorialPanel()
@@ -132,6 +131,7 @@ public class GameManager : MonoBehaviour {
         string[] splitScores = (SQLQuery.text).Split('/');
         int user_rank = int.Parse(splitScores[1]) - 1;
         total_number_users.text = splitScores[0];
+        ranking_user.text = splitScores[1];
 
         string[] splitScores_each = (splitScores[2]).Split('*');
         //Debug.Log(SQLQuery.text);
