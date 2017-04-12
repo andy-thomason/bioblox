@@ -189,6 +189,8 @@ public class BioBlox : MonoBehaviour
     public Transform Molecules;
     public Toggle ToggleMode;
 
+    TutorialController tc;
+
     //bool loaded = false;
 
     #region HINT MOVEMENT
@@ -307,6 +309,7 @@ public class BioBlox : MonoBehaviour
         aminoSlider = FindObjectOfType<AminoSliderController>();
         dm = FindObjectOfType<DataManager>();
         lj_atom_graph = FindObjectOfType<LennardJonesGraph>();
+        tc = FindObjectOfType<TutorialController>();
         
         game_sounds = GameObject.FindGameObjectWithTag("game_sounds").GetComponents<AudioSource>();
 
@@ -1218,7 +1221,7 @@ public class BioBlox : MonoBehaviour
 
                 #region GAME SCORE
 
-                if (max_game_score != 0)
+                if (max_game_score != 0 && !tc.tutorial_score_fixed)
                 {
                     float current_game_score = 0;
                     //chheck if the atoms are in touch

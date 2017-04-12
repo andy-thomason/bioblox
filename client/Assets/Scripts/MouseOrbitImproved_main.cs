@@ -29,10 +29,13 @@ public class MouseOrbitImproved_main : MonoBehaviour
     float x = 0.0f;
     float y = 0.0f;
 
+    TutorialController tc;
+
     // Use this for initialization
     void Start()
     {
         ui = FindObjectOfType<UIController>();
+        tc = FindObjectOfType<TutorialController>();
         Init();
     }
 
@@ -59,7 +62,7 @@ public class MouseOrbitImproved_main : MonoBehaviour
 
     void Update()
     {
-        if(!ui.isOverUI)
+        if(!ui.isOverUI && !tc.tutorial_camera_fixed)
         {
             if (Input.GetMouseButton(1))
             {
