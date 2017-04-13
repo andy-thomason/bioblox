@@ -202,7 +202,7 @@ public class BioBlox : MonoBehaviour
     float journeyLength_1;
     float speed = 0.2F;
     float startTime;
-    bool is_hint_moving = false;
+    public bool is_hint_moving = false;
     #endregion
     //List<int> hint_pairs;
 
@@ -2136,7 +2136,6 @@ public class BioBlox : MonoBehaviour
 
     public void StartHintMovement()
     {
-
         if (!is_hint_moving)
         {
             is_hint_moving = !is_hint_moving;

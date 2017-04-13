@@ -31,6 +31,7 @@ public class AminoConnectionHolder : MonoBehaviour {
     Vector3 normal_scale = new Vector3(1, 1, 1);
     Vector3 selected_scale = new Vector3(1.2f, 1.2f, 1.2f);
     public int connection_id;
+    TutorialController tc;
 
     public void UpdateLink()
 	{		
@@ -44,14 +45,17 @@ public class AminoConnectionHolder : MonoBehaviour {
 
     public void DeleteLink()
     {
-        sfx.PlayTrack(SFX.sound_index.button_click);
-        cn.DeleteAminoAcidLink(connection);
-        //asc.RestoreDeletedAminoButtons(ID_button1, ID_button2);
-        cn.DisableSlider();
-        asc.DeselectAmino();
-        //ui.P1CleanAtomButtons();
-        //ui.P2CleanAtomButtons();
-        Destroy(gameObject);
+        if (!tc.tutorial_no_delete_link)
+        {
+            sfx.PlayTrack(SFX.sound_index.button_click);
+            cn.DeleteAminoAcidLink(connection);
+            //asc.RestoreDeletedAminoButtons(ID_button1, ID_button2);
+            cn.DisableSlider();
+            asc.DeselectAmino();
+            //ui.P1CleanAtomButtons();
+            //ui.P2CleanAtomButtons();
+            Destroy(gameObject);
+        }
     }
 
     //public void HighlightClick()
@@ -122,6 +126,7 @@ public class AminoConnectionHolder : MonoBehaviour {
         bb = FindObjectOfType<BioBlox>();
         cn = FindObjectOfType<ConnectionManager>();
         or = FindObjectOfType<OverlayRenderer>();
+        tc = FindObjectOfType<TutorialController>();
 
         //if (ui.expert_mode)
         //{
