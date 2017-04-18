@@ -85,7 +85,7 @@ public class TutorialController : MonoBehaviour {
     int tutorial_step = -1;
 
     Transform background_tutorial;
-    enum background_size { medium_size, short_size };
+    enum background_size { large_size, medium_size, short_size };
     enum background_position { down, up, left, right };
 
     UIController ui;
@@ -275,7 +275,7 @@ public class TutorialController : MonoBehaviour {
                     }
                     //DEACTIVATE THE DOCKING ANIMATION IN CASE THE USER GOES BACK
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "Very good! now we know you know the functionalities of the Control menu, you will learn how to manipulate the proteins and move the camera to explore the workspace from different angles.To zoom in and out the camera, scroll themouse wheel. Remember, you can always reset the camera position, pressing (     ) in the Control Menu.");
+                    set_background(background_position.left, background_size.large_size, "Very good! now we know you know the functionalities of the Control menu, you will learn how to manipulate the proteins and move the camera to explore the workspace from different angles.To zoom in and out the camera, scroll themouse wheel. Remember, you can always reset the camera position, pressing (     ) in the Control Menu.");
                     Debug.Log("MOUSE CONTROLS / ZOOM");
                 }
                 break;
@@ -320,7 +320,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_panel_1_cg);
                     ShowCanvasGroupElement(protein_panel_2_cg);
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.medium_size, "First, let’s start with the Protein Panels. This two panels shows the proteins content. There’s one for each protein in the level. Please,place the cursor over the protein models to see which panel gets highlighted with red and blue. Now you can easily identify which panel correspond to each protein model.");
+                    set_background(background_position.right, background_size.large_size, "First, let’s start with the Protein Panels. This two panels shows the proteins content. There’s one for each protein in the level. Please,place the cursor over the protein models to see which panel gets highlighted with red and blue. Now you can easily identify which panel correspond to each protein model.");
                     Debug.Log("PROTEIN PANELS");
                 }
                 break;
@@ -346,7 +346,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_views_1_cg);
                     ShowCanvasGroupElement(protein_views_2_cg);
                     transform.position = protein_views_1_pos.position;
-                    set_background(background_position.right, background_size.short_size, "To explore the protein model, you can switch among visualizations using theVisualization Section in the Protein Panel. Please, Left-click over the four different visualization modes. You will notice that in some modes you can see all the atoms and other allow you to see the shape of the protein. During the game you can switch any time the visualization modes to facilitate your task. ");
+                    set_background(background_position.right, background_size.large_size, "To explore the protein model, you can switch among visualizations using theVisualization Section in the Protein Panel. Please, Left-click over the four different visualization modes. You will notice that in some modes you can see all the atoms and other allow you to see the shape of the protein. During the game you can switch any time the visualization modes to facilitate your task. ");
                     Debug.Log("PROTEIN PANELS RENDERERS");
                 }
                 break;
@@ -378,7 +378,7 @@ public class TutorialController : MonoBehaviour {
             case 19: //SELECT ATOM FROM AMINO PANEL
                 {
                     transform.position = panel_atom.position;
-                    set_background(background_position.right, background_size.medium_size, "Additionally, you can open each amino acid from the Aminoacid Boardby clicking (    ) to open the Atom List. Use this to explore and change the active atom of the selected amino acid. You will notice the active atom is highlighted in green in both Atom list and the protein model.");
+                    set_background(background_position.right, background_size.large_size, "Additionally, you can open each amino acid from the Aminoacid Boardby clicking (    ) to open the Atom List. Use this to explore and change the active atom of the selected amino acid. You will notice the active atom is highlighted in green in both Atom list and the protein model.");
                     Debug.Log("SELECT ATOM FROM AMINO PANEL");
                 }
                 break;
@@ -386,7 +386,7 @@ public class TutorialController : MonoBehaviour {
             case 20: //SELECT DIFFERENT REDNER
                 {
                     transform.position = protein_views_2.position;
-                    set_background(background_position.right, background_size.medium_size, "To explore the protein model, you can switch among visualizations using theVisualization Section in the Protein Panel. Please, Left-click over the four different visualization modes. You will notice that in some modes you can see all the atoms and other allow you to see the shape of the protein. During the game you can switch any time the visualization modes to facilitate your task.");
+                    set_background(background_position.right, background_size.large_size, "To explore the protein model, you can switch among visualizations using theVisualization Section in the Protein Panel. Please, Left-click over the four different visualization modes. You will notice that in some modes you can see all the atoms and other allow you to see the shape of the protein. During the game you can switch any time the visualization modes to facilitate your task.");
                     Debug.Log("SELECT DIFFERENT REDNER");
                 }
                 break;
@@ -406,7 +406,7 @@ public class TutorialController : MonoBehaviour {
                     ui.ToggleNormalMesh(1);
                     //SET TO NORMAL RENDER
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "Excellent! now you can explore a protein, let’s make some connections! To make a connection you need to select two amino acids, one from each protein model. You can select them either from the protein model or the protein panel.You will notice the amino acid are selected when they are highlighted in green.");
+                    set_background(background_position.left, background_size.large_size, "Excellent! now you can explore a protein, let’s make some connections! To make a connection you need to select two amino acids, one from each protein model. You can select them either from the protein model or the protein panel.You will notice the amino acid are selected when they are highlighted in green.");
                     Debug.Log("SELECT AMINO FOR COONECTION");
                 }
                 break;
@@ -431,7 +431,7 @@ public class TutorialController : MonoBehaviour {
             case 24: //CONNECTION PANEL FURTHER DESCRIPTION
                 {
                     transform.position = connections_holder.position;
-                    set_background(background_position.left, background_size.medium_size, "This panel, indicates the two amino acids connected and allows you to edit the connection, changing both amino acids and their respective atoms. This panel allows you to explore other amino acids in the Protein Panel, without losing the existing connection. ");
+                    set_background(background_position.left, background_size.large_size, "This panel, indicates the two amino acids connected and allows you to edit the connection, changing both amino acids and their respective atoms. This panel allows you to explore other amino acids in the Protein Panel, without losing the existing connection. ");
                     Debug.Log("CONNECTION PANEL FURTHER DESCRIPTION");
                 }
                 break;
@@ -460,7 +460,7 @@ public class TutorialController : MonoBehaviour {
                     //DEACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     ShowCanvasGroupElement(game_score_bar_cg);
                     transform.position = game_score_bar.position;
-                    set_background(background_position.left, background_size.medium_size, "The Score Bar indicates the quality of the connection. You see the score is 0%?. That’s because not all the connections are equally compatible or efficient. Let’s try another connection. Please delete the existing connections clicking the button in the Connection Panel. ");
+                    set_background(background_position.left, background_size.large_size, "The Score Bar indicates the quality of the connection. You see the score is 0%?. That’s because not all the connections are equally compatible or efficient. Let’s try another connection. Please delete the existing connections clicking the button in the Connection Panel. ");
                     Debug.Log("SCORE AND DELETE LINK");
                 }
                 break;
@@ -484,7 +484,7 @@ public class TutorialController : MonoBehaviour {
             case 30: //EXPLANATION OF CONTEXTUAL MENU
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "Now, you will learn another way to create a connection, using a Contextual Panel. This panel appears when you Right-click over an amino acid label in the Aminoacid Panel or over the protein model, suggesting possible connections. That connections are very effective.");
+                    set_background(background_position.left, background_size.large_size, "Now, you will learn another way to create a connection, using a Contextual Panel. This panel appears when you Right-click over an amino acid label in the Aminoacid Panel or over the protein model, suggesting possible connections. That connections are very effective.");
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
@@ -492,7 +492,7 @@ public class TutorialController : MonoBehaviour {
             case 31: //OPEN CONTEXTUAL MENU
                 {
                     transform.position = protein_panel_2_pos.position;
-                    set_background(background_position.left, background_size.short_size, "Please search the amino acid TYR E 39 in the protein 2PTC.E and Right-click over it.");
+                    set_background(background_position.right, background_size.short_size, "Please search the amino acid TYR E 39 in the protein 2PTC.E and Right-click over it.");
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
@@ -559,9 +559,11 @@ public class TutorialController : MonoBehaviour {
         {
             background.GetChild(0).gameObject.SetActive(false);
             background.GetChild(1).gameObject.SetActive(false);
+            background.GetChild(2).gameObject.SetActive(false);
             //ERASE TEXTS
             background.GetChild(0).GetChild(0).GetComponent<Text>().text = "";
             background.GetChild(1).GetChild(0).GetComponent<Text>().text = "";
+            background.GetChild(2).GetChild(0).GetComponent<Text>().text = "";
             background.gameObject.SetActive(false);
         }
     }
