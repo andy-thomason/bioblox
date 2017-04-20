@@ -342,6 +342,9 @@ public class BioBlox : MonoBehaviour
 
         if (current_level != -1)
             StartCoroutine(DownloadMolecules());
+
+        if (gm.is_tutorial)
+            FindObjectOfType<TutorialController>().StartTutorial();
     }
 
     Rigidbody r0;

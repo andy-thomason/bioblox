@@ -82,7 +82,7 @@ public class TutorialController : MonoBehaviour {
 
     List<CanvasGroup> tutorial_cg = new List<CanvasGroup>();
 
-    int tutorial_step = -1;
+    public int tutorial_step = -1;
 
     Transform background_tutorial;
     enum background_size { large_size, medium_size, short_size };
@@ -99,6 +99,11 @@ public class TutorialController : MonoBehaviour {
     public Sprite hand_alt;
     public Sprite hand_normal;
     Image hand;
+
+    public GameObject intro_tutorial;
+    public GameObject outro_tutorial;
+
+    Animator hand_animation;
 
     // Use this for initialization
     void Start ()
@@ -172,7 +177,9 @@ public class TutorialController : MonoBehaviour {
 
     public void StartTutorial()
     {
-        transform.position = new Vector3(6000.0f, 0, 0);
+        tutorial_step = 0;
+        deactivate_background();
+        hand_animation = transform.GetComponentInChildren<Animator>();
 
 
         ui = FindObjectOfType<UIController>();
@@ -187,6 +194,7 @@ public class TutorialController : MonoBehaviour {
             HideCanvasGroupElement(cg);
 
         tutorial_is_on = true;
+        advance_tutorial();
     }
 
 
@@ -197,9 +205,10 @@ public class TutorialController : MonoBehaviour {
         {
             case 0: //WELCOME + PRESENTATION BIOBLOX
                 {
-                    deactivate_background();
-                    StartTutorial();
+                    transform.position = new Vector3(2000, 0, 0);
+                    hand_animation.enabled = false;
                     Debug.Log("WELCOME + PRESENTATION BIOBLOX");
+                    intro_tutorial.SetActive(true);
                 }
                 break;
 
@@ -209,6 +218,8 @@ public class TutorialController : MonoBehaviour {
 
             case 1: //MENU FROM THE TOP / SOUNDS
                 {
+                    transform.GetComponentInChildren<Animator>().enabled = true;
+                    intro_tutorial.SetActive(false);
                     ShowCanvasGroupElement(background_top_menu);
                     ShowCanvasGroupElement(sound_fx_cg);
                     ShowCanvasGroupElement(sound_cg);
@@ -543,10 +554,20 @@ public class TutorialController : MonoBehaviour {
 
             case 35: //CONTROL MENU
                 {
+                    outro_tutorial.SetActive(false);
                     ShowCanvasGroupElement(save_bottom_cg);
                     transform.position = save_bottom.position;
                     set_background(background_position.down, background_size.short_size, "And at last, this is the game menu. Here, you can save your progress, pressing ( ), load a saved game or a new level by pressing() or reload the current level pressing().");
                     Debug.Log("CONTROL MENU");
+                }
+                break;
+
+            case 36: //CHAO
+                {
+
+                    outro_tutorial.SetActive(true);
+                    hand_animation.enabled = false;
+                    transform.position = new Vector3(2000, 0, 0);
                 }
                 break;
 
@@ -582,6 +603,7 @@ public class TutorialController : MonoBehaviour {
 
     void set_background(background_position bp, background_size bs, string text)
     {
+        ui.isOverUI = false;
         deactivate_background();
         background_tutorial.GetChild(bp.GetHashCode()).gameObject.SetActive(true);
         background_tutorial.GetChild(bp.GetHashCode()).GetChild(bs.GetHashCode()).gameObject.SetActive(true);
@@ -603,8 +625,22 @@ public class TutorialController : MonoBehaviour {
 
     public void back_step()
     {
-        tutorial_step--;
-        advance_tutorial();
+        if(tutorial_step > 0)
+        {
+            tutorial_step--;
+            advance_tutorial();
+        }
+    }
+
+    public void exit_tutorial()
+    {
+        outro_tutorial.SetActive(false);
+        GameManager gm = FindObjectOfType<GameManager>();
+        gm.is_tutorial = false;
+        tutorial_step = -1;
+        gm.selection_panel.alpha = 1;
+        gm.selection_panel.interactable = true;
+        gm.selection_panel.blocksRaycasts = true;
     }
 }
 //case 2: // MOUSE INSTRUCTIONSS

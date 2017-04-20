@@ -65,8 +65,13 @@ public class DataManager : MonoBehaviour {
 
         //SPLIT
         string[] splitScores = (SQLQuery.text).Split('+');
+
+        //TUTORIAL
+        if (splitScores[0] == "0")
+            gm.welcome_tutorial.SetActive(true);
+
         //ASSIGN THE SCORES TO THE BUTTONS
-        for (int i = 0; i < number_of_level; i++)
+        for (int i = 1; i <= number_of_level; i++)
         {
             string[] splitScores_slot = splitScores[i].Split('*');
             //Debug.Log(splitScores[i]);

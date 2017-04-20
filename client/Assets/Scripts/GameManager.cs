@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour {
     public Transform ranking_container;
     WWWForm www_form;
 
+    public bool is_tutorial = false;
+
+    public GameObject welcome_tutorial;
+
     void Awake()
     {
         DontDestroyOnLoad(transform.gameObject);
@@ -154,5 +158,22 @@ public class GameManager : MonoBehaviour {
                 ranking_container.GetChild(i).GetComponent<Image>().color = default_background_color;
             }
         }
+    }
+
+    public void close_welcome_tutorial()
+    {
+        welcome_tutorial.SetActive(false);
+    }
+
+    public void start_tutorial()
+    {
+        sfx.PlayTrack(SFX.sound_index.button_click);
+
+        is_tutorial = true;
+        ChangeLevel(0, -1);
+        tutorial_panel.SetActive(false);
+        welcome_tutorial.SetActive(false);
+        open_selection_once_at_start = true;
+        switch_to_game_mode();
     }
 }
