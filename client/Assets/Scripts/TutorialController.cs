@@ -90,6 +90,7 @@ public class TutorialController : MonoBehaviour {
 
     UIController ui;
     BioBlox bb;
+    AminoSliderController asc;
 
     public Button hint_button;
     Image hint_button_color;
@@ -104,6 +105,11 @@ public class TutorialController : MonoBehaviour {
     public GameObject outro_tutorial;
 
     Animator hand_animation;
+
+    public Sprite[] tutorial_texts;
+
+    public Color default_color;
+    public Color high_color;
 
     // Use this for initialization
     void Start ()
@@ -184,6 +190,7 @@ public class TutorialController : MonoBehaviour {
 
         ui = FindObjectOfType<UIController>();
         bb = FindObjectOfType<BioBlox>();
+        asc = FindObjectOfType<AminoSliderController>();
         sound_cg = GameObject.FindGameObjectWithTag("music_boton").GetComponent<CanvasGroup>();
         tutorial_cg.Add(sound_cg);
         sound_fx_cg = GameObject.FindGameObjectWithTag("sfx_boton").GetComponent<CanvasGroup>();
@@ -200,6 +207,7 @@ public class TutorialController : MonoBehaviour {
 
     void advance_tutorial()
     {
+        ui.isOverUI = false;
         //TUTORIAL STEPS
         switch (tutorial_step)
         {
@@ -224,7 +232,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(sound_fx_cg);
                     ShowCanvasGroupElement(sound_cg);
                     transform.position = sound_pos.position;
-                    set_background(background_position.down, background_size.medium_size, "This is the Control Menu. Here you can adjust some visual parameters of the interface and receive some help during the gameplay. Press (    ) and (    )  to turn off/on the volume of music and effects respectively.");
+                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / SOUNDS");
                 }
                 break;
@@ -233,7 +241,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(grid_cg);
                     transform.position = grid_pos.position;
-                    set_background(background_position.down, background_size.short_size, "Press (    ) to activate or deactivate the grid.");
+                    set_background(background_position.down, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / GRID");
                 }
                 break;
@@ -243,7 +251,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(bg_color_cg);
                     ShowCanvasGroupElement(bg_color_boton_cg);
                     transform.position = bg_color_pos.position;
-                    set_background(background_position.down, background_size.short_size, "Press (    ) to change the background colour. Try it picking one colour of your preference. ");
+                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / BACKGROUND COLOR");
                 }
                 break;
@@ -252,7 +260,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(reset_camera_cg);
                     transform.position = reset_camera_pos.position;
-                    set_background(background_position.down, background_size.short_size, "Press (    ) to rest the camera to the frontal view. Try moving the camera and then press the button. ");
+                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / RESET CAMERA");
                 }
                 break;
@@ -269,7 +277,7 @@ public class TutorialController : MonoBehaviour {
 
                     ShowCanvasGroupElement(control_panel_cg);
                     transform.position = control_panel_pos.position;
-                    set_background(background_position.down, background_size.short_size, "Press (    ) to display the main controls. Very useful if you forget them. ");
+                    set_background(background_position.down, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / CONTROL PANEL");
                 }
                 break;
@@ -278,7 +286,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(dock_example_cg);
                     transform.position = dock_example_pos.position;
-                    set_background(background_position.down, background_size.short_size, "Press (    ) to display an animated preview of a correct protein dock of the level.");
+                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / DOCK ANIMATION");
                 }
                 break;
@@ -297,7 +305,7 @@ public class TutorialController : MonoBehaviour {
                     }
                     //DEACTIVATE THE DOCKING ANIMATION IN CASE THE USER GOES BACK
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.large_size, "Very good! now we know you know the functionalities of the control menu, you will learn how to manipulate the proteins and move the camera to explore the workspace from different angles.To zoom in and out the camera, scroll the mouse wheel. Remember, you can always reset the camera position, pressing (     ) in the control menu.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ZOOM");
                 }
                 break;
@@ -305,7 +313,7 @@ public class TutorialController : MonoBehaviour {
             case 8: //MOUSE CONTROLS / ROTATE CAMERA
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "You can turn the camera to see the proteins from different angles. Simply, Left-click in the background and drag the mouse to turn the camera. Remember, you can always reset the camera position, pressing (     ) in the control menu.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ROTATE CAMERA");
                 }
                 break;
@@ -313,15 +321,16 @@ public class TutorialController : MonoBehaviour {
             case 9: //MOUSE CONTROLS / KEYBOARD
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, "You can also pan the camera. Press any of the keyboard arrows to move the camera in that direction.");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / KEYBOARD");
                 }
                 break;
 
             case 10: //MOUSE CONTROLS / ROTATE PROTEINS
                 {
+                    ui.RestartCamera();
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, "You can rotate a single protein model to see it from different angles, simple hold a Left-click on it and move.");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ROTATE PROTEINS");
                 }
                 break;
@@ -333,7 +342,7 @@ public class TutorialController : MonoBehaviour {
             case 11: //Exploring Proteins INTRO
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "Brilliant! now you can manipulate the protein models, the camera and the main menus of the game, it is time to learn how to explore the proteins, its amino acids and atoms, and make connections among them.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("Exploring Proteins INTRO");
                 }
                 break;
@@ -343,7 +352,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_panel_1_cg);
                     ShowCanvasGroupElement(protein_panel_2_cg);
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.large_size, "First, let’s start with the Protein Panels. This two panels shows the proteins content. There’s one for each protein in the level. Please,place the cursor over the protein models to see which panel gets highlighted with red and blue. Now you can easily identify which panel correspond to each protein model.");
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS");
                 }
                 break;
@@ -351,7 +360,7 @@ public class TutorialController : MonoBehaviour {
             case 13: //PROTEIN PANELS DESCRIPTION
                 {
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.short_size, "The protein panels are divided in 3 parts: name of the protein, amino acids panel and protein views. We will describe them briefly for now, but don’t worry, later, we’re going to work with them. ");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS DESCRIPTION");
                 }
                 break;
@@ -359,7 +368,7 @@ public class TutorialController : MonoBehaviour {
             case 14: //PROTEIN PANELS NAME
                 {
                     transform.position = protein_panel_name.position;
-                    set_background(background_position.right, background_size.short_size, "First, at the top of each panel, you can see the protein’s name, in this case 2PTC.E and 2PTC.I respectively.");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS NAME");
                 }
                 break;
@@ -369,7 +378,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_views_1_cg);
                     ShowCanvasGroupElement(protein_views_2_cg);
                     transform.position = protein_views_1_pos.position;
-                    set_background(background_position.right, background_size.large_size, "In the protein views, you can switch the view of each protein among 4 views: aormal, transparency, skeleton and carbon-alpha.");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS RENDERERS");
                 }
                 break;
@@ -377,7 +386,7 @@ public class TutorialController : MonoBehaviour {
             case 16: //PROTEIN PANELS AMINO
                 {
                     transform.position = protein_panel_2_pos.position;
-                    set_background(background_position.right, background_size.short_size, "The main area is the amino acids panel. Here you can explore the content of each protein, selecting a specific amino acid of its chain.");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS AMINO");
                 }
                 break;
@@ -385,7 +394,7 @@ public class TutorialController : MonoBehaviour {
             case 17: //SELECT AMINO FROM 3D MODEL
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, "Now, left-click over a protein, picking any part of it. You will see that the amino acid will appear in the protein and also in the amino acid panel in the protein panel, highlighting in green the selected amino acid.");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FROM 3D MODEL");
                 }
                 break;
@@ -393,7 +402,7 @@ public class TutorialController : MonoBehaviour {
             case 18: //SELECT AMINO FROM AMINO PANEL
                 {
                     transform.position = protein_panel_1_pos.position;
-                    set_background(background_position.right, background_size.medium_size, "Now, go to the amino acid panel and select different amino acids from the list left-click on it. You will notice that different amino acid appears in the protein model, as you click through the list.");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FROM AMINO PANEL");
                 }
                 break;
@@ -401,7 +410,7 @@ public class TutorialController : MonoBehaviour {
             case 19: //SELECT ATOM FROM AMINO PANEL
                 {
                     transform.position = panel_atom.position;
-                    set_background(background_position.right, background_size.large_size, "Additionally, you can explore each amino acid from the amino acid panel by clicking (    ) to see the atomic composition of the amino acid. Use this to explore and change the active atom of the selected amino acid. You will notice the active atom is highlighted in green in both atom list and the protein model.");
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT ATOM FROM AMINO PANEL");
                 }
                 break;
@@ -409,7 +418,7 @@ public class TutorialController : MonoBehaviour {
             case 20: //SELECT DIFFERENT REDNER
                 {
                     transform.position = protein_views_2.position;
-                    set_background(background_position.right, background_size.large_size, "To explore the protein model, you can switch among visualizations using the protein views in the protein panel. Please, left-click over the different visualization modes. You will notice that in some modes you can see all the atoms and other allow you to see the shape of the protein. During the game you can switch any time the visualization modes to facilitate your task. ");
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT DIFFERENT REDNER");
                 }
                 break;
@@ -429,7 +438,7 @@ public class TutorialController : MonoBehaviour {
                     ui.ToggleNormalMesh(1);
                     //SET TO NORMAL RENDER
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.large_size, "Excellent! now you can explore a protein, let's make some connections! To make a connection you need to select two amino acids, one from each protein. You can select them either from the protein model or the protein panel. You will notice the amino acid are selected when they are highlighted in green.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FOR COONECTION");
                 }
                 break;
@@ -438,7 +447,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(add_connection_cg);
                     transform.position = add_connection_pos.position;
-                    set_background(background_position.up, background_size.short_size, "Create a connection pressing (                         )");
+                    set_background(background_position.up, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CREATE CONNECTION");
                 }
                 break;
@@ -446,7 +455,7 @@ public class TutorialController : MonoBehaviour {
             case 23: //CONNECTION PANEL DESCRIPTION
                 {
                     transform.position = connection_panel.position;
-                    set_background(background_position.left, background_size.medium_size, "You will also notice that this panel has appeared next to the score bar. This is the connection panel. It appears each time you create a connection.");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL DESCRIPTION");
                 }
                 break;
@@ -454,7 +463,7 @@ public class TutorialController : MonoBehaviour {
             case 24: //CONNECTION PANEL FURTHER DESCRIPTION
                 {
                     transform.position = connection_panel.position;
-                    set_background(background_position.left, background_size.large_size, "This panel, indicates the two amino acids connected and allows you to edit the connection, changing both amino acids and their respective atoms. This panel allows you to explore other combination of amino acids, without losing the existing connection.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL FURTHER DESCRIPTION");
                 }
                 break;
@@ -462,7 +471,7 @@ public class TutorialController : MonoBehaviour {
             case 25: //CONNECTION PANEL ERASE LINK
                 {
                     transform.position = connection_panel_erase.position;
-                    set_background(background_position.left, background_size.short_size, "The panel will remain on the screen until you delete the connection, pressing the (                   ) button. In this tutorial, the button is deactivated. ");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL ERASE LINK");
                 }
                 break;
@@ -471,62 +480,74 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(slider_string_cg);
                     transform.position = slider_string_pos.position;
-                    set_background(background_position.up, background_size.short_size, "Now you have the connection established, please drag the slider (                     ) to pull the protein models together. You will see how the proteins gets closer and collide with each other. ");
+                    set_background(background_position.up, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SLIDER");
                 }
                 break;
 
             case 27: //SCORE AND DELETE LINK
                 {
+                    asc.SliderMol[0].transform.GetChild(169).GetComponent<Image>().color = default_color;
+                    asc.SliderMol[1].transform.GetChild(14).GetComponent<Image>().color = default_color;
                     //DEACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     tutorial_no_delete_link = false;
                     //DEACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     ShowCanvasGroupElement(game_score_bar_cg);
                     transform.position = game_score_bar_pos.position;
-                    set_background(background_position.left, background_size.large_size, "The score bar indicates the quality of the connection. You see the score is 0%?. That's because not all the connections are equally compatible or efficient. Let's try another connection. Please delete the existing connections clicking the button in the connection panel. ");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SCORE AND DELETE LINK");
                 }
                 break;
 
             case 28: //SELECT CORRECT FIRST PAIR OF AMINO
                 {
+                    asc.SliderMol[0].transform.GetChild(169).GetComponent<Image>().color = high_color;
+                    asc.SliderMol[1].transform.GetChild(14).GetComponent<Image>().color = high_color;
+                    //asc.SliderMol[0]. amino lys 15 child 14
+
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.medium_size, "Good!, now go to the protein panel and select the following amino acids: SER E 190 from 2PTC.E and RYS I 15 from 2PTC.I respectively. ");
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT CORRECT FIRST PAIR OF AMINO");
                 }
                 break;
 
             case 29: //CREATE CONNECTION
                 {
-                    transform.position = add_connection.position;
-                    set_background(background_position.up, background_size.short_size, "Create a connection pressing (                         )");
+                    asc.SliderMol[0].transform.GetChild(169).GetComponent<Image>().color = default_color;
+                    asc.SliderMol[1].transform.GetChild(14).GetComponent<Image>().color = default_color;
+                    transform.position = add_connection_pos.position;
+                    set_background(background_position.up, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CREATE CONNECTION");
                 }
                 break;
 
             case 30: //EXPLANATION OF CONTEXTUAL MENU
                 {
+                    asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = default_color;
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.large_size, "Now, you will learn another way to create a connection, using the contextual panel. This panel appears when you rRight-click over an amino acid in the aminoacid panel or over the protein model, suggesting the best fit connections. Those connections are very effective.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
 
             case 31: //OPEN CONTEXTUAL MENU
                 {
-                    transform.position = protein_panel_2_pos.position;
-                    set_background(background_position.right, background_size.short_size, "Please search the amino acid TYR E 39 from the protein 2PTC.E and right-click over it.");
+                    //child 21
+                    asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = high_color;
+                    transform.position = protein_panel_1_pos.position;
+                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
 
             case 32: //CREATE CONNECTION CONTEXTUAL MENU
                 {
+                    asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = default_color;
                     //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     tutorial_score_fixed = true;
                     //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, "In the contextual panel, select ARG I 17/O, and press (             ) to make a connection without needing to search for the amino acid in the other protein panel.");
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CREATE CONNECTION CONTEXTUAL MENU");
                 }
                 break;
@@ -537,32 +558,51 @@ public class TutorialController : MonoBehaviour {
                     tutorial_score_fixed = false;
                     //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     transform.position = add_connection_pos.position;
-                    set_background(background_position.up, background_size.short_size, "Now you have 2 connections, drag the slider (             ) to join both proteins.");
+                    set_background(background_position.up, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PULL TOGETHER");
                 }
                 break;
 
             case 34: //SCORE GOING UP
                 {
-                    
+                    ui.CutAway.value = -100;
                     transform.position = game_score_bar_pos.position;
-                    set_background(background_position.left, background_size.short_size, "Now you see that you are scoring! Excellent job!");
+                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SCORE GOING UP");
                 }
                 break;
 
 
-            case 35: //CONTROL MENU
+            case 35: //cutaway
+                {
+                    ShowCanvasGroupElement(cutaway_cg);
+                    transform.position = cutaway_pos.position;
+                    set_background(background_position.down, background_size.short_size, tutorial_texts[tutorial_step]);
+                    Debug.Log("CUTAWAY");
+                }
+                break;
+
+            case 36: //CONTACT VIZ
+                {
+                    ui.CutAway.value = -100;
+                    ShowCanvasGroupElement(viz_atoms_contact_cg);
+                    transform.position = viz_atoms_contact_pos.position;
+                    set_background(background_position.up, background_size.short_size, tutorial_texts[tutorial_step]);
+                    Debug.Log("CONTACT VIZ");
+                }
+                break;
+
+            case 37: //CONTROL MENU
                 {
                     outro_tutorial.SetActive(false);
                     ShowCanvasGroupElement(save_bottom_cg);
-                    transform.position = save_bottom.position;
-                    set_background(background_position.down, background_size.short_size, "And at last, this is the game menu. Here, you can save your progress, pressing ( ), load a saved game or a new level by pressing() or reload the current level pressing().");
+                    transform.position = save_bottom_pos.position;
+                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONTROL MENU");
                 }
                 break;
 
-            case 36: //CHAO
+            case 38: //CHAO
                 {
 
                     outro_tutorial.SetActive(true);
@@ -572,6 +612,8 @@ public class TutorialController : MonoBehaviour {
                 break;
 
         }
+
+        ui.isOverUI = false;
     }
 
     void HideCanvasGroupElement(CanvasGroup cg)
@@ -594,20 +636,20 @@ public class TutorialController : MonoBehaviour {
             background.GetChild(1).gameObject.SetActive(false);
             background.GetChild(2).gameObject.SetActive(false);
             //ERASE TEXTS
-            background.GetChild(0).GetChild(0).GetComponent<Text>().text = "";
-            background.GetChild(1).GetChild(0).GetComponent<Text>().text = "";
-            background.GetChild(2).GetChild(0).GetComponent<Text>().text = "";
+            //background.GetChild(0).GetChild(0).GetComponent<Text>().text = "";
+            //background.GetChild(1).GetChild(0).GetComponent<Text>().text = "";
+            //background.GetChild(2).GetChild(0).GetComponent<Text>().text = "";
             background.gameObject.SetActive(false);
         }
     }
 
-    void set_background(background_position bp, background_size bs, string text)
+    void set_background(background_position bp, background_size bs, Sprite text)
     {
         ui.isOverUI = false;
         deactivate_background();
         background_tutorial.GetChild(bp.GetHashCode()).gameObject.SetActive(true);
         background_tutorial.GetChild(bp.GetHashCode()).GetChild(bs.GetHashCode()).gameObject.SetActive(true);
-        background_tutorial.GetChild(bp.GetHashCode()).GetChild(bs.GetHashCode()).GetChild(0).GetComponent<Text>().text = text;
+        background_tutorial.GetChild(bp.GetHashCode()).GetChild(bs.GetHashCode()).GetChild(0).GetComponent<Image>().sprite = text;
         //set hand rotation and sprite
         hand_rotation.rotation = Quaternion.AngleAxis(hand_rotation_degrees[bp.GetHashCode()], Vector3.forward);
         if (bp == background_position.right)
