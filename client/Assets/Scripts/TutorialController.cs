@@ -503,6 +503,8 @@ public class TutorialController : MonoBehaviour {
                 {
                     asc.SliderMol[0].transform.GetChild(169).GetComponent<Image>().color = high_color;
                     asc.SliderMol[1].transform.GetChild(14).GetComponent<Image>().color = high_color;
+                    asc.ScrollbarAmino1.value = 0.222f;
+                    asc.ScrollbarAmino2.value = 0.766f;
                     //asc.SliderMol[0]. amino lys 15 child 14
 
                     transform.position = protein_panels.position;
@@ -534,6 +536,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     //child 21
                     asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = high_color;
+                    asc.ScrollbarAmino1.value = 0.91f;
                     transform.position = protein_panel_1_pos.position;
                     set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
