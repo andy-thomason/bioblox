@@ -339,7 +339,7 @@ public class BioBlox : MonoBehaviour
 
         //set the trypsin fiesr level temp
 
-        get_spheres();
+        //get_spheres();
 
 
         StartGame();
@@ -382,7 +382,7 @@ public class BioBlox : MonoBehaviour
         //dm.GetLevelScore();
         //set the hint on the amino buttons
         find_hint_pairs(molecules_PDB_mesh[0].mol, molecules_PDB_mesh[1].mol);
-        spawn_contact_atoms();
+        //spawn_contact_atoms();
 
         //InvokeRepeating("CalcScore", 1.0f, 0.5f);
 
@@ -1787,6 +1787,8 @@ public class BioBlox : MonoBehaviour
     string mol2_bs_filename;
     string mol1_ca_filename;
     string mol2_ca_filename;
+    string mol1_vr_filename;
+    string mol2_vr_filename;
 
     //creation of the files
     TextAsset mol1_se_filename_txt;
@@ -1795,6 +1797,8 @@ public class BioBlox : MonoBehaviour
     TextAsset mol2_bs_filename_txt;
     TextAsset mol1_ca_filename_txt;
     TextAsset mol2_ca_filename_txt;
+    TextAsset mol1_vr_filename_txt;
+    TextAsset mol2_vr_filename_txt;
     byte[] txt_bytes;
     Level level;
     GameObject mol1;
@@ -1821,6 +1825,8 @@ public class BioBlox : MonoBehaviour
         mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs;
         mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs;
         mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs;
+        mol1_vr_filename = level.pdbFile + "_" + level.chainsA + "_vr_2";
+        mol2_vr_filename = level.pdbFile + "_" + level.chainsB + "_vr_2";
 
         //using (WWW www = new WWW(BundleURL))
         //{
@@ -1843,8 +1849,8 @@ public class BioBlox : MonoBehaviour
         //    bundle.Unload(false);
         //}
 
-       
-            
+
+
         //AssetBundle bundle = WWW.LoadFromCacheOrDownload(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower(), 2).assetBundle;
         //Debug.Log(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower());
         //Debug.Log(bundle);
@@ -1855,6 +1861,8 @@ public class BioBlox : MonoBehaviour
         mol2_bs_filename_txt = Resources.Load("ply/" + mol2_bs_filename) as TextAsset;
         mol1_ca_filename_txt = Resources.Load("ply/" + mol1_ca_filename) as TextAsset;
         mol2_ca_filename_txt = Resources.Load("ply/" + mol2_ca_filename) as TextAsset;
+        mol1_vr_filename_txt = Resources.Load("ply/" + mol1_ca_filename) as TextAsset;
+        mol2_vr_filename_txt = Resources.Load("ply/" + mol2_ca_filename) as TextAsset;
 
         //bundle.Unload(false);
 
@@ -1980,6 +1988,28 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference = Instantiate(parent_molecule);
         parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs;
         txt_bytes = mol2_ca_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(false);
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        //VR 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_vr_2";
+        txt_bytes = mol1_vr_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(false);
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        //VR 2
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_vr_2";
+        txt_bytes = mol2_vr_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
         parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
