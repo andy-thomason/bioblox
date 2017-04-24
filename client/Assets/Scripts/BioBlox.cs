@@ -1861,8 +1861,8 @@ public class BioBlox : MonoBehaviour
         mol2_bs_filename_txt = Resources.Load("ply/" + mol2_bs_filename) as TextAsset;
         mol1_ca_filename_txt = Resources.Load("ply/" + mol1_ca_filename) as TextAsset;
         mol2_ca_filename_txt = Resources.Load("ply/" + mol2_ca_filename) as TextAsset;
-        mol1_vr_filename_txt = Resources.Load("ply/" + mol1_ca_filename) as TextAsset;
-        mol2_vr_filename_txt = Resources.Load("ply/" + mol2_ca_filename) as TextAsset;
+        mol1_vr_filename_txt = Resources.Load("ply/" + mol1_vr_filename) as TextAsset;
+        mol2_vr_filename_txt = Resources.Load("ply/" + mol2_vr_filename) as TextAsset;
 
         //bundle.Unload(false);
 
@@ -1995,6 +1995,22 @@ public class BioBlox : MonoBehaviour
         //parent_molecule_reference.transform.Translate(offset_position_1);
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
+        //TRANSPARENT 1
+        transparency_0.transform.SetParent(molecule_0_views.transform);
+        // mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(transparency_0, 0);
+        transparency_0.SetActive(false);
+        //transparency_0.transform.Translate(offset_position_0);
+        transparency_0.transform.localPosition = Vector3.zero;
+
+        //TRANSPARENT 2
+        transparency_1.transform.SetParent(molecule_1_views.transform);
+        // mol1_mesh.name = "transparent_p1";
+        FixTransparentMolecule(transparency_1, 1);
+        transparency_1.SetActive(false);
+        //transparency_1.transform.Translate(offset_position_1);
+        transparency_1.transform.localPosition = Vector3.zero;
+
         //VR 1
         parent_molecule_reference = Instantiate(parent_molecule);
         parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_vr_2";
@@ -2016,22 +2032,6 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.SetActive(false);
         //parent_molecule_reference.transform.Translate(offset_position_1);
         parent_molecule_reference.transform.localPosition = Vector3.zero;
-
-        //TRANSPARENT 1
-        transparency_0.transform.SetParent(molecule_0_views.transform);
-        // mol1_mesh.name = "transparent_p1";
-        FixTransparentMolecule(transparency_0, 0);
-        transparency_0.SetActive(false);
-        //transparency_0.transform.Translate(offset_position_0);
-        transparency_0.transform.localPosition = Vector3.zero;
-
-        //TRANSPARENT 2
-        transparency_1.transform.SetParent(molecule_1_views.transform);
-        // mol1_mesh.name = "transparent_p1";
-        FixTransparentMolecule(transparency_1, 1);
-        transparency_1.SetActive(false);
-        //transparency_1.transform.Translate(offset_position_1);
-        transparency_1.transform.localPosition = Vector3.zero;
 
         Vector3 xoff = new Vector3(level.separation, 0, 0);
 
@@ -2320,7 +2320,6 @@ public class BioBlox : MonoBehaviour
     {
         if (protein_id == 0)
         {
-            current_render_p1++;
 
             switch (current_render_p1)
             {
@@ -2330,6 +2329,7 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.transparent.GetHashCode();
                     }
                     break;
@@ -2339,6 +2339,7 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.bs.GetHashCode();
                     }
                     break;
@@ -2348,24 +2349,37 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.carbon.GetHashCode();
                     }
                     break;
                 case 3:
                     {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.contact.GetHashCode();
+                    }
+                    break;
+                case 4:
+                    {
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.normal.GetHashCode();
-                        current_render_p1 = 0;
+                        current_render_p1 = -1;
                     }
                     break;
             }
+            
+            current_render_p1++;
         }
         else
         {
-            current_render_p2++;
 
             switch (current_render_p2)
             {
@@ -2375,6 +2389,7 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(true);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.transparent.GetHashCode();
                     }
                     break;
@@ -2384,6 +2399,7 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.bs.GetHashCode();
                     }
                     break;
@@ -2393,20 +2409,34 @@ public class BioBlox : MonoBehaviour
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.carbon.GetHashCode();
                     }
                     break;
                 case 3:
                     {
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+                        molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.contact.GetHashCode();
+                    }
+                    break;
+                case 4:
+                    {
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(true);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
                         molecules[protein_id].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+                        molecules[protein_id].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(false);
                         molecules_PDB_mesh[protein_id].protein_render = PDB_mesh.protein_render_options.normal.GetHashCode();
-                        current_render_p2 = 0;
+                        current_render_p2 = -1;
                     }
                     break;
             }
+            
+            current_render_p2++;
         }
     }
 
