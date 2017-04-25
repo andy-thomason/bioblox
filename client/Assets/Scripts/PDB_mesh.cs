@@ -229,7 +229,7 @@ public class PDB_mesh : MonoBehaviour
     Vector3 camera_position;
     Quaternion camera_rotation;
 
-    public enum protein_render_options { normal, transparent, bs, carbon, contact };
+    public enum protein_render_options { normal, bs, carbon, transparent, contact };
     public int protein_render = 0;
 
     void Awake()
