@@ -33,18 +33,20 @@ public class BioBlox : MonoBehaviour
         public string chainsA;
         public string chainsB;
         public string lod;
+        public string lod_vr;
         public string lod_bs;
         public Vector3 offset;
         public float separation;
         public float docking_degrees;
         public int dificulty;
 
-        public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_bs, Vector3 offset, float separation, float docking_degrees, int dificulty)
+        public Level(string pdbFile, string chainsA, string chainsB, string lod, string lod_vr, string lod_bs, Vector3 offset, float separation, float docking_degrees, int dificulty)
         {
             this.pdbFile = pdbFile;
             this.chainsA = chainsA;
             this.chainsB = chainsB;
             this.lod = lod;
+            this.lod_vr = lod_vr;
             this.lod_bs = lod_bs;
             this.offset = offset;
             this.separation = separation;
@@ -54,18 +56,18 @@ public class BioBlox : MonoBehaviour
     };
 
     public Level[] levels = {
-       new Level("2PTC", "E", "I", "2", "1", new Vector3(0, 0, 0), 35, -90, 2),
-       new Level("4KC3", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 3),
-       new Level("1FSS", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 45, 3),
-       new Level("1EMV", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1GRN", "A", "B", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1ACB", "E", "I", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1ATN", "A", "D", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AVX", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AY7", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1BUH", "A", "B", "1", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1BVN", "P", "T", "1", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1EXB", "A", "E", "1", "1", new Vector3(0, 0, 0), 40, 0, 2)
+       new Level("2PTC", "E", "I", "2", "2", "1", new Vector3(0, 0, 0), 35, -90, 2),
+       new Level("4KC3", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 3),
+       new Level("1FSS", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 45, 3),
+       new Level("1EMV", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1GRN", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1ACB", "E", "I", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1ATN", "A", "D", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AVX", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AY7", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1BUH", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1BVN", "P", "T", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1EXB", "A", "E", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2)
     };
 
     enum protein_view { normal, transparent, bs };
@@ -1773,6 +1775,8 @@ public class BioBlox : MonoBehaviour
     string mol2_bs_filename;
     string mol1_ca_filename;
     string mol2_ca_filename;
+    string mol1_vr_filename;
+    string mol2_vr_filename;
 
     //creation of the files
     TextAsset mol1_se_filename_txt;
@@ -1781,6 +1785,8 @@ public class BioBlox : MonoBehaviour
     TextAsset mol2_bs_filename_txt;
     TextAsset mol1_ca_filename_txt;
     TextAsset mol2_ca_filename_txt;
+    TextAsset mol1_vr_filename_txt;
+    TextAsset mol2_vr_filename_txt;
     string pdb_file;
     byte[] txt_bytes;
     public Level level;
@@ -1816,6 +1822,8 @@ public class BioBlox : MonoBehaviour
         mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
         mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs + ".bytes";
         mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs + ".bytes";
+        mol1_vr_filename = level.pdbFile + "_" + level.chainsA + "_vr_" + level.lod_vr + ".bytes";
+        mol2_vr_filename = level.pdbFile + "_" + level.chainsB + "_vr_" + level.lod_vr + ".bytes";
 
         using (WWW www = new WWW(BundleURL))
         {
@@ -1832,6 +1840,8 @@ public class BioBlox : MonoBehaviour
             mol2_bs_filename_txt = bundle.LoadAsset(mol2_bs_filename, typeof(TextAsset)) as TextAsset;
             mol1_ca_filename_txt = bundle.LoadAsset(mol1_ca_filename, typeof(TextAsset)) as TextAsset;
             mol2_ca_filename_txt = bundle.LoadAsset(mol2_ca_filename, typeof(TextAsset)) as TextAsset;
+            mol1_vr_filename_txt = bundle.LoadAsset(mol1_vr_filename, typeof(TextAsset)) as TextAsset;
+            mol2_vr_filename_txt = bundle.LoadAsset(mol2_vr_filename, typeof(TextAsset)) as TextAsset;
 
             bundle.Unload(false);
         }
@@ -1963,6 +1973,28 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference = Instantiate(parent_molecule);
         parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs;
         txt_bytes = mol2_ca_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(false);
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        //HELADO 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsA + "_vr_" + level.lod_vr;
+        txt_bytes = mol1_vr_filename_txt.bytes;
+        stream = new MemoryStream(txt_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(false);
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        //HELADO 2
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = level.pdbFile + "_" + level.chainsB + "_vr_" + level.lod_vr;
+        txt_bytes = mol2_vr_filename_txt.bytes;
         stream = new MemoryStream(txt_bytes);
         PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
         parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
