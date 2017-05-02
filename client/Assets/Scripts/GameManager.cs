@@ -62,6 +62,8 @@ public class GameManager : MonoBehaviour {
             level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(false);
             //disable ranking
             ranking_user.transform.parent.gameObject.SetActive(false);
+            //if demo show leaderboard
+            load_leaderboard();
         }
     }
     
