@@ -91,12 +91,25 @@ public class VRGrabObject : MonoBehaviour
         joint.connectedBody = bb.molecules[1].GetComponent<Rigidbody>();
     }
 
+    private void GrabObject_both()
+    {
+        bb.molecules[0].GetComponent<Rigidbody>().velocity = Vector3.zero;
+        bb.molecules[0].GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        bb.molecules[1].GetComponent<Rigidbody>().velocity = Vector3.zero;
+        bb.molecules[1].GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+
+        bb.Molecules.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        bb.Molecules.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        var joint = AddFixedJoint();
+        joint.connectedBody = bb.Molecules.GetComponent<Rigidbody>();
+    }
+
     // 3
     private FixedJoint AddFixedJoint()
     {
         FixedJoint fx = gameObject.AddComponent<FixedJoint>();
-        fx.breakForce = 20000;
-        fx.breakTorque = 20000;
+        fx.breakForce = 200000;
+        fx.breakTorque = 200000;
         return fx;
     }
 
@@ -108,7 +121,6 @@ public class VRGrabObject : MonoBehaviour
             Destroy(GetComponent<FixedJoint>());
             bb.molecules[0].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
         }
-        objectInHand = null;
     }
 
     private void ReleaseObject_1()
@@ -119,7 +131,16 @@ public class VRGrabObject : MonoBehaviour
             Destroy(GetComponent<FixedJoint>());
             bb.molecules[1].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
         }
-        objectInHand = null;
+    }
+
+    private void ReleaseObject_both()
+    {
+        if (GetComponent<FixedJoint>())
+        {
+            GetComponent<FixedJoint>().connectedBody = null;
+            Destroy(GetComponent<FixedJoint>());
+            bb.Molecules.GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
+        }
     }
 
     // Update is called once per frame
@@ -208,6 +229,19 @@ public class VRGrabObject : MonoBehaviour
         {
             bb.is_scanning_amino = false;
             laser.SetActive(false);
+        }
+
+        // press grip
+        if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
+        {
+            Debug.Log("asdasd");
+            GrabObject_both();
+        }
+
+        // press grip
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip))
+        {
+            ReleaseObject_both();
         }
 
 

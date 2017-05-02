@@ -295,7 +295,7 @@ public class BioBlox : MonoBehaviour
         Application.targetFrameRate = -1;
 #endif
 
-       
+
         game_status = GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
         sfx = FindObjectOfType<SFX>();
@@ -364,7 +364,7 @@ public class BioBlox : MonoBehaviour
 
         //aminoSlider.init();
 
-       // molecules_PDB_mesh[0].DeselectAminoAcid();
+        // molecules_PDB_mesh[0].DeselectAminoAcid();
         //molecules_PDB_mesh[1].DeselectAminoAcid();
         //aminoSlider.DeselectAmino();
 
@@ -553,7 +553,7 @@ public class BioBlox : MonoBehaviour
             if (playing)
                 game_time += Time.deltaTime;
 
-           
+
 
 
             //if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
@@ -1347,7 +1347,7 @@ public class BioBlox : MonoBehaviour
         //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         //set color depending if its valid
         score_bar.color = is_score_valid ? Color.green : Color.red;
-       // lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+        // lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)
             sfx.Mute_Track(SFX.sound_index.warning, false);
@@ -1814,6 +1814,9 @@ public class BioBlox : MonoBehaviour
     Vector3 position_molecule_1;
     public Text prot_name_VR;
 
+    Vector3 p1_position;
+    Vector3 p2_position;
+
     void DownloadMolecules_VR()
     {
         level = levels[current_level];
@@ -1855,7 +1858,7 @@ public class BioBlox : MonoBehaviour
         //Debug.Log(Application.dataPath + "/Resources/AssetBundle/" + level.pdbFile.ToLower());
         //Debug.Log(bundle);
 
-        mol1_se_filename_txt = Resources.Load("ply/"+mol1_se_filename) as TextAsset;
+        mol1_se_filename_txt = Resources.Load("ply/" + mol1_se_filename) as TextAsset;
         mol2_se_filename_txt = Resources.Load("ply/" + mol2_se_filename) as TextAsset;
         mol1_bs_filename_txt = Resources.Load("ply/" + mol1_bs_filename) as TextAsset;
         mol2_bs_filename_txt = Resources.Load("ply/" + mol2_bs_filename) as TextAsset;
@@ -2033,10 +2036,11 @@ public class BioBlox : MonoBehaviour
         //parent_molecule_reference.transform.Translate(offset_position_1);
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
-        Vector3 xoff = new Vector3(level.separation, 0, 0);
+        p1_position = level.offset - new Vector3(level.separation, 0, 0);
+        p2_position = level.offset + new Vector3(level.separation, 0, 0);
 
-        reset_molecule(molecules[0], 0, level.offset - xoff);
-        reset_molecule(molecules[1], 1, level.offset + xoff);
+        reset_molecule(molecules[0], 0, p1_position);
+        reset_molecule(molecules[1], 1, p2_position);
 
         //setting the position of each molecule
         molecule_0_views.transform.localPosition = position_molecule_0;
@@ -2057,6 +2061,13 @@ public class BioBlox : MonoBehaviour
         //create_mesh_11();
         //create_mesh2();
         //StartGame();
+    }
+
+    public void restart_position()
+    {
+        molecules[0].transform.localPosition = p1_position;
+        molecules[1].transform.localPosition = p2_position;
+        //molecules[1].transform.Rotate(0, 0, 270);
     }
 
     public GameObject mesh_temp;
