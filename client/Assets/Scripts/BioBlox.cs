@@ -2067,6 +2067,7 @@ public class BioBlox : MonoBehaviour
     {
         molecules[0].transform.localPosition = p1_position;
         molecules[1].transform.localPosition = p2_position;
+        Molecules.rotation = Quaternion.identity;
         //molecules[1].transform.Rotate(0, 0, 270);
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using UnityEngine.UI;
 
 public class ChangeControlModeMain : MonoBehaviour {
@@ -21,7 +22,6 @@ public class ChangeControlModeMain : MonoBehaviour {
     }
 
     BioBlox bb;
-    Text amino_text;
     int previous_atoms = -1;
 
     void Awake()
@@ -36,7 +36,6 @@ public class ChangeControlModeMain : MonoBehaviour {
         default_hand = transform.GetChild(0).transform.GetChild(0).gameObject;
         point_hand = transform.GetChild(0).transform.GetChild(1).gameObject;
         close_hand = transform.GetChild(0).transform.GetChild(2).gameObject;
-        amino_text = GameObject.FindGameObjectWithTag("amino_name").GetComponent<Text>();
     }
 
     // Update is called once per frame
@@ -50,7 +49,6 @@ public class ChangeControlModeMain : MonoBehaviour {
             //deselect
             bb.molecules_PDB_mesh[0].DeselectAminoAcid();
             bb.molecules_PDB_mesh[1].DeselectAminoAcid();
-            amino_text.text = "";
         }
 
         // release trigger
@@ -70,7 +68,6 @@ public class ChangeControlModeMain : MonoBehaviour {
             //deselect
             bb.molecules_PDB_mesh[0].DeselectAminoAcid();
             bb.molecules_PDB_mesh[1].DeselectAminoAcid();
-            amino_text.text = "";
         }
 
         // press grip

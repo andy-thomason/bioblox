@@ -45,7 +45,14 @@ public class PDB_mesh : MonoBehaviour
         VR_right_controller = GameObject.FindGameObjectWithTag("VR_C_R").transform;
         if (GameObject.FindGameObjectWithTag("VR_C_R").transform == null)
             Debug.Log("no esta");
-        amino_text = GameObject.FindGameObjectWithTag("amino_name").GetComponent<Text>();
+        try
+        {
+            amino_text = GameObject.FindGameObjectWithTag("amino_name").GetComponent<Text>();
+        }
+        catch (NullReferenceException)
+        {
+            Debug.Log("amino_text not found");
+        }
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)
