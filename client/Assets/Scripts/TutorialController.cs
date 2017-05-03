@@ -88,7 +88,7 @@ public class TutorialController : MonoBehaviour {
     public int tutorial_step = -1;
 
     Transform background_tutorial;
-    enum background_size { large_size, medium_size, short_size };
+    enum background_size { xl_size, large_size, medium_size, short_size };
     enum background_position { down, up, left, right };
 
     UIController ui;
@@ -689,6 +689,7 @@ public class TutorialController : MonoBehaviour {
             background.GetChild(0).gameObject.SetActive(false);
             background.GetChild(1).gameObject.SetActive(false);
             background.GetChild(2).gameObject.SetActive(false);
+            background.GetChild(3).gameObject.SetActive(false);
             //ERASE TEXTS
             //background.GetChild(0).GetChild(0).GetComponent<Text>().text = "";
             //background.GetChild(1).GetChild(0).GetComponent<Text>().text = "";
