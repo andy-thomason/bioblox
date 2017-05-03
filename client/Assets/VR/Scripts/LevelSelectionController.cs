@@ -17,6 +17,7 @@ public class LevelSelectionController : MonoBehaviour
     Vector3 to;
 
     public int level_id;
+    public int temp_level_id;
     public string level_name;
     public string description;
     Transform mc;
