@@ -85,13 +85,15 @@ public class SelectLevel : MonoBehaviour {
 
                 if (hit.transform.GetComponent<LevelSelectionController>().level_id == -2)
                     FindObjectOfType<GameManager>().ChangeLevel(current_level_id);
-
-                panel.SetActive(true);
-                current_level_selected = hit.transform.gameObject;
-                current_level_selected.GetComponent<LevelSelectionController>().StartHintMovement();
-                current_level_id = current_level_selected.GetComponent<LevelSelectionController>().level_id;
-                name_level.text = current_level_selected.GetComponent<LevelSelectionController>().level_name;
-                description.text = current_level_selected.GetComponent<LevelSelectionController>().description;
+                else
+                {
+                    panel.SetActive(true);
+                    current_level_selected = hit.transform.gameObject;
+                    current_level_selected.GetComponent<LevelSelectionController>().StartHintMovement();
+                    current_level_id = current_level_selected.GetComponent<LevelSelectionController>().level_id;
+                    name_level.text = current_level_selected.GetComponent<LevelSelectionController>().level_name;
+                    description.text = current_level_selected.GetComponent<LevelSelectionController>().description;
+                }
 
             }
         }
@@ -107,9 +109,7 @@ public class SelectLevel : MonoBehaviour {
                 {
                     Debug.Log(ex);
                 }
-
-                if (hit.transform.GetComponent<LevelSelectionController>().level_id == -2)
-                    FindObjectOfType<GameManager>().ChangeLevel(current_level_id);
+                
 
                 current_panel = hit.transform.GetChild(0).gameObject;
                 current_panel.SetActive(true);
@@ -118,6 +118,8 @@ public class SelectLevel : MonoBehaviour {
                 current_level_id = current_level_selected.GetComponent<LevelSelectionController>().level_id;
                 current_panel.transform.GetChild(1).GetComponent<Text>().text = current_level_selected.GetComponent<LevelSelectionController>().level_name;
                 current_panel.transform.GetChild(2).GetComponent<Text>().text = current_level_selected.GetComponent<LevelSelectionController>().description;
+                
+                
             }
         }
     }

@@ -1346,7 +1346,7 @@ public class BioBlox : MonoBehaviour
 
         //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         //set color depending if its valid
-        score_bar.color = is_score_valid ? Color.green : Color.red;
+        //score_bar.color = is_score_valid ? Color.green : Color.red;
         // lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)
