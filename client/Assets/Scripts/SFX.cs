@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class SFX : MonoBehaviour
 {
 
-    public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand, ship, ship_scanning };
+    public enum sound_index { main_audio, amb, amino_click, button_click, connection_click, protein_colliding, warning, end_level, string_reel_in, string_reel_out, harpoon_shoot, harpoon_hit_protein, harpoon_hit_ground, connection_exist, slider_mouse_in, slider_mouse_out, cutaway_start, cutaway_cutting, cutaway_protein, camera_shrink, camera_expand, ship, ship_scanning, well_done, almost, protein_pick, level_select };
     public AudioClip ReelIn;
     public AudioClip ReelOut;
     AudioClip main_music;
@@ -16,7 +16,6 @@ public class SFX : MonoBehaviour
     void Awake()
     {
         audioSource = GetComponents<AudioSource>();
-        audioSource_collision = transform.GetChild(0).GetComponents<AudioSource>();
     }
 
     void Update()

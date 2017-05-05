@@ -277,6 +277,11 @@ public class BioBlox : MonoBehaviour
 
     public bool is_scanning_amino = false;
 
+    //VR
+    public GameObject overlaping_r_h;
+    public GameObject overlaping_l_h;
+
+
     void Awake()
     {
         ////creatt ehe sene manager to keep track of the level
@@ -1347,6 +1352,7 @@ public class BioBlox : MonoBehaviour
         //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         //set color depending if its valid
         //score_bar.color = is_score_valid ? Color.green : Color.red;
+        overlaping_r_h.active = overlaping_l_h.active = !is_score_valid;
         // lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)

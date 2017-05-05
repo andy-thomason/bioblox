@@ -7,9 +7,16 @@ public class ButtonGo : MonoBehaviour {
     
     public GameObject images_go_default;
     public GameObject images_go_activo;
+    SFX sfx;
+
+    void Start()
+    {
+        sfx = FindObjectOfType<SFX>();
+    }
     
     void OnCollisionEnter(Collision collision)
     {
+        sfx.PlayTrack(SFX.sound_index.level_select);
         images_go_default.SetActive(false);
         images_go_activo.SetActive(true);
     }

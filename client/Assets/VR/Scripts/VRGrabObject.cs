@@ -22,11 +22,20 @@ public class VRGrabObject : MonoBehaviour
 
     int index_right_hand;
     int index_left_hand;
+    SFX sfx;
+    float timer_for_game_mode;
+    bool cambio = false;
+
+    GameMode g_mo;
+    GameManager gm;
 
     void Awake()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
         bb = FindObjectOfType<BioBlox>();
+        sfx = FindObjectOfType<SFX>();
+        gm = FindObjectOfType<GameManager>();
+        g_mo = FindObjectOfType<GameMode>();
         laser = transform.GetChild(2).gameObject;
 
         index_left_hand = (int)SteamVR_Controller.Input(SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Leftmost)).index;
@@ -100,7 +109,7 @@ public class VRGrabObject : MonoBehaviour
         return fx;
     }
 
-    private void ReleaseObject_0()
+    public void ReleaseObject_0()
     {
         if (GetComponent<FixedJoint>())
         {
@@ -110,7 +119,7 @@ public class VRGrabObject : MonoBehaviour
         }
     }
 
-    private void ReleaseObject_1()
+    public void ReleaseObject_1()
     {
         if (GetComponent<FixedJoint>())
         {
@@ -123,95 +132,119 @@ public class VRGrabObject : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        // press trigger
-        if (Controller.GetHairTriggerDown())
+        if(!g_mo.game_over)
         {
-            
-            //izq 3 der 2
-            if (Controller.index == index_left_hand)
+            // press trigger
+            if (Controller.GetHairTriggerDown())
             {
-                StartCoroutine(scale_protein_0());
-                GrabObject_0();
-            }
-            else
-            {
-                StartCoroutine(scale_protein_1());
-                GrabObject_1();
-            }
-        }
-
-        // release trigger
-        if (Controller.GetHairTriggerUp())
-        {
-            //izq 3 der 2
-            if (Controller.index == index_left_hand)
-                ReleaseObject_0();
-            else
-                ReleaseObject_1();
-        }
-
-        //// press grip
-        //if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
-        //{
-        //    //izq 3 der 2
-        //    if (Controller.index == control_hand.left.GetHashCode())
-        //        bb.ChangeProteinRenderer(0);
-        //    else
-        //        bb.ChangeProteinRenderer(1);
-        //}
-
-        ////ONLY RIGHT
-        //if(Controller.index == control_hand.right.GetHashCode())
-        //{
-        //    if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
-        //    {
-        //        bb.is_scanning_amino = true;
-        //        laser.SetActive(true);
-        //    }
-        //    if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-        //    {
-        //        bb.is_scanning_amino = false;
-        //        laser.SetActive(false);
-        //    }
-        //}
-
-        if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
-        {
-            if (Controller.GetAxis().x > 0.6f)
-            {
+                sfx.PlayTrack(SFX.sound_index.protein_pick);
+                //izq 3 der 2
                 if (Controller.index == index_left_hand)
-                    bb.ChangeProteinRenderer_forward(0);
-                else
-                    bb.ChangeProteinRenderer_forward(1);
-            }
-            else if(Controller.GetAxis().x < -0.6f)
-            {
-                if (Controller.index == index_left_hand)
-                    bb.ChangeProteinRenderer_backwards(0);
-                else
-                    bb.ChangeProteinRenderer_backwards(1);
-            }
-            else
-            {
-                if (Controller.index == index_right_hand)
                 {
-                    bb.is_scanning_amino = true;
-                    laser.SetActive(true);
+                    StartCoroutine(scale_protein_0());
+                    GrabObject_0();
+                }
+                else
+                {
+                    StartCoroutine(scale_protein_1());
+                    GrabObject_1();
                 }
             }
+
+            // release trigger
+            if (Controller.GetHairTriggerUp())
+            {
+                //izq 3 der 2
+                if (Controller.index == index_left_hand)
+                    ReleaseObject_0();
+                else
+                    ReleaseObject_1();
+            }
+
+            //// press grip
+            //if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Grip))
+            //{
+            //    //izq 3 der 2
+            //    if (Controller.index == control_hand.left.GetHashCode())
+            //        bb.ChangeProteinRenderer(0);
+            //    else
+            //        bb.ChangeProteinRenderer(1);
+            //}
+
+            ////ONLY RIGHT
+            //if(Controller.index == control_hand.right.GetHashCode())
+            //{
+            //    if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+            //    {
+            //        bb.is_scanning_amino = true;
+            //        laser.SetActive(true);
+            //    }
+            //    if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+            //    {
+            //        bb.is_scanning_amino = false;
+            //        laser.SetActive(false);
+            //    }
+            //}
+
+            if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                if (Controller.GetAxis().x > 0.6f)
+                {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
+                    if (Controller.index == index_left_hand)
+                        bb.ChangeProteinRenderer_forward(0);
+                    else
+                        bb.ChangeProteinRenderer_forward(1);
+                }
+                else if(Controller.GetAxis().x < -0.6f)
+                {
+                    sfx.PlayTrack(SFX.sound_index.amino_click);
+                    if (Controller.index == index_left_hand)
+                        bb.ChangeProteinRenderer_backwards(0);
+                    else
+                        bb.ChangeProteinRenderer_backwards(1);
+                }
+                else
+                {
+                    sfx.PlayTrack(SFX.sound_index.ship_scanning);
+                    if (Controller.index == index_right_hand)
+                    {
+                        bb.is_scanning_amino = true;
+                        laser.SetActive(true);
+                    }
+                }
+            }
+
+            if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad) && Controller.index == index_right_hand)
+            {
+                bb.is_scanning_amino = false;
+                sfx.StopTrack(SFX.sound_index.ship_scanning);
+                laser.SetActive(false);
+            }
+
+                //// press grip
+                //if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip))
+                //{
+                //    bb.Molecules.transform.Rotate(Controller.angularVelocity);
+                //}
+        }
+        //game_mode
+        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) && !cambio && Controller.index == index_right_hand)
+        {
+            timer_for_game_mode += Time.deltaTime;
+
+            if(timer_for_game_mode > 3.0f)
+            {
+                cambio = true;
+                gm.is_game_mode = !gm.is_game_mode;
+                g_mo.switch_mode(gm.is_game_mode);
+            }
         }
 
-        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad) && Controller.index == index_right_hand)
+        if (Controller.GetPressUp(SteamVR_Controller.ButtonMask.Grip))
         {
-            bb.is_scanning_amino = false;
-            laser.SetActive(false);
-        }
-
-        // press grip
-        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip))
-        {
-            bb.Molecules.transform.Rotate(Controller.angularVelocity);
+            timer_for_game_mode = 0;
+            cambio = false;
         }
 
 

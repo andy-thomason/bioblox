@@ -92,4 +92,12 @@ if len(sys.argv) == 2 and sys.argv[1] == 'sconly':
     print(ex)
     for line in os.popen(ex):
       print(line)
+	  
+if len(sys.argv) == 2 and sys.argv[1] == 'complex':
+  # thumbnail meshes
+  for f, ch1, ch2, lod in chains:
+    ex = "%s %s se --chains %s%s --ply --lod 1" % (exe_file, pdbdir + '/' + f, ch1, ch2)
+    print(ex)
+    for line in os.popen(ex):
+      print(line)
 

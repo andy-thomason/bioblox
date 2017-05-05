@@ -28,6 +28,7 @@ public class SelectLevel : MonoBehaviour {
     public Material laser_off;
     public Material laser_on;
     Renderer laser_mat;
+    SFX sfx;
 
     void Awake()
     {
@@ -37,6 +38,7 @@ public class SelectLevel : MonoBehaviour {
     void Start()
     {
         laser_mat = laser.GetComponent<Renderer>();
+        sfx = FindObjectOfType<SFX>();
     }
 
     // Update is called once per frame
@@ -101,6 +103,7 @@ public class SelectLevel : MonoBehaviour {
         {
             if (current_level_id_temp != hit.transform.GetComponent<LevelSelectionController>().temp_level_id)
             {
+                sfx.PlayTrack(SFX.sound_index.button_click);
                 try
                 {
                     current_panel.SetActive(false);
