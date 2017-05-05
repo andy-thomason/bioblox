@@ -88,12 +88,13 @@ public class TutorialController : MonoBehaviour {
     public int tutorial_step = -1;
 
     Transform background_tutorial;
-    enum background_size { large_size, medium_size, short_size };
+    enum background_size { xl_size, large_size, medium_size, short_size };
     enum background_position { down, up, left, right };
 
     UIController ui;
     BioBlox bb;
     AminoSliderController asc;
+    SFX sfx;
 
     public Button hint_button;
     Image hint_button_color;
@@ -195,6 +196,7 @@ public class TutorialController : MonoBehaviour {
 
         ui = FindObjectOfType<UIController>();
         bb = FindObjectOfType<BioBlox>();
+        sfx = FindObjectOfType<SFX>();
         asc = FindObjectOfType<AminoSliderController>();
         sound_cg = GameObject.FindGameObjectWithTag("music_boton").GetComponent<CanvasGroup>();
         tutorial_cg.Add(sound_cg);
@@ -212,6 +214,7 @@ public class TutorialController : MonoBehaviour {
 
     void advance_tutorial()
     {
+        sfx.PlayTrack(SFX.sound_index.amino_click);
         ui.isOverUI = false;
         //TUTORIAL STEPS
         switch (tutorial_step)
@@ -242,7 +245,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(sound_fx_cg);
                     ShowCanvasGroupElement(sound_cg);
                     transform.position = sound_pos.position;
-                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.down, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / SOUNDS");
                     
                     HideCanvasGroupElement(grid_cg);
@@ -266,7 +269,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(bg_color_cg);
                     ShowCanvasGroupElement(bg_color_boton_cg);
                     transform.position = bg_color_pos.position;
-                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.down, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / BACKGROUND COLOR");
 
                     HideCanvasGroupElement(reset_camera_cg);
@@ -307,7 +310,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(dock_example_cg);
                     transform.position = dock_example_pos.position;
-                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.down, background_size.short_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MENU FROM THE TOP / DOCK ANIMATION");
                 }
                 break;
@@ -326,7 +329,7 @@ public class TutorialController : MonoBehaviour {
                     }
                     //DEACTIVATE THE DOCKING ANIMATION IN CASE THE USER GOES BACK
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ZOOM");
                 }
                 break;
@@ -334,7 +337,7 @@ public class TutorialController : MonoBehaviour {
             case 8: //MOUSE CONTROLS / ROTATE CAMERA
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ROTATE CAMERA");
                 }
                 break;
@@ -342,7 +345,7 @@ public class TutorialController : MonoBehaviour {
             case 9: //MOUSE CONTROLS / KEYBOARD
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / KEYBOARD");
                 }
                 break;
@@ -351,7 +354,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ui.RestartCamera();
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("MOUSE CONTROLS / ROTATE PROTEINS");
                 }
                 break;
@@ -363,7 +366,7 @@ public class TutorialController : MonoBehaviour {
             case 11: //Exploring Proteins INTRO
                 {
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("Exploring Proteins INTRO");
                     
                     HideCanvasGroupElement(protein_panel_1_cg);
@@ -376,7 +379,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_panel_1_cg);
                     ShowCanvasGroupElement(protein_panel_2_cg);
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS");
                 }
                 break;
@@ -384,7 +387,7 @@ public class TutorialController : MonoBehaviour {
             case 13: //PROTEIN PANELS DESCRIPTION
                 {
                     transform.position = protein_panels.position;
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS DESCRIPTION");
                     extra_hand.position = new Vector3(2000, 0, 0);
                 }
@@ -394,7 +397,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     transform.position = protein_panel_name_1.position;
                     position_extra_hand(background_position.right, protein_panel_name_0);
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS NAME");
                     
                     HideCanvasGroupElement(protein_views_1_cg);
@@ -408,7 +411,7 @@ public class TutorialController : MonoBehaviour {
                     ShowCanvasGroupElement(protein_views_2_cg);
                     transform.position = viz_1.position;
                     position_extra_hand(background_position.right, viz_0);
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS RENDERERS");
                 }
                 break;
@@ -417,7 +420,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     transform.position = protein_panel_2_pos.position;
                     position_extra_hand(background_position.right, protein_panel_1_pos);
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("PROTEIN PANELS AMINO");
                 }
                 break;
@@ -426,7 +429,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     extra_hand.position = new Vector3(2000, 0, 0);
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FROM 3D MODEL");
                 }
                 break;
@@ -435,7 +438,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     transform.position = protein_panel_1_pos.position;
                     position_extra_hand(background_position.right, protein_panel_2_pos);
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FROM AMINO PANEL");
                 }
                 break;
@@ -443,7 +446,7 @@ public class TutorialController : MonoBehaviour {
             case 19: //SELECT ATOM FROM AMINO PANEL
                 {
                     transform.position = panel_atom.position;
-                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.xl_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT ATOM FROM AMINO PANEL");
                     extra_hand.position = new Vector3(2000, 0, 0);
                 }
@@ -453,7 +456,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     transform.position = viz_1.position;
                     position_extra_hand(background_position.right, viz_0);
-                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.xl_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT DIFFERENT REDNER");
                 }
                 break;
@@ -473,7 +476,7 @@ public class TutorialController : MonoBehaviour {
                     ui.ToggleNormalMesh(1);
                     //SET TO NORMAL RENDER
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.xl_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT AMINO FOR COONECTION");
 
                     extra_hand.position = new Vector3(2000, 0, 0);
@@ -493,7 +496,7 @@ public class TutorialController : MonoBehaviour {
             case 23: //CONNECTION PANEL DESCRIPTION
                 {
                     transform.position = connection_panel.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL DESCRIPTION");
                 }
                 break;
@@ -501,7 +504,7 @@ public class TutorialController : MonoBehaviour {
             case 24: //CONNECTION PANEL FURTHER DESCRIPTION
                 {
                     transform.position = connection_panel.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL FURTHER DESCRIPTION");
                 }
                 break;
@@ -509,7 +512,7 @@ public class TutorialController : MonoBehaviour {
             case 25: //CONNECTION PANEL ERASE LINK
                 {
                     transform.position = connection_panel_erase.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONNECTION PANEL ERASE LINK");
                     
                     HideCanvasGroupElement(slider_string_cg);
@@ -520,7 +523,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     ShowCanvasGroupElement(slider_string_cg);
                     transform.position = slider_string_pos.position;
-                    set_background(background_position.up, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.up, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SLIDER");
                     
                     HideCanvasGroupElement(game_score_bar_cg);
@@ -536,7 +539,7 @@ public class TutorialController : MonoBehaviour {
                     //DEACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     ShowCanvasGroupElement(game_score_bar_cg);
                     transform.position = game_score_bar_pos.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SCORE AND DELETE LINK");
                     extra_hand.position = new Vector3(2000, 0, 0);
                 }
@@ -552,7 +555,7 @@ public class TutorialController : MonoBehaviour {
 
                     position_extra_hand(background_position.right, protein_panel_1_pos);
                     transform.position = protein_panel_2_pos.position;
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.medium_size, tutorial_texts[tutorial_step]);
                     Debug.Log("SELECT CORRECT FIRST PAIR OF AMINO");
                 }
                 break;
@@ -572,7 +575,7 @@ public class TutorialController : MonoBehaviour {
                 {
                     asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = default_color;
                     transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.left, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
@@ -583,24 +586,12 @@ public class TutorialController : MonoBehaviour {
                     asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = high_color;
                     asc.ScrollbarAmino1.value = 0.91f;
                     transform.position = protein_panel_1_pos.position;
-                    set_background(background_position.right, background_size.short_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.right, background_size.xl_size, tutorial_texts[tutorial_step]);
                     Debug.Log("EXPLANATION OF CONTEXTUAL MENU");
                 }
                 break;
 
-            case 32: //CREATE CONNECTION CONTEXTUAL MENU
-                {
-                    asc.SliderMol[0].transform.GetChild(21).GetComponent<Image>().color = default_color;
-                    //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
-                    tutorial_score_fixed = true;
-                    //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
-                    transform.position = corner_down.position;
-                    set_background(background_position.left, background_size.medium_size, tutorial_texts[tutorial_step]);
-                    Debug.Log("CREATE CONNECTION CONTEXTUAL MENU");
-                }
-                break;
-
-            case 33: //PULL TOGETHER
+            case 32: //PULL TOGETHER
                 {
                     //ACTIVATE THE ERASE BOTON IN THE CONNECTION PANEL
                     tutorial_score_fixed = false;
@@ -611,19 +602,7 @@ public class TutorialController : MonoBehaviour {
                 }
                 break;
 
-            case 34: //SCORE GOING UP
-                {
-                    ui.CutAway.value = -100;
-                    transform.position = game_score_bar_pos.position;
-                    set_background(background_position.left, background_size.short_size, tutorial_texts[tutorial_step]);
-                    Debug.Log("SCORE GOING UP");
-
-                    HideCanvasGroupElement(cutaway_cg);
-                }
-                break;
-
-
-            case 35: //cutaway
+            case 33: //cutaway
                 {
                     ShowCanvasGroupElement(cutaway_cg);
                     transform.position = cutaway_pos.position;
@@ -634,7 +613,7 @@ public class TutorialController : MonoBehaviour {
                 }
                 break;
 
-            case 36: //CONTACT VIZ
+            case 34: //CONTACT VIZ
                 {
                     ui.CutAway.value = -100;
                     ShowCanvasGroupElement(viz_atoms_contact_cg);
@@ -646,17 +625,17 @@ public class TutorialController : MonoBehaviour {
                 }
                 break;
 
-            case 37: //CONTROL MENU
+            case 35: //CONTROL MENU
                 {
                     outro_tutorial.SetActive(false);
                     ShowCanvasGroupElement(save_bottom_cg);
                     transform.position = save_bottom_pos.position;
-                    set_background(background_position.down, background_size.medium_size, tutorial_texts[tutorial_step]);
+                    set_background(background_position.down, background_size.large_size, tutorial_texts[tutorial_step]);
                     Debug.Log("CONTROL MENU");
                 }
                 break;
 
-            case 38: //CHAO
+            case 36: //CHAO
                 {
 
                     outro_tutorial.SetActive(true);
@@ -689,6 +668,7 @@ public class TutorialController : MonoBehaviour {
             background.GetChild(0).gameObject.SetActive(false);
             background.GetChild(1).gameObject.SetActive(false);
             background.GetChild(2).gameObject.SetActive(false);
+            background.GetChild(3).gameObject.SetActive(false);
             //ERASE TEXTS
             //background.GetChild(0).GetChild(0).GetComponent<Text>().text = "";
             //background.GetChild(1).GetChild(0).GetComponent<Text>().text = "";
