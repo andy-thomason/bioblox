@@ -117,6 +117,8 @@ public class TutorialController : MonoBehaviour {
 
     public Transform extra_hand;
 
+    int number_of_connections;
+
     // Use this for initialization
     void Start ()
     {
@@ -184,6 +186,16 @@ public class TutorialController : MonoBehaviour {
             //transform.position = tutorial_pos[tutorial_step].position;
             tutorial_step--;
             advance_tutorial();
+        }
+
+        //IF THEY HAVE TO CREATE A CONNECTION
+        if(tutorial_step == 22 || tutorial_step == 29)
+        {
+            if (asc.AminoLinkPanelParent.transform.childCount > number_of_connections)
+            {
+                tutorial_step++;
+                advance_tutorial();
+            }
         }
     }
 
@@ -486,6 +498,7 @@ public class TutorialController : MonoBehaviour {
 
             case 22: //CREATE CONNECTION
                 {
+                    number_of_connections = asc.AminoLinkPanelParent.transform.childCount;
                     ShowCanvasGroupElement(add_connection_cg);
                     transform.position = add_connection_pos.position;
                     set_background(background_position.up, background_size.short_size, tutorial_texts[tutorial_step]);
@@ -562,6 +575,7 @@ public class TutorialController : MonoBehaviour {
 
             case 29: //CREATE CONNECTION
                 {
+                    number_of_connections = asc.AminoLinkPanelParent.transform.childCount;
                     asc.SliderMol[0].transform.GetChild(169).GetComponent<Image>().color = default_color;
                     asc.SliderMol[1].transform.GetChild(14).GetComponent<Image>().color = default_color;
                     transform.position = add_connection_pos.position;
