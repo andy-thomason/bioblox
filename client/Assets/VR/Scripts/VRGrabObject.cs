@@ -206,9 +206,9 @@ public class VRGrabObject : MonoBehaviour
                 }
                 else
                 {
-                    sfx.PlayTrack(SFX.sound_index.ship_scanning);
                     if (Controller.index == index_right_hand)
                     {
+                        sfx.PlayTrack(SFX.sound_index.ship_scanning);
                         bb.is_scanning_amino = true;
                         laser.SetActive(true);
                     }

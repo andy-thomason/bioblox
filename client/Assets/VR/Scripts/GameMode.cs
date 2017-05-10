@@ -19,6 +19,8 @@ public class GameMode : MonoBehaviour {
     public Sprite almost_sprite;
     public Sprite fail_sprite;
     public GameObject win_object;
+    float timer_win = 0;
+    bool timer_win_condition = false;
 
     // Use this for initialization
     void Start ()
@@ -48,8 +50,20 @@ public class GameMode : MonoBehaviour {
             if (game_play_time < 1.0f)
                 game_over_call();
 
-            if (bb.bar_value == 1.0f)
-                win_call();
+            if (bb.bar_value == 1.0f && bb.is_score_valid)
+            {
+                timer_win += Time.deltaTime;
+
+                if(timer_win > 3 && !timer_win_condition)
+                {
+                    win_call();
+                    timer_win_condition = true;
+                }
+            }
+            else
+            {
+                timer_win = 0;
+            }
         }
 		
 	}
@@ -69,6 +83,7 @@ public class GameMode : MonoBehaviour {
 
     void game_over_call()
     {
+        sfx.Mute_Track(SFX.sound_index.warning, true);
         game_over = true;
         VRGrabObject[] hands = FindObjectsOfType<VRGrabObject>();
         hands[0].ReleaseObject_0();
@@ -78,6 +93,7 @@ public class GameMode : MonoBehaviour {
         bb.Molecules.gameObject.SetActive(false);
         menu.SetActive(false);
         timer_text.gameObject.SetActive(false);
+        sfx.StopTrack(SFX.sound_index.warning);
 
         if (bb.bar_value > 0.7f)
         {
@@ -91,15 +107,18 @@ public class GameMode : MonoBehaviour {
         sfx.PlayTrack(SFX.sound_index.almost);
 
         lost_object.SetActive(true);
+        bb.overlaping_r_h.active = bb.overlaping_l_h.active = false;
     }
 
     void win_call()
     {
+        sfx.Mute_Track(SFX.sound_index.warning, true);
         win = true;
         timer_text.gameObject.SetActive(false);
         menu.SetActive(false);
         win_object.SetActive(true);
         sfx.PlayTrack(SFX.sound_index.well_done);
+        bb.overlaping_r_h.active = bb.overlaping_l_h.active = false;
     }
 
 
