@@ -56,18 +56,18 @@ public class BioBlox : MonoBehaviour
     };
 
     public Level[] levels = {
-       new Level("2PTC", "E", "I", "2", "2", "1", new Vector3(0, 0, 0), 35, -90, 2),
-       new Level("4KC3", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 3),
-       new Level("1FSS", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 45, 3),
-       new Level("1EMV", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1GRN", "A", "B", "2", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1ACB", "E", "I", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1ATN", "A", "D", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AVX", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AY7", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1BUH", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1BVN", "P", "T", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1EXB", "A", "E", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2)
+       new Level("2PTC", "E", "I", "1", "1", "0.2", new Vector3(0, 0, 0), 35, -90, 2),
+       new Level("4KC3", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 3),
+       new Level("1FSS", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 45, 3),
+       new Level("1EMV", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1GRN", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1ACB", "E", "I", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1ATN", "A", "D", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AVX", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AY7", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1BUH", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1BVN", "P", "T", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1EXB", "A", "E", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2)
     };
 
     enum protein_view { normal, transparent, bs };
