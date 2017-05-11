@@ -46,51 +46,49 @@ public class DataManager : MonoBehaviour {
 
     IEnumerator insertUser()
     {
-        //temp
-        //number_of_level = 7;
+        ////temp
         //www_form = new WWWForm();
         //www_form.AddField("id_user", 2);
         //www_form.AddField("username", "pedro");
-        //www_form.AddField("number_of_levels", number_of_level);
         //gm.id_user = 2;
-        //temp
+        ////temp
         WWW SQLQuery = new WWW("https://bioblox3d.org/wp-content/themes/write/db/userlog.php", www_form);
         yield return SQLQuery;
         gm.SetID();
         
-        //get the number of levels
-        level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
-        //slots holder
-        int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
+        ////get the number of levels
+        //level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
+        ////slots holder
+        //int slot_holder_index = level_holder.GetChild(0).transform.childCount - 1;
 
-        //SPLIT
-        string[] splitScores = (SQLQuery.text).Split('+');
+        ////SPLIT
+        //string[] splitScores = (SQLQuery.text).Split('+');
 
         //TUTORIAL
-        if (splitScores[0] == "0")
+        if (SQLQuery.text == "0")
             gm.welcome_tutorial.SetActive(true);
 
-        //ASSIGN THE SCORES TO THE BUTTONS
-        for (int i = 1; i <= number_of_level; i++)
-        {
-            string[] splitScores_slot = splitScores[i].Split('*');
-            //Debug.Log(splitScores[i]);
-            for (int j = 0; j <= 2; j++)
-            {
-                string[] splitScoresLevel = splitScores_slot[j].Split(',');
-                level_holder.GetChild(i).transform.GetChild(slot_holder_index).transform.GetChild(j).GetComponent<SlotController>().SetValues(splitScoresLevel);
+        ////ASSIGN THE SCORES TO THE BUTTONS
+        //for (int i = 1; i <= number_of_level; i++)
+        //{
+        //    string[] splitScores_slot = splitScores[i].Split('*');
+        //    //Debug.Log(splitScores[i]);
+        //    for (int j = 0; j <= 2; j++)
+        //    {
+        //        string[] splitScoresLevel = splitScores_slot[j].Split(',');
+        //        level_holder.GetChild(i).transform.GetChild(slot_holder_index).transform.GetChild(j).GetComponent<SlotController>().SetValues(splitScoresLevel);
 
-                if(j==0)
-                {
-                    //assign score ui
-                    for (int l = 0; l <= 3; l++)
-                    {
-                        level_holder.GetChild(i).transform.GetChild(0).transform.GetChild(l + 1).GetComponent<Text>().text = splitScoresLevel[l];
-                    }
-                }
-            }
+        //        if(j==0)
+        //        {
+        //            //assign score ui
+        //            for (int l = 0; l <= 3; l++)
+        //            {
+        //                level_holder.GetChild(i).transform.GetChild(0).transform.GetChild(l + 1).GetComponent<Text>().text = splitScoresLevel[l];
+        //            }
+        //        }
+        //    }
 
-        }
+        //}
     }
 
     public void SendSaveData(int slot, string n_atoms, string lpj, string ei, string game_score, string P1_connections, string P2_connections, float slider_value, string connections, float bar_game_score, int n_connections)

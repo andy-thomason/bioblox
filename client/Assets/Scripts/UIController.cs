@@ -1175,7 +1175,7 @@ public class UIController : MonoBehaviour {
         connections = "";
 
         //IF IT IS TUTORIAL, DONT SAVE TO SERVER
-        if(gm.is_tutorial)
+        if (!gm.is_tutorial)
         {
             foreach (Transform AminoLinkChild in AminoLinkPanel.transform)
             {
@@ -1186,7 +1186,7 @@ public class UIController : MonoBehaviour {
             }
 
             dm.SendSaveData(slot, n_atoms.text, lpj.text, ei.text, game_score.text, P1_connections, P2_connections, cm.SliderStrings.value, connections, BioBloxReference.bar_value, AminoLinkPanel.transform.childCount);
-            UpdateLocalScore(slot, n_atoms.text, lpj.text, ei.text, game_score.text);
+            //UpdateLocalScore(slot, n_atoms.text, lpj.text, ei.text, game_score.text);
             //update button save
             //slot_score[slot].text = "score: " + BioBloxReference.game_score.text;
         }
@@ -1217,22 +1217,22 @@ public class UIController : MonoBehaviour {
         isOverUI = false;
     }
 
-    void UpdateLocalScore(int slot, string n_atoms, string lpj, string ei, string game_score)
-    {
-        string[] new_scores = { game_score, n_atoms, lpj, ei};
+    //void UpdateLocalScore(int slot, string n_atoms, string lpj, string ei, string game_score)
+    //{
+    //    string[] new_scores = { game_score, n_atoms, lpj, ei};
 
-        Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
+    //    Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform;
 
-        level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<SlotController>().SetValues(new_scores);
+    //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<SlotController>().SetValues(new_scores);
 
-        //if (int.Parse(level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<Text>().text) < int.Parse(game_score))
-        //{
-        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = game_score;
-        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(2).GetComponent<Text>().text = n_atoms;
-        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(3).GetComponent<Text>().text = lpj;
-        //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(4).GetComponent<Text>().text = ei;
-        //}
-    }
+    //    //if (int.Parse(level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(level_holder.GetChild(0).childCount - 1).transform.GetChild(slot).GetComponent<Text>().text) < int.Parse(game_score))
+    //    //{
+    //    //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(1).GetComponent<Text>().text = game_score;
+    //    //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(2).GetComponent<Text>().text = n_atoms;
+    //    //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(3).GetComponent<Text>().text = lpj;
+    //    //    level_holder.GetChild(BioBloxReference.current_level).transform.GetChild(4).GetComponent<Text>().text = ei;
+    //    //}
+    //}
 
     //void GetAminoAtoms()
     //{
