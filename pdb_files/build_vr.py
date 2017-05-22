@@ -32,18 +32,18 @@ if len(sys.argv) == 2 and sys.argv[1] == 'list':
   sys.exit()
 
 chains = [
-  ('2PTC.pdb', 'E', 'I', 2),
-  ('4KC3.pdb', 'A', 'B', 2),
-  ('1FSS.pdb', 'A', 'B', 2),
-  ('1EMV.pdb', 'A', 'B', 2),
-  ('1GRN.pdb', 'A', 'B', 2),
-  ('1ACB.pdb', 'E', 'I', 2),
-  ('1ATN.pdb', 'A', 'D', 2),
-  ('1AVX.pdb', 'A', 'B', 2),
-  ('1AY7.pdb', 'A', 'B', 2),
-  ('1BUH.pdb', 'A', 'B', 2),
-  ('1BVN.pdb', 'P', 'T', 2),
-  ('1EXB.pdb', 'A', 'E', 2),
+  ('2PTC.pdb', 'E', 'I', 1),
+  # ('4KC3.pdb', 'A', 'B', 2),
+  # ('1FSS.pdb', 'A', 'B', 2),
+  # ('1EMV.pdb', 'A', 'B', 2),
+  # ('1GRN.pdb', 'A', 'B', 2),
+  # ('1ACB.pdb', 'E', 'I', 2),
+  # ('1ATN.pdb', 'A', 'D', 2),
+  # ('1AVX.pdb', 'A', 'B', 2),
+  # ('1AY7.pdb', 'A', 'B', 2),
+  # ('1BUH.pdb', 'A', 'B', 2),
+  # ('1BVN.pdb', 'P', 'T', 2),
+  # ('1EXB.pdb', 'A', 'E', 2),
 ]
 
 if len(sys.argv) == 2 and sys.argv[1] == 'build':

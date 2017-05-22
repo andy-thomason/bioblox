@@ -70,7 +70,7 @@ public class BioBlox : MonoBehaviour
        new Level("1EXB", "A", "E", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2)
     };
 
-    enum protein_view { normal, transparent, bs };
+    public enum protein_view { normal, transparent, bs };
 
     // a holder variable for the current event system
     EventSystem eventSystem;
@@ -342,8 +342,21 @@ public class BioBlox : MonoBehaviour
 
         get_spheres();
 
-        if (current_level != -1)
+        if (current_level >= 0)
             StartCoroutine(DownloadMolecules());
+        else if(current_level == -2)
+        {
+            PDBCustom pbc = FindObjectOfType<PDBCustom>();
+            custom_protein_name = pbc.pdb_id_input.text.ToUpper();
+            pdb_url = pbc.pdb_url;
+            pdb_chain_0 = pbc.pdb_id_input_chain_0.text.ToUpper();
+            pdb_chain_1 = pbc.pdb_id_input_chain_1.text.ToUpper();
+            //hide UI elements
+            GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
+            GameObject.FindGameObjectWithTag("view_p_1").GetComponent<CanvasGroup>().interactable = false;
+            GameObject.FindGameObjectWithTag("view_p_2").GetComponent<CanvasGroup>().interactable = false;
+            StartCoroutine(Custom_DownloadMolecules());
+        }
 
         if (gm.is_tutorial)
             FindObjectOfType<TutorialController>().StartTutorial();
@@ -561,7 +574,7 @@ public class BioBlox : MonoBehaviour
             molecules[1].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
 
             //rotate parent(molecules vertical instead of horizontal) if needed. LEvel struct parameter
-            molecules[0].transform.parent.transform.localRotation = Quaternion.Lerp(molecules[0].transform.parent.transform.localRotation, Quaternion.Euler(0, 0, levels[current_level].docking_degrees), fracJourney);
+            molecules[0].transform.parent.transform.localRotation = Quaternion.Lerp(molecules[0].transform.parent.transform.localRotation, Quaternion.Euler(0, 0, current_level == -2 ? 0 : levels[current_level].docking_degrees), fracJourney);
         }
     }
 
@@ -2046,10 +2059,154 @@ public class BioBlox : MonoBehaviour
         //StartGame();
     }
 
+    string pdb_url;
+    string pdb_chain_0;
+    string pdb_chain_1;
+    string custom_protein_name;
+    string server_for_custom_level_url = "http://www.atomicincrement.com/bioblox/test/index.php";
+    byte[] custom_protein_0_bytes;
+    byte[] custom_protein_1_bytes;
+
+    //public void custom_download_proteins(string protein_name_t, string pdb_url_t, string pdb_chain_0_t, string pdb_chain_1_t)
+    //{
+    //    custom_protein_name = protein_name_t;
+    //    pdb_url = pdb_url_t;
+    //    pdb_chain_0 = pdb_chain_0_t;
+    //    pdb_chain_1 = pdb_chain_1_t;
+    //    StartCoroutine(Custom_DownloadMolecules());
+    //} 
+
+    IEnumerator Custom_DownloadMolecules()
+    {
+        Debug.Log(pdb_url);
+        Debug.Log(pdb_chain_0);
+        //DOWNLOAD PROTEIN 0
+        WWWForm www_form = new WWWForm();
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_0);
+
+        WWW custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_0_bytes = custom_www.bytes;
+
+        //DOWNLOAD PROTEIN 1
+        www_form = new WWWForm();
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_1);
+
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_1_bytes = custom_www.bytes;
+
+        using (WWW www = new WWW(pdb_url))
+        {
+            yield return www;
+
+            if (www.error != null)
+                throw new System.Exception("WWW download had an error:" + www.error);
+
+            pdb_file = www.text;
+        }
+
+        // Make two PDB_mesh instances from the PDB file and a chain selection.
+        mol1 = make_molecule(custom_protein_name + "." + pdb_chain_0, "Proto1", 7, MeshTopology.Triangles, 0);
+        mol1.transform.SetParent(Molecules);
+        mol2 = make_molecule(custom_protein_name + "." + pdb_chain_1, "Proto2", 7, MeshTopology.Triangles, 1);
+        mol2.transform.SetParent(Molecules);
+
+        //create holder of amino views
+        GameObject molecule_0_views = new GameObject();
+        molecule_0_views.name = "molecule_0";
+        molecule_0_views.transform.SetParent(mol1.transform);
+
+        //create holder of amino views
+        GameObject molecule_1_views = new GameObject();
+        molecule_1_views.name = "molecule_1";
+        molecule_1_views.transform.SetParent(mol2.transform);
+
+        //disabled atoms holder 1
+        GameObject temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_1";
+        temp_atom_disable_holder.transform.SetParent(mol1.transform);
+
+        //disabled atoms holder 2
+        temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_2";
+        temp_atom_disable_holder.transform.SetParent(mol2.transform);
+
+        molecules[0] = mol1.gameObject;
+        molecules[1] = mol2.gameObject;
+        molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+        molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+
+        // Set a bit in this bit array to disable an atom from collision
+        BitArray bad0 = new BitArray(molecules_PDB_mesh[0].mol.atom_centres.Length);
+        BitArray bad1 = new BitArray(molecules_PDB_mesh[1].mol.atom_centres.Length);
+        atoms_disabled = new BitArray[] { bad0, bad1 };
+
+        // Ioannis scoring
+        scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
+
+        offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+        offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+
+        System.GC.Collect();
+
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "custom_0";
+        stream = new MemoryStream(custom_protein_0_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(true);
+        docking_rotation_0 = parent_molecule_reference.transform.localRotation;
+        parent_molecule_reference.transform.Translate(offset_position_0);
+        position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        //DEFAULT
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "custom_0";
+        stream = new MemoryStream(custom_protein_1_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(true);
+        docking_rotation_1 = parent_molecule_reference.transform.localRotation;
+        parent_molecule_reference.transform.Translate(offset_position_1);
+        position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        Vector3 xoff = new Vector3(40, 0, 0);
+
+        reset_molecule(molecules[0], 0, -xoff);
+        reset_molecule(molecules[1], 1, xoff);
+
+        //setting the position of each molecule
+        molecule_0_views.transform.localPosition = position_molecule_0;
+        molecule_1_views.transform.localPosition = position_molecule_1;
+
+        /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
+          GameObject go = new GameObject();
+          go.transform.SetParent(mol1.transform);
+          MeshFilter mf = go.AddComponent<MeshFilter>();
+          //mf.mesh = 
+          MeshRenderer mr = go.AddComponent<MeshRenderer>();
+          go.transform.position = c;
+        }*/
+
+        //uiController.SetHintImage(level.pdbFile); //HINT
+
+        StartGame();
+
+        //create_mesh_1();
+        //create_mesh_11();
+        //create_mesh2();
+        //StartGame();
+    }
+
     public GameObject mesh_temp;
     GameObject mesh_reference;
 
-    void PLYDecoder(Stream stream, Transform parent_molecule, int id_protein, protein_view protein_view)
+    public void PLYDecoder(Stream stream, Transform parent_molecule, int id_protein, protein_view protein_view)
     {
         PlyLoader loader = new PlyLoader();
         Mesh[] mesh = loader.load_memory(stream);
