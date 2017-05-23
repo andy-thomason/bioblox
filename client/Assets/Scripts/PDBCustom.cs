@@ -10,6 +10,7 @@ public class PDBCustom : MonoBehaviour {
     public InputField pdb_id_input_chain_0;
     public InputField pdb_id_input_chain_1;
     public string pdb_url;
+    public GameObject pdb_error;
     Stream stream;
 
     // Use this for initialization
@@ -34,9 +35,10 @@ public class PDBCustom : MonoBehaviour {
             yield return www;
 
             if (www.error != null)
-                throw new System.Exception("WWW download had an error:" + www.error);
+                pdb_error.SetActive(true);
             else
             {
+                pdb_error.SetActive(false);
                 pdb_url = "https://files.rcsb.org/view/" + pdb_id_input.text + ".pdb";
 
                 GetComponent<GameManager>().Custom_ChangeLevel();
@@ -47,7 +49,7 @@ public class PDBCustom : MonoBehaviour {
 
                 //WWW custom_www = new WWW(server_url, www_form);
                 //yield return custom_www;
-                
+
                 //stream = new MemoryStream(www.bytes);
                 //bb.PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
             }
