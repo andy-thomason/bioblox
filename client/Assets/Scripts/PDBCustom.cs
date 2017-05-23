@@ -25,6 +25,7 @@ public class PDBCustom : MonoBehaviour {
 
     public void check_pdb_id()
     {
+        FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
         StartCoroutine(check_pdb_id_IE());
     }
 
