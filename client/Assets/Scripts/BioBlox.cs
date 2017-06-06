@@ -2052,6 +2052,9 @@ public class BioBlox : MonoBehaviour
         molecule_0_views.transform.localPosition = position_molecule_0;
         molecule_1_views.transform.localPosition = position_molecule_1;
 
+       // mol1.transform.localPosition = new Vector3(mol1.transform.localPosition.x, 0, 0);
+       // mol2.transform.localPosition = new Vector3(mol2.transform.localPosition.x, 0, 0);
+
         /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
           GameObject go = new GameObject();
           go.transform.SetParent(mol1.transform);
