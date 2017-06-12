@@ -12,6 +12,7 @@ public class PDBCustom : MonoBehaviour {
     public string pdb_url;
     public GameObject pdb_error;
     Stream stream;
+    string file_pdb;
 
     // Use this for initialization
     void Start ()
@@ -26,36 +27,66 @@ public class PDBCustom : MonoBehaviour {
     public void check_pdb_id()
     {
         FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
-        StartCoroutine(check_pdb_id_IE());
+        // NOTE: gameObject.name MUST BE UNIQUE!!!!
+        GetFile.GetFileFromUserAsync(gameObject.name, "ReceivePDB");
+        //StartCoroutine(check_pdb_id_IE());
     }
 
-    IEnumerator check_pdb_id_IE()
+    //static string s_dataUrlPrefix = "data:image/png;base64,";
+    public void ReceivePDB(string dataUrl)
     {
-        using (WWW www = new WWW("https://files.rcsb.org/view/" + pdb_id_input.text + ".pdb"))
-        {
-            yield return www;
-
-            if (www.error != null)
-                pdb_error.SetActive(true);
-            else
-            {
-                pdb_error.SetActive(false);
-                pdb_url = "https://files.rcsb.org/view/" + pdb_id_input.text + ".pdb";
-
-                GetComponent<GameManager>().Custom_ChangeLevel();
-
-                //WWWForm www_form = new WWWForm();
-                //www_form.AddField("url", pdb_url);
-                //www_form.AddField("chain", pdb_id_input_chain_0.text);
-
-                //WWW custom_www = new WWW(server_url, www_form);
-                //yield return custom_www;
-
-                //stream = new MemoryStream(www.bytes);
-                //bb.PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
-            }
-        }
+        file_pdb = dataUrl;
+        //file_output.text = dataUrl;
+        Debug.Log(file_pdb);
+        StartCoroutine(upload_file());
     }
+
+    IEnumerator upload_file()
+    {
+        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(file_pdb);
+        WWWForm form = new WWWForm();
+        form.AddField("file", "file");
+        form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+
+        WWW w = new WWW("https://bioblox3d.org/upload_file.php", form);
+
+        yield return w;
+
+        Debug.Log(w.error);
+
+        pdb_url = file_pdb;
+
+        //GetComponent<GameManager>().Custom_ChangeLevel();
+    }
+
+
+    //IEnumerator check_pdb_id_IE()
+    //{
+    //    using (WWW www = new WWW("https://files.rcsb.org/view/" + pdb_id_input.text + ".pdb"))
+    //    {
+    //        yield return www;
+
+    //        if (www.error != null)
+    //            pdb_error.SetActive(true);
+    //        else
+    //        {
+    //            pdb_error.SetActive(false);
+    //            pdb_url = "https://files.rcsb.org/view/" + pdb_id_input.text + ".pdb";
+
+    //            GetComponent<GameManager>().Custom_ChangeLevel();
+
+    //            //WWWForm www_form = new WWWForm();
+    //            //www_form.AddField("url", pdb_url);
+    //            //www_form.AddField("chain", pdb_id_input_chain_0.text);
+
+    //            //WWW custom_www = new WWW(server_url, www_form);
+    //            //yield return custom_www;
+
+    //            //stream = new MemoryStream(www.bytes);
+    //            //bb.PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+    //        }
+    //    }
+    //}
 
 //    IEnumerator Custom_DownloadMolecules()
 //    {

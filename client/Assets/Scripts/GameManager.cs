@@ -40,31 +40,31 @@ public class GameManager : MonoBehaviour {
 
         DidYouKnow.text = loading_facts[Random.Range(0, 11)];
 
-        //if NOT DEMO, GET THE USER ID
-        if (!FindObjectOfType<BioBlox>().isDemo)
-        {
-            Application.ExternalCall("SendUserData");
-        }
-        else // DISABLE THE REST OF THE LEVELS / IS DONE HERE BECAUSE IS ONLY ONCE
-        {
-            id_user = -1;
-            Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
-            int button_child = level_holder.GetChild(0).transform.childCount - 1;
+        ////if NOT DEMO, GET THE USER ID
+        //if (!FindObjectOfType<BioBlox>().isDemo)
+        //{
+        //    Application.ExternalCall("SendUserData");
+        //}
+        //else // DISABLE THE REST OF THE LEVELS / IS DONE HERE BECAUSE IS ONLY ONCE
+        //{
+        //    id_user = -1;
+        //    Transform level_holder = GameObject.FindGameObjectWithTag("level_holder").transform;
+        //    int button_child = level_holder.GetChild(0).transform.childCount - 1;
 
-            for(int i = 1; i < level_holder.childCount; i++)
-            {
-                level_holder.GetChild(i).transform.GetChild(button_child).gameObject.SetActive(false);
-                level_holder.GetChild(i).transform.GetChild(button_child - 1).GetComponent<LevelSelectionButton>().enabled = false;
-                level_holder.GetChild(i).transform.GetChild(button_child - 1).gameObject.AddComponent<RedirectToLogin>();
-                level_holder.GetChild(i).transform.GetChild(button_child - 1).transform.GetChild(0).GetComponent<Text>().text = "Log in to play";
-            }
-            //disable load slots from the first level
-            level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(false);
-            //disable ranking
-            ranking_user.transform.parent.gameObject.SetActive(false);
-            //if demo show leaderboard
-            load_leaderboard();
-        }
+        //    for(int i = 1; i < level_holder.childCount; i++)
+        //    {
+        //        level_holder.GetChild(i).transform.GetChild(button_child).gameObject.SetActive(false);
+        //        level_holder.GetChild(i).transform.GetChild(button_child - 1).GetComponent<LevelSelectionButton>().enabled = false;
+        //        level_holder.GetChild(i).transform.GetChild(button_child - 1).gameObject.AddComponent<RedirectToLogin>();
+        //        level_holder.GetChild(i).transform.GetChild(button_child - 1).transform.GetChild(0).GetComponent<Text>().text = "Log in to play";
+        //    }
+        //    //disable load slots from the first level
+        //    level_holder.GetChild(0).transform.GetChild(button_child).gameObject.SetActive(false);
+        //    //disable ranking
+        //    ranking_user.transform.parent.gameObject.SetActive(false);
+        //    //if demo show leaderboard
+        //    load_leaderboard();
+        //}
     }
     
     public void ChangeLevel(int level, int slot)

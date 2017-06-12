@@ -27,22 +27,22 @@ public class DataManager : MonoBehaviour {
 	
 	}
 
-    void SendUserData(string user_data)
-    {
-        string[] splitArray = user_data.Split('+');
-        id_user = splitArray[0];
-        string username = splitArray[1];
+    //void SendUserData(string user_data)
+    //{
+    //    string[] splitArray = user_data.Split('+');
+    //    id_user = splitArray[0];
+    //    string username = splitArray[1];
 
-        //get nubmer of levels
-        number_of_level = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.childCount - 1;
+    //    //get nubmer of levels
+    //    number_of_level = GameObject.FindGameObjectWithTag("level_holder").gameObject.transform.childCount - 1;
 
-        www_form = new WWWForm();
-        www_form.AddField("id_user", id_user);
-        www_form.AddField("username", username);
-        www_form.AddField("number_of_levels", number_of_level);
+    //    www_form = new WWWForm();
+    //    www_form.AddField("id_user", id_user);
+    //    www_form.AddField("username", username);
+    //    www_form.AddField("number_of_levels", number_of_level);
 
-        StartCoroutine(insertUser());
-    }
+    //    StartCoroutine(insertUser());
+    //}
 
     IEnumerator insertUser()
     {
