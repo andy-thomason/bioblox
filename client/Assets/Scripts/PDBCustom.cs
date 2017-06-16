@@ -48,7 +48,7 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
 
-        WWW w = new WWW("https://bioblox3d.org/upload_file.php", form);
+        WWW w = new WWW("http://quiley.com/BB/upload_file.php", form);
 
         yield return w;
 
@@ -56,7 +56,7 @@ public class PDBCustom : MonoBehaviour {
 
         pdb_url = file_pdb;
 
-        //GetComponent<GameManager>().Custom_ChangeLevel();
+        GetComponent<GameManager>().Custom_ChangeLevel();
     }
 
 
