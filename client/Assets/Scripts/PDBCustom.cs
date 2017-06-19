@@ -48,7 +48,7 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
 
-        WWW w = new WWW("http://quiley.com/BB/upload_file.php", form);
+        WWW w = new WWW("http://www.atomicincrement.com/bioblox/pro/upload_file.php", form);
 
         yield return w;
 

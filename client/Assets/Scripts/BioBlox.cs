@@ -2083,7 +2083,7 @@ public class BioBlox : MonoBehaviour
         //DOWNLOAD PROTEIN 0
         WWWForm www_form = new WWWForm();
         www_form.AddField("url", pdb_url);
-        www_form.AddField("chains", pdb_chain_0);
+        www_form.AddField("chains", "E");
 
         WWW custom_www = new WWW(server_for_custom_level_url, www_form);
         yield return custom_www;
@@ -2092,7 +2092,7 @@ public class BioBlox : MonoBehaviour
         //DOWNLOAD PROTEIN 1
         www_form = new WWWForm();
         www_form.AddField("url", pdb_url);
-        www_form.AddField("chains", pdb_chain_1);
+        www_form.AddField("chains", "I");
 
         custom_www = new WWW(server_for_custom_level_url, www_form);
         yield return custom_www;
