@@ -2064,6 +2064,8 @@ public class BioBlox : MonoBehaviour
     string pdb_chain_1;
     string custom_protein_name;
     string server_for_custom_level_url = "http://www.atomicincrement.com/bioblox/test/index.php";
+    //string server_for_custom_level_url = "http://quiley.com/BB/server/index.php";
+    //string server_for_custom_level_url = "http://bioblox3d.org/server/";
     byte[] custom_protein_0_bytes;
     byte[] custom_protein_1_bytes;
 
