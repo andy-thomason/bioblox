@@ -15,7 +15,7 @@ public class GetFile
     static public void GetFileFromUserAsync(string objectName, string callbackFuncName)
     {
 #if UNITY_WEBGL
-
+        Debug.Log(callbackFuncName);
         getFileFromBrowser(objectName, callbackFuncName);
 
 #else

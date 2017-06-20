@@ -280,6 +280,9 @@ public class BioBlox : MonoBehaviour
     
     AudioSource[] game_sounds;
 
+    //PRO
+    byte[] file_pdb_bytes;
+
     void Awake()
     {
         //creatt ehe sene manager to keep track of the level
@@ -346,9 +349,13 @@ public class BioBlox : MonoBehaviour
             StartCoroutine(DownloadMolecules());
         else if(current_level == -2)
         {
+
             PDBCustom pbc = FindObjectOfType<PDBCustom>();
+            
+            file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pbc.pdb_file);
+
             custom_protein_name = pbc.pdb_id_input.text.ToUpper();
-            pdb_url = pbc.pdb_url;
+            pdb_url = pbc.pdb_file;
             pdb_chain_0 = pbc.pdb_id_input_chain_0.text.ToUpper();
             pdb_chain_1 = pbc.pdb_id_input_chain_1.text.ToUpper();
             //hide UI elements
@@ -2063,7 +2070,7 @@ public class BioBlox : MonoBehaviour
     string pdb_chain_0;
     string pdb_chain_1;
     string custom_protein_name;
-    string server_for_custom_level_url = "http://www.atomicincrement.com/bioblox/test/index.php";
+    string server_for_custom_level_url = "http://www.atomicincrement.com/bioblox/pro/index.php";
     byte[] custom_protein_0_bytes;
     byte[] custom_protein_1_bytes;
 
@@ -2082,31 +2089,43 @@ public class BioBlox : MonoBehaviour
         Debug.Log(pdb_chain_0);
         //DOWNLOAD PROTEIN 0
         WWWForm www_form = new WWWForm();
+        //www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
         www_form.AddField("url", pdb_url);
         www_form.AddField("chains", "E");
 
+        Debug.Log("ENVIANDO 1");
         WWW custom_www = new WWW(server_for_custom_level_url, www_form);
         yield return custom_www;
         custom_protein_0_bytes = custom_www.bytes;
+        Debug.Log(custom_www.text);
+        Debug.Log("TERMINO 1");
 
         //DOWNLOAD PROTEIN 1
         www_form = new WWWForm();
+       // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
         www_form.AddField("url", pdb_url);
         www_form.AddField("chains", "I");
 
+        Debug.Log("ENVIANDO 2");
         custom_www = new WWW(server_for_custom_level_url, www_form);
         yield return custom_www;
         custom_protein_1_bytes = custom_www.bytes;
+        Debug.Log(custom_www.text);
+        Debug.Log("TERMINO 2");
 
-        using (WWW www = new WWW(pdb_url))
-        {
-            yield return www;
+        //using (WWW www = new WWW(pdb_url))
+        //{
+        //    yield return www;
 
-            if (www.error != null)
-                throw new System.Exception("WWW download had an error:" + www.error);
+        //    if (www.error != null)
+        //        throw new System.Exception("WWW download had an error:" + www.error);
 
-            pdb_file = www.text;
-        }
+        //    pdb_file = www.text;
+        //}
+
+        pdb_file = pdb_url;
 
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         mol1 = make_molecule(custom_protein_name + "." + pdb_chain_0, "Proto1", 7, MeshTopology.Triangles, 0);
