@@ -11,7 +11,6 @@ public class GetFile
     private static extern void getFileFromBrowser(string objectName, string callbackFuncName);
 
 #endif
-
     static public void GetFileFromUserAsync(string objectName, string callbackFuncName)
     {
 #if UNITY_WEBGL

@@ -611,6 +611,7 @@ end_header
         }
         else
         {
+            Debug.Log(atom_centres.Length);
             Vector3 min = atom_centres[b];
             Vector3 max = min;
             for (int j = b; j != e; ++j)

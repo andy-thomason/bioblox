@@ -82,7 +82,7 @@ public class PDB_parser {
         PDB_molecule cur = new PDB_molecule();
         float minx = 1e37f, miny = 1e37f, minz = 1e37f;
         float maxx = -1e37f, maxy = -1e37f, maxz = -1e37f;
-
+        Debug.Log("leyendo parser");
         List<int> serial_to_atom = new List<int>();
         using (StringReader reader = new StringReader(pdb_file)) {
             string line;
@@ -100,12 +100,13 @@ public class PDB_parser {
                     float x = -float.Parse(line.Substring(31 - 1, 8));
                     float y = float.Parse(line.Substring(39 - 1, 8));
                     float z = float.Parse(line.Substring(47 - 1, 8));
-                    float r = radii[line.Substring(77 - 1, 2)];
+                    float r = radii[line.Substring(77 - 1, 2) == " D" ? " H" : line.Substring(77 - 1, 2)];
                     string aminoAcid = line.Substring(17, 3);
                     string id = line.Substring(13, 3) + ' ' + aminoAcid;
                     string aatag = line.Substring (21, 5);
                     char aa_version = line[16];
 
+                    Debug.Log(id);
                     Color col = Color.white;
                     if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
                         // +Ve: Blue His, Arg, Lys
@@ -123,6 +124,7 @@ public class PDB_parser {
                         col = buttons.HYDROColor;
                     }
 
+                    Debug.Log(aa_version);
                     if (aa_version == ' ' || aa_version == 'A')
                     {
                         while (aminoAcidName.Count < chainNumber)
@@ -162,52 +164,60 @@ public class PDB_parser {
                         minx = Mathf.Min(minx, x); miny = Mathf.Min(miny, y); minz = Mathf.Min(minz, z);
                         maxx = Mathf.Max(maxx, x); maxy = Mathf.Max(maxy, y); maxz = Mathf.Max(maxz, z);
                     }
-                } else if (kind == "CONECT") {
-                    /*int len = line.Length;
-                    int idx = int.Parse(line.Substring(7 - 1, 5));
-                    int a = int.Parse(line.Substring(12 - 1, 5));
-                    pairs.Add((idx << 16) | a);
-                    string sb = line.Substring(17 - 1, 5);
-                    string sc = line.Substring(22 - 1, 5);
-                    if (sb != "     ") {
-                        int b = int.Parse(sb);
-                        pairs.Add((idx << 16) | b);
-                    }
-                    if (sc != "     ") {
-                        int c = int.Parse(sc);
-                        pairs.Add((idx << 16) | c);
-                    }*/
-                } else if(kind == "BBSPNG"){
-                    int firstLabel = int.Parse(line.Substring(7, 4));
-                    int secondLabel = int.Parse(line.Substring(13, 4));
-                    springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
-                } else if (kind == "BBPAIR") {
-                    int firstLabel = int.Parse(line.Substring(7, 4));
-                    int secondLabel = int.Parse(line.Substring(13, 4));
-                    pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
-                } else if (kind == "BIOB  ") {
-                    int labelIndex = int.Parse(line.Substring(7, 4));
-                    int atomSerial = int.Parse(line.Substring(12, 4));
-                    int molNumber = int.Parse(line.Substring(17, 4));
-                    ////string tag = line.Substring(22, 4);
-                    //while(labels.Count < molNumber + 1)
-                    //{
-                    //    labels.Add(new List<PDB_molecule.Label>());
-                    //}
-                    //while(labels[molNumber].Count < labelIndex + 1)
-                    //{
-                    //    labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
-                    //}
-                    ////Debug.Log( atomSerial + " added to " + labelIndex);
-                    //labels[molNumber][labelIndex].atomIds.Add(atomSerial);
-                } 
+                }
+                //else if (kind == "CONECT")
+                //{
+                //    /*int len = line.Length;
+                //    int idx = int.Parse(line.Substring(7 - 1, 5));
+                //    int a = int.Parse(line.Substring(12 - 1, 5));
+                //    pairs.Add((idx << 16) | a);
+                //    string sb = line.Substring(17 - 1, 5);
+                //    string sc = line.Substring(22 - 1, 5);
+                //    if (sb != "     ") {
+                //        int b = int.Parse(sb);
+                //        pairs.Add((idx << 16) | b);
+                //    }
+                //    if (sc != "     ") {
+                //        int c = int.Parse(sc);
+                //        pairs.Add((idx << 16) | c);
+                //    }*/
+                //}
+                //else if (kind == "BBSPNG")
+                //{
+                //    int firstLabel = int.Parse(line.Substring(7, 4));
+                //    int secondLabel = int.Parse(line.Substring(13, 4));
+                //    springPairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
+                //}
+                //else if (kind == "BBPAIR")
+                //{
+                //    int firstLabel = int.Parse(line.Substring(7, 4));
+                //    int secondLabel = int.Parse(line.Substring(13, 4));
+                //    pairs.Add(new Tuple<int, int>(firstLabel, secondLabel));
+                //}
+                //else if (kind == "BIOB  ")
+                //{
+                //    int labelIndex = int.Parse(line.Substring(7, 4));
+                //    int atomSerial = int.Parse(line.Substring(12, 4));
+                //    int molNumber = int.Parse(line.Substring(17, 4));
+                //    ////string tag = line.Substring(22, 4);
+                //    //while(labels.Count < molNumber + 1)
+                //    //{
+                //    //    labels.Add(new List<PDB_molecule.Label>());
+                //    //}
+                //    //while(labels[molNumber].Count < labelIndex + 1)
+                //    //{
+                //    //    labels[molNumber].Add(new PDB_molecule.Label(labelIndex));
+                //    //}
+                //    ////Debug.Log( atomSerial + " added to " + labelIndex);
+                //    //labels[molNumber][labelIndex].atomIds.Add(atomSerial);
+                //}
             }
         }
 
 
         cur.names = names.ToArray();
         cur.atomNames = atomNames.ToArray();
-
+        Debug.Log("acaca");
 
         // pos is 
         cur.pos.x = (maxx + minx) * 0.5f;
@@ -225,7 +235,8 @@ public class PDB_parser {
                 cur.aminoAcidsAtomIds.Add(aminoAcidAtomIDs[i].ToArray());
             }
         }
-                
+
+        Debug.Log("acaca1");
         cur.atom_centres = new Vector3[atom_centres.Count];
         cur.atom_colours = atom_colours.ToArray();
         cur.atom_radii = atom_radii.ToArray();
@@ -242,6 +253,7 @@ public class PDB_parser {
         }*/
         cur.name = asset_name + "." + chains;
         cur.build_mesh();
+        Debug.Log("acaca2");
         return cur;
     }
 
@@ -254,6 +266,13 @@ public class PDB_parser {
             mols[name] = mol;
         }
         return mols[name];
+    }
+
+    public static void caca(string pdb_file)
+    {
+        
+        Debug.Log(pdb_file);
+            PDB_molecule mol = parse("5PTI", "E", pdb_file);
     }
 }
 

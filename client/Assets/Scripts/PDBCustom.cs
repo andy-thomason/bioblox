@@ -19,6 +19,8 @@ public class PDBCustom : MonoBehaviour {
     public string pdb_1_temp;
     public string pdb_2_temp;
 
+    int pdb_id;
+
     // Use this for initialization
     void Start ()
     {
@@ -30,32 +32,42 @@ public class PDBCustom : MonoBehaviour {
 	}
 
     //FIRST PDB
-    public void load_pdb_id_1()
+    public void load_pdb_id(int id_pdb_temp)
     {
+        pdb_id = id_pdb_temp;
         FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
         // NOTE: gameObject.name MUST BE UNIQUE!!!!
-        GetFile.GetFileFromUserAsync(gameObject.name, "ReceivePDB_one");
+        GetFile.GetFileFromUserAsync(gameObject.name, "ReceivePDB");
         //StartCoroutine(check_pdb_id_IE());
     }
 
     //static string s_dataUrlPrefix = "data:image/png;base64,";
-    public void ReceivePDB_one(string dataUrl)
+    public void ReceivePDB(string dataUrl)
     {
-        Debug.Log("111");
-        pdb_1 = dataUrl;
+        if(pdb_id == 0)
+        {
+            pdb_1 = dataUrl;
+            Debug.Log(pdb_1);
+        }
+        else
+        {
+            pdb_2 = dataUrl;
+            Debug.Log(pdb_2);
+        }
+
         //file_output.text = dataUrl;
-        Debug.Log(pdb_1);
-        StartCoroutine(upload_file_1());
+        StartCoroutine(upload_file());
     }
 
-    IEnumerator upload_file_1()
+    IEnumerator upload_file()
     {
-        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_1);
+        string file_name = pdb_id == 0 ? "file_1.pdb" : "file_2.pdb";
+        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_id == 0 ? pdb_1 : pdb_2);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
-        form.AddBinaryData("file", file_pdb_bytes, "file_1.pdb");
+        form.AddBinaryData("file", file_pdb_bytes, file_name);
 
-        WWW w = new WWW("http://www.atomicincrement.com/bioblox/pro/upload_file.php", form);
+        WWW w = new WWW("http://82.15.223.84/pro/upload_file.php", form);
 
         yield return w;
 
@@ -64,45 +76,31 @@ public class PDBCustom : MonoBehaviour {
        // GetComponent<GameManager>().Custom_ChangeLevel();
     }
 
-    //SECOND PDB
-    public void load_pdb_id_2()
+    public void merge_pdb()
     {
-        FindObjectOfType<SFX>().PlayTrack(SFX.sound_index.button_click);
-        // NOTE: gameObject.name MUST BE UNIQUE!!!!
-        GetFile.GetFileFromUserAsync(gameObject.name, "ReceivePDB_two");
-        //StartCoroutine(check_pdb_id_IE());
-    }
-
-    //static string s_dataUrlPrefix = "data:image/png;base64,";
-    public void ReceivePDB_two(string dataUrl)
-    {
-        Debug.Log("222");
-        pdb_2 = dataUrl;
-        //file_output.text = dataUrl;
+        Debug.Log("****************************");
+        Debug.Log(pdb_1);
         Debug.Log(pdb_2);
-        StartCoroutine(upload_file_2());
-    }
-
-    IEnumerator upload_file_2()
-    {
-        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_2);
-        WWWForm form = new WWWForm();
-        form.AddField("file", "file");
-        form.AddBinaryData("file", file_pdb_bytes, "file_2.pdb");
-
-        WWW w = new WWW("http://www.atomicincrement.com/bioblox/pro/upload_file.php", form);
-
-        yield return w;
-
-        Debug.Log(w.error);
+        Debug.Log("****************************");
         
+        pdb_file = string.Concat(read_pdb_1(pdb_1), read_pdb_2(pdb_2));
+        Debug.Log(pdb_file);
+        StartCoroutine(upload_file_pdb());
+
         //GetComponent<GameManager>().Custom_ChangeLevel();
     }
 
-    public void load_custom_pdbs()
+    string index_amino_to_follow_s;
+    int index_amino_to_follow;
+    string empty_space = "    ";
+    int index_atom = 1;
+    string previous_amino;
+
+    public string read_pdb_1(string pdb_file)
     {
-        pdb_1_temp = string.Empty;
-        using (StringReader reader = new StringReader(pdb_1))
+        index_amino_to_follow_s = string.Empty;
+        string pdb_temp = string.Empty;
+        using (StringReader reader = new StringReader(pdb_file))
         {
             string line;
 
@@ -112,32 +110,67 @@ public class PDBCustom : MonoBehaviour {
 
                 if (kind == "ATOM  ")
                 {
-                    pdb_1_temp = string.Concat(pdb_1_temp, Environment.NewLine, line.Substring(0, Mathf.Max(6, line.Length)));
+                    pdb_temp = pdb_temp != string.Empty ? string.Concat(pdb_temp, Environment.NewLine, string.Concat(line.Substring(0, 21), "A", line.Substring(22, line.Length - 22))) : string.Concat(line.Substring(0, 21), "A", line.Substring(22, (line.Length - 22)));
+                    index_amino_to_follow_s = line.Substring(23, 3);
+                    index_atom++;
                 }
             }
         }
+        Debug.Log("****************************");
+        Debug.Log(pdb_temp);
+        Debug.Log("****************************");
+        return pdb_temp;
 
-        pdb_2_temp = string.Empty;
-        using (StringReader reader = new StringReader(pdb_2))
+    }
+
+    public string read_pdb_2(string pdb_file)
+    {
+        index_amino_to_follow = int.Parse(index_amino_to_follow_s) + 1;
+        string pdb_temp = string.Empty;
+        using (StringReader reader = new StringReader(pdb_file))
         {
             string line;
 
             while ((line = reader.ReadLine()) != null)
             {
-                string kind = line.Substring(0, Mathf.Max(6, line.Length));
+
+                string kind = line.Substring(0, Mathf.Min(6, line.Length));
 
                 if (kind == "ATOM  ")
                 {
-                    pdb_2_temp = string.Concat(pdb_2_temp, Environment.NewLine, line.Substring(0, Mathf.Min(6, line.Length)));
+                    if (index_atom < 1000)
+                        empty_space = "    ";
+                    else
+                        empty_space = "   ";
+                    
+                    string line_0 = string.Concat("ATOM", empty_space, index_atom.ToString(), line.Substring(11, 10));
+
+                    if(previous_amino != line.Substring(17, 3))
+                    {
+                        index_amino_to_follow++;
+                        previous_amino = line.Substring(17, 3);
+                    }
+
+                    if (index_amino_to_follow >= 100)
+                        empty_space = " ";
+                    else if (index_amino_to_follow <= 99 && index_amino_to_follow >= 10)
+                        empty_space = "  ";
+                    else
+                        empty_space = "   ";
+
+                    string line_1 = string.Concat("B", empty_space, index_amino_to_follow.ToString());
+
+                    string line_pdb = string.Concat(line_0, line_1, line.Substring(26, (line.Length - 26)));
+                    pdb_temp = string.Concat(pdb_temp, Environment.NewLine, line_pdb);
+                    index_atom++;
                 }
             }
         }
+        Debug.Log("****************************");
+        Debug.Log(pdb_temp);
+        Debug.Log("****************************");
+        return pdb_temp;
 
-        pdb_file = string.Concat(pdb_1_temp, pdb_2_temp);
-        Debug.Log(pdb_file);
-        StartCoroutine(upload_file_pdb());
-
-        //GetComponent<GameManager>().Custom_ChangeLevel();
     }
 
     IEnumerator upload_file_pdb()
@@ -147,13 +180,13 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, "file_merged.pdb");
 
-        WWW w = new WWW("http://www.atomicincrement.com/bioblox/pro/upload_file.php", form);
+        WWW w = new WWW("http://82.15.223.84/pro/upload_file.php", form);
 
         yield return w;
 
         Debug.Log(w.error);
 
-        //GetComponent<GameManager>().Custom_ChangeLevel();
+        GetComponent<GameManager>().Custom_ChangeLevel();
     }
 
 }

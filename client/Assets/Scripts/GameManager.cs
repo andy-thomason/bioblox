@@ -187,4 +187,27 @@ public class GameManager : MonoBehaviour {
         open_selection_once_at_start = true;
         switch_to_game_mode();
     }
+
+    public void caca()
+    {
+        StartCoroutine(cacaca());
+    }
+    IEnumerator cacaca()
+    {
+        //using (WWW www = new WWW("https://files.rcsb.org/view/2PTC.pdb"))
+        //using (WWW www = new WWW("http://82.15.223.84/pdb_file_merged.pdb"))
+        using (WWW www = new WWW("http://quiley.com/pdb_file_merged.pdb"))
+        {
+            yield return www;
+
+            if (www.error != null)
+                throw new System.Exception("WWW download had an error:" + www.error);
+
+            //pdb_file = www.text;
+            //PDB_parser.caca(www.text);
+            FindObjectOfType<PDBCustom>().pdb_file = www.text;
+        }
+        
+        GetComponent<GameManager>().Custom_ChangeLevel();
+    }
 }
