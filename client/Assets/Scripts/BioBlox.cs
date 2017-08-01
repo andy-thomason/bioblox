@@ -402,6 +402,7 @@ public class BioBlox : MonoBehaviour
 
         //UI INIT
         uiController.init();
+        InvokeRepeating("CalcScore", 1.0f, 0.5f);
         StartCoroutine(game_loop());
         //gm.EndLoading();
 
@@ -410,7 +411,6 @@ public class BioBlox : MonoBehaviour
         //set the hint on the amino buttons
         //find_hint_pairs(molecules_PDB_mesh[0].mol, molecules_PDB_mesh[1].mol);
 
-        //InvokeRepeating("CalcScore", 1.0f, 0.5f);
 
     }
 
@@ -1121,8 +1121,8 @@ public class BioBlox : MonoBehaviour
             //}
 
 
-            Debug.Log(molecules);
-            Debug.Log(molecules.Length);
+            //Debug.Log(molecules);
+            //Debug.Log(molecules.Length);
             //ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
             if (molecules != null && molecules.Length >= 2)
             {
@@ -1219,7 +1219,7 @@ public class BioBlox : MonoBehaviour
                 }
 
 
-                Debug.Log(num_touching_0 + num_touching_1);
+                //Debug.Log(num_touching_0 + num_touching_1);
 
                 //System.IO.File.WriteAllLines(@"C:\Users\Public\LJP.txt", debug_csv.ToArray());
                 //Debug.Log("num_invalid: " + num_invalid);
@@ -1351,16 +1351,16 @@ public class BioBlox : MonoBehaviour
             //Debug.Log(is_score_valid);
         }
         //Debug.Log("lj_atom_graph=" + lj_atom_graph);
-        //if (lj_atom_graph != null && ljp_atom_points != null)
-        //{
-        //    lj_atom_graph.points = ljp_atom_points;
-        //    lj_atom_graph.SetVerticesDirty();
-        //}
+        if (lj_atom_graph != null && ljp_atom_points != null)
+        {
+            lj_atom_graph.points = ljp_atom_points;
+            lj_atom_graph.SetVerticesDirty();
+        }
 
         //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
         ////set color depending if its valid
         //score_bar.color = is_score_valid ? Color.green : Color.red;
-        //lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+        lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)
             sfx.Mute_Track(SFX.sound_index.warning, false);
@@ -1372,11 +1372,13 @@ public class BioBlox : MonoBehaviour
     {
         if (!is_hint_moving && scoring != null)
         {
+            Debug.Log("entro");
             game_score_value = 0;
 
             if (gm.game_type == game_type_mode.science_mode.GetHashCode() || uiController.SavePanel_science.activeSelf || uiController.SavePanel_game.activeSelf)
             {
 
+                Debug.Log("entro2");
                 scoring.calcScore2();
 
                 ie_score = Mathf.Round(scoring.elecScore);
@@ -2081,7 +2083,7 @@ public class BioBlox : MonoBehaviour
     string pdb_chain_0;
     string pdb_chain_1;
     string custom_protein_name;
-    string server_for_custom_level_url = "http://82.15.223.84/pro/index.php";
+    string server_for_custom_level_url = "http://13.58.210.151/index.php";
     byte[] custom_protein_0_bytes;
     byte[] custom_protein_1_bytes;
 
@@ -2178,7 +2180,7 @@ public class BioBlox : MonoBehaviour
         //atoms_disabled = new BitArray[] { bad0, bad1 };
 
         //// Ioannis scoring
-        //scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
+        scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
 
         offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
         offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);

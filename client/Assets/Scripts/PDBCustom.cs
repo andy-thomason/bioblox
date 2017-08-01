@@ -99,7 +99,7 @@ public class PDBCustom : MonoBehaviour {
     public string read_pdb_1(string pdb_file)
     {
         index_amino_to_follow_s = string.Empty;
-        string pdb_temp = string.Empty;
+        string pdb_temp = "HEADER    COMPLEX CUSTOM";
         using (StringReader reader = new StringReader(pdb_file))
         {
             string line;
@@ -110,7 +110,7 @@ public class PDBCustom : MonoBehaviour {
 
                 if (kind == "ATOM  ")
                 {
-                    pdb_temp = pdb_temp != string.Empty ? string.Concat(pdb_temp, Environment.NewLine, string.Concat(line.Substring(0, 21), "A", line.Substring(22, line.Length - 22))) : string.Concat(line.Substring(0, 21), "A", line.Substring(22, (line.Length - 22)));
+                    pdb_temp = string.Concat(pdb_temp, Environment.NewLine, string.Concat(line.Substring(0, 21), "A", line.Substring(22, line.Length - 22)));
                     index_amino_to_follow_s = line.Substring(23, 3);
                     index_atom++;
                 }
