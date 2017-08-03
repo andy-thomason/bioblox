@@ -69,7 +69,7 @@
             '</style>                                                   ',
             '<div class="getfile">                                     ',
             '    <div>                                                  ',
-            '      <label for="file">click to choose an image</label>  ',
+            '      <label for="file">click to choose a PDB file</label>  ',
             '      <input id="file" type="file" accept=".pdb"/><br/>',
             '      <a>cancel</a>                                        ',
             '    </div>                                                 ',
@@ -106,7 +106,7 @@
 		evt.stopPropagation();
 		var fileInput = evt.target.files;
 		if (!fileInput || !fileInput.length) {
-		  return sendError("no image selected");
+		  return sendError("no file selected");
 		}
 		var PDB = window.URL.createObjectURL(fileInput[0]);
 		

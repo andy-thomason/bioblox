@@ -67,7 +67,7 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, file_name);
 
-        WWW w = new WWW("http://82.15.223.84/pro/upload_file.php", form);
+        WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
 
         yield return w;
 
@@ -180,7 +180,7 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, "file_merged.pdb");
 
-        WWW w = new WWW("http://82.15.223.84/pro/upload_file.php", form);
+        WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
 
         yield return w;
 

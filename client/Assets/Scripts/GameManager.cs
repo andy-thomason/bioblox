@@ -206,7 +206,7 @@ public class GameManager : MonoBehaviour {
             //pdb_file = www.text;
             //PDB_parser.caca(www.text);
             FindObjectOfType<PDBCustom>().pdb_file = www.text;
-            Debug.Log(FindObjectOfType<PDBCustom>().pdb_file);
+            //Debug.Log(FindObjectOfType<PDBCustom>().pdb_file);
         }
         
         GetComponent<GameManager>().Custom_ChangeLevel();

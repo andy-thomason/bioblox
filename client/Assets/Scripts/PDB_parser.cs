@@ -82,7 +82,7 @@ public class PDB_parser {
         PDB_molecule cur = new PDB_molecule();
         float minx = 1e37f, miny = 1e37f, minz = 1e37f;
         float maxx = -1e37f, maxy = -1e37f, maxz = -1e37f;
-        Debug.Log("leyendo parser");
+        //Debug.Log("leyendo parser");
         List<int> serial_to_atom = new List<int>();
         using (StringReader reader = new StringReader(pdb_file)) {
             string line;
@@ -106,7 +106,7 @@ public class PDB_parser {
                     string aatag = line.Substring (21, 5);
                     char aa_version = line[16];
 
-                    Debug.Log(id);
+                    //Debug.Log(id);
                     Color col = Color.white;
                     if (id == "NZ  LYS" || id == "NH2 ARG" || id == "NH1 ARG" || id == "ND1 HIS" || id == "NE2 HIS") {
                         // +Ve: Blue His, Arg, Lys
@@ -124,7 +124,7 @@ public class PDB_parser {
                         col = buttons.HYDROColor;
                     }
 
-                    Debug.Log(aa_version);
+                    //Debug.Log(aa_version);
                     if (aa_version == ' ' || aa_version == 'A')
                     {
                         while (aminoAcidName.Count < chainNumber)
@@ -217,7 +217,7 @@ public class PDB_parser {
 
         cur.names = names.ToArray();
         cur.atomNames = atomNames.ToArray();
-        Debug.Log("acaca");
+       // Debug.Log("acaca");
 
         // pos is 
         cur.pos.x = (maxx + minx) * 0.5f;
@@ -236,7 +236,7 @@ public class PDB_parser {
             }
         }
 
-        Debug.Log("acaca1");
+        //Debug.Log("acaca1");
         cur.atom_centres = new Vector3[atom_centres.Count];
         cur.atom_colours = atom_colours.ToArray();
         cur.atom_radii = atom_radii.ToArray();
@@ -253,7 +253,7 @@ public class PDB_parser {
         }*/
         cur.name = asset_name + "." + chains;
         cur.build_mesh();
-        Debug.Log("acaca2");
+        //Debug.Log("acaca2");
         return cur;
     }
 

@@ -367,8 +367,13 @@ public class PlyLoader {
             }
             string line = builder.ToString();
             string[] words = line.Split(' ');
+            //Debug.Log(words[0]);
             switch (words[0])
             {
+                case "":
+                    {
+                    }
+                    break;
                 case "ply":
                     {
                     }

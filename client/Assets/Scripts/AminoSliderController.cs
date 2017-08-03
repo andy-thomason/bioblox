@@ -748,14 +748,17 @@ public class AminoSliderController : MonoBehaviour
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
         {
+            if (atom_buttons_holder.childCount == i)
+                break;
             atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
             atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
             atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
-        
-        atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+
+       // if (atom_buttons_holder.childCount < A_atom_index)
+            atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
 
         ////INSTIATE THE ELEMENT
         //GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
