@@ -1134,6 +1134,10 @@ public class UIController : MonoBehaviour {
     string connections;
     AminoConnectionHolder ach;
 
+    public Text attract_pro;
+    public Text lpj_pro;
+    public Text ei_pro;
+
     public void OpenSavePanel()
     {
         sfx.PlayTrack(SFX.sound_index.button_click);

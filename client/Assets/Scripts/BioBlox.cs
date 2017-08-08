@@ -285,6 +285,12 @@ public class BioBlox : MonoBehaviour
 
     //PRO
     byte[] file_pdb_bytes;
+    public GameObject refinement;
+    ConnectionManager conMan;
+    int direction;
+    int protein_being_refined;
+    bool is_button_from_refinement_pressed_rotation = false;
+    bool is_button_from_refinement_pressed_translation = false;
 
     void Awake()
     {
@@ -303,6 +309,7 @@ public class BioBlox : MonoBehaviour
 #if UNITY_WEBGL
         Application.targetFrameRate = -1;
 #endif
+        conMan = GetComponent<ConnectionManager>();
 
         game_status = GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
@@ -334,14 +341,14 @@ public class BioBlox : MonoBehaviour
         }
 
         //game type
-        if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
-        {
-            SwitchGameMode();
-        }
-        else
-        {
-            SwitchScienceMode();
-        }
+        //if (gm.game_type == GameManager.game_type_mode.game_mode.GetHashCode())
+        //{
+        //    SwitchGameMode();
+        //}
+        //else
+        //{
+        //    SwitchScienceMode();
+        //}
 
         //set the trypsin fiesr level temp
         current_level = gm.current_level;
@@ -550,47 +557,93 @@ public class BioBlox : MonoBehaviour
 
         if (game_status == GameStatus.GameScreen)
         {
-            if (playing)
-                game_time += Time.deltaTime;
-
             if (line_renderer && camera)
             {
                 line_renderer.clear();
             }
-
-
-            //if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
-            //    UpdateHint();
         }
 
-        if (is_hint_moving)
+        if (is_button_from_refinement_pressed_rotation)
         {
-
-            float distCovered = (Time.time - startTime) * speed;
-            float fracJourney = distCovered / journeyLength_0;
-
-            //Debug.Log(molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos);
-
-            molecules[0].transform.localPosition = Vector3.Lerp(molecules[0].transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
-
-            //molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
-
-            molecules[0].transform.localRotation = Quaternion.Lerp(molecules[0].transform.localRotation, Quaternion.identity, fracJourney);
-            molecules[0].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
-
-            fracJourney = distCovered / journeyLength_1;
-
-
-            molecules[1].transform.localPosition = Vector3.Lerp(molecules[1].transform.localPosition, Vector3.zero, fracJourney);
-
-            //molecules[1].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, Vector3.zero, fracJourney);
-
-            molecules[1].transform.localRotation = Quaternion.Lerp(molecules[1].transform.localRotation, Quaternion.identity, fracJourney);
-            molecules[1].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
-
-            //rotate parent(molecules vertical instead of horizontal) if needed. LEvel struct parameter
-            molecules[0].transform.parent.transform.localRotation = Quaternion.Lerp(molecules[0].transform.parent.transform.localRotation, Quaternion.Euler(0, 0, current_level == -2 ? 0 : levels[current_level].docking_degrees), fracJourney);
+            switch (direction)
+            {
+                case 1:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.right, 1);
+                    //Quaternion.Euler(new Vector3(molecules[0].transform.localRotation.x + 1, molecules[0].transform.localRotation.y, molecules[0].transform.localRotation.z));
+                    break;
+                case 2:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.up, 1);
+                    break;
+                case 3:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.forward, 1);
+                    break;
+                case -1:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.left, 1);
+                    break;
+                case -2:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.down, 1);
+                    break;
+                case -3:
+                    molecules[protein_being_refined].transform.Rotate(Vector3.back, 1);
+                    break;
+            }
         }
+
+        if (is_button_from_refinement_pressed_translation)
+        {
+            switch (direction)
+            {
+                case 1:
+                    molecules[protein_being_refined].transform.position += new Vector3(1, 0, 0);
+                    break;
+                case 2:
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 1, 0);
+                    break;
+                case 3:
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, 1);
+                    break;
+                case -1:
+                    molecules[protein_being_refined].transform.position += new Vector3(-1, 0, 0);
+                    break;
+                case -2:
+                    molecules[protein_being_refined].transform.position += new Vector3(0, -1, 0);
+                    break;
+                case -3:
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, -1);
+                    break;
+            }
+        }
+
+
+
+        //if (is_hint_moving)
+        //{
+
+        //    float distCovered = (Time.time - startTime) * speed;
+        //    float fracJourney = distCovered / journeyLength_0;
+
+        //    //Debug.Log(molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos);
+
+        //    molecules[0].transform.localPosition = Vector3.Lerp(molecules[0].transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
+
+        //    //molecules[0].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[0].transform.GetChild(0).transform.localPosition, (molecules_PDB_mesh[0].mol.pos - molecules_PDB_mesh[1].mol.pos), fracJourney);
+
+        //    molecules[0].transform.localRotation = Quaternion.Lerp(molecules[0].transform.localRotation, Quaternion.identity, fracJourney);
+        //    molecules[0].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[0].transform.GetChild(0).transform.localRotation, docking_rotation_0, fracJourney);
+
+        //    fracJourney = distCovered / journeyLength_1;
+
+
+        //    molecules[1].transform.localPosition = Vector3.Lerp(molecules[1].transform.localPosition, Vector3.zero, fracJourney);
+
+        //    //molecules[1].transform.GetChild(0).transform.localPosition = Vector3.Lerp(molecules[1].transform.GetChild(0).transform.localPosition, Vector3.zero, fracJourney);
+
+        //    molecules[1].transform.localRotation = Quaternion.Lerp(molecules[1].transform.localRotation, Quaternion.identity, fracJourney);
+        //    molecules[1].transform.GetChild(0).transform.localRotation = Quaternion.Lerp(molecules[1].transform.GetChild(0).transform.localRotation, docking_rotation_1, fracJourney);
+
+        //    //rotate parent(molecules vertical instead of horizontal) if needed. LEvel struct parameter
+        //    molecules[0].transform.parent.transform.localRotation = Quaternion.Lerp(molecules[0].transform.parent.transform.localRotation, Quaternion.Euler(0, 0, current_level == -2 ? 0 : levels[current_level].docking_degrees), fracJourney);
+        //}
     }
 
     void PopInSound(GameObject g)
@@ -835,7 +888,6 @@ public class BioBlox : MonoBehaviour
     //aca se mueve
     void ApplyReturnToOriginForce()
     {
-        ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
         //if (conMan.SliderStrings.value > 0.5) {
         for (int i = 0; i < molecules.Length; ++i)
         {
@@ -997,7 +1049,6 @@ public class BioBlox : MonoBehaviour
                 PopInSound(mol2.gameObject);
 
                 //this is the connection manager for the complex game, it handles grappling between the molecules
-                ConnectionManager conMan = gameObject.GetComponent<ConnectionManager>();
                 /*
                 for (int i = 0; i < dockSliders.Count; ++i) {
                     dockSliders[i].maxValue =  conMan.maxDistance;
@@ -1335,7 +1386,7 @@ public class BioBlox : MonoBehaviour
                 //#endregion
             }
 
-            if (eventSystem != null && eventSystem.IsActive() && is_force_on)
+            if (eventSystem != null && eventSystem.IsActive() && refinement.activeSelf)
             {
                 ApplyReturnToOriginForce();
             }
@@ -1349,21 +1400,26 @@ public class BioBlox : MonoBehaviour
 
             number_total_atoms = num_touching_0 + num_touching_1;
 
+            //PANEL REFINEMENT
+            if (number_total_atoms != 0 && conMan.SliderStrings.value == 0)
+                toggle_refinement(true);
+            else
+                toggle_refinement(false);
 
             //change color here
             //Debug.Log(is_score_valid);
         }
         //Debug.Log("lj_atom_graph=" + lj_atom_graph);
-        if (lj_atom_graph != null && ljp_atom_points != null)
-        {
-            lj_atom_graph.points = ljp_atom_points;
-            lj_atom_graph.SetVerticesDirty();
-        }
+        //if (lj_atom_graph != null && ljp_atom_points != null)
+        //{
+        //    lj_atom_graph.points = ljp_atom_points;
+        //    lj_atom_graph.SetVerticesDirty();
+        //}
 
-        //connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
-        ////set color depending if its valid
-        //score_bar.color = is_score_valid ? Color.green : Color.red;
-        lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
+        ////connection_slider_image.color = is_score_valid ? slider_valid_color : Color.red;
+        //////set color depending if its valid
+        ////score_bar.color = is_score_valid ? Color.green : Color.red;
+        //lj_atom_graph.color = is_score_valid ? Color.green : Color.red;
 
         if (!is_score_valid)
             sfx.Mute_Track(SFX.sound_index.warning, false);
@@ -1384,22 +1440,26 @@ public class BioBlox : MonoBehaviour
                 ie_score = Mathf.Round(scoring.elecScore);
                 lpj_score = Mathf.Round(-1 * scoring.vdwScore);
 
-                if ((num_touching_0 + num_touching_1) == 0)
-                    game_score_value = 0;
-                else
-                    game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
+                //if ((num_touching_0 + num_touching_1) == 0)
+                //    game_score_value = 0;
+                //else
+                //    game_score_value = Mathf.Max(-1000.0f, (lpj_score + ie_score));
 
                 
-                ElectricScore.text = "" + ie_score;
-                LennardScore.text = "" + lpj_score;
-                touching_atoms.text = "" + (num_touching_0 + num_touching_1);
-                
+                //ElectricScore.text = "" + ie_score;
+                //LennardScore.text = "" + lpj_score;
+                //touching_atoms.text = "" + (num_touching_0 + num_touching_1);
+
 
                 //when saved panel is on
-                
-                uiController.n_atoms.text = ElectricScore.text;
-                uiController.lpj.text = LennardScore.text;
-                uiController.ei.text = touching_atoms.text;
+
+                //uiController.n_atoms.text = ElectricScore.text;
+                //uiController.lpj.text = LennardScore.text;
+                //uiController.ei.text = touching_atoms.text;
+
+                uiController.lpj_pro.text = Mathf.Abs(lpj_score) > 500 ? "error" : lpj_score.ToString();
+                uiController.ei_pro.text = Mathf.Abs(ie_score) > 500 ? "error" : ie_score.ToString();
+                uiController.attract_pro.text = (lpj_score+ie_score).ToString();
 
                 if (lpj_score > 999 || lpj_score < -999)
                 {
@@ -2643,63 +2703,73 @@ public class BioBlox : MonoBehaviour
         loading_text.text = string.Concat(loading_value.ToString(), "%");
     }
 
-    bool is_force_on = true;
-    public void toggle_force()
+    // CODE - X = 1, Y = 2, Z = 3, -X = -1, Y = -2, Z = -3
+    public void protein_refinement_movement_0(int direction_temp)
     {
-        molecules[0].GetComponent<Rigidbody>().isKinematic = is_force_on;
-        molecules[1].GetComponent<Rigidbody>().isKinematic = is_force_on;
-        is_force_on = !is_force_on;
+        is_button_from_refinement_pressed_translation = true;
+        direction = direction_temp;
+        protein_being_refined = 0;
+    }
+
+    public void protein_refinement_movement_1(int direction_temp)
+    {
+        is_button_from_refinement_pressed_translation = true;
+        direction = direction_temp;
+        protein_being_refined = 1;
     }
 
     // CODE - X = 1, Y = 2, Z = 3, -X = -1, Y = -2, Z = -3
-    public void protein_0_movement(int direction)
+    public void protein_refinement_rotation_0(int direction_temp)
     {
-        switch (direction)
-        {
-            case 1:
-                molecules[0].transform.position += new Vector3(1, 0, 0);
-                break;
-            case 2:
-                molecules[0].transform.position += new Vector3(0, 1, 0);
-                break;
-            case 3:
-                molecules[0].transform.position += new Vector3(0, 0, 1);
-                break;
-            case -1:
-                molecules[0].transform.position += new Vector3(-1, 0, 0);
-                break;
-            case -2:
-                molecules[0].transform.position += new Vector3(0, -1, 0);
-                break;
-            case -3:
-                molecules[0].transform.position += new Vector3(0, 0, -1);
-                break;
-        }
+        is_button_from_refinement_pressed_rotation = true;
+        direction = direction_temp;
+        protein_being_refined = 0;
     }
 
-    public void protein_1_movement(int direction)
+    // CODE - X = 1, Y = 2, Z = 3, -X = -1, Y = -2, Z = -3
+    public void protein_refinement_rotation_1(int direction_temp)
     {
-        switch (direction)
-        {
-            case 1:
-                molecules[1].transform.position += new Vector3(1, 0, 0);
-                break;
-            case 2:
-                molecules[1].transform.position += new Vector3(0, 1, 0);
-                break;
-            case 3:
-                molecules[1].transform.position += new Vector3(0, 0, 1);
-                break;
-            case -1:
-                molecules[1].transform.position += new Vector3(-1, 0, 0);
-                break;
-            case -2:
-                molecules[1].transform.position += new Vector3(0, -1, 0);
-                break;
-            case -3:
-                molecules[1].transform.position += new Vector3(0, 0, -1);
-                break;
-        }
+        is_button_from_refinement_pressed_rotation = true;
+        direction = direction_temp;
+        protein_being_refined = 1;
+    }
+
+    //public void protein_1_movement(int direction)
+    //{
+    //    switch (direction)
+    //    {
+    //        case 1:
+    //            molecules[1].transform.position += new Vector3(1, 0, 0);
+    //            break;
+    //        case 2:
+    //            molecules[1].transform.position += new Vector3(0, 1, 0);
+    //            break;
+    //        case 3:
+    //            molecules[1].transform.position += new Vector3(0, 0, 1);
+    //            break;
+    //        case -1:
+    //            molecules[1].transform.position += new Vector3(-1, 0, 0);
+    //            break;
+    //        case -2:
+    //            molecules[1].transform.position += new Vector3(0, -1, 0);
+    //            break;
+    //        case -3:
+    //            molecules[1].transform.position += new Vector3(0, 0, -1);
+    //            break;
+    //    }
+    //}
+
+    public void on_refinement_release()
+    {
+        is_button_from_refinement_pressed_rotation = false;
+        is_button_from_refinement_pressed_translation = false;
+    }
+
+    public void toggle_refinement(bool status)
+    {
+        molecules[0].GetComponent<Rigidbody>().isKinematic = status;
+        molecules[1].GetComponent<Rigidbody>().isKinematic = status;
+        refinement.SetActive(status);
     }
 
 }
