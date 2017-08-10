@@ -365,7 +365,6 @@ public class BioBlox : MonoBehaviour
             file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pbc.pdb_file);
 
             //custom_protein_name = pbc.pdb_id_input.text.ToUpper();
-            custom_protein_name = "TEST";
             pdb_url = pbc.pdb_file;
             //pdb_chain_0 = pbc.pdb_id_input_chain_0.text.ToUpper();
             //pdb_chain_1 = pbc.pdb_id_input_chain_1.text.ToUpper();
@@ -568,23 +567,23 @@ public class BioBlox : MonoBehaviour
             switch (direction)
             {
                 case 1:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.right, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.right, 0.2f, Space.World);
                     //Quaternion.Euler(new Vector3(molecules[0].transform.localRotation.x + 1, molecules[0].transform.localRotation.y, molecules[0].transform.localRotation.z));
                     break;
                 case 2:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.up, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.up, 0.2f, Space.World);
                     break;
                 case 3:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.forward, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.forward, 0.2f, Space.World);
                     break;
                 case -1:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.left, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.left, 0.2f, Space.World);
                     break;
                 case -2:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.down, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.down, 0.2f, Space.World);
                     break;
                 case -3:
-                    molecules[protein_being_refined].transform.Rotate(Vector3.back, 1);
+                    molecules[protein_being_refined].transform.Rotate(Vector3.back, 0.2f, Space.World);
                     break;
             }
         }
@@ -594,22 +593,22 @@ public class BioBlox : MonoBehaviour
             switch (direction)
             {
                 case 1:
-                    molecules[protein_being_refined].transform.position += new Vector3(1, 0, 0);
+                    molecules[protein_being_refined].transform.position += new Vector3(0.1f, 0, 0);
                     break;
                 case 2:
-                    molecules[protein_being_refined].transform.position += new Vector3(0, 1, 0);
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 0.1f, 0);
                     break;
                 case 3:
-                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, 1);
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, 0.1f);
                     break;
                 case -1:
-                    molecules[protein_being_refined].transform.position += new Vector3(-1, 0, 0);
+                    molecules[protein_being_refined].transform.position += new Vector3(-0.1f, 0, 0);
                     break;
                 case -2:
-                    molecules[protein_being_refined].transform.position += new Vector3(0, -1, 0);
+                    molecules[protein_being_refined].transform.position += new Vector3(0, -0.1f, 0);
                     break;
                 case -3:
-                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, -1);
+                    molecules[protein_being_refined].transform.position += new Vector3(0, 0, -0.1f);
                     break;
             }
         }
@@ -2142,7 +2141,6 @@ public class BioBlox : MonoBehaviour
     string pdb_url;
     string pdb_chain_0;
     string pdb_chain_1;
-    string custom_protein_name;
     string server_for_custom_level_url = "http://13.58.210.151/index.php";
     byte[] custom_protein_0_SE_bytes;
     byte[] custom_protein_0_BS_bytes;
@@ -2270,9 +2268,9 @@ public class BioBlox : MonoBehaviour
         pdb_file = pdb_url;
         //Debug.Log(pdb_file);
         // Make two PDB_mesh instances from the PDB file and a chain selection.
-        mol1 = make_molecule(custom_protein_name + "." + pdb_chain_0, "Proto1", 7, MeshTopology.Triangles, 0);
+        mol1 = make_molecule(gm.pdb_custom_1_name + "." + pdb_chain_0, "Proto1", 7, MeshTopology.Triangles, 0);
         mol1.transform.SetParent(Molecules);
-        mol2 = make_molecule(custom_protein_name + "." + pdb_chain_1, "Proto2", 7, MeshTopology.Triangles, 1);
+        mol2 = make_molecule(gm.pdb_custom_2_name + "." + pdb_chain_1, "Proto2", 7, MeshTopology.Triangles, 1);
         mol2.transform.SetParent(Molecules);
        // Debug.Log("TERMINO 3");
 
@@ -2281,12 +2279,12 @@ public class BioBlox : MonoBehaviour
 
         //create holder of amino views
         GameObject molecule_0_views = new GameObject();
-        molecule_0_views.name = "molecule_0";
+        molecule_0_views.name = gm.pdb_custom_1_name;
         molecule_0_views.transform.SetParent(mol1.transform);
 
         //create holder of amino views
         GameObject molecule_1_views = new GameObject();
-        molecule_1_views.name = "molecule_1";
+        molecule_1_views.name = gm.pdb_custom_2_name;
         molecule_1_views.transform.SetParent(mol2.transform);
 
         yield return new WaitForEndOfFrame();
@@ -2770,6 +2768,12 @@ public class BioBlox : MonoBehaviour
         molecules[0].GetComponent<Rigidbody>().isKinematic = status;
         molecules[1].GetComponent<Rigidbody>().isKinematic = status;
         refinement.SetActive(status);
+        if(!status)
+        {
+            is_button_from_refinement_pressed_rotation = false;
+            is_button_from_refinement_pressed_translation = false;
+
+        }
     }
 
 }

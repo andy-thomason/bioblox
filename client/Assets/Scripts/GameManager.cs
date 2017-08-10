@@ -32,6 +32,8 @@ public class GameManager : MonoBehaviour {
     public bool is_tutorial = false;
 
     public GameObject welcome_tutorial;
+    public string pdb_custom_1_name;
+    public string pdb_custom_2_name;
 
     void Awake()
     {
@@ -188,15 +190,17 @@ public class GameManager : MonoBehaviour {
         switch_to_game_mode();
     }
 
-    public void caca()
+    public void load_merge_test()
     {
-        StartCoroutine(cacaca());
+        StartCoroutine(load_merge_test_corutine());
     }
-    IEnumerator cacaca()
+
+    IEnumerator load_merge_test_corutine()
     {
         //using (WWW www = new WWW("https://files.rcsb.org/view/2PTC.pdb"))
         //using (WWW www = new WWW("http://82.15.223.84/pdb_file_merged.pdb"))
-        using (WWW www = new WWW("http://quiley.com/pdb_file_merged.pdb"))
+        //using (WWW www = new WWW("http://quiley.com/pdb_file_merged.pdb"))
+        using (WWW www = new WWW("http://13.58.210.151/bb_data/2TGT-5PTI.pdb"))
         {
             yield return www;
 

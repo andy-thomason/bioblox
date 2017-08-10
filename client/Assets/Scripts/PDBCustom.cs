@@ -15,19 +15,34 @@ public class PDBCustom : MonoBehaviour {
     public string pdb_file;
     public GameObject pdb_error;
     Stream stream;
+    GameManager gm;
 
     public string pdb_1_temp;
     public string pdb_2_temp;
+    public Text pdb_id_1;
+    public Text pdb_id_2;
+    bool is_pdb_1_loaded = false;
+    bool is_pdb_2_loaded = false;
+    public Button load_1_2;
+
+    public Text pdb_id_complex;
+    bool is_pdb_complex1_loaded = false;
+    public Button load_complex;
+
+    public string pdb_custom_1_name;
+    public string pdb_custom_2_name;
 
     int pdb_id;
 
     // Use this for initialization
     void Start ()
     {
-	}
+        gm = GetComponent<GameManager>();
+    }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 		
 	}
 
@@ -48,12 +63,23 @@ public class PDBCustom : MonoBehaviour {
         {
             pdb_1 = dataUrl;
             Debug.Log(pdb_1);
+            is_pdb_1_loaded = true;
+            pdb_custom_1_name = pdb_1.Substring(62, 4);
+            pdb_id_1.text = pdb_custom_1_name;
+            gm.pdb_custom_1_name = pdb_custom_1_name;
         }
         else
         {
             pdb_2 = dataUrl;
             Debug.Log(pdb_2);
+            is_pdb_2_loaded = true;
+            pdb_custom_2_name = pdb_2.Substring(62, 4);
+            pdb_id_2.text = pdb_custom_2_name;
+            gm.pdb_custom_2_name = pdb_custom_2_name;
         }
+
+        if (is_pdb_1_loaded && is_pdb_2_loaded)
+            load_1_2.interactable = true;
 
         //file_output.text = dataUrl;
         StartCoroutine(upload_file());
@@ -61,7 +87,8 @@ public class PDBCustom : MonoBehaviour {
 
     IEnumerator upload_file()
     {
-        string file_name = pdb_id == 0 ? "file_1.pdb" : "file_2.pdb";
+        //GET THE ID OF EACH FILE
+        string file_name = pdb_id == 0 ? string.Concat(pdb_custom_1_name, ".pdb") : string.Concat(pdb_custom_2_name, ".pdb");
         byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_id == 0 ? pdb_1 : pdb_2);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
@@ -99,7 +126,7 @@ public class PDBCustom : MonoBehaviour {
     public string read_pdb_1(string pdb_file)
     {
         index_amino_to_follow_s = string.Empty;
-        string pdb_temp = "HEADER    COMPLEX CUSTOM";
+        string pdb_temp = string.Concat("HEADER    ", pdb_custom_1_name, "-", pdb_custom_2_name);
         using (StringReader reader = new StringReader(pdb_file))
         {
             string line;
@@ -178,7 +205,7 @@ public class PDBCustom : MonoBehaviour {
         byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_file);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
-        form.AddBinaryData("file", file_pdb_bytes, "file_merged.pdb");
+        form.AddBinaryData("file", file_pdb_bytes, string.Concat(pdb_custom_1_name, "-", pdb_custom_2_name, ".pdb"));
 
         WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
 
