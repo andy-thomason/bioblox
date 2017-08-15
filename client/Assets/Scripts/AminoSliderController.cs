@@ -26,6 +26,7 @@ public class AminoSliderController : MonoBehaviour
     public GameObject AminoLinkPanel;
     // Amino acid links panel.
     public GameObject _AminoLinkPanel;
+    public GameObject _AminoLinkPanel_atom;
     public GameObject AminoLinkPanelParent;
     public RectTransform AminoLinkBackground;
     float[] button_displace = { 22.7f, -3.7f };
@@ -743,22 +744,32 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
 
-        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform;
+        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform.GetChild(0).transform.GetChild(0);
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
         {
-            if (atom_buttons_holder.childCount == i)
-                break;
-            atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
-            atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+            GameObject temp_atom = Instantiate(_AminoLinkPanel_atom);
+            temp_atom.transform.SetParent(atom_buttons_holder, false);
+            temp_atom.GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
+            temp_atom.GetComponent<AtomConnectionController>().protein_id = 0;
+            temp_atom.GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
-       // if (atom_buttons_holder.childCount < A_atom_index)
-            atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+        ////go throuygh atoms and enable
+        //for (int i = 0; i < A_atoms.Length; i++)
+        //{
+        //    if (atom_buttons_holder.childCount == i)
+        //        break;
+        //    atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
+        //    atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+        //}
+
+        // if (atom_buttons_holder.childCount < A_atom_index)
+        atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
 
         ////INSTIATE THE ELEMENT
         //GameObject temp_reference = Instantiate(atom_conn[A_atom_element]);
@@ -789,17 +800,27 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
 
-        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform;
+        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform.GetChild(0).transform.GetChild(0);
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
         {
-            atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
-            atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+            GameObject temp_atom = Instantiate(_AminoLinkPanel_atom);
+            temp_atom.transform.SetParent(atom_buttons_holder, false);
+            temp_atom.GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
+            temp_atom.GetComponent<AtomConnectionController>().protein_id = 1;
+            temp_atom.GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
+
+        ////go throuygh atoms and enable
+        //for (int i = 0; i < A_atoms.Length; i++)
+        //{
+        //    atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+        //    atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
+        //    atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+        //}
 
         atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
 
@@ -1177,25 +1198,23 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT1_name = A_atom;
 
-        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform;
+
+        Transform atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(1).transform.GetChild(5).transform.GetChild(0).GetChild(0);
 
         //go throuygh disable them all
-        for (int i = 0; i < 14; i++)
+        foreach(Transform son in atom_buttons_holder)
         {
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = false;
-            atom_buttons_holder.GetChild(i).GetComponent<Image>().color = normal_atom_color;
+            Destroy(son.gameObject);
         }
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
         {
-            atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
-            atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+            GameObject temp_atom = Instantiate(_AminoLinkPanel_atom);
+            temp_atom.transform.SetParent(atom_buttons_holder, false);
+            temp_atom.GetComponentInChildren<Text>().text = P1_mol.atomNames[A_atoms[i]];
+            temp_atom.GetComponent<AtomConnectionController>().protein_id = 0;
+            temp_atom.GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
 
@@ -1230,25 +1249,21 @@ public class AminoSliderController : MonoBehaviour
         //seting atom name
         AminoLinkPanelReference.GetComponent<AminoConnectionHolder>().AT2_name = A_atom;
 
-        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform;
+        atom_buttons_holder = AminoLinkPanelReference.transform.GetChild(2).transform.GetChild(5).transform.GetChild(0).GetChild(0);
 
-        //go throuygh disable them all
-        for (int i = 0; i < 14; i++)
+        foreach (Transform son in atom_buttons_holder)
         {
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 0;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = false;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = false;
-            atom_buttons_holder.GetChild(i).GetComponent<Image>().color = normal_atom_color;
+            Destroy(son.gameObject);
         }
 
         //go throuygh atoms and enable
         for (int i = 0; i < A_atoms.Length; i++)
         {
-            atom_buttons_holder.GetChild(i).GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
-            atom_buttons_holder.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
-            atom_buttons_holder.GetChild(i).GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
+            GameObject temp_atom = Instantiate(_AminoLinkPanel_atom);
+            temp_atom.transform.SetParent(atom_buttons_holder, false);
+            temp_atom.GetComponentInChildren<Text>().text = P2_mol.atomNames[A_atoms[i]];
+            temp_atom.GetComponent<AtomConnectionController>().protein_id = 1;
+            temp_atom.GetComponent<AtomConnectionController>().atom_id = A_atoms[i];
         }
 
         atom_buttons_holder.GetChild(A_atom_index).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
@@ -1604,16 +1619,16 @@ public class AminoSliderController : MonoBehaviour
         if(protein_id == 0)
         {
             atom_selected_p1 = atom_child_index;
-            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.normal_button_color;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(0).GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.normal_button_color;
             current_atom_child_id0 = atom_child_index;
-            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(0).GetChild(current_atom_child_id0).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
         }
         else
         {
             atom_selected_p2 = atom_child_index;
-            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.normal_button_color;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(0).GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.normal_button_color;
             current_atom_child_id1 = atom_child_index;
-            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
+            SliderMol[protein_id].transform.GetChild(amino_child_index + 1).transform.GetChild(0).transform.GetChild(0).GetChild(current_atom_child_id1).GetComponent<Image>().color = uIController.GridToggleColor_pressed;
         }
 
         //if (current_atom_child_id0 != -1)

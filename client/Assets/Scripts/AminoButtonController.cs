@@ -21,7 +21,8 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
     AminoSliderController aminoSli;
     UIController ui;
     int selected_index = 0;
-    public GameObject AminoButton_Atom;
+    public GameObject AminoButton_Atom_2;
+    public GameObject atom;
     public Sprite OpenAtomPanel;
     public Sprite CloseAtomPanel;
     bool is_AminoButton_Atom_open = false;
@@ -193,7 +194,7 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
         if(!is_AminoButton_Atom_open)
         {
             transform.GetChild(2).GetComponent<Image>().sprite = CloseAtomPanel;
-            GameObject temp_panel = Instantiate(AminoButton_Atom);
+            GameObject temp_panel = Instantiate(AminoButton_Atom_2);
             temp_panel.transform.SetParent(transform.parent, false);
             temp_panel.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
             aminoSli.current_atom_child_id0 = aminoSli.current_atom_child_id1 = 0;
@@ -218,15 +219,29 @@ public class AminoButtonController : MonoBehaviour, IPointerClickHandler {
             //go throuygh atoms and enable
             for (int i = 0; i < A_atoms.Length; i++)
             {
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponentInChildren<Text>().text = P_mol.atomNames[A_atoms[i]];
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().protein_id = protein_id;
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().atom_id = A_atoms[i];
-                temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().amino_child_index = AminoButtonID;
+                GameObject temp_atom = Instantiate(atom);
+                //set son
+                temp_atom.transform.SetParent(temp_panel.transform.GetChild(0).transform.GetChild(0), false);
+
+                temp_atom.transform.GetChild(0).GetComponent<Text>().text = P_mol.atomNames[A_atoms[i]];
+                temp_atom.GetComponent<AtomOnAminoController>().protein_id = protein_id;
+                temp_atom.GetComponent<AtomOnAminoController>().atom_id = A_atoms[i];
+                temp_atom.GetComponent<AtomOnAminoController>().amino_child_index = AminoButtonID;
             }
-            temp_panel.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().color = FindObjectOfType<UIController>().GridToggleColor_pressed;
+            temp_panel.transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().color = FindObjectOfType<UIController>().GridToggleColor_pressed;
+
+            ////go throuygh atoms and enable
+            //for (int i = 0; i < A_atoms.Length; i++)
+            //{
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponentInChildren<Text>().text = P_mol.atomNames[A_atoms[i]];
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().alpha = 1;
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().interactable = true;
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<CanvasGroup>().blocksRaycasts = true;
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().protein_id = protein_id;
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().atom_id = A_atoms[i];
+            //    temp_panel.transform.GetChild(0).transform.GetChild(i).GetComponent<AtomOnAminoController>().amino_child_index = AminoButtonID;
+            //}
+            //temp_panel.transform.GetChild(0).transform.GetChild(0).GetComponent<Image>().color = FindObjectOfType<UIController>().GridToggleColor_pressed;
 
         }
         else

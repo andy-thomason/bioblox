@@ -448,22 +448,22 @@ public class AminoConnectionHolder : MonoBehaviour {
         if(protein_id == 0)
         {
             //remove highlight color previous amino
-            transform.GetChild(1).transform.GetChild(5).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.normal_button_color;
+            transform.GetChild(1).transform.GetChild(5).GetChild(0).GetChild(0).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.normal_button_color;
             AT1_index = atom_child_index;
             connection = cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, atom_child_index, bb.molecules_PDB_mesh[1], ID_button2, AT2_index);
             or.P1_selected_atom_id = atom_index;
             //add highlight color previous amino
-            transform.GetChild(1).transform.GetChild(5).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
+            transform.GetChild(1).transform.GetChild(5).GetChild(0).GetChild(0).transform.GetChild(AT1_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
         }
         else
         {
             //remove highlight color previous amino
-            transform.GetChild(2).transform.GetChild(5).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.normal_button_color;
+            transform.GetChild(2).transform.GetChild(5).GetChild(0).GetChild(0).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.normal_button_color;
             AT2_index = atom_child_index;
             connection = cn.CreateAminoAcidLink_atom_modification(bb.molecules_PDB_mesh[0], ID_button1, AT1_index, bb.molecules_PDB_mesh[1], ID_button2, atom_child_index);
             or.P2_selected_atom_id = atom_index;
             //add highlight color previous amino
-            transform.GetChild(2).transform.GetChild(5).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
+            transform.GetChild(2).transform.GetChild(5).GetChild(0).GetChild(0).transform.GetChild(AT2_index).GetComponent<Image>().color = ui.GridToggleColor_pressed;
         }
     }
 
