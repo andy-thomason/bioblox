@@ -24,7 +24,6 @@ public class PDBCustom : MonoBehaviour {
     public Text pdb_id_2;
     bool is_pdb_1_loaded = false;
     bool is_pdb_2_loaded = false;
-    bool is_pdb_complex_loaded = false;
     public Button load_1_2;
 
     public Text pdb_id_complex;
@@ -70,6 +69,7 @@ public class PDBCustom : MonoBehaviour {
             pdb_custom_1_name = pdb_1.Substring(62, 4);
             pdb_id_1.text = pdb_custom_1_name;
             gm.pdb_custom_1_name = pdb_custom_1_name;
+            StartCoroutine(upload_file());
         }
         else if(pdb_id == 1)
         {
@@ -79,25 +79,30 @@ public class PDBCustom : MonoBehaviour {
             pdb_custom_2_name = pdb_2.Substring(62, 4);
             pdb_id_2.text = pdb_custom_2_name;
             gm.pdb_custom_2_name = pdb_custom_2_name;
+            StartCoroutine(upload_file());
         }
         else if (pdb_id == 2)
         {
-            pdb_complex = pdb_file = dataUrl;
-            Debug.Log(pdb_complex);
-            is_pdb_complex_loaded = true;
-            pdb_custom_complex_name = pdb_complex.Substring(10, 9);
-            pdb_id_complex.text = pdb_custom_complex_name;
-            gm.pdb_custom_complex_name = pdb_custom_complex_name;
+            if (dataUrl.Substring(7, 7) != "BIOBLOX") //invalid
+            {
+                pdb_id_complex.color = Color.red;
+                pdb_id_complex.text = "INVALID PDB FILE";
+            }
+            else
+            {
+                pdb_id_complex.color = Color.white;
+                pdb_complex = pdb_file = dataUrl;
+                Debug.Log(pdb_complex);
+                pdb_custom_complex_name = pdb_complex.Substring(15, 9);
+                pdb_id_complex.text = pdb_custom_complex_name;
+                gm.pdb_custom_complex_name = pdb_custom_complex_name;
+                StartCoroutine(upload_file());
+                load_complex.interactable = true;
+            }
         }
 
         if (is_pdb_1_loaded && is_pdb_2_loaded)
             load_1_2.interactable = true;
-
-        if (is_pdb_complex_loaded)
-            load_complex.interactable = true;
-
-        //file_output.text = dataUrl;
-        StartCoroutine(upload_file());
     }
 
     IEnumerator upload_file()
@@ -141,7 +146,7 @@ public class PDBCustom : MonoBehaviour {
     public string read_pdb_1(string pdb_file)
     {
         index_amino_to_follow_s = string.Empty;
-        string pdb_temp = string.Concat("HEADER    ", pdb_custom_1_name, "-", pdb_custom_2_name);
+        string pdb_temp = string.Concat("HEADER BIOBLOX ", pdb_custom_1_name, "-", pdb_custom_2_name);
         using (StringReader reader = new StringReader(pdb_file))
         {
             string line;
