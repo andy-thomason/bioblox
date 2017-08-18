@@ -12,6 +12,7 @@ public class PDBCustom : MonoBehaviour {
     public InputField pdb_id_input_chain_1;
     public string pdb_1;
     public string pdb_2;
+    public string pdb_complex;
     public string pdb_file;
     public GameObject pdb_error;
     Stream stream;
@@ -23,6 +24,7 @@ public class PDBCustom : MonoBehaviour {
     public Text pdb_id_2;
     bool is_pdb_1_loaded = false;
     bool is_pdb_2_loaded = false;
+    bool is_pdb_complex_loaded = false;
     public Button load_1_2;
 
     public Text pdb_id_complex;
@@ -31,6 +33,7 @@ public class PDBCustom : MonoBehaviour {
 
     public string pdb_custom_1_name;
     public string pdb_custom_2_name;
+    public string pdb_custom_complex_name;
 
     int pdb_id;
 
@@ -68,7 +71,7 @@ public class PDBCustom : MonoBehaviour {
             pdb_id_1.text = pdb_custom_1_name;
             gm.pdb_custom_1_name = pdb_custom_1_name;
         }
-        else
+        else if(pdb_id == 1)
         {
             pdb_2 = dataUrl;
             Debug.Log(pdb_2);
@@ -77,9 +80,21 @@ public class PDBCustom : MonoBehaviour {
             pdb_id_2.text = pdb_custom_2_name;
             gm.pdb_custom_2_name = pdb_custom_2_name;
         }
+        else if (pdb_id == 2)
+        {
+            pdb_complex = pdb_file = dataUrl;
+            Debug.Log(pdb_complex);
+            is_pdb_complex_loaded = true;
+            pdb_custom_complex_name = pdb_complex.Substring(10, 9);
+            pdb_id_complex.text = pdb_custom_complex_name;
+            gm.pdb_custom_complex_name = pdb_custom_complex_name;
+        }
 
         if (is_pdb_1_loaded && is_pdb_2_loaded)
             load_1_2.interactable = true;
+
+        if (is_pdb_complex_loaded)
+            load_complex.interactable = true;
 
         //file_output.text = dataUrl;
         StartCoroutine(upload_file());
@@ -88,8 +103,8 @@ public class PDBCustom : MonoBehaviour {
     IEnumerator upload_file()
     {
         //GET THE ID OF EACH FILE
-        string file_name = pdb_id == 0 ? string.Concat(pdb_custom_1_name, ".pdb") : string.Concat(pdb_custom_2_name, ".pdb");
-        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_id == 0 ? pdb_1 : pdb_2);
+        string file_name = pdb_id == 0 ? string.Concat(pdb_custom_1_name, ".pdb") : pdb_id == 1 ? string.Concat(pdb_custom_2_name, ".pdb") : string.Concat(pdb_custom_complex_name, "_complex.pdb");
+        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_id == 0 ? pdb_1 : pdb_id == 1 ? pdb_2: pdb_complex);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, file_name);
@@ -214,6 +229,11 @@ public class PDBCustom : MonoBehaviour {
         Debug.Log(w.error);
 
         GetComponent<GameManager>().Custom_ChangeLevel();
+    }
+
+    public void load_custom_complex()
+    {
+        GetComponent<GameManager>().Custom_complex_ChangeLevel();
     }
 
 }

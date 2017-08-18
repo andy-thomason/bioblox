@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour {
     public GameObject welcome_tutorial;
     public string pdb_custom_1_name;
     public string pdb_custom_2_name;
+    public string pdb_custom_complex_name;
 
     void Awake()
     {
@@ -85,6 +86,15 @@ public class GameManager : MonoBehaviour {
         selection_panel.alpha = 0;
         selection_panel.blocksRaycasts = false;
         current_level = -2;
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+
+    public void Custom_complex_ChangeLevel()
+    {
+        loading_panel.SetActive(true);
+        selection_panel.alpha = 0;
+        selection_panel.blocksRaycasts = false;
+        current_level = -3;
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 

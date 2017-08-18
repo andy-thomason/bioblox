@@ -376,6 +376,30 @@ public class BioBlox : MonoBehaviour
             //GameObject.FindGameObjectWithTag("view_p_2").GetComponent<CanvasGroup>().interactable = false;
             StartCoroutine(Custom_DownloadMolecules());
         }
+        else if (current_level == -3)
+        {
+
+            Debug.Log("llebo");
+            PDBCustom pbc = FindObjectOfType<PDBCustom>();
+
+            Debug.Log("pbc.pdb_file "+ pbc.pdb_file);
+            file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pbc.pdb_file);
+
+            //custom_protein_name = pbc.pdb_id_input.text.ToUpper();
+            pdb_url = pbc.pdb_file;
+            //pdb_chain_0 = pbc.pdb_id_input_chain_0.text.ToUpper();
+            //pdb_chain_1 = pbc.pdb_id_input_chain_1.text.ToUpper();
+            pdb_chain_0 = "A";
+            pdb_chain_1 = "B";
+            //hide UI elements
+            GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
+            //set names
+            gm.pdb_custom_1_name = gm.pdb_custom_complex_name.Substring(0, 4);
+            Debug.Log(gm.pdb_custom_1_name);
+            gm.pdb_custom_2_name = gm.pdb_custom_complex_name.Substring(5, 4);
+            Debug.Log(gm.pdb_custom_2_name);
+            StartCoroutine(Custom_DownloadMolecules());
+        }
 
         if (gm.is_tutorial)
             FindObjectOfType<TutorialController>().StartTutorial();
@@ -414,6 +438,13 @@ public class BioBlox : MonoBehaviour
         InvokeRepeating("CalcScore", 1.0f, 0.5f);
         StartCoroutine(game_loop());
         //gm.EndLoading();
+
+        if(current_level == -3)
+        {
+            //freeze
+            toggle_refinement(true);
+            is_refinement_on = true;
+        }
 
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
         //dm.GetLevelScore();
@@ -1400,10 +1431,10 @@ public class BioBlox : MonoBehaviour
             number_total_atoms = num_touching_0 + num_touching_1;
 
             //PANEL REFINEMENT
-            if (number_total_atoms != 0 && conMan.SliderStrings.value == 0)
-                toggle_refinement(true);
-            else
-                toggle_refinement(false);
+            //if (number_total_atoms != 0 && conMan.SliderStrings.value == 0)
+            //    toggle_refinement(true);
+            //else
+            //    toggle_refinement(false);
 
             //change color here
             //Debug.Log(is_score_valid);
@@ -2763,7 +2794,15 @@ public class BioBlox : MonoBehaviour
         is_button_from_refinement_pressed_translation = false;
     }
 
-    public void toggle_refinement(bool status)
+    bool is_refinement_on = false;
+
+    public void toggle_refinement_button()
+    {
+        is_refinement_on = !is_refinement_on;
+        toggle_refinement(is_refinement_on);
+    }
+
+    void toggle_refinement(bool status)
     {
         molecules[0].GetComponent<Rigidbody>().isKinematic = status;
         molecules[1].GetComponent<Rigidbody>().isKinematic = status;
