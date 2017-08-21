@@ -439,12 +439,12 @@ public class BioBlox : MonoBehaviour
         StartCoroutine(game_loop());
         //gm.EndLoading();
 
-        if(current_level == -3)
-        {
+        //if(current_level == -3)
+       // {
             //freeze
             toggle_refinement(true);
             is_refinement_on = true;
-        }
+       // }
 
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
         //dm.GetLevelScore();
@@ -909,8 +909,8 @@ public class BioBlox : MonoBehaviour
         ri.mass = mass;
         ri.inertiaTensor = new Vector3(val, val, val);
 
-        obj.transform.Translate(offset);
-        obj.transform.Rotate(0, 0, 270);
+        //obj.transform.Translate(offset);
+        //obj.transform.Rotate(0, 0, 270);
     }
 
 
@@ -2443,14 +2443,17 @@ public class BioBlox : MonoBehaviour
         yield return new WaitForEndOfFrame();
         update_loading_bar();
 
-        Vector3 xoff = new Vector3(40, 0, 0);
+        //if(current_level != -3)
+        //{
+            Vector3 xoff = new Vector3(40, 0, 0);
 
-        reset_molecule(molecules[0], 0, -xoff);
-        reset_molecule(molecules[1], 1, xoff);
+            reset_molecule(molecules[0], 0, -xoff);
+            reset_molecule(molecules[1], 1, xoff);
 
-        //setting the position of each molecule
-        molecule_0_views.transform.localPosition = position_molecule_0;
-        molecule_1_views.transform.localPosition = position_molecule_1;
+            //setting the position of each molecule
+            molecule_0_views.transform.localPosition = position_molecule_0;
+            molecule_1_views.transform.localPosition = position_molecule_1;
+        //}
         //Debug.Log("TERMINO 7");
 
         /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
@@ -2813,6 +2816,16 @@ public class BioBlox : MonoBehaviour
             is_button_from_refinement_pressed_translation = false;
 
         }
+    }
+
+    int caca = 0;
+    public void log_atom_centre()
+    {
+        Debug.Log(molecules_PDB_mesh[0].mol.aminoAcidsNames[caca] + " / "+molecules_PDB_mesh[0].mol.atomNames[caca]+" / "+molecules_PDB_mesh[0].GetAtomWorldPositon(caca));
+        Debug.Log(molecules_PDB_mesh[0].mol.atom_centres.Length);
+        Debug.Log(molecules_PDB_mesh[1].mol.atom_centres.Length);
+        Debug.Log(pdb_file);
+        //caca++;
     }
 
 }
