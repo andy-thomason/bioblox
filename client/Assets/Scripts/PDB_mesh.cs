@@ -88,6 +88,11 @@ public class PDB_mesh : MonoBehaviour
         t = 0;
     }
 
+    public int return_number_of_atoms()
+    {
+        return mol.atom_centres.Length;
+    }
+
     public void OneAxisDock()
     {
         shouldCollide = true;

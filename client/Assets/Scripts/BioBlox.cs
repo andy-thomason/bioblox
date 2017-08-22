@@ -439,12 +439,11 @@ public class BioBlox : MonoBehaviour
         StartCoroutine(game_loop());
         //gm.EndLoading();
 
-        //if(current_level == -3)
-       // {
-            //freeze
-            toggle_refinement(true);
-            is_refinement_on = true;
-       // }
+        //if (current_level == -3)
+        //{
+        //    freeze
+           
+        //}
 
         //get level scores before starts, once its downloaded it calls SetLevelScoresBeforeStartGame()
         //dm.GetLevelScore();
@@ -909,8 +908,8 @@ public class BioBlox : MonoBehaviour
         ri.mass = mass;
         ri.inertiaTensor = new Vector3(val, val, val);
 
-        //obj.transform.Translate(offset);
-        //obj.transform.Rotate(0, 0, 270);
+        obj.transform.Translate(offset);
+        obj.transform.Rotate(0, 0, 270);
     }
 
 
@@ -1098,44 +1097,84 @@ public class BioBlox : MonoBehaviour
                 yield return new WaitForSeconds(0.1f);
                 eventSystem.enabled = true;
 
-                ////set the score from the sever
-                //if (level_scores_from_server != "0")
-                //{
-                //    //freeze them
-                //    mol1.GetComponent<Rigidbody>().isKinematic = true;
-                //    mol2.GetComponent<Rigidbody>().isKinematic = true;
+                if (current_level == -3)
+                {
+                    string rotation_proteins = string.Empty;
+                    string position_proteins = string.Empty;
 
-                //    string[] splitLevelData = (level_scores_from_server).Split('*');
-                //    //SET THE CONNECTIONS
-                //    //SPLIT
-                //    string[] splitScores = (splitLevelData[0]).Split('/');
+                    toggle_refinement(true);
+                    is_refinement_on = true;
 
-                //    for (int i = 0; i < splitScores.Length - 1; i++)
-                //    {
-                //        //SPLIT each amino
-                //        string[] splitScores_amino = (splitScores[i]).Split('-');
-                //        string[] splitScores_amino_atoms_1 = (splitScores_amino[0]).Split(',');
-                //        string[] splitScores_amino_atoms_2 = (splitScores_amino[1]).Split(',');
-                        
-                //        aminoSlider._AminoAcidsLinkPanel(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink_atom_modification(molecules_PDB_mesh[0], int.Parse(splitScores_amino_atoms_1[0]), int.Parse(splitScores_amino_atoms_1[1]), molecules_PDB_mesh[1], int.Parse(splitScores_amino_atoms_2[0]), int.Parse(splitScores_amino_atoms_2[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino_atoms_1[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino_atoms_2[0]).gameObject);
-                //    }
+                    //GET POSITION/ROTATION FROM FILE
+                    using (StringReader reader = new StringReader(pdb_file))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            string kind = line.Substring(0, 16);
+                            if (kind == "BIOBLOX POSITION")
+                            {
+                                position_proteins = line.Substring(17, line.Length - 17);
+                            }
+                            else if(kind == "BIOBLOX ROTATION")
+                            {
+                                rotation_proteins = line.Substring(17, line.Length - 17);
+                            }
+                        }
+                    }
 
-                //    //SET THE ROTATION
-                //    molecules[0].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[2]));
-                //    molecules[1].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[2]));
-                //    //SET THE POSOTION
-                //    molecules[0].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
-                //    molecules[1].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
 
-                //    gameObject.GetComponent<ConnectionManager>().SliderStrings.interactable = true;
-                //    gameObject.GetComponent<ConnectionManager>().SliderStrings.value = float.Parse(splitLevelData[3]);
-                //    sfx.StopTrack(SFX.sound_index.string_reel_out);
+                    string[] split_protein_rotation = (rotation_proteins).Split('/');
+                    string[] split_protein_position = (position_proteins).Split('/');
 
-                //    //unfreeze them
-                //    yield return new WaitForSeconds(1.0f);
-                //    mol1.GetComponent<Rigidbody>().isKinematic = false;
-                //    mol2.GetComponent<Rigidbody>().isKinematic = false;
-                //}
+                    //SET THE ROTATION
+                    molecules[0].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[0].Split(',')[0])), float.Parse((split_protein_rotation[0].Split(',')[1])), float.Parse((split_protein_rotation[0].Split(',')[2])));
+                    molecules[1].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[1].Split(',')[0])), float.Parse((split_protein_rotation[1].Split(',')[1])), float.Parse((split_protein_rotation[1].Split(',')[2])));
+                    //SET THE POSOTION
+                    molecules[0].transform.localPosition = new Vector3(float.Parse((split_protein_position[0].Split(',')[0])), float.Parse((split_protein_position[0].Split(',')[1])), float.Parse((split_protein_position[0].Split(',')[2])));
+                    molecules[1].transform.localPosition = new Vector3(float.Parse((split_protein_position[1].Split(',')[0])), float.Parse((split_protein_position[1].Split(',')[1])), float.Parse((split_protein_position[1].Split(',')[2])));
+                    Debug.Log(split_protein_rotation[0].Split(',')[0]+", "+ split_protein_rotation[0].Split(',')[1] + ", " + split_protein_rotation[0].Split(',')[2]);
+                    Debug.Log(split_protein_rotation[1].Split(',')[0] + ", " + split_protein_rotation[1].Split(',')[1] + ", " + split_protein_rotation[1].Split(',')[2]);
+                }
+
+                    ////set the score from the sever
+                    //if (level_scores_from_server != "0")
+                    //{
+                    //    //freeze them
+                    //    mol1.GetComponent<Rigidbody>().isKinematic = true;
+                    //    mol2.GetComponent<Rigidbody>().isKinematic = true;
+
+                    //    string[] splitLevelData = (level_scores_from_server).Split('*');
+                    //    //SET THE CONNECTIONS
+                    //    //SPLIT
+                    //    string[] splitScores = (splitLevelData[0]).Split('/');
+
+                    //    for (int i = 0; i < splitScores.Length - 1; i++)
+                    //    {
+                    //        //SPLIT each amino
+                    //        string[] splitScores_amino = (splitScores[i]).Split('-');
+                    //        string[] splitScores_amino_atoms_1 = (splitScores_amino[0]).Split(',');
+                    //        string[] splitScores_amino_atoms_2 = (splitScores_amino[1]).Split(',');
+
+                    //        aminoSlider._AminoAcidsLinkPanel(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink_atom_modification(molecules_PDB_mesh[0], int.Parse(splitScores_amino_atoms_1[0]), int.Parse(splitScores_amino_atoms_1[1]), molecules_PDB_mesh[1], int.Parse(splitScores_amino_atoms_2[0]), int.Parse(splitScores_amino_atoms_2[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino_atoms_1[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino_atoms_2[0]).gameObject);
+                    //    }
+
+                    //    //SET THE ROTATION
+                    //    molecules[0].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[2]));
+                    //    molecules[1].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[2]));
+                    //    //SET THE POSOTION
+                    //    molecules[0].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
+                    //    molecules[1].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
+
+                    //    gameObject.GetComponent<ConnectionManager>().SliderStrings.interactable = true;
+                    //    gameObject.GetComponent<ConnectionManager>().SliderStrings.value = float.Parse(splitLevelData[3]);
+                    //    sfx.StopTrack(SFX.sound_index.string_reel_out);
+
+                    //    //unfreeze them
+                    //    yield return new WaitForSeconds(1.0f);
+                    //    mol1.GetComponent<Rigidbody>().isKinematic = false;
+                    //    mol2.GetComponent<Rigidbody>().isKinematic = false;
+                    //}
 
                 gm.EndLoading();
 
@@ -2445,14 +2484,14 @@ public class BioBlox : MonoBehaviour
 
         //if(current_level != -3)
         //{
-            Vector3 xoff = new Vector3(40, 0, 0);
+        Vector3 xoff = new Vector3(40, 0, 0);
 
-            reset_molecule(molecules[0], 0, -xoff);
-            reset_molecule(molecules[1], 1, xoff);
+        reset_molecule(molecules[0], 0, -xoff);
+        reset_molecule(molecules[1], 1, xoff);
 
-            //setting the position of each molecule
-            molecule_0_views.transform.localPosition = position_molecule_0;
-            molecule_1_views.transform.localPosition = position_molecule_1;
+        //setting the position of each molecule
+        molecule_0_views.transform.localPosition = position_molecule_0;
+        molecule_1_views.transform.localPosition = position_molecule_1;
         //}
         //Debug.Log("TERMINO 7");
 
@@ -2821,11 +2860,12 @@ public class BioBlox : MonoBehaviour
     int caca = 0;
     public void log_atom_centre()
     {
-        Debug.Log(molecules_PDB_mesh[0].mol.aminoAcidsNames[caca] + " / "+molecules_PDB_mesh[0].mol.atomNames[caca]+" / "+molecules_PDB_mesh[0].GetAtomWorldPositon(caca));
-        Debug.Log(molecules_PDB_mesh[0].mol.atom_centres.Length);
-        Debug.Log(molecules_PDB_mesh[1].mol.atom_centres.Length);
-        Debug.Log(pdb_file);
+        //Debug.Log(molecules_PDB_mesh[0].mol.aminoAcidsNames[caca] + " / "+molecules_PDB_mesh[0].mol.atomNames[caca]+" / "+molecules_PDB_mesh[0].GetAtomWorldPositon(caca));
+        //Debug.Log(molecules_PDB_mesh[0].mol.atom_centres.Length);
+        //Debug.Log(molecules_PDB_mesh[1].mol.atom_centres.Length);
+        //Debug.Log(pdb_file);
         //caca++;
+        FindObjectOfType<PDBCustom>().test_write_custom_pdb();
     }
 
 }

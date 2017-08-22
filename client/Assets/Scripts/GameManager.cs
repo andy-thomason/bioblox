@@ -210,7 +210,8 @@ public class GameManager : MonoBehaviour {
         //using (WWW www = new WWW("https://files.rcsb.org/view/2PTC.pdb"))
         //using (WWW www = new WWW("http://82.15.223.84/pdb_file_merged.pdb"))
         //using (WWW www = new WWW("http://quiley.com/pdb_file_merged.pdb"))
-        using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.pdb"))
+        //using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.pdb"))
+        using (WWW www = new WWW("http://13.58.210.151/bb_data/test_uploaded.pdb"))
         {
             yield return www;
 
