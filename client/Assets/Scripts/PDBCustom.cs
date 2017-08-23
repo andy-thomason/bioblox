@@ -66,32 +66,55 @@ public class PDBCustom : MonoBehaviour {
     //static string s_dataUrlPrefix = "data:image/png;base64,";
     public void ReceivePDB(string dataUrl)
     {
-        if(pdb_id == 0)
+        Debug.Log("dataUrl: " + dataUrl);
+        Debug.Log("string.IsNullOrEmpty(dataUrl): " + string.IsNullOrEmpty(dataUrl));
+        if (pdb_id == 0)
         {
-            pdb_1 = dataUrl;
-            Debug.Log(pdb_1);
-            is_pdb_1_loaded = true;
-            pdb_custom_1_name = pdb_1.Substring(62, 4);
-            pdb_id_1.text = pdb_custom_1_name;
-            gm.pdb_custom_1_name = pdb_custom_1_name;
-            StartCoroutine(upload_file());
+            if (dataUrl != "0" || !string.IsNullOrEmpty(dataUrl))
+            {
+                pdb_id_1.color = Color.white;
+                pdb_1 = dataUrl;
+                Debug.Log(pdb_1);
+                is_pdb_1_loaded = true;
+                pdb_custom_1_name = pdb_1.Substring(62, 4);
+                pdb_id_1.text = pdb_custom_1_name;
+                gm.pdb_custom_1_name = pdb_custom_1_name;
+                StartCoroutine(upload_file());
+            }
+            else
+            {
+                pdb_id_1.color = Color.red;
+                pdb_id_1.text = "INVALID FILE";
+                is_pdb_1_loaded = false;
+            }
         }
         else if(pdb_id == 1)
         {
-            pdb_2 = dataUrl;
-            Debug.Log(pdb_2);
-            is_pdb_2_loaded = true;
-            pdb_custom_2_name = pdb_2.Substring(62, 4);
-            pdb_id_2.text = pdb_custom_2_name;
-            gm.pdb_custom_2_name = pdb_custom_2_name;
-            StartCoroutine(upload_file());
+            if(dataUrl != "0" || !string.IsNullOrEmpty(dataUrl))
+            {
+                pdb_id_2.color = Color.white;
+                pdb_2 = dataUrl;
+                Debug.Log(pdb_2);
+                is_pdb_2_loaded = true;
+                pdb_custom_2_name = pdb_2.Substring(62, 4);
+                pdb_id_2.text = pdb_custom_2_name;
+                gm.pdb_custom_2_name = pdb_custom_2_name;
+                StartCoroutine(upload_file());
+            }
+            else
+            {
+                pdb_id_2.color = Color.red;
+                pdb_id_2.text = "INVALID FILE";
+                is_pdb_2_loaded = false;
+            }
         }
         else if (pdb_id == 2)
         {
-            if (dataUrl.Substring(7, 7) != "BIOBLOX") //invalid
+            if (dataUrl == "0" || dataUrl.Substring(7, 7) != "BIOBLOX" || string.IsNullOrEmpty(dataUrl)) //invalid
             {
                 pdb_id_complex.color = Color.red;
-                pdb_id_complex.text = "INVALID PDB FILE";
+                pdb_id_complex.text = "INVALID FILE";
+                load_complex.interactable = false;
             }
             else
             {
@@ -288,22 +311,19 @@ public class PDBCustom : MonoBehaviour {
             }
         }
         yield return new WaitForEndOfFrame();
-        
-        Debug.Log("cacacaaca");
 
         //GET THE ID OF EACH FILE
-        string file_name = string.Concat(DateTime.Now.ToString(),".pdb");
+        string file_name = string.Concat(gm.pdb_custom_1_name, "-", gm.pdb_custom_2_name, ".", DateTime.Now.Day, ".", DateTime.Now.Month, ".", DateTime.Now.Year, ".", DateTime.Now.Hour, ".", DateTime.Now.Minute, ".", DateTime.Now.Second, ".", DateTime.Now.Millisecond, ".pdb");
         byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_temp);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, file_name);
-
+        Debug.Log(file_name);
         WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
 
         yield return w;
 
         Debug.Log(w.error);
-        Debug.Log("arrriiiiiiiiiba");
         download_file(file_name);
     }
 

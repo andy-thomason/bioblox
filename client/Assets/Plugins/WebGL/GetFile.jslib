@@ -130,11 +130,11 @@
       function handleCancel(evt) {
           evt.stopPropagation();
           evt.preventDefault();
-          sendError("cancelled");
+          sendError();
       }
 	  
-      function sendError(msg) {
-          sendResult("error: " + msg);
+      function sendError() {
+          sendResult("0");
       }
 
       function hide() {
