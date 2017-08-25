@@ -398,7 +398,7 @@ public class BioBlox : MonoBehaviour
             Debug.Log(gm.pdb_custom_1_name);
             gm.pdb_custom_2_name = gm.pdb_custom_complex_name.Substring(5, 4);
             Debug.Log(gm.pdb_custom_2_name);
-            StartCoroutine(Custom_DownloadMolecules());
+            StartCoroutine(Custom_DownloadMolecules_complex());
         }
 
         if (gm.is_tutorial)
@@ -908,8 +908,11 @@ public class BioBlox : MonoBehaviour
         ri.mass = mass;
         ri.inertiaTensor = new Vector3(val, val, val);
 
-        obj.transform.Translate(offset);
-        obj.transform.Rotate(0, 0, 270);
+        if(current_level != -3)
+        {
+            obj.transform.Translate(offset);
+            obj.transform.Rotate(0, 0, 270);
+        }
     }
 
 
@@ -1099,42 +1102,42 @@ public class BioBlox : MonoBehaviour
 
                 if (current_level == -3)
                 {
-                    string rotation_proteins = string.Empty;
-                    string position_proteins = string.Empty;
+                    //string rotation_proteins = string.Empty;
+                    //string position_proteins = string.Empty;
 
                     toggle_refinement(true);
                     is_refinement_on = true;
 
-                    //GET POSITION/ROTATION FROM FILE
-                    using (StringReader reader = new StringReader(pdb_file))
-                    {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
-                        {
-                            string kind = line.Substring(0, 16);
-                            if (kind == "BIOBLOX POSITION")
-                            {
-                                position_proteins = line.Substring(17, line.Length - 17);
-                            }
-                            else if(kind == "BIOBLOX ROTATION")
-                            {
-                                rotation_proteins = line.Substring(17, line.Length - 17);
-                            }
-                        }
-                    }
+                    ////GET POSITION/ROTATION FROM FILE
+                    //using (StringReader reader = new StringReader(pdb_file))
+                    //{
+                    //    string line;
+                    //    while ((line = reader.ReadLine()) != null)
+                    //    {
+                    //        string kind = line.Substring(0, 16);
+                    //        if (kind == "BIOBLOX POSITION")
+                    //        {
+                    //            position_proteins = line.Substring(17, line.Length - 17);
+                    //        }
+                    //        else if(kind == "BIOBLOX ROTATION")
+                    //        {
+                    //            rotation_proteins = line.Substring(17, line.Length - 17);
+                    //        }
+                    //    }
+                    //}
 
 
-                    string[] split_protein_rotation = (rotation_proteins).Split('/');
-                    string[] split_protein_position = (position_proteins).Split('/');
+                    //string[] split_protein_rotation = (rotation_proteins).Split('/');
+                    //string[] split_protein_position = (position_proteins).Split('/');
 
-                    //SET THE ROTATION
-                    molecules[0].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[0].Split(',')[0])), float.Parse((split_protein_rotation[0].Split(',')[1])), float.Parse((split_protein_rotation[0].Split(',')[2])));
-                    molecules[1].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[1].Split(',')[0])), float.Parse((split_protein_rotation[1].Split(',')[1])), float.Parse((split_protein_rotation[1].Split(',')[2])));
-                    //SET THE POSOTION
-                    molecules[0].transform.localPosition = new Vector3(float.Parse((split_protein_position[0].Split(',')[0])), float.Parse((split_protein_position[0].Split(',')[1])), float.Parse((split_protein_position[0].Split(',')[2])));
-                    molecules[1].transform.localPosition = new Vector3(float.Parse((split_protein_position[1].Split(',')[0])), float.Parse((split_protein_position[1].Split(',')[1])), float.Parse((split_protein_position[1].Split(',')[2])));
-                    Debug.Log(split_protein_rotation[0].Split(',')[0]+", "+ split_protein_rotation[0].Split(',')[1] + ", " + split_protein_rotation[0].Split(',')[2]);
-                    Debug.Log(split_protein_rotation[1].Split(',')[0] + ", " + split_protein_rotation[1].Split(',')[1] + ", " + split_protein_rotation[1].Split(',')[2]);
+                    ////SET THE ROTATION
+                    //molecules[0].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[0].Split(',')[0])), float.Parse((split_protein_rotation[0].Split(',')[1])), float.Parse((split_protein_rotation[0].Split(',')[2])));
+                    //molecules[1].transform.eulerAngles = new Vector3(float.Parse((split_protein_rotation[1].Split(',')[0])), float.Parse((split_protein_rotation[1].Split(',')[1])), float.Parse((split_protein_rotation[1].Split(',')[2])));
+                    ////SET THE POSOTION
+                    //molecules[0].transform.localPosition = new Vector3(float.Parse((split_protein_position[0].Split(',')[0])), float.Parse((split_protein_position[0].Split(',')[1])), float.Parse((split_protein_position[0].Split(',')[2])));
+                    //molecules[1].transform.localPosition = new Vector3(float.Parse((split_protein_position[1].Split(',')[0])), float.Parse((split_protein_position[1].Split(',')[1])), float.Parse((split_protein_position[1].Split(',')[2])));
+                    //Debug.Log(split_protein_rotation[0].Split(',')[0]+", "+ split_protein_rotation[0].Split(',')[1] + ", " + split_protein_rotation[0].Split(',')[2]);
+                    //Debug.Log(split_protein_rotation[1].Split(',')[0] + ", " + split_protein_rotation[1].Split(',')[1] + ", " + split_protein_rotation[1].Split(',')[2]);
                 }
 
                     ////set the score from the sever
@@ -1455,7 +1458,7 @@ public class BioBlox : MonoBehaviour
                 //#endregion
             }
 
-            if (eventSystem != null && eventSystem.IsActive() && refinement.activeSelf)
+            if (eventSystem != null && eventSystem.IsActive() && !refinement.activeSelf)
             {
                 ApplyReturnToOriginForce();
             }
@@ -2390,6 +2393,8 @@ public class BioBlox : MonoBehaviour
 
         offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
         offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+        Debug.Log(offset_position_0);
+        Debug.Log(offset_position_1);
 
         yield return new WaitForEndOfFrame();
 
@@ -2434,11 +2439,11 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.SetActive(false);
         docking_rotation_0 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_0);
-        position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        //position_molecule_0 = parent_molecule_reference.transform.localPosition;
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         yield return new WaitForEndOfFrame();
-        
+
         //BS - 1
         parent_molecule_reference = Instantiate(parent_molecule);
         parent_molecule_reference.name = "BS_1";
@@ -2448,7 +2453,7 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.SetActive(false);
         docking_rotation_1 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_1);
-        position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        // position_molecule_1 = parent_molecule_reference.transform.localPosition;
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         yield return new WaitForEndOfFrame();
@@ -2462,7 +2467,7 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.SetActive(false);
         docking_rotation_0 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_0);
-        position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        //position_molecule_0 = parent_molecule_reference.transform.localPosition;
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         yield return new WaitForEndOfFrame();
@@ -2476,7 +2481,7 @@ public class BioBlox : MonoBehaviour
         parent_molecule_reference.SetActive(false);
         docking_rotation_1 = parent_molecule_reference.transform.localRotation;
         parent_molecule_reference.transform.Translate(offset_position_1);
-        position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        //position_molecule_1 = parent_molecule_reference.transform.localPosition;
         parent_molecule_reference.transform.localPosition = Vector3.zero;
 
         yield return new WaitForEndOfFrame();
@@ -2492,6 +2497,304 @@ public class BioBlox : MonoBehaviour
         //setting the position of each molecule
         molecule_0_views.transform.localPosition = position_molecule_0;
         molecule_1_views.transform.localPosition = position_molecule_1;
+        //}
+        //Debug.Log("TERMINO 7");
+
+        /*foreach (Vector3 c in molecules_PDB_mesh[0].mol.atom_centres) {
+          GameObject go = new GameObject();
+          go.transform.SetParent(mol1.transform);
+          MeshFilter mf = go.AddComponent<MeshFilter>();
+          //mf.mesh = 
+          MeshRenderer mr = go.AddComponent<MeshRenderer>();
+          go.transform.position = c;
+        }*/
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+        //uiController.SetHintImage(level.pdbFile); //HINT
+
+        StartGame();
+
+        update_loading_bar();
+        //create_mesh_1();
+        //create_mesh_11();
+        //create_mesh2();
+        //StartGame();
+    }
+
+    IEnumerator Custom_DownloadMolecules_complex()
+    {
+        loading_text = GameObject.FindGameObjectWithTag("loading_text").GetComponent<Text>();
+        loading_bar = GameObject.FindGameObjectWithTag("loading_bar").GetComponent<Image>();
+        loading_value = 0;
+        update_loading_bar();
+
+        //Debug.Log(pdb_url);
+        //Debug.Log(pdb_chain_0);
+        //DOWNLOAD PROTEIN 0 - SE
+        WWWForm www_form = new WWWForm();
+        //www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_0);
+        www_form.AddField("mesh", "se");
+        WWW custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_0_SE_bytes = custom_www.bytes;
+
+        yield return new WaitForEndOfFrame();
+
+        //DOWNLOAD PROTEIN 0 - BS
+        www_form = new WWWForm();
+        // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_0);
+        www_form.AddField("mesh", "bs");
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_0_BS_bytes = custom_www.bytes;
+
+        //DOWNLOAD PROTEIN 0 - CA
+        www_form = new WWWForm();
+        // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_0);
+        www_form.AddField("mesh", "ca");
+
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_0_CA_bytes = custom_www.bytes;
+        //Debug.Log(custom_www.text);
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //DOWNLOAD PROTEIN 1 - SE
+        www_form = new WWWForm();
+        // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_1);
+        www_form.AddField("mesh", "se");
+
+        //Debug.Log("ENVIANDO 2");
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_1_SE_bytes = custom_www.bytes;
+        // Debug.Log(custom_www.text);
+        //Debug.Log("TERMINO 2");
+
+        yield return new WaitForEndOfFrame();
+
+        //DOWNLOAD PROTEIN 1 - BS
+        www_form = new WWWForm();
+        // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_1);
+        www_form.AddField("mesh", "bs");
+
+        // Debug.Log("ENVIANDO 2");
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_1_BS_bytes = custom_www.bytes;
+        //Debug.Log(custom_www.text);
+        //Debug.Log("TERMINO 2");
+        yield return new WaitForEndOfFrame();
+
+        //DOWNLOAD PROTEIN 1 - CA
+        www_form = new WWWForm();
+        // www_form.AddField("file", "file");
+        //www_form.AddBinaryData("file", file_pdb_bytes, "test.pdb");
+        www_form.AddField("url", pdb_url);
+        www_form.AddField("chains", pdb_chain_1);
+        www_form.AddField("mesh", "ca");
+
+        custom_www = new WWW(server_for_custom_level_url, www_form);
+        yield return custom_www;
+        custom_protein_1_CA_bytes = custom_www.bytes;
+        // Debug.Log(custom_www.text);
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+        //using (WWW www = new WWW(pdb_url))
+        //{
+        //    yield return www;
+
+        //    if (www.error != null)
+        //        throw new System.Exception("WWW download had an error:" + www.error);
+
+        //    pdb_file = www.text;
+        //}
+
+        pdb_file = pdb_url;
+        //Debug.Log(pdb_file);
+        // Make two PDB_mesh instances from the PDB file and a chain selection.
+        mol1 = make_molecule(gm.pdb_custom_1_name + "." + pdb_chain_0, "Proto1", 7, MeshTopology.Triangles, 0);
+        mol1.transform.SetParent(Molecules);
+        mol2 = make_molecule(gm.pdb_custom_2_name + "." + pdb_chain_1, "Proto2", 7, MeshTopology.Triangles, 1);
+        mol2.transform.SetParent(Molecules);
+        // Debug.Log("TERMINO 3");
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //create holder of amino views
+        GameObject molecule_0_views = new GameObject();
+        molecule_0_views.name = gm.pdb_custom_1_name;
+        molecule_0_views.transform.SetParent(mol1.transform);
+
+        //create holder of amino views
+        GameObject molecule_1_views = new GameObject();
+        molecule_1_views.name = gm.pdb_custom_2_name;
+        molecule_1_views.transform.SetParent(mol2.transform);
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        // Debug.Log("TERMINO 4");
+        //disabled atoms holder 1
+        GameObject temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_1";
+        temp_atom_disable_holder.transform.SetParent(mol1.transform);
+
+        //disabled atoms holder 2
+        temp_atom_disable_holder = new GameObject();
+        temp_atom_disable_holder.name = "holder_2";
+        temp_atom_disable_holder.transform.SetParent(mol2.transform);
+
+        molecules[0] = mol1.gameObject;
+        molecules[1] = mol2.gameObject;
+        molecules_PDB_mesh[0] = mol1.gameObject.GetComponent<PDB_mesh>();
+        molecules_PDB_mesh[1] = mol2.gameObject.GetComponent<PDB_mesh>();
+        //Debug.Log("TERMINO 5");
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //// Set a bit in this bit array to disable an atom from collision
+        //BitArray bad0 = new BitArray(molecules_PDB_mesh[0].mol.atom_centres.Length);
+        //BitArray bad1 = new BitArray(molecules_PDB_mesh[1].mol.atom_centres.Length);
+        //atoms_disabled = new BitArray[] { bad0, bad1 };
+
+        //// Ioannis scoring
+        scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
+
+        offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+        offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+        offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
+        offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
+        Debug.Log(offset_position_0);
+        Debug.Log(offset_position_1);
+
+        yield return new WaitForEndOfFrame();
+
+        //System.GC.Collect();
+
+        //SE - 0
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "SE_0";
+        stream = new MemoryStream(custom_protein_0_SE_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(true);
+        docking_rotation_0 = parent_molecule_reference.transform.localRotation;
+        // parent_molecule_reference.transform.Translate(offset_position_0);
+        //position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //SE - 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "SE_1";
+        stream = new MemoryStream(custom_protein_1_SE_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.normal);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(true);
+        docking_rotation_1 = parent_molecule_reference.transform.localRotation;
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+       // position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //BS - 0
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "BS_0";
+        stream = new MemoryStream(custom_protein_0_BS_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(false);
+        docking_rotation_0 = parent_molecule_reference.transform.localRotation;
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        //position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+
+        //BS - 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "BS_1";
+        stream = new MemoryStream(custom_protein_1_BS_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(false);
+        docking_rotation_1 = parent_molecule_reference.transform.localRotation;
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        // position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+
+        //CA - 0
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "CA_0";
+        stream = new MemoryStream(custom_protein_0_CA_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 0, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_0_views.transform);
+        parent_molecule_reference.SetActive(false);
+        docking_rotation_0 = parent_molecule_reference.transform.localRotation;
+        //parent_molecule_reference.transform.Translate(offset_position_0);
+        //position_molecule_0 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+
+        //CA - 1
+        parent_molecule_reference = Instantiate(parent_molecule);
+        parent_molecule_reference.name = "CA_1";
+        stream = new MemoryStream(custom_protein_1_CA_bytes);
+        PLYDecoder(stream, parent_molecule_reference.transform, 1, protein_view.bs);
+        parent_molecule_reference.transform.SetParent(molecule_1_views.transform);
+        parent_molecule_reference.SetActive(false);
+        docking_rotation_1 = parent_molecule_reference.transform.localRotation;
+        //parent_molecule_reference.transform.Translate(offset_position_1);
+        //position_molecule_1 = parent_molecule_reference.transform.localPosition;
+        //parent_molecule_reference.transform.localPosition = Vector3.zero;
+
+        yield return new WaitForEndOfFrame();
+        update_loading_bar();
+
+        //if(current_level != -3)
+        //{
+        Vector3 xoff = new Vector3(40, 0, 0);
+
+        reset_molecule(molecules[0], 0, -xoff);
+        reset_molecule(molecules[1], 1, xoff);
+
+        //setting the position of each molecule
+        molecule_0_views.transform.localPosition = offset_position_0;
+        molecule_1_views.transform.localPosition = offset_position_1;
+        molecules[0].transform.position = new Vector3(-offset_position_0.x, offset_position_0.y, offset_position_0.z);
+        molecules[1].transform.position = new Vector3(-offset_position_1.x, offset_position_1.y, offset_position_1.z);
+        molecules[0].transform.Rotate(180, 0,0);
+        molecules[1].transform.position = new Vector3(-offset_position_1.x, offset_position_1.y, offset_position_1.z);
+        molecules[1].transform.Rotate(180, 0, 0);
+        //molecules[0].transform.rotation = new Quaternion(-molecules_PDB_mesh[0].mol.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
         //}
         //Debug.Log("TERMINO 7");
 
