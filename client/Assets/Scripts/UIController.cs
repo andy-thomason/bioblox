@@ -1284,4 +1284,9 @@ public class UIController : MonoBehaviour {
         GridToggleButton.color = is_grid_active ? GridToggleColor_normal : GridToggleColor_pressed;
         is_grid_active = !is_grid_active;
     }
+
+    public void write_custom_pdb()
+    {
+        StartCoroutine(FindObjectOfType<PDBCustom>().save_user_file());
+    }
 }

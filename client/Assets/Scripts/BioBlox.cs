@@ -283,6 +283,11 @@ public class BioBlox : MonoBehaviour
     
     AudioSource[] game_sounds;
 
+    public Button toggle_force_button;
+    Color32 pressed_color_normal = new Color32(170,170,170,255);
+    Color32 pressed_color_pressed = new Color32(146, 204, 0, 255);
+    Color32 highlighted_pressed_text = new Color32(156, 229, 4, 255);
+
     //PRO
     byte[] file_pdb_bytes;
     public GameObject refinement;
@@ -371,7 +376,7 @@ public class BioBlox : MonoBehaviour
             pdb_chain_0 = "A";
             pdb_chain_1 = "B";
             //hide UI elements
-            GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
+            //GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
            // GameObject.FindGameObjectWithTag("view_p_1").GetComponent<CanvasGroup>().interactable = false;
             //GameObject.FindGameObjectWithTag("view_p_2").GetComponent<CanvasGroup>().interactable = false;
             StartCoroutine(Custom_DownloadMolecules());
@@ -392,7 +397,7 @@ public class BioBlox : MonoBehaviour
             pdb_chain_0 = "A";
             pdb_chain_1 = "B";
             //hide UI elements
-            GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
+           // GameObject.FindGameObjectWithTag("save_button").GetComponent<Button>().interactable = false;
             //set names
             gm.pdb_custom_1_name = gm.pdb_custom_complex_name.Substring(0, 4);
             Debug.Log(gm.pdb_custom_1_name);
@@ -2681,6 +2686,10 @@ public class BioBlox : MonoBehaviour
         //// Ioannis scoring
         scoring = new PDB_score(molecules_PDB_mesh[0].mol, mol1.gameObject.transform, molecules_PDB_mesh[1].mol, mol2.gameObject.transform);
 
+        //offset_position_0 = new Vector3(molecules_PDB_mesh[0].mol.pos.x, molecules_PDB_mesh[0].mol.pos.y, molecules_PDB_mesh[0].mol.pos.z);
+        //offset_position_1 = new Vector3(molecules_PDB_mesh[1].mol.pos.x, molecules_PDB_mesh[1].mol.pos.y, molecules_PDB_mesh[1].mol.pos.z);
+        //offset_position_0 = new Vector3(molecules_PDB_mesh[0].mol.pos.x, molecules_PDB_mesh[0].mol.pos.y, molecules_PDB_mesh[0].mol.pos.z);
+        //offset_position_1 = new Vector3(molecules_PDB_mesh[1].mol.pos.x, molecules_PDB_mesh[1].mol.pos.y, molecules_PDB_mesh[1].mol.pos.z);
         offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
         offset_position_1 = new Vector3(-molecules_PDB_mesh[1].mol.pos.x, -molecules_PDB_mesh[1].mol.pos.y, -molecules_PDB_mesh[1].mol.pos.z);
         offset_position_0 = new Vector3(-molecules_PDB_mesh[0].mol.pos.x, -molecules_PDB_mesh[0].mol.pos.y, -molecules_PDB_mesh[0].mol.pos.z);
@@ -3152,23 +3161,17 @@ public class BioBlox : MonoBehaviour
         molecules[0].GetComponent<Rigidbody>().isKinematic = status;
         molecules[1].GetComponent<Rigidbody>().isKinematic = status;
         refinement.SetActive(status);
-        if(!status)
+        if (!status)
         {
             is_button_from_refinement_pressed_rotation = false;
             is_button_from_refinement_pressed_translation = false;
+            toggle_force_button.GetComponent<Image>().color = pressed_color_normal;
 
         }
-    }
-
-    int caca = 0;
-    public void log_atom_centre()
-    {
-        //Debug.Log(molecules_PDB_mesh[0].mol.aminoAcidsNames[caca] + " / "+molecules_PDB_mesh[0].mol.atomNames[caca]+" / "+molecules_PDB_mesh[0].GetAtomWorldPositon(caca));
-        //Debug.Log(molecules_PDB_mesh[0].mol.atom_centres.Length);
-        //Debug.Log(molecules_PDB_mesh[1].mol.atom_centres.Length);
-        //Debug.Log(pdb_file);
-        //caca++;
-        FindObjectOfType<PDBCustom>().test_write_custom_pdb();
+        else
+        {
+            toggle_force_button.GetComponent<Image>().color = highlighted_pressed_text;
+        }
     }
 
 }

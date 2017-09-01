@@ -66,11 +66,17 @@ public class PDBCustom : MonoBehaviour {
     //static string s_dataUrlPrefix = "data:image/png;base64,";
     public void ReceivePDB(string dataUrl)
     {
-        Debug.Log("dataUrl: " + dataUrl);
-        Debug.Log("string.IsNullOrEmpty(dataUrl): " + string.IsNullOrEmpty(dataUrl));
         if (pdb_id == 0)
         {
-            if (dataUrl != "0" || !string.IsNullOrEmpty(dataUrl))
+            Debug.Log("dataUrl: " + dataUrl);
+            Debug.Log("string.IsNullOrEmpty(dataUrl): " + string.IsNullOrEmpty(dataUrl));
+            if (dataUrl == "0" || string.IsNullOrEmpty(dataUrl))
+            {
+                pdb_id_1.color = Color.red;
+                pdb_id_1.text = "INVALID FILE";
+                is_pdb_1_loaded = false;
+            }
+            else
             {
                 pdb_id_1.color = Color.white;
                 pdb_1 = dataUrl;
@@ -81,18 +87,18 @@ public class PDBCustom : MonoBehaviour {
                 gm.pdb_custom_1_name = pdb_custom_1_name;
                 StartCoroutine(upload_file());
             }
-            else
-            {
-                pdb_id_1.color = Color.red;
-                pdb_id_1.text = "INVALID FILE";
-                is_pdb_1_loaded = false;
-            }
         }
         else if(pdb_id == 1)
         {
-            Debug.Log(string.IsNullOrEmpty(dataUrl));
-            Debug.Log(dataUrl);
-            if (dataUrl != "0" || !string.IsNullOrEmpty(dataUrl))
+            Debug.Log("dataUrl: " + dataUrl);
+            Debug.Log("string.IsNullOrEmpty(dataUrl): " + string.IsNullOrEmpty(dataUrl));
+            if (dataUrl == "0" || string.IsNullOrEmpty(dataUrl))
+            {
+                pdb_id_2.color = Color.red;
+                pdb_id_2.text = "INVALID FILE";
+                is_pdb_2_loaded = false;
+            }
+            else
             {
                 pdb_id_2.color = Color.white;
                 pdb_2 = dataUrl;
@@ -103,35 +109,34 @@ public class PDBCustom : MonoBehaviour {
                 gm.pdb_custom_2_name = pdb_custom_2_name;
                 StartCoroutine(upload_file());
             }
-            else
-            {
-                pdb_id_2.color = Color.red;
-                pdb_id_2.text = "INVALID FILE";
-                is_pdb_2_loaded = false;
-            }
         }
         else if (pdb_id == 2)
         {
             if (dataUrl == "0" || string.IsNullOrEmpty(dataUrl)) //invalid
             {
-                if (dataUrl.Substring(7, 7) != "BIOBLOX")
-                {
                 pdb_id_complex.color = Color.red;
                 pdb_id_complex.text = "INVALID FILE";
                 load_complex.interactable = false;
-                }
             }
             else
             {
-                Debug.Log("ENTROOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-                pdb_id_complex.color = Color.white;
-                pdb_complex = pdb_file = dataUrl;
-                Debug.Log(pdb_complex);
-                pdb_custom_complex_name = pdb_complex.Substring(15, 9);
-                pdb_id_complex.text = pdb_custom_complex_name;
-                gm.pdb_custom_complex_name = pdb_custom_complex_name;
-                StartCoroutine(upload_file());
-                load_complex.interactable = true;
+                if (dataUrl.Substring(7, 7) != "BIOBLOX")
+                {
+                    pdb_id_complex.color = Color.red;
+                    pdb_id_complex.text = "INVALID FILE";
+                    load_complex.interactable = false;
+                }
+                else
+                {
+                    Debug.Log("ENTROOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+                    pdb_id_complex.color = Color.white;
+                    pdb_complex = pdb_file = dataUrl;
+                    //Debug.Log(pdb_complex);
+                   
+                    invert_coordinates();
+                   // StartCoroutine(upload_file());
+                    load_complex.interactable = true;
+                }
             }
         }
 
@@ -274,12 +279,6 @@ public class PDBCustom : MonoBehaviour {
     {
         GetComponent<GameManager>().Custom_complex_ChangeLevel();
     }
-
-    public void test_write_custom_pdb()
-    {
-        StartCoroutine(save_user_file());
-    }
-
     //public IEnumerator save_user_file()
     //{
     //    //using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.pdb"))
@@ -387,9 +386,9 @@ public class PDBCustom : MonoBehaviour {
                         Environment.NewLine,
                         string.Concat(line.Substring(0, 30),
                         string.Concat(
-                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).x < 0 ? " " : "-"), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).x).ToString("000.000")),
-                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).y < 0 ? " " : "-"), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).y).ToString("000.000")),
-                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).z < 0 ? " " : "-"), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).z).ToString("000.000"))
+                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).x < 0 ? "-" : " "), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).x).ToString("000.000")),
+                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).y < 0 ? "-" : " "), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).y).ToString("000.000")),
+                            string.Concat((bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).z < 0 ? "-" : " "), Math.Abs(bb.molecules_PDB_mesh[current_protein].GetAtomWorldPositon(atom_index).z).ToString("000.000"))
                             ),
                         line.Substring(54, line.Length - 54)));
 
@@ -422,4 +421,94 @@ public class PDBCustom : MonoBehaviour {
         download_file(file_name);
     }
 
+    public GameObject atom_temp;
+
+    public void temp_create_protein()
+    {
+        StartCoroutine(temp_create_protein_corutine());
+    }
+
+    IEnumerator temp_create_protein_corutine()
+    {
+        //using (WWW www = new WWW("https://files.rcsb.org/view/2PTC.pdb"))
+        //using (WWW www = new WWW("http://82.15.223.84/pdb_file_merged.pdb"))
+        //using (WWW www = new WWW("http://quiley.com/pdb_file_merged.pdb"))
+        //using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.pdb"))
+        using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.1.9.2017.11.43.40.994.pdb"))
+        {
+            yield return www;
+
+            if (www.error != null)
+                throw new System.Exception("WWW download had an error:" + www.error);
+            
+            pdb_file = www.text;
+        }
+
+        using (StringReader reader = new StringReader(pdb_file))
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string kind = line.Substring(0, Mathf.Min(6, line.Length));
+
+                if (kind == "ATOM  ")
+                {
+                    GameObject temp = Instantiate(atom_temp);
+                    //temp.transform.position = new Vector3(float.Parse(line.Substring(30, 8)) * -1, float.Parse(line.Substring(38, 8)) * -1, float.Parse(line.Substring(46, 8)) * -1);
+                    temp.transform.position = new Vector3(float.Parse(line.Substring(30, 8)), float.Parse(line.Substring(38, 8)), float.Parse(line.Substring(46, 8)));
+                }
+                //yield return new WaitForSeconds(0.001f);
+            }
+        }
+    }
+
+    public void invert_coordinates()
+    {
+        string pdb_temp;
+        using (StringReader reader = new StringReader(pdb_file))
+        {
+            string line;
+            pdb_temp = pdb_file.Substring(0, 24);
+            while ((line = reader.ReadLine()) != null)
+            {
+                string kind = line.Substring(0, Mathf.Min(6, line.Length));
+
+                if (kind == "ATOM  ")
+                {
+                    pdb_temp = string.Concat(pdb_temp,
+                        Environment.NewLine,
+                        string.Concat(line.Substring(0, 30),
+                        string.Concat(
+                            string.Concat((float.Parse(line.Substring(30, 8)) * -1) < 0 ? "-" : " ", Math.Abs(float.Parse(line.Substring(30, 8))).ToString("000.000")),
+                            string.Concat((float.Parse(line.Substring(38, 8)) * -1) < 0 ? "-" : " ", Math.Abs(float.Parse(line.Substring(38, 8))).ToString("000.000")),
+                            string.Concat((float.Parse(line.Substring(46, 8)) * -1) < 0 ? "-" : " ", Math.Abs(float.Parse(line.Substring(46, 8))).ToString("000.000"))
+                            ),
+                        line.Substring(54, line.Length - 54)));
+                }
+            }
+        }
+        pdb_complex = pdb_file = pdb_temp;
+        pdb_custom_complex_name = pdb_complex.Substring(15, 9);
+        pdb_id_complex.text = pdb_custom_complex_name;
+        gm.pdb_custom_complex_name = pdb_custom_complex_name;
+        StartCoroutine(upload_file_temp());
+    }
+
+    IEnumerator upload_file_temp()
+    {
+        //GET THE ID OF EACH FILE
+        string file_name = "test.pdb";
+        byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_complex);
+        WWWForm form = new WWWForm();
+        form.AddField("file", "file");
+        form.AddBinaryData("file", file_pdb_bytes, file_name);
+
+        WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
+
+        yield return w;
+
+        Debug.Log(w.error);
+
+        // GetComponent<GameManager>().Custom_ChangeLevel();
+    }
 }
