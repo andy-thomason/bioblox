@@ -281,25 +281,27 @@ public class BioBlox : MonoBehaviour
     public GameObject overlaping_r_h;
     public GameObject overlaping_l_h;
 
+    public bool exhibition = false;
+
 
     void Awake()
     {
         ////creatt ehe sene manager to keep track of the level
-        //if (GameObject.FindGameObjectWithTag("GameManager") == null)
-        //{
-        //    Instantiate(GameManager_object);
-        //}
-
+        if (exhibition)
+        {
+            if (GameObject.FindGameObjectWithTag("GameManager") == null)
+            {
+                GameObject temp = Instantiate(GameManager_object);
+                temp.GetComponent<GameManager>().current_level = 0;
+                temp.GetComponent<LevelSelectionController>().enabled = false;
+            }
+        }
         gm = FindObjectOfType<GameManager>();
     }
 
     // Use this for initialization
     void Start()
     {
-#if UNITY_WEBGL
-        Application.targetFrameRate = -1;
-#endif
-
 
         game_status = GameStatus.MainScreen;
         uiController = FindObjectOfType<UIController>();
@@ -349,6 +351,16 @@ public class BioBlox : MonoBehaviour
 
         StartGame();
 
+        if(exhibition)
+        {
+            toggle_renders();
+            gm.is_game_mode = true;
+            FindObjectOfType<GameMode>().switch_mode(true);
+            menu_normal.SetActive(false);
+            menu_normal_expo.SetActive(true);
+        }
+
+        FindObjectOfType<SetHeight>().set_height();
         //if (current_level != -1)
     }
 
@@ -563,6 +575,12 @@ public class BioBlox : MonoBehaviour
 
             //if (ToggleMode.isOn && uiController.MainCanvas.GetComponent<CanvasGroup>().alpha == 1)
             //    UpdateHint();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            toggle_renders();
+            Debug.Log("sisisisis");
         }
 
         if (is_hint_moving)
@@ -2588,6 +2606,38 @@ public class BioBlox : MonoBehaviour
             }
         }
     }
+
+    public void set_up_vr()
+    {
+        molecules_PDB_mesh[0].set_up_vr();
+        molecules_PDB_mesh[1].set_up_vr();
+    }
+
+    public bool renders_enable = true;
+
+    void toggle_renders()
+    {
+        renders_enable = !renders_enable;
+
+        if(!renders_enable)
+        {
+            molecules[0].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+            molecules[0].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+            molecules[0].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+            molecules[0].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+            molecules[0].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+
+            molecules[1].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
+            molecules[1].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
+            molecules[1].transform.GetChild(0).transform.GetChild(2).gameObject.SetActive(false);
+            molecules[1].transform.GetChild(0).transform.GetChild(3).gameObject.SetActive(false);
+            molecules[1].transform.GetChild(0).transform.GetChild(4).gameObject.SetActive(true);
+        }
+
+    }
+
+    public GameObject menu_normal;
+    public GameObject menu_normal_expo;
 
 }
 

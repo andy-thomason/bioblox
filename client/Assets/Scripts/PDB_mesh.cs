@@ -42,6 +42,10 @@ public class PDB_mesh : MonoBehaviour
         meshes = GetComponentsInChildren<MeshRenderer>();
         sfx = FindObjectOfType<SFX>();
         or = FindObjectOfType<OverlayRenderer>();
+    }
+
+    public void set_up_vr()
+    {
         VR_right_controller = GameObject.FindGameObjectWithTag("VR_C_R").transform;
         if (GameObject.FindGameObjectWithTag("VR_C_R").transform == null)
             Debug.Log("no esta");
@@ -53,6 +57,7 @@ public class PDB_mesh : MonoBehaviour
         {
             Debug.Log("amino_text not found");
         }
+
     }
 
     public void AlignPointToVector(Vector3 point, Vector3 targetDir)

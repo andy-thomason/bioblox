@@ -46,6 +46,7 @@ public class VRGrabObject : MonoBehaviour
     {
         //protein_0 = bb.molecules[0].GetComponent<Rigidbody>();
         //protein_1 = bb.molecules[1].GetComponent<Rigidbody>();
+        bb.set_up_vr();
     }
 
     private void SetCollidingObject(Collider col)
@@ -100,6 +101,14 @@ public class VRGrabObject : MonoBehaviour
         joint.connectedBody = bb.molecules[1].GetComponent<Rigidbody>();
     }
 
+    private void GrabObject()
+    {
+        //collidingObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        //collidingObject.GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        var joint = AddFixedJoint();
+        joint.connectedBody = collidingObject.GetComponent<Rigidbody>();
+    }
+
     // 3
     private FixedJoint AddFixedJoint()
     {
@@ -115,7 +124,7 @@ public class VRGrabObject : MonoBehaviour
         {
             GetComponent<FixedJoint>().connectedBody = null;
             Destroy(GetComponent<FixedJoint>());
-            bb.molecules[0].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
+            //bb.molecules[0].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
         }
     }
 
@@ -125,7 +134,7 @@ public class VRGrabObject : MonoBehaviour
         {
             GetComponent<FixedJoint>().connectedBody = null;
             Destroy(GetComponent<FixedJoint>());
-            bb.molecules[1].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
+            //bb.molecules[1].GetComponent<Rigidbody>().velocity = Controller.velocity * 100;
         }
     }
 
@@ -135,20 +144,22 @@ public class VRGrabObject : MonoBehaviour
         if(!g_mo.game_over)
         {
             // press trigger
-            if (Controller.GetHairTriggerDown())
+            if (Controller.GetHairTriggerDown() && collidingObject)
             {
                 sfx.PlayTrack(SFX.sound_index.protein_pick);
                 //izq 3 der 2
-                if (Controller.index == index_left_hand)
-                {
-                    StartCoroutine(scale_protein_0());
-                    GrabObject_0();
-                }
-                else
-                {
-                    StartCoroutine(scale_protein_1());
-                    GrabObject_1();
-                }
+                //if (Controller.index == index_left_hand)
+                //{
+                //    StartCoroutine(scale_protein_0());
+                //    GrabObject_0();
+                //}
+                //else
+                //{
+                //    StartCoroutine(scale_protein_1());
+                //    GrabObject_1();
+                //}
+               // StartCoroutine(collidingObject.GetComponent<PDB_mesh>().protein_id == 0 ? scale_protein_0() : scale_protein_1());
+                GrabObject();
             }
 
             // release trigger
@@ -188,7 +199,7 @@ public class VRGrabObject : MonoBehaviour
 
             if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
             {
-                if (Controller.GetAxis().x > 0.6f)
+                if (Controller.GetAxis().x > 0.6f && bb.renders_enable)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     if (Controller.index == index_left_hand)
@@ -196,7 +207,7 @@ public class VRGrabObject : MonoBehaviour
                     else
                         bb.ChangeProteinRenderer_forward(1);
                 }
-                else if(Controller.GetAxis().x < -0.6f)
+                else if(Controller.GetAxis().x < -0.6f && bb.renders_enable)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     if (Controller.index == index_left_hand)
@@ -228,8 +239,18 @@ public class VRGrabObject : MonoBehaviour
                 //    bb.Molecules.transform.Rotate(Controller.angularVelocity);
                 //}
         }
+        else
+        {
+
+        }
+        if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu))
+        {
+            FindObjectOfType<BioBlox>().restart_position();
+            FindObjectOfType<GameMode>().restart();
+            FindObjectOfType<SetHeight>().set_height();
+        }
         //game_mode
-        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) && !cambio && Controller.index == index_right_hand)
+        if (Controller.GetPress(SteamVR_Controller.ButtonMask.Grip) && !cambio && Controller.index == index_right_hand && !bb.exhibition)
         {
             timer_for_game_mode += Time.deltaTime;
 

@@ -114,7 +114,7 @@ public class GameMode : MonoBehaviour {
     {
         sfx.Mute_Track(SFX.sound_index.warning, true);
         win = true;
-        timer_text.gameObject.SetActive(false);
+        //timer_text.gameObject.SetActive(false);
         menu.SetActive(false);
         win_object.SetActive(true);
         sfx.PlayTrack(SFX.sound_index.well_done);
