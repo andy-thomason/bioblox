@@ -26,6 +26,7 @@ public class GameManager : MonoBehaviour {
     public Image game_mode_image;
     public Color default_background_color;
 
+
     public bool is_game_mode = false;
 
     void Awake()
