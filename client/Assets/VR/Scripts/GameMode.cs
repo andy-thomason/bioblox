@@ -21,6 +21,8 @@ public class GameMode : MonoBehaviour {
     public GameObject win_object;
     float timer_win = 0;
     bool timer_win_condition = false;
+    public GameObject video_tuto;
+    public MovieTexture video_tuto_texture;
 
     // Use this for initialization
     void Start ()
@@ -35,12 +37,14 @@ public class GameMode : MonoBehaviour {
             game_play_time = set_game_play_time;
             timer_text.gameObject.SetActive(true);
         }
+
+        video_tuto_texture = ((MovieTexture)video_tuto.GetComponent<RawImage>().mainTexture);
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        if(gm.is_game_mode && !game_over && !win)
+        if(gm.is_game_mode && !game_over && !win && !bb.renders_enable)
         {
             game_play_time -= Time.deltaTime;
             string minutes = Mathf.Floor(game_play_time / 60).ToString("00");
@@ -121,14 +125,40 @@ public class GameMode : MonoBehaviour {
         bb.overlaping_r_h.active = bb.overlaping_l_h.active = false;
     }
 
+    public void play_video_tutorial()
+    {
+        StopCoroutine(wait_for_video_to_end_to_start_game());
+
+        timer_text.gameObject.SetActive(false);
+
+        bb.molecules_PDB_mesh[0].DeselectAminoAcid();
+        bb.molecules_PDB_mesh[1].DeselectAminoAcid();
+
+        win_object.SetActive(false);
+        bb.Molecules.gameObject.SetActive(false);
+        lost_object.SetActive(false);
+
+        video_tuto.SetActive(true);
+        video_tuto_texture.Stop();
+        video_tuto_texture.Play();
+        StartCoroutine(wait_for_video_to_end_to_start_game());
+    }
+
+    IEnumerator wait_for_video_to_end_to_start_game()
+    {
+        yield return new WaitForSeconds(16);
+        video_tuto.SetActive(false);
+        timer_text.gameObject.SetActive(true);
+        restart();
+    }
 
     public void restart()
     {
-        timer_text.gameObject.SetActive(true);
+        // timer_text.gameObject.SetActive(true);
         win_object.SetActive(false);
         bb.Molecules.gameObject.SetActive(true);
         lost_object.SetActive(false);
-        menu.SetActive(true);
+        //menu.SetActive(true);
         bb.restart_position();
         game_play_time = set_game_play_time;
         game_over = false;

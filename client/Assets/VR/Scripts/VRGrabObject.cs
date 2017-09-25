@@ -197,9 +197,9 @@ public class VRGrabObject : MonoBehaviour
             //    }
             //}
 
-            if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+            if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && bb.renders_enable)
             {
-                if (Controller.GetAxis().x > 0.6f && bb.renders_enable)
+                if (Controller.GetAxis().x > 0.6f)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     if (Controller.index == index_left_hand)
@@ -207,7 +207,7 @@ public class VRGrabObject : MonoBehaviour
                     else
                         bb.ChangeProteinRenderer_forward(1);
                 }
-                else if(Controller.GetAxis().x < -0.6f && bb.renders_enable)
+                else if(Controller.GetAxis().x < -0.6f)
                 {
                     sfx.PlayTrack(SFX.sound_index.amino_click);
                     if (Controller.index == index_left_hand)
@@ -245,8 +245,10 @@ public class VRGrabObject : MonoBehaviour
         }
         if (Controller.GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu))
         {
-            FindObjectOfType<BioBlox>().restart_position();
-            FindObjectOfType<GameMode>().restart();
+            if (!bb.renders_enable)
+                FindObjectOfType<GameMode>().play_video_tutorial();
+            else
+                FindObjectOfType<GameMode>().restart();
             FindObjectOfType<SetHeight>().set_height();
         }
         //game_mode

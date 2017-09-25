@@ -282,6 +282,7 @@ public class BioBlox : MonoBehaviour
     public GameObject overlaping_l_h;
 
     public bool exhibition = false;
+    GameMode gmo;
 
 
     void Awake()
@@ -297,6 +298,7 @@ public class BioBlox : MonoBehaviour
             }
         }
         gm = FindObjectOfType<GameManager>();
+        gmo = FindObjectOfType<GameMode>();
     }
 
     // Use this for initialization
@@ -357,7 +359,7 @@ public class BioBlox : MonoBehaviour
             gm.is_game_mode = true;
             FindObjectOfType<GameMode>().switch_mode(true);
             menu_normal.SetActive(false);
-            menu_normal_expo.SetActive(true);
+            //menu_normal_expo.SetActive(true);
         }
 
         FindObjectOfType<SetHeight>().set_height();
@@ -580,7 +582,6 @@ public class BioBlox : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             toggle_renders();
-            Debug.Log("sisisisis");
         }
 
         if (is_hint_moving)
@@ -2618,8 +2619,9 @@ public class BioBlox : MonoBehaviour
     void toggle_renders()
     {
         renders_enable = !renders_enable;
+        gmo.timer_text.gameObject.SetActive(!renders_enable);
 
-        if(!renders_enable)
+        if (!renders_enable)
         {
             molecules[0].transform.GetChild(0).transform.GetChild(0).gameObject.SetActive(false);
             molecules[0].transform.GetChild(0).transform.GetChild(1).gameObject.SetActive(false);
