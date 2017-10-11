@@ -1897,12 +1897,12 @@ public class BioBlox : MonoBehaviour
         // Make two PDB_mesh instances from the PDB file and a chain selection.
         mol1 = make_molecule(level.pdbFile + "." + level.chainsA, "Proto1", 7, MeshTopology.Triangles, 0);
         mol1.AddComponent<SphereCollider>();
-        mol1.GetComponent<SphereCollider>().radius = 15.0f;
+        mol1.GetComponent<SphereCollider>().radius = 22.5f;
         mol1.GetComponent<SphereCollider>().isTrigger = true;
         mol1.transform.SetParent(Molecules);
         mol2 = make_molecule(level.pdbFile + "." + level.chainsB, "Proto2", 7, MeshTopology.Triangles, 1);
         mol2.AddComponent<SphereCollider>();
-        mol2.GetComponent<SphereCollider>().radius = 15.0f;
+        mol2.GetComponent<SphereCollider>().radius = 18.0f;
         mol2.GetComponent<SphereCollider>().isTrigger = true;
         mol2.transform.SetParent(Molecules);
 

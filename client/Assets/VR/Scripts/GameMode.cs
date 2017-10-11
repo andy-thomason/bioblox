@@ -116,6 +116,13 @@ public class GameMode : MonoBehaviour {
 
     void win_call()
     {
+        game_play_time -= 120f;
+        game_play_time *= -1;
+        //string minutes = Mathf.Floor(game_play_time / 60).ToString("00");
+        //string seconds = Mathf.Floor(game_play_time % 60).ToString("00");
+        timer_text.text = game_play_time.ToString("F2");
+        //Debug.Log(game_play_time);
+
         sfx.Mute_Track(SFX.sound_index.warning, true);
         win = true;
         //timer_text.gameObject.SetActive(false);
@@ -127,9 +134,10 @@ public class GameMode : MonoBehaviour {
 
     public void play_video_tutorial()
     {
-        StopCoroutine(wait_for_video_to_end_to_start_game());
+        StopAllCoroutines();
 
         timer_text.gameObject.SetActive(false);
+        bb.restart_position();
 
         bb.molecules_PDB_mesh[0].DeselectAminoAcid();
         bb.molecules_PDB_mesh[1].DeselectAminoAcid();
@@ -146,7 +154,7 @@ public class GameMode : MonoBehaviour {
 
     IEnumerator wait_for_video_to_end_to_start_game()
     {
-        yield return new WaitForSeconds(16);
+        yield return new WaitForSeconds(20);
         video_tuto.SetActive(false);
         timer_text.gameObject.SetActive(true);
         restart();
@@ -159,9 +167,7 @@ public class GameMode : MonoBehaviour {
         bb.Molecules.gameObject.SetActive(true);
         lost_object.SetActive(false);
         //menu.SetActive(true);
-        bb.restart_position();
         game_play_time = set_game_play_time;
-        game_over = false;
-        win = false;
+        game_over = timer_win_condition = win = false;
     }
 }
