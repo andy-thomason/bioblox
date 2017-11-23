@@ -22,6 +22,7 @@ public class PDBCustom : MonoBehaviour {
     Stream stream;
     GameManager gm;
     BioBlox bb;
+    UIController ui;
 
     public string pdb_1_temp;
     public string pdb_2_temp;
@@ -45,6 +46,7 @@ public class PDBCustom : MonoBehaviour {
     void Start ()
     {
         gm = GetComponent<GameManager>();
+        ui = FindObjectOfType<UIController>();
     }
 	
 	// Update is called once per frame
@@ -351,9 +353,13 @@ public class PDBCustom : MonoBehaviour {
     }
 
 
+    string upload_url = "http://13.58.210.151/upload_file.php";
+    string file_name;
+
     //FUCTNION TO LOAD ALL THE COORDINATE OF ATOMS
-    public IEnumerator save_user_file()
+    public IEnumerator save_user_file(string user_email_temp)
     {
+        user_email = user_email_temp;
         //using (WWW www = new WWW("http://13.58.210.151/bb_data/2P2P-TCTC.pdb"))
         //{
         //    yield return www;
@@ -407,18 +413,19 @@ public class PDBCustom : MonoBehaviour {
         //Debug.Log("cacacaaca");
 
         //GET THE ID OF EACH FILE
-        string file_name = string.Concat(gm.pdb_custom_1_name, "-", gm.pdb_custom_2_name, ".", DateTime.Now.Day, ".", DateTime.Now.Month, ".", DateTime.Now.Year, ".", DateTime.Now.Hour, ".", DateTime.Now.Minute, ".", DateTime.Now.Second, ".", DateTime.Now.Millisecond, ".pdb");
+        file_name = string.Concat(gm.pdb_custom_1_name, "-", gm.pdb_custom_2_name, ".", DateTime.Now.Day.ToString("d2"), ".", DateTime.Now.Month.ToString("d2"), ".", DateTime.Now.Year.ToString("d2"), ".", DateTime.Now.Hour.ToString("d2"), ".", DateTime.Now.Minute.ToString("d2"), ".", DateTime.Now.Second.ToString("d2"), ".", DateTime.Now.Millisecond.ToString("d2"));
         byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_temp);
         WWWForm form = new WWWForm();
         form.AddField("file", "file");
-        form.AddBinaryData("file", file_pdb_bytes, file_name);
+        form.AddBinaryData("file", file_pdb_bytes, string.Concat(file_name,".pdb"));
         Debug.Log(file_name);
-        WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
+        WWW w = new WWW(upload_url, form);
 
         yield return w;
 
         Debug.Log(w.error);
-        download_file(file_name);
+        StartCoroutine(upload_game_image());
+        //download_file(file_name);
     }
 
     public GameObject atom_temp;
@@ -503,12 +510,74 @@ public class PDBCustom : MonoBehaviour {
         form.AddField("file", "file");
         form.AddBinaryData("file", file_pdb_bytes, file_name);
 
-        WWW w = new WWW("http://13.58.210.151/upload_file.php", form);
+        WWW w = new WWW(upload_url, form);
 
         yield return w;
 
         Debug.Log(w.error);
 
         // GetComponent<GameManager>().Custom_ChangeLevel();
+    }
+
+    string user_email;
+
+   IEnumerator send_email()
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("email", user_email);
+        form.AddField("date", string.Concat(DateTime.Now.Day.ToString("d2"), "/", DateTime.Now.Month.ToString("d2"), "/", DateTime.Now.Year.ToString("d2")));
+        form.AddField("date_content", string.Concat(DateTime.Now.Day.ToString("d2"), "/", DateTime.Now.Month.ToString("d2"), "/", DateTime.Now.Year.ToString("d2"), " ", DateTime.Now.Hour.ToString("d2"), ":", DateTime.Now.Minute.ToString("d2"), ":", DateTime.Now.Second.ToString("d2")));
+        form.AddField("name_file", file_name);
+        WWW SQLQuery = new WWW("http://bioblox.org/php/send_email.php", form);
+        yield return SQLQuery;
+    }
+
+    //public void upload_image_button()
+    //{
+    //    StartCoroutine(UploadPNG());
+    //}
+
+    IEnumerator upload_game_image()
+    {
+        // We should only read the screen after all rendering is complete
+        yield return new WaitForEndOfFrame();
+
+        // Create a texture the size of the screen, RGB24 format
+        int width = Screen.width;
+        int height = Screen.height;
+        var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+
+        // Read screen contents into the texture
+        tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        tex.Apply();
+
+        // Encode texture into PNG
+        byte[] bytes = tex.EncodeToJPG();
+        Destroy(tex);
+
+        //string file_name = string.Concat(gm.pdb_custom_1_name, "-", gm.pdb_custom_2_name, ".", DateTime.Now.Day, ".", DateTime.Now.Month, ".", DateTime.Now.Year, ".", DateTime.Now.Hour, ".", DateTime.Now.Minute, ".", DateTime.Now.Second, ".", DateTime.Now.Millisecond, ".pdb");
+        //byte[] file_pdb_bytes = System.Text.Encoding.UTF8.GetBytes(pdb_temp);
+        //WWWForm form = new WWWForm();
+        //form.AddField("file", "file");
+        //form.AddBinaryData("file", file_pdb_bytes, file_name);
+        //Debug.Log(file_name);
+        //WWW w = new WWW(upload_url, form);
+
+        // Create a Web Form
+        WWWForm form = new WWWForm();
+        form.AddField("frameCount", Time.frameCount.ToString());
+        form.AddBinaryData("file", bytes, string.Concat(file_name, ".jpg"), "image/jpg");
+
+        // Upload to a cgi script
+        WWW w = new WWW(upload_url, form);
+        yield return w;
+        if (!string.IsNullOrEmpty(w.error))
+        {
+            print(w.error);
+        }
+        else
+        {
+            StartCoroutine(send_email());
+        }
     }
 }

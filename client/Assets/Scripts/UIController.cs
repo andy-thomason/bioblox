@@ -56,6 +56,7 @@ public class UIController : MonoBehaviour {
 
     AminoSliderController aminoSliderController;
     BioBlox BioBloxReference;
+    PDBCustom pdbc;
 
 	public Toggle[] ToggleButtonFunctionsView;
     Camera MainCameraComponent;
@@ -189,6 +190,8 @@ public class UIController : MonoBehaviour {
 
     CUIColorPicker cui;
 
+    public Text user_email;
+
     void Awake()
 	{
 		aminoSliderController = FindObjectOfType<AminoSliderController> ();
@@ -202,6 +205,7 @@ public class UIController : MonoBehaviour {
         cm = FindObjectOfType<ConnectionManager>();
         gm = FindObjectOfType<GameManager>();
         cui = FindObjectOfType<CUIColorPicker>();
+        pdbc = FindObjectOfType<PDBCustom>();
 
     }
 
@@ -1106,7 +1110,7 @@ public class UIController : MonoBehaviour {
     {
         Application.OpenURL("http://bioblox.org/");
     }
-
+    
     #region
     public void StopReel()
     {
@@ -1287,6 +1291,25 @@ public class UIController : MonoBehaviour {
 
     public void write_custom_pdb()
     {
-        StartCoroutine(FindObjectOfType<PDBCustom>().save_user_file());
+        open_email_panel();
+    }
+
+    public GameObject send_email_panel;
+
+    public void send_email()
+    {
+        StartCoroutine(pdbc.save_user_file(user_email.text));
+        close_email_panel();
+    }
+
+    public void open_email_panel()
+    {
+        send_email_panel.SetActive(true);
+    }
+
+    public void close_email_panel()
+    {
+        send_email_panel.SetActive(false);
+        isOverUI = false;
     }
 }
