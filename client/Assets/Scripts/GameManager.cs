@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
             //disable ranking
             ranking_user.transform.parent.gameObject.SetActive(false);
             //if demo show leaderboard
-            load_leaderboard();
+            //load_leaderboard();
         }
     }
     
@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour {
     {
         id_user = int.Parse(FindObjectOfType<DataManager>().id_user);
         //LOAD LEAVERBOARD
-        load_leaderboard();
+        //load_leaderboard();
     }
 
     public void CloseTutorialPanel()

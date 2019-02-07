@@ -56,18 +56,18 @@ public class BioBlox : MonoBehaviour
     };
 
     public Level[] levels = {
-       new Level("2PTC", "E", "I", "1", "1", "0.2", new Vector3(0, 0, 0), 35, -90, 2),
-       new Level("4KC3", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 3),
-       new Level("1FSS", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 45, 3),
-       new Level("1EMV", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1GRN", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1ACB", "E", "I", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1ATN", "A", "D", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AVX", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1AY7", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 1),
-       new Level("1BUH", "A", "B", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1BVN", "P", "T", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2),
-       new Level("1EXB", "A", "E", "1", "1", "0.2", new Vector3(0, 0, 0), 40, 0, 2)
+       new Level("2PTC", "E", "I", "1", "2", "1", new Vector3(0, 0, 0), 35, -90, 2),
+       new Level("4KC3", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 3),
+       new Level("1FSS", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 45, 3),
+       new Level("1EMV", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1GRN", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1ACB", "E", "I", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1ATN", "A", "D", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AVX", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1AY7", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 1),
+       new Level("1BUH", "A", "B", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1BVN", "P", "T", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2),
+       new Level("1EXB", "A", "E", "1", "2", "1", new Vector3(0, 0, 0), 40, 0, 2)
     };
 
     enum protein_view { normal, transparent, bs };
@@ -990,43 +990,43 @@ public class BioBlox : MonoBehaviour
                 eventSystem.enabled = true;
 
                 //set the score from the sever
-                if (level_scores_from_server != "0")
-                {
-                    //freeze them
-                    mol1.GetComponent<Rigidbody>().isKinematic = true;
-                    mol2.GetComponent<Rigidbody>().isKinematic = true;
+                //if (level_scores_from_server != "0")
+                //{
+                //    //freeze them
+                //    mol1.GetComponent<Rigidbody>().isKinematic = true;
+                //    mol2.GetComponent<Rigidbody>().isKinematic = true;
 
-                    string[] splitLevelData = (level_scores_from_server).Split('*');
-                    //SET THE CONNECTIONS
-                    //SPLIT
-                    string[] splitScores = (splitLevelData[0]).Split('/');
+                //    string[] splitLevelData = (level_scores_from_server).Split('*');
+                //    //SET THE CONNECTIONS
+                //    //SPLIT
+                //    string[] splitScores = (splitLevelData[0]).Split('/');
 
-                    for (int i = 0; i < splitScores.Length - 1; i++)
-                    {
-                        //SPLIT each amino
-                        string[] splitScores_amino = (splitScores[i]).Split('-');
-                        string[] splitScores_amino_atoms_1 = (splitScores_amino[0]).Split(',');
-                        string[] splitScores_amino_atoms_2 = (splitScores_amino[1]).Split(',');
+                //    for (int i = 0; i < splitScores.Length - 1; i++)
+                //    {
+                //        //SPLIT each amino
+                //        string[] splitScores_amino = (splitScores[i]).Split('-');
+                //        string[] splitScores_amino_atoms_1 = (splitScores_amino[0]).Split(',');
+                //        string[] splitScores_amino_atoms_2 = (splitScores_amino[1]).Split(',');
                         
-                        aminoSlider._AminoAcidsLinkPanel(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink_atom_modification(molecules_PDB_mesh[0], int.Parse(splitScores_amino_atoms_1[0]), int.Parse(splitScores_amino_atoms_1[1]), molecules_PDB_mesh[1], int.Parse(splitScores_amino_atoms_2[0]), int.Parse(splitScores_amino_atoms_2[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino_atoms_1[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino_atoms_2[0]).gameObject);
-                    }
+                //        aminoSlider._AminoAcidsLinkPanel(gameObject.GetComponent<ConnectionManager>().CreateAminoAcidLink_atom_modification(molecules_PDB_mesh[0], int.Parse(splitScores_amino_atoms_1[0]), int.Parse(splitScores_amino_atoms_1[1]), molecules_PDB_mesh[1], int.Parse(splitScores_amino_atoms_2[0]), int.Parse(splitScores_amino_atoms_2[1])), aminoSlider.SliderMol[0].transform.Find(splitScores_amino_atoms_1[0]).gameObject, aminoSlider.SliderMol[1].transform.Find(splitScores_amino_atoms_2[0]).gameObject);
+                //    }
 
-                    //SET THE ROTATION
-                    molecules[0].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[2]));
-                    molecules[1].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[2]));
-                    //SET THE POSOTION
-                    molecules[0].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
-                    molecules[1].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
+                //    //SET THE ROTATION
+                //    molecules[0].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[0]).Split(',')[2]));
+                //    molecules[1].transform.eulerAngles = new Vector3(float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[2].Split('/')[1]).Split(',')[2]));
+                //    //SET THE POSOTION
+                //    molecules[0].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[0]).Split(',')[2]));
+                //    molecules[1].transform.localPosition = new Vector3(float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[0]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[1]), float.Parse((splitLevelData[1].Split('/')[1]).Split(',')[2]));
 
-                    gameObject.GetComponent<ConnectionManager>().SliderStrings.interactable = true;
-                    gameObject.GetComponent<ConnectionManager>().SliderStrings.value = float.Parse(splitLevelData[3]);
-                    sfx.StopTrack(SFX.sound_index.string_reel_out);
+                //    gameObject.GetComponent<ConnectionManager>().SliderStrings.interactable = true;
+                //    gameObject.GetComponent<ConnectionManager>().SliderStrings.value = float.Parse(splitLevelData[3]);
+                //    sfx.StopTrack(SFX.sound_index.string_reel_out);
 
-                    //unfreeze them
-                    yield return new WaitForSeconds(1.0f);
-                    mol1.GetComponent<Rigidbody>().isKinematic = false;
-                    mol2.GetComponent<Rigidbody>().isKinematic = false;
-                }
+                //    //unfreeze them
+                //    yield return new WaitForSeconds(1.0f);
+                //    mol1.GetComponent<Rigidbody>().isKinematic = false;
+                //    mol2.GetComponent<Rigidbody>().isKinematic = false;
+                //}
 
                 gm.EndLoading();
 
@@ -1808,22 +1808,26 @@ public class BioBlox : MonoBehaviour
         level = levels[current_level];
 
 #if UNITY_WEBGL
-        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWebGL/" + level.pdbFile.ToLower();
+        string BundleURL = "http://igor.gold.ac.uk/bioblox/pdb/bundle/" + level.pdbFile.ToLower();
 #endif
 
 #if UNITY_STANDALONE
-        string BundleURL = "https://bioblox3d.org/wp-content/themes/write/game_data/Asset/AssetBundlesWindows/" + level.pdbFile.ToLower();
+        string BundleURL = "http://igor.gold.ac.uk/bioblox/pdb/bundle/" + level.pdbFile.ToLower();
 #endif
 
         // These filenames refer to the fbx in the asset bundle in the server
-        mol1_se_filename = level.pdbFile + "_" + level.chainsA + "_se_" + level.lod + ".bytes";
-        mol2_se_filename = level.pdbFile + "_" + level.chainsB + "_se_" + level.lod + ".bytes";
-        mol1_bs_filename = level.pdbFile + "_" + level.chainsA + "_bs_" + level.lod_bs + ".bytes";
-        mol2_bs_filename = level.pdbFile + "_" + level.chainsB + "_bs_" + level.lod_bs + ".bytes";
-        mol1_ca_filename = level.pdbFile + "_" + level.chainsA + "_ca_" + level.lod_bs + ".bytes";
-        mol2_ca_filename = level.pdbFile + "_" + level.chainsB + "_ca_" + level.lod_bs + ".bytes";
-        mol1_vr_filename = level.pdbFile + "_" + level.chainsA + "_vr_" + level.lod_vr + ".bytes";
-        mol2_vr_filename = level.pdbFile + "_" + level.chainsB + "_vr_" + level.lod_vr + ".bytes";
+        mol1_se_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsA.ToLower() + "_se_" + level.lod + ".bytes";
+        mol2_se_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsB.ToLower() + "_se_" + level.lod + ".bytes";
+        mol1_bs_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsA.ToLower() + "_bs_" + level.lod_bs + ".bytes";
+        mol2_bs_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsB.ToLower() + "_bs_" + level.lod_bs + ".bytes";
+        mol1_ca_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsA.ToLower() + "_ca_" + level.lod_bs + ".bytes";
+        mol2_ca_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsB.ToLower() + "_ca_" + level.lod_bs + ".bytes";
+        mol1_vr_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsA.ToLower() + "_vr_" + level.lod_vr + ".bytes";
+        mol2_vr_filename = "assets/ply/" + level.pdbFile.ToLower() + "_" + level.chainsB.ToLower() + "_vr_" + level.lod_vr + ".bytes";
+
+        Debug.Log(mol1_bs_filename);
+        //mol1_vr_filename = "assets/ply/" + level.pdbFile + "_" + level.chainsA + "_vr_" + level.lod_vr + ".bytes";
+        //mol2_vr_filename = "assets/ply/" + level.pdbFile + "_" + level.chainsB + "_vr_" + level.lod_vr + ".bytes";
 
         using (WWW www = new WWW(BundleURL))
         {
@@ -1845,8 +1849,7 @@ public class BioBlox : MonoBehaviour
 
             bundle.Unload(false);
         }
-
-        using (WWW www = new WWW("https://bioblox3d.org/wp-content/themes/write/game_data/pdb/" + level.pdbFile + ".txt"))
+        using (WWW www = new WWW("http://igor.gold.ac.uk/bioblox/pdb/" + level.pdbFile + ".txt"))
         { 
             yield return www;
 
